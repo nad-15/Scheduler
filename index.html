@@ -3,20 +3,40 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drag and Drop Copy</title>
+    <meta name="viewport" content="width=device-width, initial-scale= 1.0">
+    <title>Scheduler</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="flex-container" id="source-container">
-        <div class="flex-item" draggable="true" id="item1">1</div>
-        <div class="flex-item" draggable="true" id="item2">2</div>
-        <div class="flex-item" draggable="true" id="item3">3</div>
-    </div>
+    <div class="container" id="main-container">
+        <div class="menu-container">
+            <div class="hamburger-menu">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <header id="main-header">
+                <h1 id="app-title">Skhayeduler</h1>
+            </header>
+        </div>
 
-    <h2>Drop Items Here:</h2>
-    <div class="flex-container" id="target-container"></div>
+        <div class="month-name-container">
+            <div class="navi-button">
+                <button class="buttons" id="button-prev-month">&lt</button>
+                        <button class="buttons" id="button-next-month">&gt</button>
+            </div>
+            <h2>February</h2>
+            <button class="buttons" id="add-task">+</button>
+        </div>
+        <main>
+
+
+
+
+            <footer></footer>
+        </main>
+    </div>
 
     <script src="script.js"></script>
 </body>
