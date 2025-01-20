@@ -77,6 +77,23 @@ h2 {
     text-align: center;
 }
 
+#date-container {
+    border: 1px solid violet;
+    display: flex;
+    flex-wrap: no-wrap; 
+    flex-direction: column;
+    max-height: 200vh; 
+    width: 100%; 
+    /* margin: 0 auto;  */
+    /* overflow: hidden; */
+}
+
+#date-container div {
+background-color: aquamarine;
+margin: 1px;
+}
+
+
 @media screen and (min-width: 1024px) {
 
     #main-container {
