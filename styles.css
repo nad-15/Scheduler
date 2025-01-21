@@ -13,7 +13,7 @@ body {
 }
 
 #main-container {
-    background-color: rgb(245, 218, 220);
+    background-color: white;
     box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
     height: 100vh;
     width: 100%;
@@ -28,7 +28,8 @@ body {
     align-items: center;
     background-color: rgb(235, 160, 160);
     margin: 0;
-    padding: 4px 2px 4px 2px;
+    font-size: 16px;
+    padding: 2px 1px 2px 1px;
     /* padding: 10px; */
 }
 
@@ -58,11 +59,12 @@ h1 {
     box-sizing: border-box;
     display: flex;
     margin: 0;
+    font-size: 12px;
     justify-content: space-between;
     align-items: center;
     /* margin: 0 12px; */
     padding: 8px 15px 8px 15px;
-    background-color: white;
+    background-color: rgb(238, 198, 198);
 }
 
 .buttons {
@@ -95,8 +97,8 @@ h2 {
 }
 
 #date-container div {
-    border: .5px solid grey;
-    background-color: rgb(215, 224, 221);
+    border: .3px solid grey;
+    background-color: white;
     /* margin: 1px; */
 }
 
