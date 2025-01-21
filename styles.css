@@ -78,19 +78,26 @@ h2 {
 }
 
 #date-container {
-    border: 1px solid violet;
+    box-sizing: border-box;
     display: flex;
-    flex-wrap: no-wrap; 
+    flex-wrap: no-wrap;
     flex-direction: column;
-    max-height: 200vh; 
-    width: 100%; 
+    /* max-height: 100vh;  */
+    width: 100%;
+    flex-shrink: 1;
+    flex-grow: 1;
+    font-size: 12px;
+    gap: 0;
+    padding-left: 8px;
+    padding-right: 8px;
     /* margin: 0 auto;  */
     /* overflow: hidden; */
 }
 
 #date-container div {
-background-color: aquamarine;
-margin: 1px;
+    border: .5px solid grey;
+    background-color: rgb(215, 224, 221);
+    /* margin: 1px; */
 }
 
 
@@ -100,6 +107,6 @@ margin: 1px;
         width: 60%;
     }
 
-    
+
 
 }
