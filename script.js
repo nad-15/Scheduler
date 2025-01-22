@@ -25,11 +25,11 @@ function addDays(date = "1", day = "Sun", morningTask = "", afternoonTask = "", 
         dayContainer.classList.add('day-container');
 
         const dateDiv = document.createElement('div');
-        dateDiv = classList.add('date');
+        dateDiv.classList.add('date');
         dateDiv.textContent = date;
 
-        const dayDiv = createElement('div');
-        dayDiv = classList.add('day');
+        const dayDiv = document.createElement('div');
+        dayDiv.classList.add('day');
         dayDiv.textContent = day;
 
         const morningTaskDiv = document.createElement('div');
@@ -38,11 +38,11 @@ function addDays(date = "1", day = "Sun", morningTask = "", afternoonTask = "", 
 
         const afternoonTaskDiv = document.createElement('div');
         afternoonTaskDiv.classList.add('afternoon');
-        afternoonTaskDiv.textContent = morningTask;
+        afternoonTaskDiv.textContent = afternoonTask;
 
         const eveningTaskDiv = document.createElement('div');
         eveningTaskDiv.classList.add('evening');
-        eveningTaskDiv.textContent = morningTask;
+        eveningTaskDiv.textContent = eveningTask;
 
 
         dayContainer.appendChild(dateDiv);
@@ -55,4 +55,4 @@ function addDays(date = "1", day = "Sun", morningTask = "", afternoonTask = "", 
 
     }
 }
-
+addDays();
