@@ -87,7 +87,8 @@ h1 {
     background-color: #f1f1f1;
     border: none;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 18px;
+    font-weight: bold;
 }
 
 h2 {
