@@ -132,8 +132,9 @@ h2 {
 .day {
     flex: 1;
     border: .5px solid #ccc;
-    background-color: aqua;
+    /* background-color: aqua; */
     text-align: center;
+    font-size: 12px;
 
 }
 

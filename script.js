@@ -13,46 +13,68 @@ console.log(date);
 console.log(month);
 console.log(year);
 
-const currentCalendarDate = new Date(year, month + 2, 0);
-const firstDayOfMonth = currentCalendarDate.getDate();
+const currentCalendarDate = new Date(year, month, 1);
+let firstDayOfMonth = currentCalendarDate.getDay();
 
 console.log(firstDayOfMonth);
 
-function addDays(date = "1", day = "Sun", morningTask = "", afternoonTask = "", eveningTask = "") {
+function getDayName(value) {
 
-    for (i = 1; i < 30; i++) {
-        const dayContainer = document.createElement('div');
-        dayContainer.classList.add('day-container');
-
-        const dateDiv = document.createElement('div');
-        dateDiv.classList.add('date');
-        dateDiv.textContent = date;
-
-        const dayDiv = document.createElement('div');
-        dayDiv.classList.add('day');
-        dayDiv.textContent = day;
-
-        const morningTaskDiv = document.createElement('div');
-        morningTaskDiv.classList.add('morning');
-        morningTaskDiv.textContent = morningTask;
-
-        const afternoonTaskDiv = document.createElement('div');
-        afternoonTaskDiv.classList.add('afternoon');
-        afternoonTaskDiv.textContent = afternoonTask;
-
-        const eveningTaskDiv = document.createElement('div');
-        eveningTaskDiv.classList.add('evening');
-        eveningTaskDiv.textContent = eveningTask;
-
-
-        dayContainer.appendChild(dateDiv);
-        dayContainer.appendChild(dayDiv);
-        dayContainer.appendChild(morningTaskDiv);
-        dayContainer.appendChild(afternoonTaskDiv);
-        dayContainer.appendChild(eveningTaskDiv);
-
-        monthContainer.appendChild(dayContainer);
-
+    console.log(`value is ${firstDayOfMonth}`);
+    switch(value) {
+        case 0: return "Sun";
+        case 1: return "Mon";
+        case 2: return "Tue";
+        case 3: return "Wed";
+        case 4: return "Thu";
+        case 5: return "Fri";
+        case 6: return "Sat";
+        default: return "Invalid";
     }
+
+    console.log(`value is ${firstDayOfMonth}`);
 }
-addDays();
+
+    function addDays(date = "1", day = getDayName(firstDayOfMonth%7), morningTask = "", afternoonTask = "", eveningTask = "") {
+
+
+        for (i = 1; i < 30; i++) {
+            const dayContainer = document.createElement('div');
+            dayContainer.classList.add('day-container');
+
+            const dateDiv = document.createElement('div');
+            dateDiv.classList.add('date');
+            dateDiv.textContent = date;
+
+            const dayDiv = document.createElement('div');
+            dayDiv.classList.add('day');
+            dayDiv.textContent = day;
+
+            const morningTaskDiv = document.createElement('div');
+            morningTaskDiv.classList.add('morning');
+            morningTaskDiv.textContent = morningTask;
+
+            const afternoonTaskDiv = document.createElement('div');
+            afternoonTaskDiv.classList.add('afternoon');
+            afternoonTaskDiv.textContent = afternoonTask;
+
+            const eveningTaskDiv = document.createElement('div');
+            eveningTaskDiv.classList.add('evening');
+            eveningTaskDiv.textContent = eveningTask;
+
+
+            dayContainer.appendChild(dateDiv);
+            dayContainer.appendChild(dayDiv);
+            dayContainer.appendChild(morningTaskDiv);
+            dayContainer.appendChild(afternoonTaskDiv);
+            dayContainer.appendChild(eveningTaskDiv);
+
+            monthContainer.appendChild(dayContainer);
+            date = parseInt(date) + 1;
+
+            firstDayOfMonth++;
+            day = getDayName(firstDayOfMonth%7);
+
+        }
+    }
+    addDays();
