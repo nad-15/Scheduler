@@ -16,7 +16,11 @@ console.log(year);
 const currentCalendarDate = new Date(year, month, 1);
 let firstDayOfMonth = currentCalendarDate.getDay();
 
+const nextCalendarDate = new Date(year, month + 1, 0);
+let lastDayOfMonth = nextCalendarDate.getDate();
+
 console.log(firstDayOfMonth);
+console.log(lastDayOfMonth);
 
 function getDayName(value) {
 
@@ -38,7 +42,7 @@ function getDayName(value) {
     function addDays(date = "1", day = getDayName(firstDayOfMonth%7), morningTask = "", afternoonTask = "", eveningTask = "") {
 
 
-        for (i = 1; i < 30; i++) {
+        for (i = 1; i <=lastDayOfMonth; i++) {
             const dayContainer = document.createElement('div');
             dayContainer.classList.add('day-container');
 
