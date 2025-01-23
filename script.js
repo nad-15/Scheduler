@@ -1,4 +1,5 @@
 const monthContainer = document.getElementById('month-container');
+let monthName = document.getElementById('month-name');
 // const daysContainer = document.getElementById('days-container');
 // appTitle = document.getElementById('app-title');
 
@@ -8,10 +9,10 @@ const date = today.getDate();
 const month = today.getMonth();
 const year = today.getFullYear();
 
-console.log(day);
-console.log(date);
-console.log(month);
-console.log(year);
+// console.log(day);
+// console.log(date);
+// console.log(month);
+// console.log(year);
 
 const currentCalendarDate = new Date(year, month, 1);
 let firstDayOfMonth = currentCalendarDate.getDay();
@@ -19,8 +20,9 @@ let firstDayOfMonth = currentCalendarDate.getDay();
 const nextCalendarDate = new Date(year, month + 1, 0);
 let lastDayOfMonth = nextCalendarDate.getDate();
 
-console.log(firstDayOfMonth);
-console.log(lastDayOfMonth);
+// console.log(firstDayOfMonth);
+// console.log(lastDayOfMonth);
+monthName.textContent = getMonthName(month) ;
 
 function getDayName(value) {
 
@@ -36,8 +38,34 @@ function getDayName(value) {
         default: return "Invalid";
     }
 
-    console.log(`value is ${firstDayOfMonth}`);
+    // console.log(`value is ${firstDayOfMonth}`);
 }
+
+
+
+
+
+
+// format Month Names
+function getMonthName(value) {
+    switch(value) {
+        case 0: return "January";
+        case 1: return "February";
+        case 2: return "March";
+        case 3: return "April";
+        case 4: return "May";
+        case 5: return "June";
+        case 6: return "July";
+        case 7: return "August";
+        case 8: return "September";
+        case 9: return "October";
+        case 10: return "November";
+        case 11: return "December";
+    }
+}
+
+addDays();
+
 
     function addDays(date = "1", day = getDayName(firstDayOfMonth%7), morningTask = "", afternoonTask = "", eveningTask = "") {
 
@@ -81,4 +109,4 @@ function getDayName(value) {
 
         }
     }
-    addDays();
+
