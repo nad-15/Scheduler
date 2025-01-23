@@ -168,6 +168,10 @@ h2 {
     font-size: 15px;
 }
 
+.day {
+    font-size: 12px;
+}
+
 .morning,
 .afternoon,
 .evening {
