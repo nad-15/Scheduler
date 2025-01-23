@@ -2,18 +2,23 @@ const monthContainer = document.getElementById('month-container');
 let monthName = document.getElementById('month-name');
 // const daysContainer = document.getElementById('days-container');
 // appTitle = document.getElementById('app-title');
-
-
+let lastScrollTop =0;
 monthContainer.addEventListener('scroll', () =>{
     const scrollTop = monthContainer.scrollTop;
     const scrollHeight = monthContainer.scrollHeight;
     const clientHeight =monthContainer.clientHeight;
 
-    if(scrollTop === 0){
+    if(scrollTop === 0 && lastScrollTop === 0){
+        //call prepend function here
         console.log(`scrolled to the top`);
+
+        addDays("prev",0)
     } else if (scrollTop + clientHeight >= scrollHeight){
+        //call append function here
+        addDays("next",2);
         console.log(`scroll to the bottom`);
     }
+    // lastScrollTop = scrollTop;
 });
 
 let currentDate = new Date();
@@ -78,7 +83,7 @@ function getMonthName(value) {
     }
 }
 
-    function addDays(date = 1, day = getDayName(firstDayOfMonth%7), morningTask = "", afternoonTask = "", eveningTask = "") {
+    function addDays(scroll="", date = 1, day = getDayName(firstDayOfMonth%7), morningTask = "", afternoonTask = "", eveningTask = "") {
 
 
         for (i = 1; i <=lastDayOfMonth; i++) {
@@ -112,7 +117,19 @@ function getMonthName(value) {
             dayContainer.appendChild(afternoonTaskDiv);
             dayContainer.appendChild(eveningTaskDiv);
 
-            monthContainer.appendChild(dayContainer);
+            if (scroll==="" || scroll === "next") {
+                monthContainer.appendChild(dayContainer);
+            }
+            else {
+                const previousScrollHeight = monthContainer.scrollHeight;
+
+                monthContainer.prepend(dayContainer);
+
+                const newScrollHeight = monthContainer.scrollHeight;
+                monthContainer.scrollTop += newScrollHeight - previousScrollHeight;
+            }
+
+
             date = date + 1;
 
             firstDayOfMonth++;
@@ -121,6 +138,6 @@ function getMonthName(value) {
         }
     }
     // let currentMonthDisplay = addDays();
-    addDays(1);
+    addDays("" , 1);
 
 
