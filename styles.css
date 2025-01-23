@@ -91,6 +91,10 @@ h1 {
     font-weight: bold;
 }
 
+.fa-download {
+    font-size: 15px !important;
+}
+
 h2 {
     margin: 0;
     text-align: center;
