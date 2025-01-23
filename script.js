@@ -111,20 +111,24 @@ function getMonthName(value) {
             eveningTaskDiv.textContent = eveningTask;
 
 
-            dayContainer.appendChild(dateDiv);
-            dayContainer.appendChild(dayDiv);
-            dayContainer.appendChild(morningTaskDiv);
-            dayContainer.appendChild(afternoonTaskDiv);
-            dayContainer.appendChild(eveningTaskDiv);
+
 
             if (scroll==="" || scroll === "next") {
+                dayContainer.appendChild(dateDiv);
+                dayContainer.appendChild(dayDiv);
+                dayContainer.appendChild(morningTaskDiv);
+                dayContainer.appendChild(afternoonTaskDiv);
+                dayContainer.appendChild(eveningTaskDiv);
                 monthContainer.appendChild(dayContainer);
             }
             else {
                 const previousScrollHeight = monthContainer.scrollHeight;
-
+                dayContainer.prepend(dateDiv);
+                dayContainer.prepend(dayDiv);
+                dayContainer.prepend(morningTaskDiv);
+                dayContainer.prepend(afternoonTaskDiv);
+                dayContainer.prepend(eveningTaskDiv);
                 monthContainer.prepend(dayContainer);
-
                 const newScrollHeight = monthContainer.scrollHeight;
                 monthContainer.scrollTop += newScrollHeight - previousScrollHeight;
             }
