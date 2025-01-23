@@ -26,7 +26,7 @@ monthName.textContent = getMonthName(month) ;
 
 function getDayName(value) {
 
-    console.log(`value is ${firstDayOfMonth}`);
+    // console.log(`new value for getDay is ${firstDayOfMonth}`);
     switch(value) {
         case 0: return "Sun";
         case 1: return "Mon";
@@ -37,8 +37,6 @@ function getDayName(value) {
         case 6: return "Sat";
         default: return "Invalid";
     }
-
-    // console.log(`value is ${firstDayOfMonth}`);
 }
 
 
