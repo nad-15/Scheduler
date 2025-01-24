@@ -144,10 +144,18 @@ h2 {
     /* margin: 0 auto;  */
     /* overflow: hidden; */
 }
+
+.month-name-container {
+    display: flex;              
+    flex-direction: column;     
+    justify-content: space-evenly;
+    height: 100%;             
+  }
+  
 #month-container {
     box-sizing: border-box;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
 }
 
 
