@@ -1,18 +1,18 @@
-const monthContainer = document.getElementById('month-container');
+const yearContainer = document.getElementById('year-container');
 let monthName = document.getElementById('month-name');
 // const daysContainer = document.getElementById('days-container');
 // appTitle = document.getElementById('app-title');
 let lastScrollTop =0;
-monthContainer.addEventListener('scroll', () =>{
-    const scrollTop = monthContainer.scrollTop;
-    const scrollHeight = monthContainer.scrollHeight;
-    const clientHeight =monthContainer.clientHeight;
+yearContainer.addEventListener('scroll', () =>{
+    const scrollTop = yearContainer.scrollTop;
+    const scrollHeight = yearContainer.scrollHeight;
+    const clientHeight =yearContainer.clientHeight;
 
     if(scrollTop === 0 && lastScrollTop === 0){
         //call prepend function here
         console.log(`scrolled to the top`);
 
-        addDays("prev",0)
+        addDays("prev",0);
     } else if (scrollTop + clientHeight >= scrollHeight){
         //call append function here
         addDays("next",2);
@@ -85,8 +85,9 @@ function getMonthName(value) {
 
     function addDays(scroll="", date = 1, day = getDayName(firstDayOfMonth%7), morningTask = "", afternoonTask = "", eveningTask = "") {
 
-
+        const monthContainer = document.createElement('div');
         for (i = 1; i <=lastDayOfMonth; i++) {
+
             const dayContainer = document.createElement('div');
             dayContainer.classList.add('day-container');
 
@@ -120,26 +121,42 @@ function getMonthName(value) {
                 dayContainer.appendChild(afternoonTaskDiv);
                 dayContainer.appendChild(eveningTaskDiv);
                 monthContainer.appendChild(dayContainer);
+                yearContainer.appendChild(monthContainer);
             }
             else {
                 const previousScrollHeight = monthContainer.scrollHeight;
-                dayContainer.prepend(dateDiv);
-                dayContainer.prepend(dayDiv);
-                dayContainer.prepend(morningTaskDiv);
-                dayContainer.prepend(afternoonTaskDiv);
-                dayContainer.prepend(eveningTaskDiv);
-                monthContainer.prepend(dayContainer);
+                dayContainer.append(dateDiv);
+                dayContainer.append(dayDiv);
+                dayContainer.append(morningTaskDiv);
+                dayContainer.append(afternoonTaskDiv);
+                dayContainer.append(eveningTaskDiv);
+                monthContainer.append(dayContainer);
                 const newScrollHeight = monthContainer.scrollHeight;
                 monthContainer.scrollTop += newScrollHeight - previousScrollHeight;
             }
 
-
+            dayContainer.appendChild(dateDiv);
+            dayContainer.appendChild(dayDiv);
+            dayContainer.appendChild(morningTaskDiv);
+            dayContainer.appendChild(afternoonTaskDiv);
+            dayContainer.appendChild(eveningTaskDiv);
+            monthContainer.appendChild(dayContainer);
             date = date + 1;
 
             firstDayOfMonth++;
             day = getDayName(firstDayOfMonth%7);
 
         }
+        if (scroll==="" || scroll === "next") {
+            yearContainer.appendChild(monthContainer);
+        }
+        else {
+            const previousScrollHeight = yearContainer.scrollHeight;
+            yearContainer.prepend(monthContainer);
+            const newScrollHeight = yearContainer.scrollHeight;
+            yearContainer.scrollTop += newScrollHeight - previousScrollHeight;
+        }
+
     }
     // let currentMonthDisplay = addDays();
     addDays("" , 1);
