@@ -8,7 +8,7 @@ yearContainer.addEventListener('scroll', () =>{
     const scrollHeight = yearContainer.scrollHeight;
     const clientHeight =yearContainer.clientHeight;
 
-    if(scrollTop === 0 && lastScrollTop === 0){
+    if(scrollTop === 0){
         //call prepend function here
         console.log(`scrolled to the top`);
 
@@ -110,30 +110,6 @@ function getMonthName(value) {
             const eveningTaskDiv = document.createElement('div');
             eveningTaskDiv.classList.add('evening');
             eveningTaskDiv.textContent = eveningTask;
-
-
-
-
-            if (scroll==="" || scroll === "next") {
-                dayContainer.appendChild(dateDiv);
-                dayContainer.appendChild(dayDiv);
-                dayContainer.appendChild(morningTaskDiv);
-                dayContainer.appendChild(afternoonTaskDiv);
-                dayContainer.appendChild(eveningTaskDiv);
-                monthContainer.appendChild(dayContainer);
-                yearContainer.appendChild(monthContainer);
-            }
-            else {
-                const previousScrollHeight = monthContainer.scrollHeight;
-                dayContainer.append(dateDiv);
-                dayContainer.append(dayDiv);
-                dayContainer.append(morningTaskDiv);
-                dayContainer.append(afternoonTaskDiv);
-                dayContainer.append(eveningTaskDiv);
-                monthContainer.append(dayContainer);
-                const newScrollHeight = monthContainer.scrollHeight;
-                monthContainer.scrollTop += newScrollHeight - previousScrollHeight;
-            }
 
             dayContainer.appendChild(dateDiv);
             dayContainer.appendChild(dayDiv);
