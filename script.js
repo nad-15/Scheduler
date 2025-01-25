@@ -42,9 +42,9 @@ submitTaskBtn.addEventListener('click', () => {
 
 const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
-const buttonPrevMonth = document.getElementById(`button-prev-month`);
+const fullScreenButton = document.getElementById(`fullscreen-button`);
 
-buttonPrevMonth.addEventListener(`click`, enterFullScreen);
+fullScreenButton.addEventListener(`click`, enterFullScreen);
 let yearNameText = document.getElementById('year-name');
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
 let currentMonthContainer = null;

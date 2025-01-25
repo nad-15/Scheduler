@@ -29,13 +29,17 @@
                     <button class="buttons" id="button-next-month">&gt</button>
                 </div>
                 <h2 id="year-name"></h2>
-                <button class="buttons" id="add-task"><i class="fa fa-download"></i></button>
+                <div class="full-screen-container">
+                    <!-- Full-Screen Button -->
+                    <button class="fullscreen-btn" id="fullscreen-button"><i class="fas fa-arrows-alt"></i></button>
+                    <button class="buttons" id="download-button"><i class="fa fa-download"></i></button>
+                </div>
             </div>
 
 
             <div class="container" id="year-container">
                 <!-- <div class="month-name-day=container"> -->
-                    <!--insert days here in column-->
+                <!--insert days here in column-->
                 <!-- </div> -->
             </div>
         </div>
@@ -46,22 +50,22 @@
 
             <!-- Sliding Input View -->
             <div class="sliding-input-view" id="slidingInputView">
-              <div class="title-submit-container">
-                <input type="text" id="taskTitle" placeholder="Enter Task Title">
-                <button id="submitTask">Add Task</button>
-              </div>
-          
-              <!-- Color Picker (6 predefined colors) -->
-              <div class="color-picker" id="colorPicker">
-                <button class="color-option" data-color="#FF6347" style="background-color: #FF6347;"></button>
-                <button class="color-option" data-color="#FF4500" style="background-color: #FF4500;"></button>
-                <button class="color-option" data-color="#32CD32" style="background-color: #32CD32;"></button>
-                <button class="color-option" data-color="#1E90FF" style="background-color: #1E90FF;"></button>
-                <button class="color-option" data-color="#FFD700" style="background-color: #FFD700;"></button>
-                <button class="color-option" data-color="#8A2BE2" style="background-color: #8A2BE2;"></button>
-              </div>
-          
-              <div class="task-template">Your Job-Template will go here...</div>
+                <div class="title-submit-container">
+                    <input type="text" id="taskTitle" placeholder="Enter Task Title">
+                    <button id="submitTask">Add Task</button>
+                </div>
+
+                <!-- Color Picker (6 predefined colors) -->
+                <div class="color-picker" id="colorPicker">
+                    <button class="color-option" data-color="#FF6347" style="background-color: #FF6347;"></button>
+                    <button class="color-option" data-color="#FF4500" style="background-color: #FF4500;"></button>
+                    <button class="color-option" data-color="#32CD32" style="background-color: #32CD32;"></button>
+                    <button class="color-option" data-color="#1E90FF" style="background-color: #1E90FF;"></button>
+                    <button class="color-option" data-color="#FFD700" style="background-color: #FFD700;"></button>
+                    <button class="color-option" data-color="#8A2BE2" style="background-color: #8A2BE2;"></button>
+                </div>
+
+                <div class="task-template">Your Job-Template will go here...</div>
             </div>
 
 

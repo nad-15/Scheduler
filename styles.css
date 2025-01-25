@@ -107,8 +107,25 @@ h1 {
     margin: 0;
 }
 
-#add-task {
+.full-screen-container {
+    display: flex;
+    margin: 0;
+    gap: 0px;
     border-radius: 3px;
+    overflow: hidden;
+
+}
+
+.fullscreen-btn {
+    background-color: #3388cc;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#download-button {
+    /* border-radius: 3px; */
 }
 
 .fa-download {
@@ -149,8 +166,8 @@ h2 {
     border: none;
     border-radius: 50%;
     font-size: 24px;
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
     z-index: 1000;
     transition: transform 1s ease, background-color 0.3s ease;
@@ -403,6 +420,9 @@ h2 {
 
     #year-container {
         scrollbar-width:auto;
+    }
+    .sliding-input-view {
+        width: 60%;
     }
 
 
