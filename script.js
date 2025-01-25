@@ -1,5 +1,7 @@
 const yearContainer = document.getElementById('year-container');
 let monthName = document.getElementById('month-name');
+let nextMonthContainer = null;
+let prevMonthContainer = null;
 
 // Get the current date details
 let today = new Date();
@@ -56,9 +58,13 @@ yearContainer.addEventListener('scroll', () => {
     prevDateFirstDay = getDayName(prevDate.getDay());
     prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
 
-    console.log(`Scrolled to the top`);
-    console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
-    console.log(`Previous Month: ${prevDateMonth}, Last Date: ${prevDateLastDate}`);
+
+
+    addDays("prev", 1 , prevDate.getDay(), prevDateLastDate, "", "", "" );
+
+    // console.log(`Scrolled to the top`);
+    // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
+    // console.log(`Previous Month: ${prevDateMonth}, Last Date: ${prevDateLastDate}`);
   } else if (scrollTop + clientHeight >= scrollHeight) {
     // Scroll to the bottom
     prevDate = currentDate;
@@ -74,14 +80,13 @@ yearContainer.addEventListener('scroll', () => {
     nextDateYear = nextDate.getFullYear();
     // nextDateFirstDay = getDayName(nextDate.getDay());
     nextDateLastDate = new Date(nextDateYear, nextDateMonth + 1, 0).getDate();
-
-    console.log(`Scrolled to the bottom`);
-    console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
-    console.log(`Next Month: ${nextDateMonth}, Last Date: ${nextDateLastDate}`);
+    addDays("next", 1 , nextDate.getDay(), nextDateLastDate, "", "", "" );
+    
+    // console.log(`Scrolled to the bottom`);
+    // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
+    // console.log(`Next Month: ${nextDateMonth}, Last Date: ${nextDateLastDate}`);
   }
 });
-
-
 
 
 function addDays(scroll="", date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "") {
@@ -133,16 +138,19 @@ function addDays(scroll="", date = 1, day = 0, lastDateOfMonth = 0, morningTask 
         dayContainer.appendChild(afternoonTaskDiv);
         dayContainer.appendChild(eveningTaskDiv);
         monthContainer.appendChild(dayContainer);
-
-
         date = date + 1;
+
 
 
     }
     if (scroll==="" || scroll === "next") {
+        nextMonthContainer = monthContainer;
+        if (prevMonthContainer) prevMonthContainer.remove();
         yearContainer.appendChild(monthContainer);
     }
     else {
+        prevMonthContainer = monthContainer;
+        if(nextMonthContainer) nextMonthContainer.remove();
         const previousScrollHeight = yearContainer.scrollHeight;
         yearContainer.prepend(monthContainer);
         const newScrollHeight = yearContainer.scrollHeight;
