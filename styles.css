@@ -70,7 +70,7 @@ h1 {
     margin: 0;
 }
 
-.month-name-container {
+.month-name-text-container {
     box-sizing: border-box;
     display: flex;
     margin: 0;
@@ -80,7 +80,9 @@ h1 {
     /* margin: 0 12px; */
     padding: 8px 15px 8px 15px;
     /* background-color: rgb(238, 198, 198); */
-    background-color: #74c476;
+    /* background-color: #74c476; */
+    background-color: #ccc;
+
 }
 
 .buttons {
@@ -145,17 +147,28 @@ h2 {
     /* overflow: hidden; */
 }
 
+.month-name-day-container {
+    border: 1px solid green;
+    display: flex;
+    flex-direction: row;
+}
+
 .month-name-container {
     display: flex;              
     flex-direction: column;     
-    justify-content: space-evenly;
-    height: 100%;             
+    /* justify-content: space-evenly; */
+    padding: 0 8px 0px 8px;
+    align-items: center;
+    justify-content: center;
+    height: 100%;     
+    /* flex: 1;         */
   }
   
-#month-container {
+.month-container {
     box-sizing: border-box;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    flex: 8;
 }
 
 
