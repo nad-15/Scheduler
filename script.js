@@ -1,3 +1,4 @@
+const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
 const buttonPrevMonth = document.getElementById(`button-prev-month`);
 
@@ -273,5 +274,16 @@ function enterFullScreen() {
     } else if (docElement.msRequestFullscreen) {
         docElement.msRequestFullscreen(); // IE/Edge
     }
+
+    // Hide the yearNameContainer once fullscreen is entered
+    yearNameContainer.style.display = 'none';
 }
+
+// Optionally, listen for fullscreen changes (if needed)
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+        // When exiting fullscreen, show the yearNameContainer again
+        yearNameContainer.style.display = 'flex';
+    }
+});
 
