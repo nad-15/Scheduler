@@ -1,4 +1,7 @@
 const yearContainer = document.getElementById('year-container');
+const buttonPrevMonth = document.getElementById(`button-prev-month`);
+
+buttonPrevMonth.addEventListener(`click`, enterFullScreen);
 // let monthName = document.getElementById('month-name');
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
 let currentMonthContainer = null;
@@ -248,5 +251,17 @@ function getMonthName(value) {
         case 9: return "OCTOBER";
         case 10: return "NOVEMBER";
         case 11: return "DECEMBER";
+    }
+}
+
+
+function enterFullScreen() {
+    const docElement = document.documentElement;
+    if (docElement.requestFullscreen) {
+        docElement.requestFullscreen();
+    } else if (docElement.webkitRequestFullscreen) {
+        docElement.webkitRequestFullscreen(); // Safari
+    } else if (docElement.msRequestFullscreen) {
+        docElement.msRequestFullscreen(); // IE/Edge
     }
 }
