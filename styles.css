@@ -137,7 +137,7 @@ h2 {
     gap: 0;
     flex-grow: 1;
     height: auto;
-    overflow: auto;
+    /* overflow: auto; */
     overflow: scroll;
     overflow-y: auto;
     height: 100vh;
@@ -145,7 +145,13 @@ h2 {
     /* padding-right: 8px; */
     /* margin: 0 auto;  */
     /* overflow: hidden; */
+    scrollbar-width: none; /* For Firefox */
 }
+
+#year-container::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Edge */
+}
+
 
 .month-name-day-container {
     border: 1px solid green;
