@@ -1,6 +1,7 @@
 const yearContainer = document.getElementById('year-container');
 // let monthName = document.getElementById('month-name');
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
+let currentMonthContainer = null;
 let nextMonthContainer = null;
 let prevMonthContainer = null;
 
@@ -18,14 +19,14 @@ let currentDateYear = currentDate.getFullYear();
 let currentDateFirstDay = getDayName(currentDate.getDay());
 let currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
 
-addDays("initCurrent" ,currentDateMonth, 1, currentDate.getDay(), currentDateLastDate, "", "", "" );
+addDays("initCurrent", currentDateMonth, 1, currentDate.getDay(), currentDateLastDate, "", "", "");
 
 let nextDate = new Date(currentDateYear, currentDateMonth + 1, 1);
 let nextDateMonth = nextDate.getMonth();
 let nextDateYear = nextDate.getFullYear();
 let nextDateLastDate = new Date(nextDateYear, nextDateMonth + 1, 0).getDate();
 
-addDays("initNext", nextDateMonth, 1 , nextDate.getDay(), nextDateLastDate, "", "", "" );
+addDays("initNext", nextDateMonth, 1, nextDate.getDay(), nextDateLastDate, "", "", "");
 
 let prevDate = new Date(currentDateYear, currentDateMonth - 1, 1);
 let prevDateMonth = prevDate.getMonth();
@@ -34,69 +35,69 @@ let prevDateYear = prevDate.getFullYear();
 console.log(prevDateYear);
 let prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
 
-addDays("initPrev",prevDateMonth, 1 , prevDate.getDay(), prevDateLastDate, "", "", "" );
+addDays("initPrev", prevDateMonth, 1, prevDate.getDay(), prevDateLastDate, "", "", "");
 
 // Handle scroll event
 yearContainer.addEventListener('scroll', () => {
-  const scrollTop = yearContainer.scrollTop;
-  const scrollHeight = yearContainer.scrollHeight;
-  const clientHeight = yearContainer.clientHeight;
+    const scrollTop = yearContainer.scrollTop;
+    const scrollHeight = yearContainer.scrollHeight;
+    const clientHeight = yearContainer.clientHeight;
 
-  if (scrollTop === 0) {
-    // Scroll to the top
-    nextDate = currentDate;
-    currentDate = prevDate;
+    if (scrollTop === 0) {
+        // Scroll to the top
+        nextDate = currentDate;
+        currentDate = prevDate;
 
-    currentDateMonth = currentDate.getMonth();
-    currentDateYear = currentDate.getFullYear();
-    currentDateFirstDay = getDayName(currentDate.getDay());
-    currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
+        currentDateMonth = currentDate.getMonth();
+        currentDateYear = currentDate.getFullYear();
+        currentDateFirstDay = getDayName(currentDate.getDay());
+        currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
 
-    prevDate = new Date(currentDateYear, currentDateMonth - 1, 1);
-    prevDateMonth = prevDate.getMonth();
-    prevDateYear = prevDate.getFullYear();
-    prevDateFirstDay = getDayName(prevDate.getDay());
-    prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
+        prevDate = new Date(currentDateYear, currentDateMonth - 1, 1);
+        prevDateMonth = prevDate.getMonth();
+        prevDateYear = prevDate.getFullYear();
+        prevDateFirstDay = getDayName(prevDate.getDay());
+        prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
 
 
 
-    addDays("prev", prevDateMonth, 1 , prevDate.getDay(), prevDateLastDate, "", "", "" );
+        addDays("prev", prevDateMonth, 1, prevDate.getDay(), prevDateLastDate, "", "", "");
 
-    // console.log(`Scrolled to the top`);
-    // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
-    // console.log(`Previous Month: ${prevDateMonth}, Last Date: ${prevDateLastDate}`);
-  } else if (scrollTop + clientHeight >= scrollHeight) {
-    // Scroll to the bottom
-    prevDate = currentDate;
-    currentDate = nextDate;
+        // console.log(`Scrolled to the top`);
+        // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
+        // console.log(`Previous Month: ${prevDateMonth}, Last Date: ${prevDateLastDate}`);
+    } else if (scrollTop + clientHeight >= scrollHeight) {
+        // Scroll to the bottom
+        prevDate = currentDate;
+        currentDate = nextDate;
 
-    currentDateMonth = currentDate.getMonth();
-    currentDateYear = currentDate.getFullYear();
-    currentDateFirstDay = getDayName(currentDate.getDay());
-    currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
+        currentDateMonth = currentDate.getMonth();
+        currentDateYear = currentDate.getFullYear();
+        currentDateFirstDay = getDayName(currentDate.getDay());
+        currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
 
-    nextDate = new Date(currentDateYear, currentDateMonth + 1, 1);
-    nextDateMonth = nextDate.getMonth();
-    nextDateYear = nextDate.getFullYear();
-    // nextDateFirstDay = getDayName(nextDate.getDay());
-    nextDateLastDate = new Date(nextDateYear, nextDateMonth + 1, 0).getDate();
-    addDays("next",nextDateMonth, 1 , nextDate.getDay(), nextDateLastDate, "", "", "" );
-    
-    // console.log(`Scrolled to the bottom`);
-    // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
-    // console.log(`Next Month: ${nextDateMonth}, Last Date: ${nextDateLastDate}`);
-  }
+        nextDate = new Date(currentDateYear, currentDateMonth + 1, 1);
+        nextDateMonth = nextDate.getMonth();
+        nextDateYear = nextDate.getFullYear();
+        // nextDateFirstDay = getDayName(nextDate.getDay());
+        nextDateLastDate = new Date(nextDateYear, nextDateMonth + 1, 0).getDate();
+        addDays("next", nextDateMonth, 1, nextDate.getDay(), nextDateLastDate, "", "", "");
+
+        // console.log(`Scrolled to the bottom`);
+        // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
+        // console.log(`Next Month: ${nextDateMonth}, Last Date: ${nextDateLastDate}`);
+    }
 });
 
 
-function addDays(scroll="", monthName= 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "") {
+function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "") {
     console.log(`current  is ${monthName}`);
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
 
     const monthNameContainer = document.createElement('div');
     monthNameContainer.classList.add('month-name-container');
-    let FormatMonthName = getMonthName(monthName%12);
+    let FormatMonthName = getMonthName(monthName % 12);
 
 
     monthNameContainer.textContent = FormatMonthName;
@@ -107,12 +108,12 @@ function addDays(scroll="", monthName= 0, date = 1, day = 0, lastDateOfMonth = 0
         let letterDiv = document.createElement('div');
         letterDiv.textContent = letter;
         monthNameContainer.appendChild(letterDiv);
-      });
+    });
     const monthContainer = document.createElement('div');
     monthContainer.classList.add('month-container');
 
 
-    for (i = 1; i <=lastDateOfMonth; i++) {
+    for (i = 1; i <= lastDateOfMonth; i++) {
 
         const dayContainer = document.createElement('div');
         dayContainer.classList.add('day-container');
@@ -124,7 +125,7 @@ function addDays(scroll="", monthName= 0, date = 1, day = 0, lastDateOfMonth = 0
 
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
-        dayDiv.textContent = getDayName(day%7);
+        dayDiv.textContent = getDayName(day % 7);
         day++;
 
         const morningTaskDiv = document.createElement('div');
@@ -152,34 +153,43 @@ function addDays(scroll="", monthName= 0, date = 1, day = 0, lastDateOfMonth = 0
     if (scroll === "next") {
         // nextMonthContainer = monthContainer;
 
-        nextMonthContainer = monthNameDayContainer;
         if (prevMonthContainer) {
             prevMonthContainer.remove();
             console.log(`prev is remove`);
         }
+
+        prevMonthContainer = currentMonthContainer;
+        currentMonthContainer =nextMonthContainer;
+        nextMonthContainer = monthNameDayContainer;
         // yearContainer.appendChild(monthContainer);
         yearContainer.appendChild(monthNameDayContainer);
+
     }
-    else if(scroll === "prev") {
+    else if (scroll === "prev") {
         // prevMonthContainer = monthContainer;
-        prevMonthContainer = monthNameDayContainer;
-        if(nextMonthContainer) {
+        if (nextMonthContainer) {
             nextMonthContainer.remove();
             console.log(`next is remove`);
         }
+
+        nextMonthContainer = currentMonthContainer;
+        currentMonthContainer =prevMonthContainer;
+        prevMonthContainer = monthNameDayContainer;
+
         const previousScrollHeight = yearContainer.scrollHeight;
         // yearContainer.prepend(monthContainer);
         yearContainer.prepend(monthNameDayContainer);
         const newScrollHeight = yearContainer.scrollHeight;
         yearContainer.scrollTop += newScrollHeight - previousScrollHeight;
-    } else if (scroll=== "initCurrent") {
+    } else if (scroll === "initCurrent") {
+        currentMonthContainer = monthNameDayContainer;
         yearContainer.appendChild(monthNameDayContainer);
         console.log(`current is init`);
-    } else if (scroll=== "initNext") {
+    } else if (scroll === "initNext") {
         nextMonthContainer = monthNameDayContainer;
         yearContainer.appendChild(monthNameDayContainer);
         console.log(`next is init`);
-    } else if (scroll=== "initPrev") {
+    } else if (scroll === "initPrev") {
         prevMonthContainer = monthNameDayContainer;
         yearContainer.prepend(monthNameDayContainer);
         console.log(`prev is init`);
@@ -215,8 +225,8 @@ function getDayName(value) {
     // }
 
     // function getDayName(dayNumber) {
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        return days[value];
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return days[value];
 }
 
 // format Month Names
