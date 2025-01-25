@@ -101,9 +101,10 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     const monthNameContainer = document.createElement('div');
     monthNameContainer.classList.add('month-name-container');
     let FormatMonthName = getMonthName(monthName % 12);
+    console.log(FormatMonthName);
 
 
-    monthNameContainer.textContent = FormatMonthName;
+    // monthNameContainer.textContent = FormatMonthName;
 
     let letters = FormatMonthName.split('');
     monthNameContainer.innerHTML = '';
@@ -129,7 +130,6 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
         dayDiv.textContent = getDayName(day % 7);
-        day++;
 
         const morningTaskDiv = document.createElement('div');
         morningTaskDiv.classList.add('morning');
@@ -148,7 +148,15 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         dayContainer.appendChild(morningTaskDiv);
         dayContainer.appendChild(afternoonTaskDiv);
         dayContainer.appendChild(eveningTaskDiv);
-        monthContainer.appendChild(dayContainer); //created 1-30 days
+        monthContainer.appendChild(dayContainer);
+         //created 1-30 days
+         if(getDayName(day % 7) === "Sat"){
+            const weekSpacer = document.createElement('div');
+            weekSpacer.classList.add(`week-spacer`);
+            monthContainer.appendChild(weekSpacer);
+            console.log(`week spacer added`);
+        }
+        day++;
 
         monthNameDayContainer.appendChild(monthNameContainer);
         monthNameDayContainer.appendChild(monthContainer);
@@ -162,7 +170,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         }
 
         prevMonthContainer = currentMonthContainer;
-        currentMonthContainer =nextMonthContainer;
+        currentMonthContainer = nextMonthContainer;
         nextMonthContainer = monthNameDayContainer;
         // yearContainer.appendChild(monthContainer);
         yearContainer.appendChild(monthNameDayContainer);
@@ -176,7 +184,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         }
 
         nextMonthContainer = currentMonthContainer;
-        currentMonthContainer =prevMonthContainer;
+        currentMonthContainer = prevMonthContainer;
         prevMonthContainer = monthNameDayContainer;
 
         const previousScrollHeight = yearContainer.scrollHeight;
