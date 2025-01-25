@@ -18,14 +18,14 @@ let currentDateYear = currentDate.getFullYear();
 let currentDateFirstDay = getDayName(currentDate.getDay());
 let currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
 
-addDays("" ,currentDateMonth, 1, currentDate.getDay(), currentDateLastDate, "", "", "" );
+addDays("initCurrent" ,currentDateMonth, 1, currentDate.getDay(), currentDateLastDate, "", "", "" );
 
 let nextDate = new Date(currentDateYear, currentDateMonth + 1, 1);
 let nextDateMonth = nextDate.getMonth();
 let nextDateYear = nextDate.getFullYear();
 let nextDateLastDate = new Date(nextDateYear, nextDateMonth + 1, 0).getDate();
 
-addDays("next", nextDateMonth, 1 , nextDate.getDay(), nextDateLastDate, "", "", "" );
+addDays("initNext", nextDateMonth, 1 , nextDate.getDay(), nextDateLastDate, "", "", "" );
 
 let prevDate = new Date(currentDateYear, currentDateMonth - 1, 1);
 let prevDateMonth = prevDate.getMonth();
@@ -34,7 +34,7 @@ let prevDateYear = prevDate.getFullYear();
 console.log(prevDateYear);
 let prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
 
-addDays("prev",prevDateMonth, 1 , prevDate.getDay(), prevDateLastDate, "", "", "" );
+addDays("initPrev",prevDateMonth, 1 , prevDate.getDay(), prevDateLastDate, "", "", "" );
 
 // Handle scroll event
 yearContainer.addEventListener('scroll', () => {
@@ -149,7 +149,7 @@ function addDays(scroll="", monthName= 0, date = 1, day = 0, lastDateOfMonth = 0
         monthNameDayContainer.appendChild(monthNameContainer);
         monthNameDayContainer.appendChild(monthContainer);
     }
-    if (scroll==="" || scroll === "next") {
+    if (scroll === "next") {
         // nextMonthContainer = monthContainer;
 
         nextMonthContainer = monthNameDayContainer;
@@ -158,9 +158,9 @@ function addDays(scroll="", monthName= 0, date = 1, day = 0, lastDateOfMonth = 0
             console.log(`prev is remove`);
         }
         // yearContainer.appendChild(monthContainer);
-        yearContainer.append(monthNameDayContainer);
+        yearContainer.appendChild(monthNameDayContainer);
     }
-    else {
+    else if(scroll === "prev") {
         // prevMonthContainer = monthContainer;
         prevMonthContainer = monthNameDayContainer;
         if(nextMonthContainer) {
@@ -172,6 +172,17 @@ function addDays(scroll="", monthName= 0, date = 1, day = 0, lastDateOfMonth = 0
         yearContainer.prepend(monthNameDayContainer);
         const newScrollHeight = yearContainer.scrollHeight;
         yearContainer.scrollTop += newScrollHeight - previousScrollHeight;
+    } else if (scroll=== "initCurrent") {
+        yearContainer.appendChild(monthNameDayContainer);
+        console.log(`current is init`);
+    } else if (scroll=== "initNext") {
+        nextMonthContainer = monthNameDayContainer;
+        yearContainer.appendChild(monthNameDayContainer);
+        console.log(`next is init`);
+    } else if (scroll=== "initPrev") {
+        prevMonthContainer = monthNameDayContainer;
+        yearContainer.prepend(monthNameDayContainer);
+        console.log(`prev is init`);
     }
 
 }
