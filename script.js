@@ -2,7 +2,7 @@ const yearContainer = document.getElementById('year-container');
 const buttonPrevMonth = document.getElementById(`button-prev-month`);
 
 buttonPrevMonth.addEventListener(`click`, enterFullScreen);
-// let monthName = document.getElementById('month-name');
+let monthNameText = document.getElementById('month-name');
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
 let currentMonthContainer = null;
 let nextMonthContainer = null;
@@ -95,6 +95,7 @@ yearContainer.addEventListener('scroll', () => {
 
 function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "") {
     console.log(`current  is ${monthName}`);
+    monthNameText.textContent = currentDateYear;
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
 
@@ -273,3 +274,46 @@ function enterFullScreen() {
         docElement.msRequestFullscreen(); // IE/Edge
     }
 }
+
+let isDragging = false;
+let startX;
+let scrollLeft;
+
+
+// Prevent text selection while dragging
+yearContainer.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.pageX - yearContainer.offsetLeft;
+    scrollLeft = yearContainer.scrollLeft;
+    yearContainer.style.cursor = 'grabbing'; // Change cursor to grabbing
+
+    // Disable text selection during drag
+    document.body.style.userSelect = 'none';
+});
+
+// When mouse is moved while pressed
+yearContainer.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault(); // Prevent default behavior (e.g., text selection)
+    const x = e.pageX - yearContainer.offsetLeft;
+    const walk = (x - startX); // Calculate scroll distance
+    yearContainer.scrollLeft = scrollLeft - walk; // Apply the scroll
+});
+
+// When mouse button is released
+yearContainer.addEventListener('mouseup', () => {
+    isDragging = false;
+    yearContainer.style.cursor = 'grab'; // Revert cursor to grab
+
+    // Re-enable text selection after drag
+    document.body.style.userSelect = '';
+});
+
+// When mouse leaves the div
+yearContainer.addEventListener('mouseleave', () => {
+    isDragging = false;
+    yearContainer.style.cursor = 'grab'; // Revert cursor to grab
+
+    // Re-enable text selection if mouse leaves
+    document.body.style.userSelect = '';
+});

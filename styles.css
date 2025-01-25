@@ -146,6 +146,7 @@ h2 {
     /* margin: 0 auto;  */
     /* overflow: hidden; */
     scrollbar-width: none; /* For Firefox */
+    cursor: grab;
 }
 
 #year-container::-webkit-scrollbar {
