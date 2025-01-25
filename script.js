@@ -2,44 +2,6 @@ const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
 const submitTaskBtn = document.getElementById('submitTask');
 
-// Track popup state
-let isPopupOpen = false;
-
-floatingAddBtn.addEventListener('click', () => {
-  isPopupOpen = !isPopupOpen;
-
-  if (isPopupOpen) {
-    slidingInputView.style.bottom = '0'; // Show popup
-    floatingAddBtn.style.transform =  'rotate(225deg)'; //rotate button
-    floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
-  } else {
-    slidingInputView.style.bottom = '-33%'; // Hide popup
-    floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
-    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
-  }
-});
-
-submitTaskBtn.addEventListener('click', () => {
-  const taskTitle = document.getElementById('taskTitle').value;
-
-  if (taskTitle) {
-    // Simulate task submission logic
-    console.log(`Task Added: ${taskTitle}`);
-
-    // Reset inputs and hide the sliding input view
-    document.getElementById('taskTitle').value = '';
-    slidingInputView.style.bottom = '-33%'; // Slide down popup
-    floatingAddBtn.style.transform = 'translateY(0) rotate(0)'; // Reset button
-    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
-    isPopupOpen = false;
-  } else {
-    alert('Please enter a task title.');
-  }
-});
-
-
-
-
 const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
@@ -323,62 +285,156 @@ document.addEventListener('fullscreenchange', () => {
 
 
 // addClickListeners(); //put it in its proper place later
-function addClickListeners() {
-    console.log(`listener is called`);
+// function addClickListeners() {
+//     console.log(`listener is called`);
 
-    // Use event delegation by adding the listener to the container
+//     // Use event delegation by adding the listener to the container
+//     yearContainer.addEventListener('click', (event) => {
+//         const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
+
+//         if (taskElement) {
+//             // Get the parent container (day container) of the clicked task
+//             const dayContainer = taskElement.closest('.day-container');
+
+//             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
+//             console.log(date);
+//             const morningTask = dayContainer.querySelector('.morningTask').textContent;
+//             const afternoonTask = dayContainer.querySelector('.afternoonTask').textContent;
+//             const eveningTask = dayContainer.querySelector('.eveningTask').textContent;
+
+//             // Show a popup to input tasks
+//             let newMorning = prompt("Enter morning task:", morningTask);
+//             let newAfternoon = prompt("Enter afternoon task:", afternoonTask);
+//             let newEvening = prompt("Enter evening task:", eveningTask);
+
+//             // Update the task divs with the new data
+//             dayContainer.querySelector('.morningTask').textContent = newMorning;
+//             dayContainer.querySelector('.afternoonTask').textContent = newAfternoon;
+//             dayContainer.querySelector('.eveningTask').textContent = newEvening;
+
+//             // Save updated tasks using saveData
+//             saveTaskData(date, newMorning, newAfternoon, newEvening);
+//             console.log(date);
+
+//         }
+//     });
+// }
+
+function addClickListeners() {
+    console.log('listener is called');
+
+    // Get the parent container of all tasks (you can replace `yearContainer` with the actual parent container)
+
+    // Event delegation: Listen for clicks on the parent container
     yearContainer.addEventListener('click', (event) => {
+        // Check if the clicked element is a task (morning, afternoon, or evening)
         const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
         if (taskElement) {
             // Get the parent container (day container) of the clicked task
             const dayContainer = taskElement.closest('.day-container');
-
             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
-            console.log(date);
-            const morningTask = dayContainer.querySelector('.morningTask').textContent;
-            const afternoonTask = dayContainer.querySelector('.afternoonTask').textContent;
-            const eveningTask = dayContainer.querySelector('.eveningTask').textContent;
+            const taskType = taskElement.classList.contains('morningTask') ? 'morning' :
+                             taskElement.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
 
-            // Show a popup to input tasks
-            let newMorning = prompt("Enter morning task:", morningTask);
-            let newAfternoon = prompt("Enter afternoon task:", afternoonTask);
-            let newEvening = prompt("Enter evening task:", eveningTask);
+            // Get the current task text based on the task type
+            const currentTask = taskElement.textContent;
 
-            // Update the task divs with the new data
-            dayContainer.querySelector('.morningTask').textContent = newMorning;
-            dayContainer.querySelector('.afternoonTask').textContent = newAfternoon;
-            dayContainer.querySelector('.eveningTask').textContent = newEvening;
+            // Prompt to update task
+            const updatedTask = prompt(`Enter ${taskType} task:`, currentTask);
 
-            // Save updated tasks using saveData
-            saveTaskData(date, newMorning, newAfternoon, newEvening);
-            console.log(date);
+            // Update the task in the DOM based on the task type
+            if (updatedTask !== null) {
+                taskElement.textContent = updatedTask;
 
+                // Save updated task data (for the specific task type)
+                saveTaskData(date, taskType, updatedTask);
+            }
         }
     });
 }
 
-
-function saveTaskData(date, morningTask, afternoonTask, eveningTask) {
-    // Get the current data from localStorage (or initialize as empty object if not yet saved)
+function saveTaskData(date, taskType, updatedTask) {
+    // Get the current data from localStorage (or initialize as an empty object if not yet saved)
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
-    console.log(date);
-    // Save the new tasks under the specific date (e.g., "2025-01-20")
-    storedData[date] = {
-        morning: morningTask,
-        afternoon: afternoonTask,
-        evening: eveningTask,
-    };
+    
+    // Check if the date already exists in stored data
+    if (!storedData[date]) {
+        // If the date doesn't exist, initialize it with empty tasks
+        storedData[date] = {
+            morning: '',
+            afternoon: '',
+            evening: ''
+        };
+    }
+
+    // Update the task for the specific type (morning, afternoon, or evening)
+    storedData[date][taskType] = updatedTask;
 
     // Store the updated data back to localStorage
     localStorage.setItem('tasks', JSON.stringify(storedData));
-
+    
+    console.log(`Saved task for ${taskType} on ${date}: ${updatedTask}`);
 }
+
+
+
+
+// function saveTaskData(date, morningTask, afternoonTask, eveningTask) {
+//     // Get the current data from localStorage (or initialize as empty object if not yet saved)
+//     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
+//     console.log(date);
+//     // Save the new tasks under the specific date (e.g., "2025-01-20")
+//     storedData[date] = {
+//         morning: morningTask,
+//         afternoon: afternoonTask,
+//         evening: eveningTask,
+//     };
+
+//     // Store the updated data back to localStorage
+//     localStorage.setItem('tasks', JSON.stringify(storedData));
+
+// }
+
+// Track popup state
+let isPopupOpen = false;
+
+floatingAddBtn.addEventListener('click', () => {
+  isPopupOpen = !isPopupOpen;
+
+  if (isPopupOpen) {
+    slidingInputView.style.bottom = '0'; // Show popup
+    floatingAddBtn.style.transform =  'rotate(225deg)'; //rotate button
+    floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
+  } else {
+    slidingInputView.style.bottom = '-33%'; // Hide popup
+    floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
+    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+  }
+});
+
+submitTaskBtn.addEventListener('click', () => {
+  const taskTitle = document.getElementById('taskTitle').value;
+
+  if (taskTitle) {
+    // Simulate task submission logic
+    console.log(`Task Added: ${taskTitle}`);
+
+    // Reset inputs and hide the sliding input view
+    document.getElementById('taskTitle').value = '';
+    slidingInputView.style.bottom = '-33%'; // Slide down popup
+    floatingAddBtn.style.transform = 'translateY(0) rotate(0)'; // Reset button
+    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
+    isPopupOpen = false;
+  } else {
+    alert('Please enter a task title.');
+  }
+});
 // window.addEventListener('DOMContentLoaded', () => {
     // Load tasks from localStorage
     // loadTasks();
 
     // Add click event listeners to the task divs
-    addClickListeners();
+addClickListeners();
 // });
 
