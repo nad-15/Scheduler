@@ -15,11 +15,10 @@ let todayYear = today.getFullYear();
 let currentDate = new Date(todayYear, todayMonth, 1);
 let currentDateMonth = currentDate.getMonth();
 let currentDateYear = currentDate.getFullYear();
-console.log(currentDateYear);
 let currentDateFirstDay = getDayName(currentDate.getDay());
 let currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
 
-addDays("", 1 ,currentDateMonth, currentDate.getDay(), currentDateLastDate, "", "", "" );
+addDays("" ,currentDateMonth, 1, currentDate.getDay(), currentDateLastDate, "", "", "" );
 
 let nextDate = new Date(currentDateYear, currentDateMonth + 1, 1);
 let nextDateMonth = nextDate.getMonth();
@@ -90,13 +89,15 @@ yearContainer.addEventListener('scroll', () => {
 });
 
 
-function addDays(scroll="", monthName, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "") {
+function addDays(scroll="", monthName= 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "") {
+    console.log(`current  is ${monthName}`);
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
 
     const monthNameContainer = document.createElement('div');
     monthNameContainer.classList.add('month-name-container');
     let FormatMonthName = getMonthName(monthName%12);
+
 
     monthNameContainer.textContent = FormatMonthName;
 
@@ -152,14 +153,20 @@ function addDays(scroll="", monthName, date = 1, day = 0, lastDateOfMonth = 0, m
         // nextMonthContainer = monthContainer;
 
         nextMonthContainer = monthNameDayContainer;
-        // if (prevMonthContainer) prevMonthContainer.remove();
+        if (prevMonthContainer) {
+            prevMonthContainer.remove();
+            console.log(`prev is remove`);
+        }
         // yearContainer.appendChild(monthContainer);
         yearContainer.append(monthNameDayContainer);
     }
     else {
         // prevMonthContainer = monthContainer;
         prevMonthContainer = monthNameDayContainer;
-        // if(nextMonthContainer) nextMonthContainer.remove();
+        if(nextMonthContainer) {
+            nextMonthContainer.remove();
+            console.log(`next is remove`);
+        }
         const previousScrollHeight = yearContainer.scrollHeight;
         // yearContainer.prepend(monthContainer);
         yearContainer.prepend(monthNameDayContainer);
