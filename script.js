@@ -1,3 +1,45 @@
+const floatingAddBtn = document.getElementById('floatingAddBtn');
+const slidingInputView = document.getElementById('slidingInputView');
+const submitTaskBtn = document.getElementById('submitTask');
+
+// Track popup state
+let isPopupOpen = false;
+
+floatingAddBtn.addEventListener('click', () => {
+  isPopupOpen = !isPopupOpen;
+
+  if (isPopupOpen) {
+    slidingInputView.style.bottom = '0'; // Show popup
+    floatingAddBtn.style.transform = 'translateY(-370%) rotate(45deg)'; // Move and rotate button
+    floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
+  } else {
+    slidingInputView.style.bottom = '-33%'; // Hide popup
+    floatingAddBtn.style.transform = 'translateY(0) rotate(0)'; // Reset button position and rotation
+    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+  }
+});
+
+submitTaskBtn.addEventListener('click', () => {
+  const taskTitle = document.getElementById('taskTitle').value;
+
+  if (taskTitle) {
+    // Simulate task submission logic
+    console.log(`Task Added: ${taskTitle}`);
+
+    // Reset inputs and hide the sliding input view
+    document.getElementById('taskTitle').value = '';
+    slidingInputView.style.bottom = '-33%'; // Slide down popup
+    floatingAddBtn.style.transform = 'translateY(0) rotate(0)'; // Reset button
+    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
+    isPopupOpen = false;
+  } else {
+    alert('Please enter a task title.');
+  }
+});
+
+
+
+
 const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
 const buttonPrevMonth = document.getElementById(`button-prev-month`);
@@ -310,14 +352,11 @@ function addClickListeners() {
 
             // Save updated tasks using saveData
             saveTaskData(date, newMorning, newAfternoon, newEvening);
-
             console.log(date);
 
         }
     });
 }
-
-
 
 
 function saveTaskData(date, morningTask, afternoonTask, eveningTask) {
@@ -333,34 +372,8 @@ function saveTaskData(date, morningTask, afternoonTask, eveningTask) {
 
     // Store the updated data back to localStorage
     localStorage.setItem('tasks', JSON.stringify(storedData));
-    // loadTasks();
+
 }
-
-
-// function loadTasks() {
-//     // Get stored task data from localStorage
-//     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
-//     console.log(storedData);
-
-//     // Loop through each date in the stored data and update the corresponding divs
-//     for (let date in storedData) {
-//         const taskData = storedData[date];
-        
-//         // Find the corresponding task container by date (you may need to match the date format)
-//         let dateDiv = document.querySelector(`[data-full-date="${date}"]`);
-
-//         if (dateDiv) {
-//             // Update the task divs with the saved data
-//             dateDiv.querySelector('.morningTask').textContent = taskData.morning;
-//             dateDiv.querySelector('.afternoonTask').textContent = taskData.afternoon;
-//             dateDiv.querySelector('.eveningTask').textContent = taskData.evening;
-
-//             // Optionally, change background color or styling based on the tasks
-//             dateDiv.style.backgroundColor = taskData.morning ? '#FFFF99' : ''; // Example: change background color if a task is entered
-//         }
-//     }
-// }
-
 // window.addEventListener('DOMContentLoaded', () => {
     // Load tasks from localStorage
     // loadTasks();

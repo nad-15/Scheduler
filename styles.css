@@ -103,7 +103,7 @@ h2 {
     text-align: center;
 }
 
-.floating-add-button {
+/* .floating-add-button {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -120,7 +120,119 @@ h2 {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 
+} */
+
+/* Floating Add Button */
+.floating-add-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
+
+.floating-add-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Sliding Input View */
+.sliding-input-view {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: -33%;
+    width: 100%;
+    height: 33%;
+    background-color: white;
+    padding: 10px;
+    box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);
+    transition: bottom 0.3s ease;
+    z-index: 999;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+}
+
+.title-submit-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 8px;
+}
+
+/* Input fields and button styles */
+#taskTitle {
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    flex: 8;
+
+}
+
+#submitTask {
+    box-sizing: border-box;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    flex: 2;
+
+}
+
+#submitTask:hover {
+    background-color: #45a049;
+}
+
+/* Color Picker */
+.color-picker {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.color-option {
+    box-sizing: border-box;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border: 2px solid black;
+}
+
+/* Task Template */
+.task-template {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    font-family: monospace;
+    width: 100%;
+    flex-grow: 1;
+}
+
 
 #year-container {
     /* border: 2px solid green; */

@@ -41,7 +41,30 @@
         </div>
 
         <main>
-            <div class="floating-add-button">+</div>
+            <!-- <div class="floating-add-button">+</div> -->
+            <button class="floating-add-btn" id="floatingAddBtn">+</button>
+
+            <!-- Sliding Input View -->
+            <div class="sliding-input-view" id="slidingInputView">
+              <div class="title-submit-container">
+                <input type="text" id="taskTitle" placeholder="Enter Task Title">
+                <button id="submitTask">Add Task</button>
+              </div>
+          
+              <!-- Color Picker (6 predefined colors) -->
+              <div class="color-picker" id="colorPicker">
+                <button class="color-option" data-color="#FF6347" style="background-color: #FF6347;"></button>
+                <button class="color-option" data-color="#FF4500" style="background-color: #FF4500;"></button>
+                <button class="color-option" data-color="#32CD32" style="background-color: #32CD32;"></button>
+                <button class="color-option" data-color="#1E90FF" style="background-color: #1E90FF;"></button>
+                <button class="color-option" data-color="#FFD700" style="background-color: #FFD700;"></button>
+                <button class="color-option" data-color="#8A2BE2" style="background-color: #8A2BE2;"></button>
+              </div>
+          
+              <div class="task-template">Your Job-Template will go here...</div>
+            </div>
+
+
             <footer></footer>
         </main>
     </div>
