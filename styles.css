@@ -231,13 +231,18 @@ h2 {
     font-size: 12px;
 }
 
-.morning,
-.afternoon,
-.evening {
+.morningTask,
+.afternoonTask,
+.eveningTask {
     display: flex;
     border: .5px solid #ccc;
     flex: 2;
     font-weight: bold;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+
     /* align-content: center; */
 }
 
