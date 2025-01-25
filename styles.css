@@ -136,7 +136,7 @@ h2 {
     height: 50px;
     cursor: pointer;
     z-index: 1000;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    transition: transform 1s ease, background-color 0.3s ease;
 }
 
 .floating-add-btn:hover {

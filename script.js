@@ -10,7 +10,7 @@ floatingAddBtn.addEventListener('click', () => {
 
   if (isPopupOpen) {
     slidingInputView.style.bottom = '0'; // Show popup
-    floatingAddBtn.style.transform = 'translateY(-370%) rotate(45deg)'; // Move and rotate button
+    floatingAddBtn.style.transform =  'rotate(45deg)'; // Move and rotate button
     floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
   } else {
     slidingInputView.style.bottom = '-33%'; // Hide popup
