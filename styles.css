@@ -70,7 +70,7 @@ h1 {
     margin: 0;
 }
 
-.month-name-text-container {
+.year-name-text-container {
     box-sizing: border-box;
     display: flex;
     margin: 0;
@@ -80,8 +80,8 @@ h1 {
     /* margin: 0 12px; */
     padding: 8px 15px 8px 15px;
     /* background-color: rgb(238, 198, 198); */
-    /* background-color: #74c476; */
-    background-color: #ccc;
+    background-color: #3388cc ;
+    /* background-color: #ccc; */
 
 }
 
@@ -146,12 +146,13 @@ h2 {
     /* margin: 0 auto;  */
     /* overflow: hidden; */
     scrollbar-width: none; /* For Firefox */
-    cursor: grab;
+    /* cursor: grab; */
 }
 
 #year-container::-webkit-scrollbar {
     display: none; /* For Chrome, Safari, and Edge */
 }
+
 
 /* container for day(month-container) and month name(month-name-container) */
 .month-name-day-container {
@@ -164,11 +165,12 @@ h2 {
     display: flex;              
     flex-direction: column;     
     /* justify-content: space-evenly; */
+    font-weight: bold;
     padding: 0 8px 0px 8px;
     align-items: center;
     justify-content: center;
     height: 100%;     
-    width: 20px;
+    width: 30px;
     /* flex: 1;         */
   }
   
@@ -203,7 +205,7 @@ h2 {
 } */
 
 .week-spacer {
-    background-color: red;
+    background-color: #e57373;
     width: 100%;
     height: 2px;
 }
@@ -260,6 +262,13 @@ h2 {
         width: 60%;
     }
 
+    #year-container::-webkit-scrollbar {
+        display:block; /* For Chrome, Safari, and Edge */
+    }
+
+    #year-container {
+        scrollbar-width:auto;
+    }
 
 
 }
