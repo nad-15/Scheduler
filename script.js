@@ -191,7 +191,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         console.log(`next is init`);
     } else if (scroll === "initPrev") {
         prevMonthContainer = monthNameDayContainer;
+
+        const previousScrollHeight = yearContainer.scrollHeight;
         yearContainer.prepend(monthNameDayContainer);
+        const newScrollHeight = yearContainer.scrollHeight;
+        yearContainer.scrollTop += newScrollHeight - previousScrollHeight;
         console.log(`prev is init`);
     }
 

@@ -161,6 +161,7 @@ h2 {
     align-items: center;
     justify-content: center;
     height: 100%;     
+    width: 20px;
     /* flex: 1;         */
   }
   
@@ -168,7 +169,8 @@ h2 {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    flex: 8;
+    flex-grow: 1;
+    /* flex: 8; */
 }
 
 
