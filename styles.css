@@ -98,13 +98,7 @@ h1 {
     /* Ensures it stays on top */
 }
 
-.navi-button {
-    display: flex;
-    margin: 0;
-    gap: 0px;
-    border-radius: 3px;
-    overflow: hidden;
-}
+
 
 .buttons {
     padding: 2px 8px 2px 8px;
@@ -117,30 +111,29 @@ h1 {
     margin: 0;
 }
 
-.full-screen-container {
+
+.button-container {
     display: flex;
     margin: 0;
     gap: 0px;
     border-radius: 3px;
     overflow: hidden;
-
+    justify-content: center;
+    align-items: center;
 }
-
-.fullscreen-btn {
+.buttons {
+    display: flex;
     background-color: #3388cc;
     border: none;
-    font-size: 18px;
-    font-weight: bold;
     cursor: pointer;
+    justify-content: center;
+    align-items: center;
 }
 
-#download-button {
-    /* border-radius: 3px; */
-}
 
-.fa-download {
+/* .fa-download {
     font-size: 13px !important;
-}
+} */
 
 h2 {
     margin: 0;
@@ -202,6 +195,11 @@ h2 {
     transition: transform 1s ease, background-color 0.3s ease;
 }
 
+.floating-add-btn,
+.clear-button {
+    transition: transform 1s ease, bottom 0.3s ease; /* Same transition for the buttons */
+}
+
 
 
 .floating-add-btn:hover {
@@ -251,17 +249,18 @@ h2 {
 #submitTask {
     box-sizing: border-box;
     padding: 10px;
-    background-color: #4CAF50;
+    /* background-color: #4CAF50; */
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-weight: normal;
     flex: 2;
 
 }
 
 #submitTask:hover {
-    background-color: #45a049;
+    background-color: #2277b0;
 }
 
 /* Color Picker */

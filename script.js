@@ -124,9 +124,10 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         let letterDiv = document.createElement('div');
         letterDiv.textContent = letter;
         monthNameContainer.appendChild(letterDiv);
+        
         if(monthName%2==0){
-            monthNameContainer.style.backgroundColor = '#157759'; //darkgreen
-        } else monthNameContainer.style.backgroundColor = '#53ab8b'; //lightgreen
+            monthNameContainer.style.backgroundColor = '#82c6a2'; //lightgreen
+        } else monthNameContainer.style.backgroundColor = '#53ab8b'; //darkgreen
     });
     const monthContainer = document.createElement('div');
     monthContainer.classList.add('month-container');
@@ -463,42 +464,24 @@ floatingAddBtn.addEventListener('click', () => {
 
 
     slidingInputView.style.bottom = '0'; // Show popup
-    const slidingInputPosition = slidingInputView.getBoundingClientRect();
+
     floatingAddBtn.style.transform =  'rotate(225deg)'; //rotate button
     floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
 
     // Adjust the button positions based on the sliding input view
-    floatingAddBtn.style.bottom = `${slidingInputPosition + 20}px`;  // Adjust as needed
-    clearButton.style.bottom = `${slidingInputPosition + 80}px`;  
+    const slidingInputHeight = 33 * window.innerHeight / 100;
+    floatingAddBtn.style.bottom = `${slidingInputHeight + 20}px`; 
+    clearButton.style.bottom = `${slidingInputHeight + 80}px`;  
   } else {
     slidingInputView.style.bottom = '-33%'; // Hide popup
+
     floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
     floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+
+    // const slidingInputHeight = -(33 * window.innerHeight / 100);
+    floatingAddBtn.style.bottom = `${20}px`; 
+    clearButton.style.bottom = `${80}px`;  
   }
 });
 
-// submitTaskBtn.addEventListener('click', () => {
-//   const taskTitle = document.getElementById('taskTitle').value;
-
-//   if (taskTitle) {
-//     // Simulate task submission logic
-//     console.log(`Task Added: ${taskTitle}`);
-
-//     // Reset inputs and hide the sliding input view
-//     document.getElementById('taskTitle').value = '';
-//     slidingInputView.style.bottom = '-33%'; // Slide down popup
-//     floatingAddBtn.style.transform = 'translateY(0) rotate(0)'; // Reset button
-//     floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
-//     isPopupOpen = false;
-//   } else {
-//     alert('Please enter a task title.');
-//   }
-// });
-// window.addEventListener('DOMContentLoaded', () => {
-    // Load tasks from localStorage
-    // loadTasks();
-
-    // Add click event listeners to the task divs
-// addClickListeners();
-// });
 
