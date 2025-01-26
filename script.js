@@ -10,7 +10,7 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 let isPopupOpen = false;
 
 clearButton.addEventListener(`click`, () => {
-    localStorage.clear();
+    // localStorage.clear();
     //change this someday to not refresh the page
     location.reload();
 
@@ -163,13 +163,13 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 // dayDiv.style.color = "red"; // Set the color for Sunday
                 dayDiv.style.backgroundColor = "#e57373"; //red
                 dateDiv.style.color = "red"; //red
-                dayDiv.style.borderColor = "#e57373";
+                // dayDiv.style.borderColor = "#e57373";
 
             } else {
                 // dayDiv.style.color = "blue";
                 dayDiv.style.backgroundColor = "#3388cc"; 
                 dateDiv.style.color = "blue";// Set the color for Saturday
-                dayDiv.style.borderColor = "#3388cc";
+                // dayDiv.style.borderColor = "#3388cc";
             }
         }
 
