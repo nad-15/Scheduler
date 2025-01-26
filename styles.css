@@ -357,7 +357,7 @@ border: 2px solid #2277b0 ;
 
 
 .color-option:hover {
-    transform: scale(1.1);
+    transform: scale(.9);
 }
 
 /* .color-option.selected {
@@ -552,8 +552,8 @@ border: 2px solid #2277b0 ;
 
 .color-option {
     box-sizing: border-box;
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%; /* Ensures circular shape */
     border: 2px solid transparent; /* Default transparent border */
     cursor: pointer;
@@ -562,12 +562,29 @@ border: 2px solid #2277b0 ;
 }
 
 .color-option.selected-color {
-    background-color: transparent; /* Keep the background transparent */
-    border: 2px solid transparent; /* Transparent border for consistency */
-    border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1;
-    border-image-slice: 1; /* Ensures the gradient fills the border */
-}
-
+    border: 5px solid transparent;
+    width: 30px;
+    height: 30px;
+  }
+  .color-option-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: linear-gradient(
+        90deg, 
+        red,
+        orange,
+        yellow,
+        green,
+        blue,
+        indigo,
+        violet
+    );
+  }
 
 
 
