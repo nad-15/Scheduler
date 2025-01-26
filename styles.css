@@ -393,6 +393,18 @@ h2 {
     /* align-content: center; */
 }
 
+.morningTask:active, .afternoonTask:active, .eveningTask:active {
+    transform: scale(0.95); /* Slightly shrink the element */
+    background-color: rgba(0, 0, 0, 0.1); /* Add a temporary overlay */
+    transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+
+.task-highlight {
+    border: 2px solid #4CAF50; /* Highlight border */
+    background-color: rgba(76, 175, 80, 0.1); /* Subtle background highlight */
+    transition: all 0.3s ease;
+}
 
 
 

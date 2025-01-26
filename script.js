@@ -323,36 +323,54 @@ document.addEventListener('fullscreenchange', () => {
 function addClickListeners() {
     console.log('listener is called');
 
-    // Get the parent container of all tasks (you can replace `yearContainer` with the actual parent container)
-
-    // Event delegation: Listen for clicks on the parent container
     yearContainer.addEventListener('click', (event) => {
-        // Check if the clicked element is a task (morning, afternoon, or evening)
         const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
         if (taskElement) {
-            // Get the parent container (day container) of the clicked task
             const dayContainer = taskElement.closest('.day-container');
             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
             const taskType = taskElement.classList.contains('morningTask') ? 'morning' :
                              taskElement.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
 
-            // Get the current task text based on the task type
             const currentTask = taskElement.textContent;
 
-            // Prompt to update task
-            const updatedTask = prompt(`Enter ${taskType} task:`, currentTask);
+            taskElement.classList.add('task-highlight');
 
-            // Update the task in the DOM based on the task type
-            if (updatedTask !== null) {
-                taskElement.textContent = updatedTask;
+            // Open the sliding input view and pre-fill the input
+            isPopupOpen = true;
+            slidingInputView.style.bottom = '0'; // Show popup
+            floatingAddBtn.style.transform = 'rotate(225deg)';
+            floatingAddBtn.style.backgroundColor = '#f44336';
 
-                // Save updated task data (for the specific task type)
-                saveTaskData(date, taskType, updatedTask);
-            }
+            const taskTitleInput = document.getElementById('taskTitle');
+            taskTitleInput.value = currentTask; // Pre-fill input with current task
+
+            // Dynamically set the submit button action
+            submitTaskBtn.onclick = () => {
+                const updatedTask = taskTitleInput.value;
+
+                if (updatedTask) {
+                    // Update task in the DOM
+                    taskElement.textContent = updatedTask;
+
+                    // Save updated task data
+                    saveTaskData(date, taskType, updatedTask);
+
+                    // Reset inputs and hide the sliding input view
+                    taskTitleInput.value = '';
+                    slidingInputView.style.bottom = '-33%';
+                    floatingAddBtn.style.transform = 'rotate(0)';
+                    floatingAddBtn.style.backgroundColor = '#4CAF50';
+                    isPopupOpen = false;
+                    taskElement.classList.remove('task-highlight');
+                } else {
+                    alert('Please enter a task title.');
+                }
+            };
         }
     });
 }
+
 
 function saveTaskData(date, taskType, updatedTask) {
     // Get the current data from localStorage (or initialize as an empty object if not yet saved)
@@ -413,23 +431,23 @@ floatingAddBtn.addEventListener('click', () => {
   }
 });
 
-submitTaskBtn.addEventListener('click', () => {
-  const taskTitle = document.getElementById('taskTitle').value;
+// submitTaskBtn.addEventListener('click', () => {
+//   const taskTitle = document.getElementById('taskTitle').value;
 
-  if (taskTitle) {
-    // Simulate task submission logic
-    console.log(`Task Added: ${taskTitle}`);
+//   if (taskTitle) {
+//     // Simulate task submission logic
+//     console.log(`Task Added: ${taskTitle}`);
 
-    // Reset inputs and hide the sliding input view
-    document.getElementById('taskTitle').value = '';
-    slidingInputView.style.bottom = '-33%'; // Slide down popup
-    floatingAddBtn.style.transform = 'translateY(0) rotate(0)'; // Reset button
-    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
-    isPopupOpen = false;
-  } else {
-    alert('Please enter a task title.');
-  }
-});
+//     // Reset inputs and hide the sliding input view
+//     document.getElementById('taskTitle').value = '';
+//     slidingInputView.style.bottom = '-33%'; // Slide down popup
+//     floatingAddBtn.style.transform = 'translateY(0) rotate(0)'; // Reset button
+//     floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
+//     isPopupOpen = false;
+//   } else {
+//     alert('Please enter a task title.');
+//   }
+// });
 // window.addEventListener('DOMContentLoaded', () => {
     // Load tasks from localStorage
     // loadTasks();
