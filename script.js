@@ -9,6 +9,12 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
 
+
+// Get the color picker input and predefined color options
+const colorPickerInput = document.getElementById('colorPickerInput');
+
+
+
 clearButton.addEventListener(`click`, () => {
     // localStorage.clear();
     //change this someday to not refresh the page
@@ -376,6 +382,11 @@ document.querySelectorAll('.color-option').forEach(button => {
     });
 });
 
+// Handle input from the custom color picker
+colorPickerInput.addEventListener('input', (e) => {
+    chosenColor = e.target.value;
+  });
+
 yearContainer.addEventListener('click', (event) => {
     const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
@@ -431,31 +442,6 @@ submitTaskBtn.addEventListener('click', () => {
 
 
 
-
-
-// function saveTaskData(date, taskType, updatedTask) {
-//     // Get the current data from localStorage (or initialize as an empty object if not yet saved)
-//     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
-
-//     // Check if the date already exists in stored data
-//     if (!storedData[date]) {
-//         // If the date doesn't exist, initialize it with empty tasks
-//         storedData[date] = {
-//             morning: '',
-//             afternoon: '',
-//             evening: ''
-//         };
-//     }
-
-//     // Update the task for the specific type (morning, afternoon, or evening)
-//     storedData[date][taskType] = updatedTask;
-
-//     // Store the updated data back to localStorage
-//     localStorage.setItem('tasks', JSON.stringify(storedData));
-
-//     console.log(`Saved task for ${taskType} on ${date}: ${updatedTask}`);
-// }
-
 function saveTaskData(date, taskType, updatedTask, taskColor) {
     // Get the current data from localStorage (or initialize as an empty object if not yet saved)
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
@@ -480,27 +466,6 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
 }
 
 
-
-
-
-// function saveTaskData(date, morningTask, afternoonTask, eveningTask) {
-//     // Get the current data from localStorage (or initialize as empty object if not yet saved)
-//     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
-//     console.log(date);
-//     // Save the new tasks under the specific date (e.g., "2025-01-20")
-//     storedData[date] = {
-//         morning: morningTask,
-//         afternoon: afternoonTask,
-//         evening: eveningTask,
-//     };
-
-//     // Store the updated data back to localStorage
-//     localStorage.setItem('tasks', JSON.stringify(storedData));
-
-// }
-
-// Track popup state
-// let isPopupOpen = false;
 
 floatingAddBtn.addEventListener('click', () => {
     isPopupOpen = !isPopupOpen;

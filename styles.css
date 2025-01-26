@@ -376,6 +376,8 @@ h2 {
     /* background-color: red; */
 }
 
+
+
 /* .day:has(:where(:text("Sun"))) {
     color: red;
 }
@@ -426,6 +428,7 @@ h2 {
 .afternoonTask,
 .eveningTask {
     display: flex;
+    padding: 0;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
     flex: 2;
@@ -433,7 +436,8 @@ h2 {
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    font-size: 8px;
+    /* was 8px */
+    font-size: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -477,6 +481,14 @@ h2 {
     border-image-slice: 1; /* Ensures the gradient fills the border */
 }
 
+
+.color-picker-special {
+    width: 100%;
+    height: 100%;
+    /* border-radius: 50%; */
+    cursor: pointer;
+    border: none;
+}
 
 .color-option {
     box-sizing: border-box;
