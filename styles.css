@@ -409,6 +409,7 @@ border: 2px solid #2277b0 ;
 
 
 .month-name-container {
+    font-family: monospace;
     display: flex;
     flex-direction: column;
     /* justify-content: space-evenly; */
