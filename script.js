@@ -498,11 +498,13 @@ clearButton.addEventListener('click', () => {
         // Check if the data for this date exists, then remove the task data
         if (storedData[fullDate]) {
             storedData[fullDate][taskType] = { task: '', color: '' }; // Clear task and color for this type
+
+            if (!storedData[fullDate].morning.task && !storedData[fullDate].afternoon.task && !storedData[fullDate].evening.task) {
+                delete storedData[fullDate]; // Remove date if no tasks are left
+            }
         }
 
-        if (!storedData[fullDate].morning.task && !storedData[fullDate].afternoon.task && !storedData[fullDate].evening.task) {
-            delete storedData[fullDate]; // Remove date if no tasks are left
-        }
+
 
         // Store the updated data back to localStorage
         localStorage.setItem('tasks', JSON.stringify(storedData));
