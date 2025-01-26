@@ -143,18 +143,41 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
         const morningTaskDiv = document.createElement('div');
         morningTaskDiv.classList.add('morningTask');
-        morningTaskDiv.textContent = taskData ? taskData.morning : morningTask;
+        if (taskData && taskData.morning) {
+            morningTaskDiv.textContent = taskData.morning.task; // Set the task text
+            morningTaskDiv.style.backgroundColor = taskData.morning.color;
+            // morningTaskDiv.style.border = `.5px solid ${taskData.morning.color}`;  // Set the task color
+        } else {
+            morningTaskDiv.textContent = morningTask; // Use default task text
+        }
+
+        // morningTaskDiv.textContent = taskData ? taskData.morning : morningTask;
         // morningTaskDiv.textContent = morningTask;
 
         const afternoonTaskDiv = document.createElement('div');
         afternoonTaskDiv.classList.add('afternoonTask');
+        if (taskData && taskData.afternoon) {
+            afternoonTaskDiv.textContent = taskData.afternoon.task; // Set the task text
+            afternoonTaskDiv.style.backgroundColor = taskData.afternoon.color; 
+            // afternoonTaskDiv.style.border = `.5px solid ${taskData.afternoon.color}`// Set the task color
+        } else {
+            afternoonTaskDiv.textContent = afternoonTask; // Use default task text
+        }
         // afternoonTaskDiv.textContent = afternoonTask;
-        afternoonTaskDiv.textContent = taskData ? taskData.afternoon : afternoonTask;
+        // afternoonTaskDiv.textContent = taskData ? taskData.afternoon : afternoonTask;
 
         const eveningTaskDiv = document.createElement('div');
         eveningTaskDiv.classList.add('eveningTask');
-        eveningTaskDiv.textContent = taskData ? taskData.evening : eveningTask;
+        if (taskData && taskData.evening) {
+            eveningTaskDiv.textContent = taskData.evening.task; // Set the task text
+            eveningTaskDiv.style.backgroundColor = taskData.evening.color; 
+            // eveningTaskDiv.style.border = `.5px solid ${taskData.evening.color}`// Set the task color
+        } else {
+            eveningTaskDiv.textContent = eveningTask; // Use default task text
+        }
+        // eveningTaskDiv.textContent = taskData ? taskData.evening : eveningTask;
         // eveningTaskDiv.textContent = eveningTask;
+
         date = date + 1;
         dayContainer.appendChild(dateDiv);
         dayContainer.appendChild(dayDiv);
@@ -441,28 +464,52 @@ submitTaskBtn.addEventListener('click', () => {
 
 
 
-function saveTaskData(date, taskType, updatedTask) {
+// function saveTaskData(date, taskType, updatedTask) {
+//     // Get the current data from localStorage (or initialize as an empty object if not yet saved)
+//     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
+    
+//     // Check if the date already exists in stored data
+//     if (!storedData[date]) {
+//         // If the date doesn't exist, initialize it with empty tasks
+//         storedData[date] = {
+//             morning: '',
+//             afternoon: '',
+//             evening: ''
+//         };
+//     }
+
+//     // Update the task for the specific type (morning, afternoon, or evening)
+//     storedData[date][taskType] = updatedTask;
+
+//     // Store the updated data back to localStorage
+//     localStorage.setItem('tasks', JSON.stringify(storedData));
+    
+//     console.log(`Saved task for ${taskType} on ${date}: ${updatedTask}`);
+// }
+
+function saveTaskData(date, taskType, updatedTask, taskColor) {
     // Get the current data from localStorage (or initialize as an empty object if not yet saved)
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
     
     // Check if the date already exists in stored data
     if (!storedData[date]) {
-        // If the date doesn't exist, initialize it with empty tasks
+        // If the date doesn't exist, initialize it with empty tasks and colors
         storedData[date] = {
-            morning: '',
-            afternoon: '',
-            evening: ''
+            morning: { task: '', color: '' },
+            afternoon: { task: '', color: '' },
+            evening: { task: '', color: '' }
         };
     }
 
-    // Update the task for the specific type (morning, afternoon, or evening)
-    storedData[date][taskType] = updatedTask;
+    // Update the task and color for the specific type (morning, afternoon, or evening)
+    storedData[date][taskType] = { task: updatedTask, color: taskColor };
 
     // Store the updated data back to localStorage
     localStorage.setItem('tasks', JSON.stringify(storedData));
     
-    console.log(`Saved task for ${taskType} on ${date}: ${updatedTask}`);
+    console.log(`Saved task for ${taskType} on ${date}: ${updatedTask} with color ${taskColor}`);
 }
+
 
 
 
@@ -522,6 +569,6 @@ floatingAddBtn.addEventListener('click', () => {
     // loadTasks();
 
     // Add click event listeners to the task divs
-addClickListeners();
+// addClickListeners();
 // });
 
