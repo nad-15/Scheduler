@@ -176,6 +176,8 @@ h2 {
     cursor: pointer;
     z-index: 1000;
     transition: transform 1s ease, background-color 0.3s ease;
+
+    -webkit-tap-highlight-color: transparent;
 }
 
 .clear-button {
@@ -197,6 +199,8 @@ h2 {
     cursor: pointer;
     z-index: 1000;
     transition: transform 1s ease, background-color 0.3s ease;
+
+    -webkit-tap-highlight-color: transparent;
 }
 
 .exit-flscreen-button {
@@ -559,6 +563,8 @@ border: 2px solid #2277b0 ;
     cursor: pointer;
     transition: transform 0.3s ease, border 0.3s ease;
     background-color: transparent; /* Default background */
+
+    -webkit-tap-highlight-color: transparent;
 }
 
 .color-option.selected-color {
