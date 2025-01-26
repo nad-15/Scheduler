@@ -270,7 +270,7 @@ h2 {
     flex-grow: 1;
     /* margin: 0 100px 0 100px; */
     overflow: scroll;
-    background-color: rgba(255, 255, 255, 0.9);
+    /* background-color: rgba(255, 255, 255, 0.9); */
 }
 
 
@@ -281,7 +281,7 @@ h2 {
     width: 100%;
     margin: 0;
     padding: 10px 10px;
-    background-color: rgba(255, 255, 255, 0.9);
+    /* background-color: rgba(255, 255, 255, 0.9); */
     /* box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2); */
 }
 
@@ -296,39 +296,36 @@ h2 {
     overflow: hidden;
     padding: 0;
     /* gap: 8px; */
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
+    border: none;
 }
 
 
-/* Input fields and button styles */
 #taskTitle {
     box-sizing: border-box;
-    padding: 5px;
-    /* border: 1px solid #ccc; */
-    border: none;
-    /* border-radius: 5px; */
-    flex: 8;
-    /* margin-top: 5px; */
-    /* margin-bottom: 5px; */
-    /* font-size: 12px; */
-
+    padding: 10px;
+    border: 2px solid #2277b0;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    flex: 8;  /* Makes the input take more space than the button */
+    font-size: 14px;
 }
 
 #submitTask {
     box-sizing: border-box;
     padding: 10px;
     background-color: #2277b0;
-    /* margin-top: 5px; */
-    /* margin-bottom: 5px; */
     color: white;
-    border: 1px solid #2277b0;
-    /* border-radius: 5px; */
+    border: 2px solid #2277b0;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
     cursor: pointer;
     font-weight: normal;
     font-size: 12px;
-    flex: 2;
-
+    flex: 2;  /* Makes the button take up less space than the input */
 }
+
+
 
 
 #submitTask:hover {
@@ -412,7 +409,7 @@ h2 {
     flex-direction: column;
     /* justify-content: space-evenly; */
     font-weight: bold;
-    padding: 0 8px 0px 8px;
+    padding: 0 7px 0px 7px;
     align-items: center;
     justify-content: center;
     height: 100%;
