@@ -1,3 +1,4 @@
+const colorSlider = document.getElementById('colorSlider');
 const clearButton = document.getElementById('clear-button');
 const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
@@ -383,9 +384,21 @@ document.querySelectorAll('.color-option').forEach(button => {
 });
 
 // Handle input from the custom color picker
-colorPickerInput.addEventListener('input', (e) => {
-    chosenColor = e.target.value;
-  });
+// colorPickerInput.addEventListener('input', (e) => {
+//     chosenColor = e.target.value;
+//   });
+
+
+colorSlider.addEventListener('input', (e) => {
+    // Map the slider value (0 to 255) to a hue (0 to 360 for rainbow)
+    const hue = e.target.value * (360 / 255); // hue ranges from 0 to 360
+    const color = `hsl(${hue}, 100%, 50%)`; // Use HSL to set the color
+    colorSlider.style.background = `linear-gradient(to right, hsl(${hue}, 100%, 50%), hsl(${(hue + 60) % 360}, 100%, 50%), hsl(${(hue + 120) % 360}, 100%, 50%), hsl(${(hue + 180) % 360}, 100%, 50%), hsl(${(hue + 240) % 360}, 100%, 50%), hsl(${(hue + 300) % 360}, 100%, 50%))`;
+    // Save the chosen color to the variable
+    chosenColor = color;
+    console.log(chosenColor);
+});
+
 
 yearContainer.addEventListener('click', (event) => {
     const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
@@ -433,6 +446,9 @@ submitTaskBtn.addEventListener('click', () => {
         slidingInputView.style.bottom = '-33%'; // Hide popup
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
         floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
+        // const slidingInputHeight = -(33 * window.innerHeight / 100);
+        floatingAddBtn.style.bottom = `${20}px`;
+        clearButton.style.bottom = `${80}px`;
         isPopupOpen = false;
     } else {
         alert('Please enter a task title.');
