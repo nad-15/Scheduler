@@ -164,7 +164,9 @@ h2 {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #4CAF50;
+    /* background-color: #4CAF50; */
+    background-color: rgba(76, 175, 80, 0.7);
+
     color: white;
     border: none;
     border-radius: 50%;
@@ -183,13 +185,35 @@ h2 {
     position: fixed;
     bottom: 80px;
     right: 20px;
-    background-color: #e57373;
+    /* background-color: #e57373; */
+    background-color: rgba(229, 115, 115, 0.7);
+
     color: white;
     border: none;
     border-radius: 50%;
     font-size: 24px;
     width: 50px;
     height: 50px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 1s ease, background-color 0.3s ease;
+}
+
+.exit-flscreen-button {
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(204, 204, 204, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
     z-index: 1000;
     transition: transform 1s ease, background-color 0.3s ease;
@@ -293,12 +317,15 @@ h2 {
 
 /* Task Template */
 .task-template {
+    display: flex;
     border: 1px solid #ccc;
     padding: 10px;
     text-align: center;
+    justify-content: center;
     font-family: monospace;
     width: 100%;
     flex-grow: 1;
+    margin: 0 10px 0 10px;
 }
 
 
@@ -481,53 +508,10 @@ h2 {
     border-image-slice: 1; /* Ensures the gradient fills the border */
 }
 
-#colorSlider {
-    display: none;
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 10px;
-    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-    border-radius: 5px;
-  }
-  
-  #colorSlider::-webkit-slider-thumb {
-    display: none;
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #fff;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid #ccc;
-  }
-  
-  #colorSlider::-moz-range-thumb {
-    display: none;
-    width: 20px;
-    height: 20px;
-    background: #fff;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid #ccc;
-  }
-  
-
-
-.color-picker-special {
-    display: none;
-    width: 100%;
-    height: 100%;
-    /* border-radius: 50%; */
-    cursor: pointer;
-    border: none;
-}
-
 .color-option {
     box-sizing: border-box;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%; /* Ensures circular shape */
     border: 2px solid transparent; /* Default transparent border */
     cursor: pointer;

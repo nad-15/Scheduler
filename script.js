@@ -1,4 +1,4 @@
-const colorSlider = document.getElementById('colorSlider');
+const exitFullscreenBtn = document.getElementById(`exit-flscreen-button`);
 const clearButton = document.getElementById('clear-button');
 const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
@@ -10,12 +10,6 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
 
-
-// Get the color picker input and predefined color options
-const colorPickerInput = document.getElementById('colorPickerInput');
-
-
-
 clearButton.addEventListener(`click`, () => {
     // localStorage.clear();
     //change this someday to not refresh the page
@@ -25,6 +19,7 @@ clearButton.addEventListener(`click`, () => {
 });
 
 fullScreenButton.addEventListener(`click`, enterFullScreen);
+
 let yearNameText = document.getElementById('year-name');
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
 let currentMonthContainer = null;
@@ -327,7 +322,7 @@ function getMonthName(value) {
         case 11: return "DECEMBER";
     }
 }
-
+exitFullscreenBtn.addEventListener("click", exitFullscreen);
 
 function enterFullScreen() {
     const docElement = document.documentElement;
@@ -338,19 +333,36 @@ function enterFullScreen() {
     } else if (docElement.msRequestFullscreen) {
         docElement.msRequestFullscreen(); // IE/Edge
     }
+
+    exitFullscreenBtn.style.display = `flex`;
     // Hide the yearNameContainer once fullscreen is entered
     yearNameContainer.style.display = 'none';
 
     slidingInputView.style.bottom = '-33%'; // Hide popup
-
-    floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
-    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+// Reset button position and rotation
+    floatingAddBtn.style.transform = 'rotate(0)'; 
+    // Reset button color to green
+    // floatingAddBtn.style.backgroundColor = '#4CAF50'; 
+    floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; 
 
     // const slidingInputHeight = -(33 * window.innerHeight / 100);
     floatingAddBtn.style.bottom = `${20}px`;
     clearButton.style.bottom = `${80}px`;
     isPopupOpen = false;
 }
+// Exit fullscreen function
+function exitFullscreen() {
+    if (document.fullscreenElement) { // Check if fullscreen is active
+        document.exitFullscreen()
+            .then(() => console.log("Exited fullscreen"))
+            .catch(err => console.error("Error exiting fullscreen:", err));
+    } else {
+        console.log("Fullscreen mode is not active");
+    }
+    exitFullscreenBtn.style.display = `none`;
+}
+
+
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
@@ -359,12 +371,13 @@ document.addEventListener('fullscreenchange', () => {
         slidingInputView.style.bottom = '-33%'; // Hide popup
 
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
-        floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+        floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
 
         // const slidingInputHeight = -(33 * window.innerHeight / 100);
         floatingAddBtn.style.bottom = `${20}px`;
         clearButton.style.bottom = `${80}px`;
         isPopupOpen = false;
+        exitFullscreenBtn.style.display = `none`;
     }
 });
 
@@ -382,23 +395,6 @@ document.querySelectorAll('.color-option').forEach(button => {
         button.classList.add('selected-color');
     });
 });
-
-// Handle input from the custom color picker
-// colorPickerInput.addEventListener('input', (e) => {
-//     chosenColor = e.target.value;
-//   });
-
-
-colorSlider.addEventListener('input', (e) => {
-    // Map the slider value (0 to 255) to a hue (0 to 360 for rainbow)
-    const hue = e.target.value * (360 / 255); // hue ranges from 0 to 360
-    const color = `hsl(${hue}, 100%, 50%)`; // Use HSL to set the color
-    colorSlider.style.background = `linear-gradient(to right, hsl(${hue}, 100%, 50%), hsl(${(hue + 60) % 360}, 100%, 50%), hsl(${(hue + 120) % 360}, 100%, 50%), hsl(${(hue + 180) % 360}, 100%, 50%), hsl(${(hue + 240) % 360}, 100%, 50%), hsl(${(hue + 300) % 360}, 100%, 50%))`;
-    // Save the chosen color to the variable
-    chosenColor = color;
-    console.log(chosenColor);
-});
-
 
 yearContainer.addEventListener('click', (event) => {
     const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
@@ -445,7 +441,7 @@ submitTaskBtn.addEventListener('click', () => {
         document.getElementById('taskTitle').value = '';
         slidingInputView.style.bottom = '-33%'; // Hide popup
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
-        floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
+        floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
         // const slidingInputHeight = -(33 * window.innerHeight / 100);
         floatingAddBtn.style.bottom = `${20}px`;
         clearButton.style.bottom = `${80}px`;
@@ -490,17 +486,19 @@ floatingAddBtn.addEventListener('click', () => {
         slidingInputView.style.bottom = '0'; // Show popup
 
         floatingAddBtn.style.transform = 'rotate(225deg)'; //rotate button
-        floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
+        // floatingAddBtn.style.backgroundColor = '#f44336'; 
+        // Change button color to red
+        floatingAddBtn.style.backgroundColor = 'rgba(244, 67, 54, 0.9)';
 
         // Adjust the button positions based on the sliding input view
         const slidingInputHeight = 33 * window.innerHeight / 100;
-        floatingAddBtn.style.bottom = `${slidingInputHeight + 20}px`;
-        clearButton.style.bottom = `${slidingInputHeight + 80}px`;
+        floatingAddBtn.style.bottom = `${slidingInputHeight+10}px`;
+        clearButton.style.bottom = `${slidingInputHeight + 70}px`;
     } else {
         slidingInputView.style.bottom = '-33%'; // Hide popup
 
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
-        floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+        floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
 
         // const slidingInputHeight = -(33 * window.innerHeight / 100);
         floatingAddBtn.style.bottom = `${20}px`;
