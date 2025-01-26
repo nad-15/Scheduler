@@ -7,6 +7,8 @@ const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
 
+let isPopupOpen = false;
+
 clearButton.addEventListener(`click`, () => {
     localStorage.clear();
     //change this someday to not refresh the page
@@ -153,19 +155,21 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
         // Make Sunday and Saturday different colors and bigger
         if (dayName === 'Sun' || dayName === 'Sat') {
-            dayDiv.style.fontSize = "15px";
+            dayDiv.style.fontSize = "12px";
             dayDiv.style.fontWeight = "bold";
             dayDiv.style.color = "white";
-            dayDiv.style.border = "none"; // Make the font larger
+            dayDiv.style.borderColor = ""; // Make the font larger
             if (dayName === 'Sun') {
                 // dayDiv.style.color = "red"; // Set the color for Sunday
                 dayDiv.style.backgroundColor = "#e57373"; //red
                 dateDiv.style.color = "red"; //red
+                dayDiv.style.borderColor = "#e57373";
 
             } else {
                 // dayDiv.style.color = "blue";
                 dayDiv.style.backgroundColor = "#3388cc"; 
                 dateDiv.style.color = "blue";// Set the color for Saturday
+                dayDiv.style.borderColor = "#3388cc";
             }
         }
 
@@ -329,12 +333,31 @@ function enterFullScreen() {
     }
     // Hide the yearNameContainer once fullscreen is entered
     yearNameContainer.style.display = 'none';
+
+    slidingInputView.style.bottom = '-33%'; // Hide popup
+
+    floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
+    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+
+    // const slidingInputHeight = -(33 * window.innerHeight / 100);
+    floatingAddBtn.style.bottom = `${20}px`;
+    clearButton.style.bottom = `${80}px`;
+    isPopupOpen = false;
 }
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
         // When exiting fullscreen, show the yearNameContainer again
         yearNameContainer.style.display = 'flex';
+        slidingInputView.style.bottom = '-33%'; // Hide popup
+
+        floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
+        floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+
+        // const slidingInputHeight = -(33 * window.innerHeight / 100);
+        floatingAddBtn.style.bottom = `${20}px`;
+        clearButton.style.bottom = `${80}px`;
+        isPopupOpen = false;
     }
 });
 
@@ -477,14 +500,12 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
 // }
 
 // Track popup state
-let isPopupOpen = false;
+// let isPopupOpen = false;
 
 floatingAddBtn.addEventListener('click', () => {
     isPopupOpen = !isPopupOpen;
 
     if (isPopupOpen) {
-
-
         slidingInputView.style.bottom = '0'; // Show popup
 
         floatingAddBtn.style.transform = 'rotate(225deg)'; //rotate button
