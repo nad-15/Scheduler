@@ -90,7 +90,7 @@ yearContainer.addEventListener('scroll', () => {
         // console.log(`Scrolled to the top`);
         // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
         // console.log(`Previous Month: ${prevDateMonth}, Last Date: ${prevDateLastDate}`);
-    } else if (scrollTop + clientHeight >= scrollHeight) {
+    } else if (scrollTop + clientHeight >= scrollHeight-10) {
         // Scroll to the bottom
         prevDate = currentDate;
         currentDate = nextDate;
