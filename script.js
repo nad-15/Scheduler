@@ -13,7 +13,7 @@ clearButton.addEventListener(`click`, () => {
     location.reload();
 
 
-} );
+});
 
 fullScreenButton.addEventListener(`click`, enterFullScreen);
 let yearNameText = document.getElementById('year-name');
@@ -124,8 +124,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         let letterDiv = document.createElement('div');
         letterDiv.textContent = letter;
         monthNameContainer.appendChild(letterDiv);
-        
-        if(monthName%2==0){
+
+        if (monthName % 2 == 0) {
             monthNameContainer.style.backgroundColor = '#82c6a2'; //lightgreen
         } else monthNameContainer.style.backgroundColor = '#53ab8b'; //darkgreen
     });
@@ -143,11 +143,26 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         dateDiv.textContent = date;
         dateDiv.setAttribute('data-full-date', `${yearDate}-${monthName}-${date}`); // Store the full date as a data attribute
 
-        
+
 
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
-        dayDiv.textContent = getDayName(day % 7);
+        //make sun and sat differenct colors and bigger
+        // Get the day name
+        const dayName = getDayName(day % 7);
+
+        // Make Sunday and Saturday different colors and bigger
+        if (dayName === 'Sun' || dayName === 'Sat') {
+            dayDiv.style.fontSize = "15px";
+            dayDiv.style.fontWeight = "bold"; // Make the font larger
+            if (dayName === 'Sun') {
+                dayDiv.style.color = "red"; // Set the color for Sunday
+            } else {
+                dayDiv.style.color = "blue"; // Set the color for Saturday
+            }
+        }
+
+        dayDiv.textContent = dayName;
 
         const taskData = storedData[`${yearDate}-${monthName}-${date}`];
 
@@ -168,7 +183,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         afternoonTaskDiv.classList.add('afternoonTask');
         if (taskData && taskData.afternoon) {
             afternoonTaskDiv.textContent = taskData.afternoon.task; // Set the task text
-            afternoonTaskDiv.style.backgroundColor = taskData.afternoon.color; 
+            afternoonTaskDiv.style.backgroundColor = taskData.afternoon.color;
             // afternoonTaskDiv.style.border = `.5px solid ${taskData.afternoon.color}`// Set the task color
         } else {
             afternoonTaskDiv.textContent = afternoonTask; // Use default task text
@@ -180,7 +195,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         eveningTaskDiv.classList.add('eveningTask');
         if (taskData && taskData.evening) {
             eveningTaskDiv.textContent = taskData.evening.task; // Set the task text
-            eveningTaskDiv.style.backgroundColor = taskData.evening.color; 
+            eveningTaskDiv.style.backgroundColor = taskData.evening.color;
             // eveningTaskDiv.style.border = `.5px solid ${taskData.evening.color}`// Set the task color
         } else {
             eveningTaskDiv.textContent = eveningTask; // Use default task text
@@ -195,8 +210,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         dayContainer.appendChild(afternoonTaskDiv);
         dayContainer.appendChild(eveningTaskDiv);
         monthContainer.appendChild(dayContainer);
-         //created 1-30 days
-         if(getDayName(day % 7) === "Sat"){
+        //created 1-30 days
+        if (getDayName(day % 7) === "Sat") {
             const weekSpacer = document.createElement('div');
             weekSpacer.classList.add(`week-spacer`);
             monthContainer.appendChild(weekSpacer);
@@ -274,7 +289,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 function getDayName(value) {
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     return days[value];
 }
 // format Month Names
@@ -305,7 +320,7 @@ function enterFullScreen() {
     } else if (docElement.msRequestFullscreen) {
         docElement.msRequestFullscreen(); // IE/Edge
     }
-// Hide the yearNameContainer once fullscreen is entered
+    // Hide the yearNameContainer once fullscreen is entered
     yearNameContainer.style.display = 'none';
 }
 
@@ -363,7 +378,7 @@ submitTaskBtn.addEventListener('click', () => {
             const dayContainer = div.closest('.day-container');
             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
             const taskType = div.classList.contains('morningTask') ? 'morning' :
-                             div.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+                div.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
 
             saveTaskData(date, taskType, taskTitle, chosenColor); // Pass color along with other task data
         });
@@ -391,7 +406,7 @@ submitTaskBtn.addEventListener('click', () => {
 // function saveTaskData(date, taskType, updatedTask) {
 //     // Get the current data from localStorage (or initialize as an empty object if not yet saved)
 //     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
-    
+
 //     // Check if the date already exists in stored data
 //     if (!storedData[date]) {
 //         // If the date doesn't exist, initialize it with empty tasks
@@ -407,14 +422,14 @@ submitTaskBtn.addEventListener('click', () => {
 
 //     // Store the updated data back to localStorage
 //     localStorage.setItem('tasks', JSON.stringify(storedData));
-    
+
 //     console.log(`Saved task for ${taskType} on ${date}: ${updatedTask}`);
 // }
 
 function saveTaskData(date, taskType, updatedTask, taskColor) {
     // Get the current data from localStorage (or initialize as an empty object if not yet saved)
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
-    
+
     // Check if the date already exists in stored data
     if (!storedData[date]) {
         // If the date doesn't exist, initialize it with empty tasks and colors
@@ -430,7 +445,7 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
 
     // Store the updated data back to localStorage
     localStorage.setItem('tasks', JSON.stringify(storedData));
-    
+
     console.log(`Saved task for ${taskType} on ${date}: ${updatedTask} with color ${taskColor}`);
 }
 
@@ -458,30 +473,30 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
 let isPopupOpen = false;
 
 floatingAddBtn.addEventListener('click', () => {
-  isPopupOpen = !isPopupOpen;
+    isPopupOpen = !isPopupOpen;
 
-  if (isPopupOpen) {
+    if (isPopupOpen) {
 
 
-    slidingInputView.style.bottom = '0'; // Show popup
+        slidingInputView.style.bottom = '0'; // Show popup
 
-    floatingAddBtn.style.transform =  'rotate(225deg)'; //rotate button
-    floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
+        floatingAddBtn.style.transform = 'rotate(225deg)'; //rotate button
+        floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
 
-    // Adjust the button positions based on the sliding input view
-    const slidingInputHeight = 33 * window.innerHeight / 100;
-    floatingAddBtn.style.bottom = `${slidingInputHeight + 20}px`; 
-    clearButton.style.bottom = `${slidingInputHeight + 80}px`;  
-  } else {
-    slidingInputView.style.bottom = '-33%'; // Hide popup
+        // Adjust the button positions based on the sliding input view
+        const slidingInputHeight = 33 * window.innerHeight / 100;
+        floatingAddBtn.style.bottom = `${slidingInputHeight + 20}px`;
+        clearButton.style.bottom = `${slidingInputHeight + 80}px`;
+    } else {
+        slidingInputView.style.bottom = '-33%'; // Hide popup
 
-    floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
-    floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
+        floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
+        floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color to green
 
-    // const slidingInputHeight = -(33 * window.innerHeight / 100);
-    floatingAddBtn.style.bottom = `${20}px`; 
-    clearButton.style.bottom = `${80}px`;  
-  }
+        // const slidingInputHeight = -(33 * window.innerHeight / 100);
+        floatingAddBtn.style.bottom = `${20}px`;
+        clearButton.style.bottom = `${80}px`;
+    }
 });
 
 
