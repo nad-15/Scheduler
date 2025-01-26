@@ -406,6 +406,17 @@ h2 {
     transition: all 0.3s ease;
 }
 
+.selected {
+    border: 2px solid #4CAF50; /* Highlight border */
+    background-color: rgba(76, 175, 80, 0.1); /* Subtle background highlight */
+    transition: all 0.3s ease;
+}
+
+.selected-color {
+    border: 2px solid #000; /* Visual cue for the selected color */
+}
+
+
 
 
 .morning {

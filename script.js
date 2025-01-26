@@ -320,56 +320,125 @@ document.addEventListener('fullscreenchange', () => {
 //     });
 // }
 
-function addClickListeners() {
-    console.log('listener is called');
+// function addClickListeners() {
+//     console.log('listener is called');
 
-    yearContainer.addEventListener('click', (event) => {
-        const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
+//     yearContainer.addEventListener('click', (event) => {
+//         const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
-        if (taskElement) {
-            const dayContainer = taskElement.closest('.day-container');
-            const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
-            const taskType = taskElement.classList.contains('morningTask') ? 'morning' :
-                             taskElement.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+//         if (taskElement) {
+//             const dayContainer = taskElement.closest('.day-container');
+//             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
+//             const taskType = taskElement.classList.contains('morningTask') ? 'morning' :
+//                              taskElement.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
 
-            const currentTask = taskElement.textContent;
+//             const currentTask = taskElement.textContent;
 
-            taskElement.classList.add('task-highlight');
+//             taskElement.classList.add('task-highlight');
 
-            // Open the sliding input view and pre-fill the input
-            isPopupOpen = true;
-            slidingInputView.style.bottom = '0'; // Show popup
-            floatingAddBtn.style.transform = 'rotate(225deg)';
-            floatingAddBtn.style.backgroundColor = '#f44336';
+//             // Open the sliding input view and pre-fill the input
+//             isPopupOpen = true;
+//             slidingInputView.style.bottom = '0'; // Show popup
+//             floatingAddBtn.style.transform = 'rotate(225deg)';
+//             floatingAddBtn.style.backgroundColor = '#f44336';
 
-            const taskTitleInput = document.getElementById('taskTitle');
-            taskTitleInput.value = currentTask; // Pre-fill input with current task
+//             const taskTitleInput = document.getElementById('taskTitle');
+//             taskTitleInput.value = currentTask; // Pre-fill input with current task
 
-            // Dynamically set the submit button action
-            submitTaskBtn.onclick = () => {
-                const updatedTask = taskTitleInput.value;
+//             // Dynamically set the submit button action
+//             submitTaskBtn.onclick = () => {
+//                 const updatedTask = taskTitleInput.value;
 
-                if (updatedTask) {
-                    // Update task in the DOM
-                    taskElement.textContent = updatedTask;
+//                 if (updatedTask) {
+//                     // Update task in the DOM
+//                     taskElement.textContent = updatedTask;
 
-                    // Save updated task data
-                    saveTaskData(date, taskType, updatedTask);
+//                     // Save updated task data
+//                     saveTaskData(date, taskType, updatedTask);
 
-                    // Reset inputs and hide the sliding input view
-                    taskTitleInput.value = '';
-                    slidingInputView.style.bottom = '-33%';
-                    floatingAddBtn.style.transform = 'rotate(0)';
-                    floatingAddBtn.style.backgroundColor = '#4CAF50';
-                    isPopupOpen = false;
-                    taskElement.classList.remove('task-highlight');
-                } else {
-                    alert('Please enter a task title.');
-                }
-            };
-        }
+//                     // Reset inputs and hide the sliding input view
+//                     taskTitleInput.value = '';
+//                     slidingInputView.style.bottom = '-33%';
+//                     floatingAddBtn.style.transform = 'rotate(0)';
+//                     floatingAddBtn.style.backgroundColor = '#4CAF50';
+//                     isPopupOpen = false;
+//                     taskElement.classList.remove('task-highlight');
+//                 } else {
+//                     alert('Please enter a task title.');
+//                 }
+//             };
+//         }
+//     });
+// }
+
+let selectedDivs = []; // Array to track selected divs
+let chosenColor = '';  // Store the chosen color
+
+// Event listener for selecting colors
+document.querySelectorAll('.color-option').forEach(button => {
+    button.addEventListener('click', () => {
+        chosenColor = button.getAttribute('data-color'); // Get the selected color
+        // Highlight the selected button
+        document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected-color'));
+        button.classList.add('selected-color');
     });
-}
+});
+
+yearContainer.addEventListener('click', (event) => {
+    const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
+
+    if (taskElement) {
+        // Toggle selection of task div
+        if (selectedDivs.includes(taskElement)) {
+            selectedDivs = selectedDivs.filter(div => div !== taskElement);
+            taskElement.classList.remove('selected');
+        } else {
+            selectedDivs.push(taskElement);
+            taskElement.classList.add('selected');
+        }
+    }
+});
+
+submitTaskBtn.addEventListener('click', () => {
+    const taskTitle = document.getElementById('taskTitle').value;
+
+    if (taskTitle) {
+        selectedDivs.forEach(div => {
+            // Update task text
+            div.textContent = taskTitle;
+
+            // Apply the chosen color to the selected divs
+            if (chosenColor) {
+                div.style.backgroundColor = chosenColor; // Apply the selected color
+            }
+
+            // Save the task data (including color)
+            const dayContainer = div.closest('.day-container');
+            const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
+            const taskType = div.classList.contains('morningTask') ? 'morning' :
+                             div.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+
+            saveTaskData(date, taskType, taskTitle, chosenColor); // Pass color along with other task data
+        });
+
+        // Clear selection and reset styles
+        selectedDivs.forEach(div => div.classList.remove('selected'));
+        selectedDivs = []; // Clear the array
+
+        // Reset inputs and hide the sliding input view
+        document.getElementById('taskTitle').value = '';
+        slidingInputView.style.bottom = '-33%'; // Hide popup
+        floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
+        floatingAddBtn.style.backgroundColor = '#4CAF50'; // Reset button color
+        isPopupOpen = false;
+    } else {
+        alert('Please enter a task title.');
+    }
+});
+
+
+
+
 
 
 function saveTaskData(date, taskType, updatedTask) {
