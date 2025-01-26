@@ -154,11 +154,18 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         // Make Sunday and Saturday different colors and bigger
         if (dayName === 'Sun' || dayName === 'Sat') {
             dayDiv.style.fontSize = "15px";
-            dayDiv.style.fontWeight = "bold"; // Make the font larger
+            dayDiv.style.fontWeight = "bold";
+            dayDiv.style.color = "white";
+            dayDiv.style.border = "none"; // Make the font larger
             if (dayName === 'Sun') {
-                dayDiv.style.color = "red"; // Set the color for Sunday
+                // dayDiv.style.color = "red"; // Set the color for Sunday
+                dayDiv.style.backgroundColor = "#e57373"; //red
+                dateDiv.style.color = "red"; //red
+
             } else {
-                dayDiv.style.color = "blue"; // Set the color for Saturday
+                // dayDiv.style.color = "blue";
+                dayDiv.style.backgroundColor = "#3388cc"; 
+                dateDiv.style.color = "blue";// Set the color for Saturday
             }
         }
 
