@@ -450,7 +450,13 @@ submitTaskBtn.addEventListener('click', () => {
         clearButton.style.bottom = `${80}px`;
         isPopupOpen = false;
     } else {
-        alert('Please enter a task title.');
+        slidingInputView.style.bottom = '-33%'; // Hide popup
+        floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
+        floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
+        // const slidingInputHeight = -(33 * window.innerHeight / 100);
+        floatingAddBtn.style.bottom = `${20}px`;
+        clearButton.style.bottom = `${80}px`;
+        isPopupOpen = false;
     }
 });
 
