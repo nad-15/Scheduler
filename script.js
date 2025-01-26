@@ -417,7 +417,7 @@ yearContainer.addEventListener('click', (event) => {
 submitTaskBtn.addEventListener('click', () => {
     const taskTitle = document.getElementById('taskTitle').value;
 
-    if (taskTitle) {
+    if (taskTitle || chosenColor !='') {
         selectedDivs.forEach(div => {
             // Update task text
             div.textContent = taskTitle;
