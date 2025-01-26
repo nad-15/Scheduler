@@ -74,18 +74,28 @@ h1 {
     box-sizing: border-box;
     display: flex;
     margin: 0;
-    font-size: 10px;
+    font-size: 15px;
     justify-content: space-between;
     align-items: center;
     /* margin: 0 12px; */
     padding: 8px 15px 8px 15px;
     /* background-color: rgb(238, 198, 198); */
     /* background-color: #3388cc ; */
-    /* background-color: white; */
-    background-color: rgba(255, 255, 255, 0.5); /* White background with 90% opacity */
+    background-color: white;
+    /* background-color: rgba(255, 255, 255, 0.5); */
+    /* White background with 90% opacity */
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);
     /* background-color: #ccc; */
 
+    /* Make it fixed */
+    position: fixed;
+    top: 0;
+    /* or set to any specific value */
+    left: 0;
+    right: 0;
+    /* if you want it to stretch across the screen */
+    z-index: 1000;
+    /* Ensures it stays on top */
 }
 
 .navi-button {
@@ -165,6 +175,25 @@ h2 {
     color: white;
     border: none;
     border-radius: 50%;
+    font-size: 30px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 1s ease, background-color 0.3s ease;
+}
+
+.clear-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background-color: #e57373;
+    color: white;
+    border: none;
+    border-radius: 50%;
     font-size: 24px;
     width: 50px;
     height: 50px;
@@ -172,6 +201,8 @@ h2 {
     z-index: 1000;
     transition: transform 1s ease, background-color 0.3s ease;
 }
+
+
 
 .floating-add-btn:hover {
     transform: scale(1.1);
@@ -187,7 +218,8 @@ h2 {
     width: 100%;
     height: 33%;
     /* background-color: white; */
-    background-color: rgba(255, 255, 255, 0.9); /* White background with 90% opacity */
+    background-color: rgba(255, 255, 255, 0.9);
+    /* White background with 90% opacity */
     padding: 10px;
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);
     transition: bottom 0.3s ease;
@@ -292,12 +324,14 @@ h2 {
     /* padding-right: 8px; */
     /* margin: 0 auto;  */
     /* overflow: hidden; */
-    scrollbar-width: none; /* For Firefox */
+    scrollbar-width: none;
+    /* For Firefox */
     /* cursor: grab; */
 }
 
 #year-container::-webkit-scrollbar {
-    display: none; /* For Chrome, Safari, and Edge */
+    display: none;
+    /* For Chrome, Safari, and Edge */
 }
 
 
@@ -309,18 +343,18 @@ h2 {
 }
 
 .month-name-container {
-    display: flex;              
-    flex-direction: column;     
+    display: flex;
+    flex-direction: column;
     /* justify-content: space-evenly; */
     font-weight: bold;
     padding: 0 8px 0px 8px;
     align-items: center;
     justify-content: center;
-    height: 100%;     
+    height: 100%;
     width: 30px;
     /* flex: 1;         */
-  }
-  
+}
+
 .month-container {
     box-sizing: border-box;
     display: flex;
@@ -339,6 +373,7 @@ h2 {
     border: none;
     /* background-color: red; */
 }
+
 /* .day:has(:where(:text("Sun"))) {
     color: red;
 }
@@ -393,27 +428,36 @@ h2 {
     /* align-content: center; */
 }
 
-.morningTask:active, .afternoonTask:active, .eveningTask:active {
-    transform: scale(0.95); /* Slightly shrink the element */
-    background-color: rgba(0, 0, 0, 0.1); /* Add a temporary overlay */
+.morningTask:active,
+.afternoonTask:active,
+.eveningTask:active {
+    transform: scale(0.95);
+    /* Slightly shrink the element */
+    background-color: rgba(0, 0, 0, 0.1);
+    /* Add a temporary overlay */
     transition: transform 0.1s ease, background-color 0.1s ease;
 }
 
 
 .task-highlight {
-    border: 2px solid #4CAF50; /* Highlight border */
-    background-color: rgba(76, 175, 80, 0.1); /* Subtle background highlight */
+    border: 2px solid #4CAF50;
+    /* Highlight border */
+    background-color: rgba(76, 175, 80, 0.1);
+    /* Subtle background highlight */
     transition: all 0.3s ease;
 }
 
 .selected {
-    border: 2px solid #4CAF50; /* Highlight border */
-    background-color: rgba(76, 175, 80, 0.1); /* Subtle background highlight */
+    border: 2px solid #4CAF50;
+    /* Highlight border */
+    background-color: rgba(76, 175, 80, 0.1);
+    /* Subtle background highlight */
     transition: all 0.3s ease;
 }
 
 .selected-color {
-    border: 2px solid #000; /* Visual cue for the selected color */
+    border: 2px solid #000;
+    /* Visual cue for the selected color */
 }
 
 
@@ -438,15 +482,22 @@ h2 {
     }
 
     #year-container::-webkit-scrollbar {
-        display:block; /* For Chrome, Safari, and Edge */
+        display: auto;
+        /* For Chrome, Safari, and Edge */
     }
 
     #year-container {
-        scrollbar-width:auto;
+        scrollbar-width: auto;
     }
+
     .sliding-input-view {
         width: 60%;
     }
 
+    .year-name-text-container {
+        /* width: 60%; */
+        position: sticky;
+        align-self: center;
+    }
 
 }

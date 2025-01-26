@@ -1,3 +1,4 @@
+const clearButton = document.getElementById('clear-button');
 const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
 const submitTaskBtn = document.getElementById('submitTask');
@@ -5,6 +6,14 @@ const submitTaskBtn = document.getElementById('submitTask');
 const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
+
+clearButton.addEventListener(`click`, () => {
+    localStorage.clear();
+    //change this someday to not refresh the page
+    location.reload();
+
+
+} );
 
 fullScreenButton.addEventListener(`click`, enterFullScreen);
 let yearNameText = document.getElementById('year-name');
@@ -307,92 +316,6 @@ document.addEventListener('fullscreenchange', () => {
 });
 
 
-// addClickListeners(); //put it in its proper place later
-// function addClickListeners() {
-//     console.log(`listener is called`);
-
-//     // Use event delegation by adding the listener to the container
-//     yearContainer.addEventListener('click', (event) => {
-//         const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
-
-//         if (taskElement) {
-//             // Get the parent container (day container) of the clicked task
-//             const dayContainer = taskElement.closest('.day-container');
-
-//             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
-//             console.log(date);
-//             const morningTask = dayContainer.querySelector('.morningTask').textContent;
-//             const afternoonTask = dayContainer.querySelector('.afternoonTask').textContent;
-//             const eveningTask = dayContainer.querySelector('.eveningTask').textContent;
-
-//             // Show a popup to input tasks
-//             let newMorning = prompt("Enter morning task:", morningTask);
-//             let newAfternoon = prompt("Enter afternoon task:", afternoonTask);
-//             let newEvening = prompt("Enter evening task:", eveningTask);
-
-//             // Update the task divs with the new data
-//             dayContainer.querySelector('.morningTask').textContent = newMorning;
-//             dayContainer.querySelector('.afternoonTask').textContent = newAfternoon;
-//             dayContainer.querySelector('.eveningTask').textContent = newEvening;
-
-//             // Save updated tasks using saveData
-//             saveTaskData(date, newMorning, newAfternoon, newEvening);
-//             console.log(date);
-
-//         }
-//     });
-// }
-
-// function addClickListeners() {
-//     console.log('listener is called');
-
-//     yearContainer.addEventListener('click', (event) => {
-//         const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
-
-//         if (taskElement) {
-//             const dayContainer = taskElement.closest('.day-container');
-//             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
-//             const taskType = taskElement.classList.contains('morningTask') ? 'morning' :
-//                              taskElement.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
-
-//             const currentTask = taskElement.textContent;
-
-//             taskElement.classList.add('task-highlight');
-
-//             // Open the sliding input view and pre-fill the input
-//             isPopupOpen = true;
-//             slidingInputView.style.bottom = '0'; // Show popup
-//             floatingAddBtn.style.transform = 'rotate(225deg)';
-//             floatingAddBtn.style.backgroundColor = '#f44336';
-
-//             const taskTitleInput = document.getElementById('taskTitle');
-//             taskTitleInput.value = currentTask; // Pre-fill input with current task
-
-//             // Dynamically set the submit button action
-//             submitTaskBtn.onclick = () => {
-//                 const updatedTask = taskTitleInput.value;
-
-//                 if (updatedTask) {
-//                     // Update task in the DOM
-//                     taskElement.textContent = updatedTask;
-
-//                     // Save updated task data
-//                     saveTaskData(date, taskType, updatedTask);
-
-//                     // Reset inputs and hide the sliding input view
-//                     taskTitleInput.value = '';
-//                     slidingInputView.style.bottom = '-33%';
-//                     floatingAddBtn.style.transform = 'rotate(0)';
-//                     floatingAddBtn.style.backgroundColor = '#4CAF50';
-//                     isPopupOpen = false;
-//                     taskElement.classList.remove('task-highlight');
-//                 } else {
-//                     alert('Please enter a task title.');
-//                 }
-//             };
-//         }
-//     });
-// }
 
 let selectedDivs = []; // Array to track selected divs
 let chosenColor = '';  // Store the chosen color
@@ -537,9 +460,16 @@ floatingAddBtn.addEventListener('click', () => {
   isPopupOpen = !isPopupOpen;
 
   if (isPopupOpen) {
+
+
     slidingInputView.style.bottom = '0'; // Show popup
+    const slidingInputPosition = slidingInputView.getBoundingClientRect();
     floatingAddBtn.style.transform =  'rotate(225deg)'; //rotate button
     floatingAddBtn.style.backgroundColor = '#f44336'; // Change button color to red
+
+    // Adjust the button positions based on the sliding input view
+    floatingAddBtn.style.bottom = `${slidingInputPosition + 20}px`;  // Adjust as needed
+    clearButton.style.bottom = `${slidingInputPosition + 80}px`;  
   } else {
     slidingInputView.style.bottom = '-33%'; // Hide popup
     floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
