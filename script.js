@@ -11,17 +11,15 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
 
-taskInput.addEventListener('focus', () => {
-    taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+const inputField = document.querySelector('#taskTitle');
+
+inputField.addEventListener('focus', () => {
+    setTimeout(() => {
+        inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300); // Wait for the keyboard to appear
 });
 
-clearButton.addEventListener(`click`, () => {
-    // localStorage.clear();
-    //change this someday to not refresh the page
-    location.reload();
 
-
-});
 
 fullScreenButton.addEventListener(`click`, enterFullScreen);
 
@@ -484,6 +482,53 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
 
 
 
+clearButton.addEventListener('click', () => {
+    // Loop through selected divs and clear their saved data
+    selectedDivs.forEach(selectedDiv => {
+        const dayContainer = selectedDiv.closest('.day-container');
+        const fullDate = dayContainer.querySelector('.date').getAttribute('data-full-date');
+        
+        // Get current data from localStorage
+        let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
+
+        // Remove the specific task data (morning, afternoon, evening) from the selected div
+        const taskType = selectedDiv.classList.contains('morningTask') ? 'morning' :
+                         selectedDiv.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+
+        // Check if the data for this date exists, then remove the task data
+        if (storedData[fullDate]) {
+            storedData[fullDate][taskType] = { task: '', color: '' }; // Clear task and color for this type
+        }
+
+        if (!storedData[fullDate].morning.task && !storedData[fullDate].afternoon.task && !storedData[fullDate].evening.task) {
+            delete storedData[fullDate]; // Remove date if no tasks are left
+        }
+
+        // Store the updated data back to localStorage
+        localStorage.setItem('tasks', JSON.stringify(storedData));
+
+        // Clear the UI data as well
+        selectedDiv.textContent = ''; // Clear task text
+        selectedDiv.style.backgroundColor = ''; // Remove background color
+    });
+
+    // Clear the selected divs list and update the UI
+    selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
+    selectedDivs = []; // Clear the array of selected divs
+
+    // Optionally reset UI elements (like task title input and any other related UI)
+    document.getElementById('taskTitle').value = ''; // Reset task input field
+    slidingInputView.style.bottom = '-33%'; // Hide sliding input view (or adjust to your logic)
+    floatingAddBtn.style.transform = 'rotate(0)'; // Reset add button
+    floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset add button color
+    floatingAddBtn.style.bottom = `${20}px`; // Reset button position
+    clearButton.style.bottom = `${80}px`; // Reset clear button position
+    isPopupOpen = false; // Optional: Reset any state flags
+});
+
+
+
+
 floatingAddBtn.addEventListener('click', () => {
     isPopupOpen = !isPopupOpen;
 
@@ -510,5 +555,4 @@ floatingAddBtn.addEventListener('click', () => {
         clearButton.style.bottom = `${80}px`;
     }
 });
-
 
