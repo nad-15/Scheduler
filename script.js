@@ -1,3 +1,4 @@
+const taskInput = document.getElementById('taskTitle');
 const exitFullscreenBtn = document.getElementById(`exit-flscreen-button`);
 const clearButton = document.getElementById('clear-button');
 const floatingAddBtn = document.getElementById('floatingAddBtn');
@@ -9,6 +10,10 @@ const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
+
+taskInput.addEventListener('focus', () => {
+    taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
 
 clearButton.addEventListener(`click`, () => {
     // localStorage.clear();
