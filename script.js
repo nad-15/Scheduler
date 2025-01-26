@@ -556,3 +556,8 @@ floatingAddBtn.addEventListener('click', () => {
     }
 });
 
+window.addEventListener('popstate', () => {
+    if (taskInput) {
+        taskInput.blur(); // Remove focus from the input field
+    }
+});
