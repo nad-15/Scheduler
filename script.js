@@ -327,6 +327,8 @@ function getMonthName(value) {
 }
 exitFullscreenBtn.addEventListener("click", exitFullscreen);
 
+
+
 function enterFullScreen() {
     const docElement = document.documentElement;
     if (docElement.requestFullscreen) {
@@ -336,7 +338,7 @@ function enterFullScreen() {
     } else if (docElement.msRequestFullscreen) {
         docElement.msRequestFullscreen(); // IE/Edge
     }
-
+    fullScreenButton.style.display = 'none';
     exitFullscreenBtn.style.display = `flex`;
     // Hide the yearNameContainer once fullscreen is entered
     yearNameContainer.style.display = 'none';
@@ -363,6 +365,7 @@ function exitFullscreen() {
         console.log("Fullscreen mode is not active");
     }
     exitFullscreenBtn.style.display = `none`;
+    fullScreenButton.style.display = 'flex';
 }
 
 

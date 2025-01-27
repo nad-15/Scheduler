@@ -71,6 +71,19 @@ h1 {
     margin: 0;
 }
 
+#year-name {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    border-radius: 0px;
+    display: flex;
+    background-color: rgba(204, 204, 204, 0.5);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    font-size: 35px;
+    border-radius: 5px;
+}
+
 .year-name-text-container {
     box-sizing: border-box;
     display: flex;
@@ -205,9 +218,9 @@ h2 {
     -webkit-tap-highlight-color: transparent;
 }
 
-.exit-flscreen-button {
+.screen-size-change {
 
-    display: none;
+    /* display: none; */
     justify-content: center;
     align-items: center;
     position: fixed;
@@ -223,6 +236,13 @@ h2 {
     cursor: pointer;
     z-index: 1000;
     transition: transform 1s ease, background-color 0.3s ease;
+}
+
+.exit-flscreen-button {
+    display: none;
+}
+.fullscreen-btn {
+    display: flex;
 }
 
 .floating-add-btn,
@@ -649,6 +669,16 @@ border: 2px solid #2277b0 ;
         bottom: 80px;
         right: calc(20px + 20vw);
 
+    }.screen-size-change {
+
+        /* display: none; */
+        top: 20px;
+        right: calc(20px + 20vw);
+    
     }
+
+    #year-name {
+
+        left: calc(20px + 20vw);
 
 }

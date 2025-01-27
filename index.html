@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=3, user-scalable=yes">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=3, user-scalable=yes">
     <title>Scheduler</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -24,20 +25,20 @@
         </div>
         <div class="month">
 
-            <div class="year-name-text-container" id="year-name-text-container">
-                <div class="navi-buttons button-container">
+
+            <!-- <div class="year-name-text-container" id="year-name-text-container"> -->
+                <!-- <div class="navi-buttons button-container">
                     <button class="buttons" id="button-prev-month"><i class="material-icons">arrow_back</i></button>
                     <button class="buttons" id="button-next-month"><i class="material-icons">arrow_forward</i></button>
-                </div>
-                <h2 id="year-name"></h2>
-                <div class="full-screen-container button-container">
+                </div> -->
+                <h2 class="year-name" id="year-name"></h2>
+                <!-- <div class="full-screen-container button-container"> -->
                     <!-- Full-Screen Button -->
-                    <button class="fullscreen-btn buttons" id="fullscreen-button"><i
-                            class="material-icons">fullscreen</i></button>
-                    <!-- <button class="buttons" id="download-button"><i class="fa fa-download"></i></button> -->
-                    <button class="buttons" id="download-button"><i class="material-icons">file_download</i></button>
-                </div>
-            </div>
+                    <!-- <button class="fullscreen-btn buttons screen-size-change" id="fullscreen-button"><i
+                            class="material-icons">fullscreen</i></button> -->
+                    <!-- <button class="buttons" id="download-button"><i class="material-icons">file_download</i></button> -->
+                <!-- </div> -->
+            <!-- </div> -->
 
 
             <div class="container" id="year-container">
@@ -53,44 +54,54 @@
             <!-- <button class="clear-button"></button> -->
             <button class="clear-button" id="clear-button">
                 <span class="material-icons">delete</span></button>
-            <button class="exit-flscreen-button" id="exit-flscreen-button">
+            <button class="exit-flscreen-button screen-size-change" id="exit-flscreen-button">
                 <span class="material-icons">fullscreen_exit</span></button>
+            <button class="fullscreen-btn buttons screen-size-change" id="fullscreen-button"><i
+                    class="material-icons">fullscreen</i></button>
 
 
             <!-- Sliding Input View -->
             <div class="sliding-input-view" id="slidingInputView">
-                
+
                 <div class="taskinput-color-container">
                     <div class="title-submit-container">
-                        <input type="text" id="taskTitle" autocomplete="off" inputmode="text" placeholder="Enter Task Title">
+                        <input type="text" id="taskTitle" autocomplete="off" inputmode="text"
+                            placeholder="Enter Task Title">
                         <button class="buttons" id="submitTask">Save</button>
                     </div>
                     <!-- Color Picker (6 predefined colors) -->
                     <div class="color-picker" id="colorPicker">
                         <div class="color-option-container">
-                          <button class="color-option selected-color" data-color="#e5f5e0 " style="background-color: #e5f5e0 ; "autofocus></button>
+                            <button class="color-option selected-color" data-color="#e5f5e0 "
+                                style="background-color: #e5f5e0 ; " autofocus></button>
                         </div>
                         <div class="color-option-container">
-                          <button class="color-option" data-color="#e27396 " style="background-color: #e27396 ;"></button>
+                            <button class="color-option" data-color="#e27396 "
+                                style="background-color: #e27396 ;"></button>
                         </div>
                         <div class="color-option-container">
-                          <button class="color-option" data-color="#ffc09f" style="background-color: #ffc09f;"></button>
+                            <button class="color-option" data-color="#ffc09f"
+                                style="background-color: #ffc09f;"></button>
                         </div>
                         <div class="color-option-container">
-                          <button class="color-option" data-color="#4caf50" style="background-color: #4caf50;"></button>
+                            <button class="color-option" data-color="#4caf50"
+                                style="background-color: #4caf50;"></button>
                         </div>
                         <div class="color-option-container">
-                          <button class="color-option" data-color="#3388cc" style="background-color: #3388cc;"></button>
+                            <button class="color-option" data-color="#3388cc"
+                                style="background-color: #3388cc;"></button>
                         </div>
                         <div class="color-option-container">
-                          <button class="color-option" data-color="#ffee93" style="background-color: #ffee93;"></button>
+                            <button class="color-option" data-color="#ffee93"
+                                style="background-color: #ffee93;"></button>
                         </div>
                         <div class="color-option-container">
-                          <button class="color-option" data-color="#dfb2f4" style="background-color: #dfb2f4;"></button>
+                            <button class="color-option" data-color="#dfb2f4"
+                                style="background-color: #dfb2f4;"></button>
                         </div>
-                  
-                  
-                      </div>
+
+
+                    </div>
                 </div>
 
                 <div class="task-template">Task template</div>
