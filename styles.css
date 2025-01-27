@@ -363,7 +363,7 @@ border: 2px solid #2277b0 ;
 
 
 .color-option:hover {
-    transform: scale(.9);
+    transform: scale(.95);
 }
 
 /* .color-option.selected {
@@ -499,7 +499,7 @@ border: 2px solid #2277b0 ;
 .day {
     font-size: 12px;
     font-family: monospace;
-    
+
 }
 
 .morningTask,
@@ -574,8 +574,8 @@ border: 2px solid #2277b0 ;
 
 .color-option.selected-color {
     border: 5px solid transparent;
-    width: 30px;
-    height: 30px;
+    width: 31px;
+    height: 31px;
   }
   .color-option-container {
     display: flex;
