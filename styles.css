@@ -555,6 +555,7 @@ border: 2px solid #2277b0 ;
     background-color: #ADD8E6; /*highlight blue */
     transition: background-color 0.3s ease;
     border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1;
+    /* border-image: conic-gradient(red, yellow,lime,aqua, blue, magenta, red); */
     /* Gradient applied as border */
     border-image-slice: 1; /* Ensures the gradient fills the border */
 }
@@ -636,6 +637,18 @@ border: 2px solid #2277b0 ;
         /* width: 60%; */
         position: sticky;
         align-self: center;
+    }
+
+    .floating-add-btn {
+        position: fixed;
+        bottom: 20px ;
+        right: calc(20px + 20vw);
+
+    }
+    .clear-button {
+        bottom: 80px;
+        right: calc(20px + 20vw);
+
     }
 
 }
