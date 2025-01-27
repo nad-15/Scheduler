@@ -498,6 +498,8 @@ border: 2px solid #2277b0 ;
 
 .day {
     font-size: 12px;
+    font-family: monospace;
+    
 }
 
 .morningTask,
