@@ -90,7 +90,7 @@ yearContainer.addEventListener('scroll', () => {
         // console.log(`Scrolled to the top`);
         // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
         // console.log(`Previous Month: ${prevDateMonth}, Last Date: ${prevDateLastDate}`);
-    } else if (scrollTop + clientHeight >= scrollHeight-10) {
+    } else if (scrollTop + clientHeight >= scrollHeight - 10) {
         // Scroll to the bottom
         prevDate = currentDate;
         currentDate = nextDate;
@@ -117,6 +117,15 @@ yearContainer.addEventListener('scroll', () => {
 function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "", yearDate) {
     console.log(`current  is ${monthName}`);
     yearNameText.textContent = currentDateYear;
+
+    // let yearLetters = currentDateYear.toString().split('');
+    // yearNameText.innerHTML = '';
+    // yearLetters.forEach(letter => {
+    //     let letterDiv = document.createElement('div');
+    //     letterDiv.textContent = letter;
+    //     yearNameText.appendChild(letterDiv);
+    // });
+    
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
 
@@ -172,7 +181,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
             } else {
                 // dayDiv.style.color = "blue";
-                dayDiv.style.backgroundColor = "#3388cc"; 
+                dayDiv.style.backgroundColor = "#3388cc";
                 dateDiv.style.color = "blue";// Set the color for Saturday
                 // dayDiv.style.borderColor = "#3388cc";
             }
@@ -344,11 +353,11 @@ function enterFullScreen() {
     yearNameContainer.style.display = 'none';
 
     slidingInputView.style.bottom = '-33%'; // Hide popup
-// Reset button position and rotation
-    floatingAddBtn.style.transform = 'rotate(0)'; 
+    // Reset button position and rotation
+    floatingAddBtn.style.transform = 'rotate(0)';
     // Reset button color to green
     // floatingAddBtn.style.backgroundColor = '#4CAF50'; 
-    floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; 
+    floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)';
 
     // const slidingInputHeight = -(33 * window.innerHeight / 100);
     floatingAddBtn.style.bottom = `${20}px`;
@@ -420,7 +429,7 @@ yearContainer.addEventListener('click', (event) => {
 submitTaskBtn.addEventListener('click', () => {
     const taskTitle = document.getElementById('taskTitle').value;
 
-    if (taskTitle || chosenColor !='') {
+    if (taskTitle || chosenColor != '') {
         selectedDivs.forEach(div => {
             // Update task text
             div.textContent = taskTitle;
@@ -496,13 +505,13 @@ clearButton.addEventListener('click', () => {
     selectedDivs.forEach(selectedDiv => {
         const dayContainer = selectedDiv.closest('.day-container');
         const fullDate = dayContainer.querySelector('.date').getAttribute('data-full-date');
-        
+
         // Get current data from localStorage
         let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
         // Remove the specific task data (morning, afternoon, evening) from the selected div
         const taskType = selectedDiv.classList.contains('morningTask') ? 'morning' :
-                         selectedDiv.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+            selectedDiv.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
 
         // Check if the data for this date exists, then remove the task data
         if (storedData[fullDate]) {
@@ -553,7 +562,7 @@ floatingAddBtn.addEventListener('click', () => {
 
         // Adjust the button positions based on the sliding input view
         const slidingInputHeight = 33 * window.innerHeight / 100;
-        floatingAddBtn.style.bottom = `${slidingInputHeight+10}px`;
+        floatingAddBtn.style.bottom = `${slidingInputHeight + 10}px`;
         clearButton.style.bottom = `${slidingInputHeight + 70}px`;
     } else {
         slidingInputView.style.bottom = '-33%'; // Hide popup
