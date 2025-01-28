@@ -11,13 +11,13 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
 
-const inputField = document.querySelector('#taskTitle');
+// const inputField = document.querySelector('#taskTitle');
 
-inputField.addEventListener('focus', () => {
-    setTimeout(() => {
-        inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300); // Wait for the keyboard to appear
-});
+// inputField.addEventListener('focus', () => {
+//     setTimeout(() => {
+//         inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+//     }, 300); // Wait for the keyboard to appear
+// });
 
 
 
