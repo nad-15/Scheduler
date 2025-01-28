@@ -5,7 +5,7 @@ const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
 const submitTaskBtn = document.getElementById('submitTask');
 
-const yearNameContainer = document.getElementById(`year-name-text-container`);
+// const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
 
@@ -350,7 +350,7 @@ function enterFullScreen() {
     fullScreenButton.style.display = 'none';
     exitFullscreenBtn.style.display = `flex`;
     // Hide the yearNameContainer once fullscreen is entered
-    yearNameContainer.style.display = 'none';
+    // yearNameContainer.style.display = 'none';
 
     slidingInputView.style.bottom = '-33%'; // Hide popup
     // Reset button position and rotation
@@ -382,7 +382,7 @@ function exitFullscreen() {
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
         // When exiting fullscreen, show the yearNameContainer again
-        yearNameContainer.style.display = 'flex';
+        // yearNameContainer.style.display = 'flex';
         slidingInputView.style.bottom = '-33%'; // Hide popup
 
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
