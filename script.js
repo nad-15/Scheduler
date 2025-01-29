@@ -151,12 +151,28 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
     for (i = 1; i <= lastDateOfMonth; i++) {
 
+
         const dayContainer = document.createElement('div');
         dayContainer.classList.add('day-container');
 
         const dateDiv = document.createElement('div');
-        dateDiv.classList.add('date');
+
+        if(today.toDateString() === new Date(yearDate, monthName, i).toDateString()) {
+            // const todayDiv = document.createElement(`div`);
+            // todayDiv.classList.add(`today-div`); 
+            // todayDiv.style.width = `25px`;
+            // todayDiv.style.height = `25px`;
+            // todayDiv.style.backgroundColor = `red`;
+            // todayDiv.style.borderRadius = "50%";
+            // todayDiv.textContent = date ;
+            // dateDiv.appendChild(todayDiv);
+            dateDiv.style.backgroundColor = 'green';
+            dateDiv.style.borderRadius = `4px`;
+            dateDiv.style.color = `white`;
+        } 
+
         dateDiv.textContent = date;
+        dateDiv.classList.add('date');
         dateDiv.setAttribute('data-full-date', `${yearDate}-${monthName}-${date}`); // Store the full date as a data attribute
 
 
