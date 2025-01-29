@@ -673,6 +673,7 @@ h2 {
 .movable-template {
     position: fixed;
     display: flex;
+    display: none;
     flex-direction: column;
     /* flex-direction: row-reverse; */
     /* justify-content: flex-start; */
@@ -726,7 +727,6 @@ h2 {
 
 .job-template-container {
     display: flex;
-    display: none;
     flex-direction: column;
     /* border: 2px solid red; */
     justify-content: space-between;
