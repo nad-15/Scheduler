@@ -520,7 +520,9 @@ clearButton.addEventListener('click', () => {
 
         // Clear the UI data as well
         selectedDiv.textContent = ''; // Clear task text
-        selectedDiv.style.backgroundColor = ''; // Remove background color
+        selectedDiv.style.backgroundColor = '';         // Remove background color
+        selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
+
     });
 
     // Clear the selected divs list and update the UI
