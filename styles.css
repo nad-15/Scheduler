@@ -349,7 +349,7 @@ h2 {
     /* border-radius:  4px; */
     flex: 8;
     /* Makes the input take more space than the button */
-    font-size: 18px;
+    font-size: 16px;
 }
 
 #taskTitle:focus {
