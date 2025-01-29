@@ -797,12 +797,12 @@ h2 {
 
         /* display: none; */
         top: 20px;
-        right: calc(20px + 20vw);
+        left: calc(20px + 20vw);
 
     }
 
     #year-name {
-        left: calc(20px + 20vw);
+        right: calc(20px + 20vw);
     }
 
 }

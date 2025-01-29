@@ -521,13 +521,14 @@ clearButton.addEventListener('click', () => {
         // Clear the UI data as well
         selectedDiv.textContent = ''; // Clear task text
         selectedDiv.style.backgroundColor = '';         // Remove background color
-        selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
+
 
     });
 
     // Clear the selected divs list and update the UI
     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
     selectedDivs = []; // Clear the array of selected divs
+    selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
 
     // Optionally reset UI elements (like task title input and any other related UI)
     document.getElementById('taskTitle').value = ''; // Reset task input field
