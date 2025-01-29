@@ -125,7 +125,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     //     letterDiv.textContent = letter;
     //     yearNameText.appendChild(letterDiv);
     // });
-    
+
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
 
@@ -157,7 +157,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
         const dateDiv = document.createElement('div');
 
-        if(today.toDateString() === new Date(yearDate, monthName, i).toDateString()) {
+        if (today.toDateString() === new Date(yearDate, monthName, i).toDateString()) {
             // const todayDiv = document.createElement(`div`);
             // todayDiv.classList.add(`today-div`); 
             // todayDiv.style.width = `25px`;
@@ -171,7 +171,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             dateDiv.style.color = `white`;
 
             dateDiv.classList.add('aurora');
-        } 
+        }
 
         dateDiv.textContent = date;
         dateDiv.classList.add('date');
@@ -367,28 +367,28 @@ function exitFullscreen() {
 
 
 
-document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-        // When exiting fullscreen, show the yearNameContainer again
-        // yearNameContainer.style.display = 'flex';
-        slidingInputView.style.bottom = '-33%'; // Hide popup
+// document.addEventListener('fullscreenchange', () => {
+//     if (!document.fullscreenElement) {
+//         // When exiting fullscreen, show the yearNameContainer again
+//         // yearNameContainer.style.display = 'flex';
+//         slidingInputView.style.bottom = '-33%'; // Hide popup
 
-        floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
-        floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
+//         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
+//         floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
 
-        // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        floatingAddBtn.style.bottom = `${20}px`;
-        clearButton.style.bottom = `${80}px`;
-        isPopupOpen = false;
-        exitFullscreenBtn.style.display = `none`;
-    }
-});
+//         // const slidingInputHeight = -(33 * window.innerHeight / 100);
+//         floatingAddBtn.style.bottom = `${20}px`;
+//         clearButton.style.bottom = `${80}px`;
+//         isPopupOpen = false;
+//         exitFullscreenBtn.style.display = `none`;
+//     }
+// });
 
 
 
 let selectedDivs = []; // Array to track selected divs
 let chosenColor = '';  // Store the chosen color
-
+const selectedTaskCounter = document.querySelector(`.selected-task`);
 // Event listener for selecting colors
 document.querySelectorAll('.color-option').forEach(button => {
     button.addEventListener('click', () => {
@@ -399,6 +399,7 @@ document.querySelectorAll('.color-option').forEach(button => {
     });
 });
 
+//add click listeners to task divs
 yearContainer.addEventListener('click', (event) => {
     const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
@@ -411,6 +412,8 @@ yearContainer.addEventListener('click', (event) => {
             selectedDivs.push(taskElement);
             taskElement.classList.add('selected');
         }
+
+        selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
     }
 });
 
@@ -564,11 +567,16 @@ floatingAddBtn.addEventListener('click', () => {
     }
 });
 
-window.addEventListener('popstate', () => {
-    if (taskInput) {
-        taskInput.blur(); // Remove focus from the input field
-    }
-});
+
+
+
+// window.addEventListener('popstate', () => {
+//     if (taskInput) {
+//         taskInput.blur(); // Remove focus from the input field
+//         console.log(`popstate`);
+//     }
+// });
+
 
 
 
