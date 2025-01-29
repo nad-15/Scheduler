@@ -442,6 +442,7 @@ submitTaskBtn.addEventListener('click', () => {
         // Clear selection and reset styles
         selectedDivs.forEach(div => div.classList.remove('selected'));
         selectedDivs = []; // Clear the array
+        selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
