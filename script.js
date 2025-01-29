@@ -166,9 +166,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             // todayDiv.style.borderRadius = "50%";
             // todayDiv.textContent = date ;
             // dateDiv.appendChild(todayDiv);
-            dateDiv.style.backgroundColor = 'green';
-            dateDiv.style.borderRadius = `4px`;
+            // dateDiv.style.backgroundColor = 'gray';
+            // dateDiv.style.borderRadius = `8px`;
             dateDiv.style.color = `white`;
+
+            dateDiv.classList.add('aurora');
         } 
 
         dateDiv.textContent = date;

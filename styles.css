@@ -718,6 +718,12 @@ h2 {
     /* margin: 0px 0px 5px 5px; */
 }
 
+.aurora {
+    background: linear-gradient(135deg, #0b3d91, #1e90ff, #00ff7f, #ff69b4, #8a2be2);
+    background-size: 400% 400%;
+    animation: aurora 15s ease infinite;
+}
+
 @media screen and (min-width: 1024px) {
 
     #main-container {
@@ -767,4 +773,21 @@ h2 {
         left: calc(20px + 20vw);
     }
 
+}
+
+
+
+
+@keyframes aurora {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
