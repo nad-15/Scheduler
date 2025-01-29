@@ -11,13 +11,13 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
 
-// const inputField = document.querySelector('#taskTitle');
+const inputField = document.querySelector('#taskTitle');
 
-// inputField.addEventListener('focus', () => {
-//     setTimeout(() => {
-//         inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-//     }, 300); // Wait for the keyboard to appear
-// });
+inputField.addEventListener('focus', () => {
+    setTimeout(() => {
+        inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300); // Wait for the keyboard to appear
+});
 
 
 
@@ -299,41 +299,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 }
 
 
-// let currentMonthDisplay = addDays();
 window.addEventListener('DOMContentLoaded', () => {
-
-    // addDays(prevMonth);
-    // addDays(currentMonth);
-    // addDays(nextDate);
-    // loadJobs();
-    // loadExpenses();
-    // loadBudget();
-    // enterFullScreen();
 
 });
 
 
-function getDayName(value) {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return days[value];
-}
-// format Month Names
-function getMonthName(value) {
-    switch (value) {
-        case 0: return "JANUARY";
-        case 1: return "FEBRUARY";
-        case 2: return "MARCH";
-        case 3: return "APRIL";
-        case 4: return "MAY";
-        case 5: return "JUNE";
-        case 6: return "JULY";
-        case 7: return "AUGUST";
-        case 8: return "SEPTEMBER";
-        case 9: return "OCTOBER";
-        case 10: return "NOVEMBER";
-        case 11: return "DECEMBER";
-    }
-}
 exitFullscreenBtn.addEventListener("click", exitFullscreen);
 
 
@@ -581,3 +551,28 @@ window.addEventListener('popstate', () => {
         taskInput.blur(); // Remove focus from the input field
     }
 });
+
+
+
+
+function getDayName(value) {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return days[value];
+}
+// format Month Names
+function getMonthName(value) {
+    switch (value) {
+        case 0: return "JANUARY";
+        case 1: return "FEBRUARY";
+        case 2: return "MARCH";
+        case 3: return "APRIL";
+        case 4: return "MAY";
+        case 5: return "JUNE";
+        case 6: return "JULY";
+        case 7: return "AUGUST";
+        case 8: return "SEPTEMBER";
+        case 9: return "OCTOBER";
+        case 10: return "NOVEMBER";
+        case 11: return "DECEMBER";
+    }
+}
