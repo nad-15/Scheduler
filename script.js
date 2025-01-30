@@ -14,7 +14,7 @@ let isPopupOpen = false;
 taskInput.addEventListener('focus', () => {
     setTimeout(() => {
         taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300); // Wait for the keyboard to appear
+    }, 500); // Wait for the keyboard to appear
 });
 
 
