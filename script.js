@@ -331,6 +331,7 @@ function enterFullScreen() {
     const docElement = document.documentElement;
     if (docElement.requestFullscreen) {
         docElement.requestFullscreen();
+        
     } else if (docElement.webkitRequestFullscreen) {
         docElement.webkitRequestFullscreen(); // Safari
     } else if (docElement.msRequestFullscreen) {
@@ -339,26 +340,28 @@ function enterFullScreen() {
     fullScreenButton.style.display = 'none';
     exitFullscreenBtn.style.display = `flex`;
 
-    slidingInputView.classList.toggle("show");
+    // slidingInputView.classList.toggle("show");
     // Reset button position and rotation
-    floatingAddBtn.style.transform = 'rotate(0)';
+    // floatingAddBtn.style.transform = 'rotate(0)';
     // Reset button color to green
     // floatingAddBtn.style.backgroundColor = '#4CAF50'; 
-    floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)';
+    // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)';
 
-    floatingAddBtn.style.bottom = `${20}px`;
-    clearButton.style.bottom = `${80}px`;
-    isPopupOpen = false;
+    // floatingAddBtn.style.bottom = `${20}px`;
+    // clearButton.style.bottom = `${80}px`;
+    // isPopupOpen = true;
 }
 // Exit fullscreen function
 function exitFullscreen() {
-    if (document.fullscreenElement) { // Check if fullscreen is active
-        document.exitFullscreen()
-            .then(() => console.log("Exited fullscreen"))
-            .catch(err => console.error("Error exiting fullscreen:", err));
-    } else {
-        console.log("Fullscreen mode is not active");
-    }
+    // if (document.fullscreenElement) { // Check if fullscreen is active
+    //     document.exitFullscreen()
+    //         .then(() => console.log("Exited fullscreen"))
+    //         .catch(err => console.error("Error exiting fullscreen:", err));
+    // } else {
+    //     console.log("Fullscreen mode is not active");
+    // }
+
+    document.exitFullscreen();
     exitFullscreenBtn.style.display = `none`;
     fullScreenButton.style.display = 'flex';
 }
@@ -367,15 +370,15 @@ function exitFullscreen() {
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
-        slidingInputView.classList.toggle("show");
+        // slidingInputView.classList.toggle("show");
 
-        floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
-        floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
+        // floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
+        // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
 
         // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        floatingAddBtn.style.bottom = `${20}px`;
-        clearButton.style.bottom = `${80}px`;
-        isPopupOpen = false;
+        // floatingAddBtn.style.bottom = `${20}px`;
+        // clearButton.style.bottom = `${80}px`;
+        // isPopupOpen = true;
         exitFullscreenBtn.style.display = `none`;
     }
 });
