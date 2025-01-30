@@ -11,22 +11,18 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
 
-// taskInput.addEventListener('focus', () => {
-//     setTimeout(() => {
-//         taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-//     }, 300); // Wait for the keyboard to appear
-// });
-
-
-taskInput.addEventListener("focus", function () {
-    document.body.style.overflow = "hidden"; // Prevents background scrolling
+taskInput.addEventListener('focus', () => {
     setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 300);
+        taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300); // Wait for the keyboard to appear
 });
 
-taskInput.addEventListener("blur", function () {
-    document.body.style.overflow = ""; // Restore scrolling
+
+window.addEventListener('popstate', () => {
+    if (taskInput) {
+        taskInput.blur(); // Remove focus from the input field
+        console.log(`popstate`);
+    }
 });
 
 
@@ -582,13 +578,6 @@ floatingAddBtn.addEventListener('click', () => {
 
 
 
-
-// window.addEventListener('popstate', () => {
-//     if (taskInput) {
-//         taskInput.blur(); // Remove focus from the input field
-//         console.log(`popstate`);
-//     }
-// });
 
 
 
