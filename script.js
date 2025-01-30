@@ -393,9 +393,18 @@ document.addEventListener('fullscreenchange', () => {
 
 
 
+
 let selectedDivs = []; // Array to track selected divs
-let chosenColor = '';  // Store the chosen color
+let chosenColor = '#e27396';  // Store the chosen color
 const selectedTaskCounter = document.querySelector(`.selected-task`);
+
+selectedTaskCounter.addEventListener('click', () => {
+    selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
+    selectedDivs = []; // Clear the array of selected divs
+    selectedTaskCounter.textContent = `${selectedDivs.length}`;
+});
+
+
 // Event listener for selecting colors
 document.querySelectorAll('.color-option').forEach(button => {
     button.addEventListener('click', () => {
@@ -427,7 +436,7 @@ yearContainer.addEventListener('click', (event) => {
 submitTaskBtn.addEventListener('click', () => {
     const taskTitle = document.getElementById('taskTitle').value;
 
-    if (taskTitle || chosenColor != '') {
+    if ((taskTitle || chosenColor != ``) && selectedDivs.length > 0 ) {
         selectedDivs.forEach(div => {
             // Update task text
             div.textContent = taskTitle;
