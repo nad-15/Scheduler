@@ -412,7 +412,7 @@ yearContainer.addEventListener('click', (event) => {
             taskElement.classList.add('selected');
         }
 
-        selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
+        selectedTaskCounter.textContent = `${selectedDivs.length}`;
     }
 });
 
@@ -441,7 +441,7 @@ submitTaskBtn.addEventListener('click', () => {
         // Clear selection and reset styles
         selectedDivs.forEach(div => div.classList.remove('selected'));
         selectedDivs = []; // Clear the array
-        selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
+        selectedTaskCounter.textContent = `${selectedDivs.length}`;
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
@@ -529,7 +529,7 @@ clearButton.addEventListener('click', () => {
     // Clear the selected divs list and update the UI
     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
     selectedDivs = []; // Clear the array of selected divs
-    selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
+    selectedTaskCounter.textContent = `${selectedDivs.length}`;
 
     // Optionally reset UI elements (like task title input and any other related UI)
     // document.getElementById('taskTitle').value = ''; // Reset task input field

@@ -62,14 +62,19 @@
 
             <!-- Sliding Input View -->
             <div class="sliding-input-view" id="slidingInputView">
-                <div class="selected-task">0 selected</div>
                 <div class="taskinput-color-container">
-                    <div class="title-submit-container">
-                        <button class="task-template-button">Template</button>
+                    <div class="template-title-submit-container">
+                        <!-- <button class="task-template-button"><i class="material-icons template-list">list_alt</i></button> -->
+
+                        <button class="task-btn selected-task">0</button>
+
+                        <div class="title-submit-container">
+                        <div class="task-btn template-task-btn">template</div>
                         <input type="text" id="taskTitle" autocomplete="off" inputmode="text"
                             placeholder="Enter Task Title">
                         <button class="buttons" id="submitTask"><i
                             class="material-icons arrow-upward">arrow_upward</i></button>
+                        </div>
                     </div>
                     <!-- Color Picker (6 predefined colors) -->
                     <div class="color-picker" id="colorPicker">
