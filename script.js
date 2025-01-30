@@ -26,7 +26,7 @@ hideAllButtons.addEventListener(`click`, () => {
         } else {
             fullScreenButton.style.display = `none`;
         }
-        isHidden =true;
+        isHidden = true;
     } else {
         if (isFullScreen) {
             exitFullscreenBtn.style.display = `flex`;
@@ -35,7 +35,6 @@ hideAllButtons.addEventListener(`click`, () => {
         }
         isHidden = false;
     }
-
 
 });
 
@@ -468,13 +467,20 @@ yearContainer.addEventListener('click', (event) => {
 });
 
 submitTaskBtn.addEventListener('click', () => {
-    const taskTitle = document.getElementById('taskTitle').value;
 
 
     if ((taskTitle || chosenColor != ``) && selectedDivs.length > 0) {
         selectedDivs.forEach(div => {
+
+            let taskTitle = document.getElementById('taskTitle').value;
             // Update task text
-            div.textContent = taskTitle;
+            if (taskTitle !== ``) {
+                div.textContent = taskTitle;
+
+            } else {
+                taskTitle = div.textContent;
+            }
+
 
             // Apply the chosen color to the selected divs
             if (chosenColor) {
@@ -497,13 +503,6 @@ submitTaskBtn.addEventListener('click', () => {
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
-        // slidingInputView.classList.toggle("show");
-
-        // floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
-        // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
-        // // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        // floatingAddBtn.style.bottom = `${20}px`;
-        // clearButton.style.bottom = `${80}px`;
         isPopupOpen = true;
     }
 });
