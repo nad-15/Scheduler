@@ -533,9 +533,25 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
     console.log(`Saved task for ${taskType} on ${date}: ${updatedTask} with color ${taskColor}`);
 }
 
+let lastTapTime = 0;
+const delay = 300;
+clearButton.addEventListener(`touchend`, function () {
+
+    let currentTime = Date.now();
+
+    if (currentTime - lastTapTime < delay) {
+        deleteFunction();
+    }
+
+    lastTapTime = currentTime;
+
+});
 
 
-clearButton.addEventListener('click', () => {
+
+clearButton.addEventListener('dblclick', deleteFunction);
+
+function deleteFunction() {
     // Loop through selected divs and clear their saved data
     selectedDivs.forEach(selectedDiv => {
         const dayContainer = selectedDiv.closest('.day-container');
@@ -582,7 +598,7 @@ clearButton.addEventListener('click', () => {
     // floatingAddBtn.style.bottom = `${20}px`; // Reset button position
     // clearButton.style.bottom = `${80}px`; // Reset clear button position
     // isPopupOpen = true; 
-});
+}
 
 
 
