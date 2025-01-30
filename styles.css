@@ -217,6 +217,12 @@ h2 {
     -webkit-tap-highlight-color: transparent;
 }
 
+.clear-button:active {
+    background-color: white;
+
+    color: rgba(244, 67, 54, 0.9);
+}
+
 .screen-size-change {
 
     /* display: none; */
@@ -825,6 +831,7 @@ h2 {
         right: calc(20px + 20vw);
 
     }
+
 
     .screen-size-change {
 

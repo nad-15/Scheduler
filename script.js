@@ -538,7 +538,7 @@ clearButton.addEventListener('click', () => {
     // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset add button color
     // floatingAddBtn.style.bottom = `${20}px`; // Reset button position
     // clearButton.style.bottom = `${80}px`; // Reset clear button position
-    isPopupOpen = true; 
+    // isPopupOpen = true; 
 });
 
 
