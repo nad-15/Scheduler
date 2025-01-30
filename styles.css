@@ -271,7 +271,7 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* justify-content: center; */
     position: fixed;
     /* left: 0;
     right: 0; */
@@ -280,7 +280,9 @@ h2 {
     height: 33%;
     max-height: 33%; */
     /* gap: 10px; */
-    /* border-radius: 15px; */
+    /* border-radius: 30px; */
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
     bottom: 0;
     width: 100%;
     height: 130px;
@@ -416,6 +418,8 @@ h2 {
     /* margin-right: 5px; */
     /* flex: 2; */
     /* Makes the button take up less space than the input */
+
+        -webkit-tap-highlight-color: transparent;
 }
 .selected-task {
     box-sizing: border-box;
@@ -833,6 +837,22 @@ h2 {
     background: linear-gradient(135deg, #0b3d91, #1e90ff, #00ff7f, #ff69b4, #8a2be2);
     background-size: 400% 400%;
     animation: aurora 15s ease infinite;
+}
+
+.hide-all-buttons {
+    display: flex;
+    font-size: 8px;
+    background-color: transparent;
+    height: 15px;
+    width: 90px;
+    rotate: -90deg;
+    position: fixed;
+    left: 17px;
+    bottom: 2px;
+    font-weight: bold;
+    transform-origin: bottom left;
+    border: none;
+
 }
 
 @media screen and (min-width: 1024px) {

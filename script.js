@@ -4,6 +4,47 @@ const clearButton = document.getElementById('clear-button');
 const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
 const submitTaskBtn = document.getElementById('submitTask');
+const hideAllButtons = document.querySelector(`.hide-all-buttons`);
+
+hideAllButtons.addEventListener('click', () => {
+    // Toggle visibility for each element
+    if (yearNameText.style.display === 'none') {
+        yearNameText.style.display = '';
+    } else {
+        yearNameText.style.display = 'none';
+    }
+
+    if (clearButton.style.display === 'none') {
+        clearButton.style.display = '';
+    } else {
+        clearButton.style.display = 'none';
+    }
+
+    if (floatingAddBtn.style.display === 'none') {
+        floatingAddBtn.style.display = '';
+    } else {
+        floatingAddBtn.style.display = 'none';
+    }
+
+    if (fullScreenButton.style.display === 'none') {
+        fullScreenButton.style.display = '';
+    } else {
+        fullScreenButton.style.display = 'none';
+    }
+
+    if (exitFullscreenBtn.style.display === 'none') {
+        exitFullscreenBtn.style.display = '';
+    } else {
+        exitFullscreenBtn.style.display = 'none';
+    }
+
+    if (slidingInputView.style.display === 'none') {
+        slidingInputView.style.display = '';
+    } else {
+        slidingInputView.style.display = 'none';
+    }
+});
+
 
 // const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
@@ -435,6 +476,7 @@ yearContainer.addEventListener('click', (event) => {
 
 submitTaskBtn.addEventListener('click', () => {
     const taskTitle = document.getElementById('taskTitle').value;
+    
 
     if ((taskTitle || chosenColor != ``) && selectedDivs.length > 0 ) {
         selectedDivs.forEach(div => {
@@ -464,14 +506,6 @@ submitTaskBtn.addEventListener('click', () => {
         document.getElementById('taskTitle').value = '';
         // slidingInputView.classList.toggle("show");
 
-        // floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
-        // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
-        // // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        // floatingAddBtn.style.bottom = `${20}px`;
-        // clearButton.style.bottom = `${80}px`;
-        isPopupOpen = true;
-    } else {
-        // slidingInputView.classList.toggle("show");
         // floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
         // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
         // // const slidingInputHeight = -(33 * window.innerHeight / 100);
