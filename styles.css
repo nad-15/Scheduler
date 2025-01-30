@@ -688,8 +688,8 @@ h2 {
 
 .color-option {
     box-sizing: border-box;
-    width: 35px;
-    height: 35px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
     /* Ensures circular shape */
     border: 2px solid transparent;
@@ -704,8 +704,8 @@ h2 {
 
 .color-option.selected-color {
     border: 5px solid transparent;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
 }
 
 .color-option-container {
@@ -713,8 +713,8 @@ h2 {
     justify-content: center;
     align-items: center;
     align-content: center;
-    width: 35px;
-    height: 35px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
     /* background: linear-gradient(
         90deg, 
