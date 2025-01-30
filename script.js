@@ -18,15 +18,15 @@ let isPopupOpen = false;
 // });
 
 
-taskInput.addEventListener("focus", () => {
+taskInput.addEventListener("focus", function () {
+    document.body.style.overflow = "hidden"; // Prevents background scrolling
     setTimeout(() => {
-        document.body.style.paddingBottom = "200px"; // Push content up
-        window.scrollTo(0, document.body.scrollHeight);
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }, 300);
 });
 
-taskInput.addEventListener("blur", () => {
-    document.body.style.paddingBottom = "0"; // Reset when keyboard closes
+taskInput.addEventListener("blur", function () {
+    document.body.style.overflow = ""; // Restore scrolling
 });
 
 
