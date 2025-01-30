@@ -558,8 +558,8 @@ floatingAddBtn.addEventListener('click', () => {
 
         // Adjust the button positions based on the sliding input view
         // const slidingInputHeight = 33 * window.innerHeight / 100;
-        floatingAddBtn.style.bottom = `${220 + 10}px`;
-        clearButton.style.bottom = `${220 + 70}px`;
+        floatingAddBtn.style.bottom = `${110 + 10}px`;
+        clearButton.style.bottom = `${110 + 70}px`;
     } else {
         slidingInputView.classList.toggle("show");
 
