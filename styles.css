@@ -286,12 +286,13 @@ h2 {
     height: 220px;
     max-height: 220px;
     background-color: rgba(255, 255, 255, 0.9);
+    background-color: transparent;
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     z-index: 999;
     /* Start hidden */
-    transform: translateY(100%); 
-    /* transform: translateY(10px);  */
+    /* transform: translateY(100%);  */
+    transform: translateY(200px); 
     transition: transform 0.3s ease-in-out; /* Smooth transition */
 }
 .show {
@@ -312,6 +313,7 @@ h2 {
     /* margin: 0 100px 0 100px; */
     overflow: scroll;
     /* background-color: rgba(255, 255, 255, 0.9); */
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
 
@@ -322,11 +324,17 @@ h2 {
     width: 100%;
     margin: 0;
     padding: 10px 10px;
+    background-color: rgba(255, 255, 255, 0.9);
     /* background-color: rgba(255, 255, 255, 0.9); */
     /* box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2); */
 }
 
 /* task input field and submit button */
+.selected-task {
+    align-self: flex-start;
+}
+
+
 .title-submit-container {
     /* border: 2px solid violet; */
     margin-bottom: 10px;
@@ -344,6 +352,7 @@ h2 {
     /* border: none; */
     /* justify-content: center; */
     align-items: center;
+    
 }
 
 .task-template-button {
