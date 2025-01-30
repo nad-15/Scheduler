@@ -337,10 +337,7 @@ function enterFullScreen() {
     }
     fullScreenButton.style.display = 'none';
     exitFullscreenBtn.style.display = `flex`;
-    // Hide the yearNameContainer once fullscreen is entered
-    // yearNameContainer.style.display = 'none';
 
-    // slidingInputView.style.bottom = '-33%'; // Hide popup
     slidingInputView.classList.toggle("show");
     // Reset button position and rotation
     floatingAddBtn.style.transform = 'rotate(0)';
@@ -348,7 +345,6 @@ function enterFullScreen() {
     // floatingAddBtn.style.backgroundColor = '#4CAF50'; 
     floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)';
 
-    // const slidingInputHeight = -(33 * window.innerHeight / 100);
     floatingAddBtn.style.bottom = `${20}px`;
     clearButton.style.bottom = `${80}px`;
     isPopupOpen = false;
@@ -370,9 +366,6 @@ function exitFullscreen() {
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
-        // When exiting fullscreen, show the yearNameContainer again
-        // yearNameContainer.style.display = 'flex';
-        // slidingInputView.style.bottom = '-33%'; // Hide popup
         slidingInputView.classList.toggle("show");
 
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
@@ -448,8 +441,8 @@ submitTaskBtn.addEventListener('click', () => {
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
-        // slidingInputView.style.bottom = '-33%'; // Hide popup
         slidingInputView.classList.toggle("show");
+
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
         floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
         // const slidingInputHeight = -(33 * window.innerHeight / 100);
@@ -457,7 +450,6 @@ submitTaskBtn.addEventListener('click', () => {
         clearButton.style.bottom = `${80}px`;
         isPopupOpen = false;
     } else {
-        // slidingInputView.style.bottom = '-33%'; // Hide popup
         slidingInputView.classList.toggle("show");
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
         floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
@@ -537,7 +529,6 @@ clearButton.addEventListener('click', () => {
 
     // Optionally reset UI elements (like task title input and any other related UI)
     document.getElementById('taskTitle').value = ''; // Reset task input field
-    // slidingInputView.style.bottom = '-33%'; // Hide sliding input view (or adjust to your logic)
     slidingInputView.classList.toggle("show");
     floatingAddBtn.style.transform = 'rotate(0)'; // Reset add button
     floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset add button color
@@ -563,10 +554,9 @@ floatingAddBtn.addEventListener('click', () => {
 
         // Adjust the button positions based on the sliding input view
         // const slidingInputHeight = 33 * window.innerHeight / 100;
-        floatingAddBtn.style.bottom = `${slidingInputHeight + 10}px`;
-        clearButton.style.bottom = `${slidingInputHeight + 70}px`;
+        floatingAddBtn.style.bottom = `${220 + 10}px`;
+        clearButton.style.bottom = `${220 + 70}px`;
     } else {
-        // slidingInputView.style.bottom = '-33%'; // Hide popup
         slidingInputView.classList.toggle("show");
 
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
