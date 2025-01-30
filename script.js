@@ -453,22 +453,22 @@ submitTaskBtn.addEventListener('click', () => {
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
-        slidingInputView.classList.toggle("show");
+        // slidingInputView.classList.toggle("show");
 
-        floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
-        floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
-        // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        floatingAddBtn.style.bottom = `${20}px`;
-        clearButton.style.bottom = `${80}px`;
-        isPopupOpen = false;
+        // floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
+        // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
+        // // const slidingInputHeight = -(33 * window.innerHeight / 100);
+        // floatingAddBtn.style.bottom = `${20}px`;
+        // clearButton.style.bottom = `${80}px`;
+        isPopupOpen = true;
     } else {
-        slidingInputView.classList.toggle("show");
-        floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
-        floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
-        // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        floatingAddBtn.style.bottom = `${20}px`;
-        clearButton.style.bottom = `${80}px`;
-        isPopupOpen = false;
+        // slidingInputView.classList.toggle("show");
+        // floatingAddBtn.style.transform = 'rotate(0)'; // Reset button
+        // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color
+        // // const slidingInputHeight = -(33 * window.innerHeight / 100);
+        // floatingAddBtn.style.bottom = `${20}px`;
+        // clearButton.style.bottom = `${80}px`;
+        isPopupOpen = true;
     }
 });
 
