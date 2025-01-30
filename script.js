@@ -11,6 +11,7 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
 
+
 const inputField = document.querySelector('#taskTitle');
 
 inputField.addEventListener('focus', () => {
@@ -528,13 +529,13 @@ clearButton.addEventListener('click', () => {
     selectedTaskCounter.textContent = `${selectedDivs.length} selected`;
 
     // Optionally reset UI elements (like task title input and any other related UI)
-    document.getElementById('taskTitle').value = ''; // Reset task input field
-    slidingInputView.classList.toggle("show");
-    floatingAddBtn.style.transform = 'rotate(0)'; // Reset add button
-    floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset add button color
-    floatingAddBtn.style.bottom = `${20}px`; // Reset button position
-    clearButton.style.bottom = `${80}px`; // Reset clear button position
-    isPopupOpen = false; // Optional: Reset any state flags
+    // document.getElementById('taskTitle').value = ''; // Reset task input field
+    // slidingInputView.classList.toggle("show");
+    // floatingAddBtn.style.transform = 'rotate(0)'; // Reset add button
+    // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset add button color
+    // floatingAddBtn.style.bottom = `${20}px`; // Reset button position
+    // clearButton.style.bottom = `${80}px`; // Reset clear button position
+    isPopupOpen = true; 
 });
 
 
