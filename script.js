@@ -11,15 +11,23 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 
 let isPopupOpen = false;
 
+// taskInput.addEventListener('focus', () => {
+//     setTimeout(() => {
+//         taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+//     }, 300); // Wait for the keyboard to appear
+// });
 
-const inputField = document.querySelector('#taskTitle');
 
-inputField.addEventListener('focus', () => {
+taskInput.addEventListener("focus", () => {
     setTimeout(() => {
-        inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300); // Wait for the keyboard to appear
+        document.body.style.paddingBottom = "200px"; // Push content up
+        window.scrollTo(0, document.body.scrollHeight);
+    }, 300);
 });
 
+taskInput.addEventListener("blur", () => {
+    document.body.style.paddingBottom = "0"; // Reset when keyboard closes
+});
 
 
 fullScreenButton.addEventListener(`click`, enterFullScreen);
