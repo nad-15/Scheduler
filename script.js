@@ -6,45 +6,38 @@ const slidingInputView = document.getElementById('slidingInputView');
 const submitTaskBtn = document.getElementById('submitTask');
 const hideAllButtons = document.querySelector(`.hide-all-buttons`);
 
-hideAllButtons.addEventListener('click', () => {
-    // Toggle visibility for each element
-    if (yearNameText.style.display === 'none') {
-        yearNameText.style.display = '';
+let isHidden = false;
+hideAllButtons.addEventListener(`click`, () => {
+
+
+
+    yearNameText.style.display = yearNameText.style.display === 'none' ? 'flex' : 'none';
+    clearButton.style.display = clearButton.style.display === 'none' ? 'flex' : 'none';
+    floatingAddBtn.style.display = floatingAddBtn.style.display === 'none' ? '' : 'none';
+    slidingInputView.style.display = slidingInputView.style.display !== 'none' ? 'none' : 'flex';
+
+    const isFullScreen = !!document.fullscreenElement;
+
+    if (!isHidden) {
+        console.log(isFullScreen);
+        if (isFullScreen) {
+
+            exitFullscreenBtn.style.display = `none`;
+        } else {
+            fullScreenButton.style.display = `none`;
+        }
+        isHidden =true;
     } else {
-        yearNameText.style.display = 'none';
+        if (isFullScreen) {
+            exitFullscreenBtn.style.display = `flex`;
+        } else {
+            fullScreenButton.style.display = `flex`;
+        }
+        isHidden = false;
     }
 
-    if (clearButton.style.display === 'none') {
-        clearButton.style.display = '';
-    } else {
-        clearButton.style.display = 'none';
-    }
 
-    if (floatingAddBtn.style.display === 'none') {
-        floatingAddBtn.style.display = '';
-    } else {
-        floatingAddBtn.style.display = 'none';
-    }
-
-    if (fullScreenButton.style.display === 'none') {
-        fullScreenButton.style.display = '';
-    } else {
-        fullScreenButton.style.display = 'none';
-    }
-
-    if (exitFullscreenBtn.style.display === 'none') {
-        exitFullscreenBtn.style.display = '';
-    } else {
-        exitFullscreenBtn.style.display = 'none';
-    }
-
-    if (slidingInputView.style.display === 'none') {
-        slidingInputView.style.display = '';
-    } else {
-        slidingInputView.style.display = 'none';
-    }
 });
-
 
 // const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
@@ -54,7 +47,7 @@ let isPopupOpen = false;
 
 taskInput.addEventListener('focus', () => {
     const isFullScreen = window.innerHeight === screen.height; // Check if full screen
-    const delay = isFullScreen ? 1000 : 500; // Set delay based on full screen status
+    const delay = isFullScreen ? 1500 : 500; // Set delay based on full screen status
 
     setTimeout(() => {
         taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -380,7 +373,7 @@ function enterFullScreen() {
     const docElement = document.documentElement;
     if (docElement.requestFullscreen) {
         docElement.requestFullscreen();
-        
+
     } else if (docElement.webkitRequestFullscreen) {
         docElement.webkitRequestFullscreen(); // Safari
     } else if (docElement.msRequestFullscreen) {
@@ -476,9 +469,9 @@ yearContainer.addEventListener('click', (event) => {
 
 submitTaskBtn.addEventListener('click', () => {
     const taskTitle = document.getElementById('taskTitle').value;
-    
 
-    if ((taskTitle || chosenColor != ``) && selectedDivs.length > 0 ) {
+
+    if ((taskTitle || chosenColor != ``) && selectedDivs.length > 0) {
         selectedDivs.forEach(div => {
             // Update task text
             div.textContent = taskTitle;
