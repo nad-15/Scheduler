@@ -12,10 +12,14 @@ const fullScreenButton = document.getElementById(`fullscreen-button`);
 let isPopupOpen = false;
 
 taskInput.addEventListener('focus', () => {
+    const isFullScreen = window.innerHeight === screen.height; // Check if full screen
+    const delay = isFullScreen ? 1000 : 500; // Set delay based on full screen status
+
     setTimeout(() => {
         taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 500); // Wait for the keyboard to appear
+    }, delay);
 });
+
 
 
 window.addEventListener('popstate', () => {
