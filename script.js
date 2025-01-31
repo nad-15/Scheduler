@@ -6,6 +6,9 @@ const slidingInputView = document.getElementById('slidingInputView');
 const submitTaskBtn = document.getElementById('submitTask');
 const hideAllButtons = document.querySelector(`.hide-all-buttons`);
 
+// submitTaskBtn.disabled = true;
+// console.log(submitTaskBtn.disabled);
+
 let isHidden = false;
 hideAllButtons.addEventListener(`click`, () => {
 
@@ -19,7 +22,7 @@ hideAllButtons.addEventListener(`click`, () => {
     const isFullScreen = !!document.fullscreenElement;
 
     if (!isHidden) {
-        console.log(isFullScreen);
+        // console.log(isFullScreen);
         if (isFullScreen) {
 
             exitFullscreenBtn.style.display = `none`;
@@ -96,9 +99,9 @@ addDays("initNext", nextDateMonth, 1, nextDate.getDay(), nextDateLastDate, "", "
 
 let prevDate = new Date(currentDateYear, currentDateMonth - 1, 1);
 let prevDateMonth = prevDate.getMonth();
-console.log(prevDateMonth);
+// console.log(prevDateMonth);
 let prevDateYear = prevDate.getFullYear();
-console.log(prevDateYear);
+// console.log(prevDateYear);
 let prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
 
 addDays("initPrev", prevDateMonth, 1, prevDate.getDay(), prevDateLastDate, "", "", "", prevDateYear);
@@ -157,7 +160,7 @@ yearContainer.addEventListener('scroll', () => {
 
 
 function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "", yearDate) {
-    console.log(`current  is ${monthName}`);
+    // console.log(`current  is ${monthName}`);
     yearNameText.textContent = currentDateYear;
 
     // let yearLetters = currentDateYear.toString().split('');
@@ -175,7 +178,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     monthNameContainer.classList.add('month-name-container');
 
     let FormatMonthName = getMonthName(monthName % 12);
-    console.log(FormatMonthName);
+    // console.log(FormatMonthName);
     let letters = FormatMonthName.split('');
     monthNameContainer.innerHTML = '';
     letters.forEach(letter => {
@@ -312,7 +315,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
         if (prevMonthContainer) {
             prevMonthContainer.remove();
-            console.log(`prev is remove`);
+            // console.log(`prev is remove`);
         }
 
         prevMonthContainer = currentMonthContainer;
@@ -326,7 +329,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         // prevMonthContainer = monthContainer;
         if (nextMonthContainer) {
             nextMonthContainer.remove();
-            console.log(`next is remove`);
+            // console.log(`next is remove`);
         }
 
         nextMonthContainer = currentMonthContainer;
@@ -341,11 +344,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     } else if (scroll === "initCurrent") {
         currentMonthContainer = monthNameDayContainer;
         yearContainer.appendChild(monthNameDayContainer);
-        console.log(`current is init`);
+        // console.log(`current is init`);
     } else if (scroll === "initNext") {
         nextMonthContainer = monthNameDayContainer;
         yearContainer.appendChild(monthNameDayContainer);
-        console.log(`next is init`);
+        // console.log(`next is init`);
     } else if (scroll === "initPrev") {
         prevMonthContainer = monthNameDayContainer;
 
@@ -353,7 +356,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         yearContainer.prepend(monthNameDayContainer);
         const newScrollHeight = yearContainer.scrollHeight;
         yearContainer.scrollTop += newScrollHeight - previousScrollHeight;
-        console.log(`prev is init`);
+        // console.log(`prev is init`);
     }
 
 }
@@ -469,14 +472,27 @@ yearContainer.addEventListener('click', (event) => {
 const counterObserver = new MutationObserver(() => {
     if (parseInt(selectedTaskCounter.textContent) > 0) {
         submitTaskBtn.classList.remove('disabled-btn'); // Remove disabled styling
-        submitTaskBtn.disabled = false;
-        console.log('btn is enabled');
+        selectedTaskCounter.classList.add(`selection-true`);
+        // submitTaskBtn.disabled = false;
+        // selectedTaskCounter.classList.remove('shake-btn'); // Remove shake effect when counter is > 0
     } else {
         submitTaskBtn.classList.add('disabled-btn'); // Add disabled styling
-        submitTaskBtn.disabled = true;
-        console.log('btn is disabled');
+        // submitTaskBtn.disabled = true;
+        selectedTaskCounter.classList.remove(`selection-true`);
+        triggerShakeEffect();
     }
 });
+
+// Function to trigger the shake effect
+function triggerShakeEffect() {
+    selectedTaskCounter.classList.add('shake-btn'); // Add shake effect
+
+    // Remove the class after the animation ends to allow for future shakes
+    selectedTaskCounter.addEventListener('animationend', () => {
+        selectedTaskCounter.classList.remove('shake-btn');
+    });
+}
+
 
 // Start observing changes in the text of selectedTaskCounter
 counterObserver.observe(selectedTaskCounter, { childList: true });
@@ -521,7 +537,10 @@ function submitTask() {
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
         isPopupOpen = true;
+    } else {
+        triggerShakeEffect();
     }
+
 }
 
 
