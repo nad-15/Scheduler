@@ -792,7 +792,7 @@ h2 {
     /* justify-content: flex-start; */
     bottom: 140px;
     right: 80px;
-    width: 110px;
+    width: 140px;
     height: 150px;
     /* border-radius: 50%; */
     /* gap: 5px; */
@@ -837,7 +837,7 @@ h2 {
     /* border: 2px solid red; */
     margin: 0px;
     padding: 0px;
-    font-size: 15px;
+    font-size: 25px;
     /* rotate: 90deg; */
 }
 
