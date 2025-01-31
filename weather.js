@@ -16,9 +16,9 @@ async function getWeather() {
         const todayNameContainer = document.getElementById('today-name');
         todayNameContainer.innerHTML = `
             <div id="today-location">Kitchener, CA</div>
-            <div id="today-date">${todayDate}</div>
-            <div id="today-temp">${temperature}°C</div>
-                        <div id="today-year">${todayYear}</div>
+                        <div id="today-temp">${temperature}°C</div>
+            <div id="today-date">${todayDate}, ${todayYear}</div>
+
         `;
     } catch (error) {
         console.error('Error fetching weather data:', error);

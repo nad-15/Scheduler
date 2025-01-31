@@ -95,11 +95,11 @@ h1 {
 
 #today-name {
     position: fixed;
-    right: 16px;
-    top: 16px;
-    background-color: rgba(0, 0, 0, 0.7);
+    right: 8px;
+    top: 8px;
+    background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     font-family: Arial, sans-serif;
     display: flex;
@@ -110,24 +110,23 @@ h1 {
 }
 
 #today-name div {
-    margin-bottom: 4px;
+    margin-bottom: 5px;
 }
 
-#today-date {
-    font-size: 30px;
-    font-weight: bold;
+.today-location {
+    font-size: 15px;
 }
-
-#today-year {
-    font-size: 18px;
-    font-weight: lighter;
-    color: #d3d3d3;
-}
-
 #today-temp {
     font-size: 30px;
     font-weight: bold;
 }
+
+#today-date {
+    font-size: 15px;
+    /* font-weight: bold; */
+}
+
+
 
 
 /* .today-name-text-container {
