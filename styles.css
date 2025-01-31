@@ -787,20 +787,23 @@ h2 {
     position: fixed;
     display: flex;
     /* display: none; */
-    flex-direction: column;
+    /* flex-direction: column; */
     /* flex-direction: row-reverse; */
     /* justify-content: flex-start; */
     bottom: 140px;
     right: 80px;
-    width: 70px;
-    height: 20px;
+    width: 110px;
+    height: 150px;
     /* border-radius: 50%; */
     /* gap: 5px; */
     /* border: 2px solid black; */
-    background-color: rgb(0, 0, 0, 0.5);
+    /* background-color: rgb(0, 0, 0, 0.5); */
+    background-color: white;
+    background-color: rgba(255, 255, 255, 0.9);
+        background-color: rgb(0, 0, 0, 0.5);
     /* background-color: transparent; */
     cursor: move;
-    user-select: none;
+    /* user-select: none; */
     /* overflow: auto; */
     border-radius: 4px;
     z-index: 2000;
@@ -811,7 +814,7 @@ h2 {
     box-sizing: border-box;
     /* background-color: red; */
     /* background-color: rgb(0, 0, 0, 0.5); */
-    color: white;
+    color:white;
     cursor: grab;
     margin-bottom: 0;
     padding: 0;
@@ -821,43 +824,63 @@ h2 {
 
 }
 
-.icon-container {
+/* .icon-container {
     border: 2px solid green;
     padding: 0;
     margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-}
+} */
 
 .material-icons.drag-icon {
     /* border: 2px solid red; */
     margin: 0px;
     padding: 0px;
-    font-size: 20px;
-    rotate: 90deg;
+    font-size: 15px;
+    /* rotate: 90deg; */
 }
 
 .job-template-container {
     display: flex;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    /* margin-right: 5px; */
+    margin-left: 5px;
     flex-direction: column;
-    /* border: 2px solid red; */
-    justify-content: space-between;
     align-items: center;
     padding-right: 5px;
-    padding-left: 5px;
-    max-height: 140px;
-    background-color: rgb(0, 0, 0, 0.5);
+    background-color: transparent;
     gap: 5px;
-    /* overflow: auto; */
+    overflow: auto;
+    color: white;
+    font-size: 12px;
+}
+
+.line {
+    width: 1.5px;
+    background-color: white;
+    height: 150px;
 }
 
 
 .items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
     box-sizing: border-box;
-    height: 15px;
-    width: 60px;
-    background-color: blue;
+    height: 20px;
+    width: 90px;
+    font-size: 10px;
+    /* overflow: auto; */
+    color: black;
+    border: 1px solid white;
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide anything that overflows */
+    text-overflow: ellipsis; /* Add '...' if content overflows */
+    /* flex-wrap: nowrap; */
+
     /* margin: 0px 0px 5px 5px; */
 }
 
