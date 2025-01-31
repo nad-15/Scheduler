@@ -786,7 +786,7 @@ h2 {
 .movable-template {
     position: fixed;
     display: flex;
-    display: none;
+    /* display: none; */
     flex-direction: column;
     /* flex-direction: row-reverse; */
     /* justify-content: flex-start; */
@@ -869,14 +869,16 @@ h2 {
 
 .hide-all-buttons {
     display: flex;
-    font-size: 8px;
+    /* was 8px */
+    font-size: 9px; 
     background-color: transparent;
     height: 15px;
-    width: 90px;
+    /* was 90px */
+    width: 100px;
     rotate: -90deg;
     position: fixed;
     left: 17px;
-    bottom: 2px;
+    bottom: 5px;
     font-weight: bold;
     transform-origin: bottom left;
     border: none;
