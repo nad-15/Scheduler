@@ -911,8 +911,8 @@ h2 {
     flex-shrink: 0;
     box-sizing: border-box;
     height: 30px;
-    width: 90px;
-    font-size: 10px;
+    width: 95px;
+    font-size: 13px;
     /* overflow: auto; */
     color: black;
     border: 1px solid white;
