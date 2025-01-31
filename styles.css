@@ -138,7 +138,7 @@ h1 {
     top: 8px;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    padding: 8px;
+    /* padding: 8px; */
     border-radius: 10px;
     font-family: Arial, sans-serif;
     display: flex; 
@@ -147,49 +147,75 @@ h1 {
     max-width: 200px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 10;
+    gap: 10px;
 }
 
 .time-container {
-    border: 2px solid green;
+    /* border: 2px solid green; */
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-}
-
-.weather-container {
-    border: 2px solid red;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#today-icon img {
-    width: 50px; 
-    height: auto;
+    margin-left: 5px;
 }
 
 #today-location {
-    font-size: 15px;
+    font-size: 12px;
 }
 
+#today-date {
+    font-size: 12px;
+    margin-bottom: 10px;
+
+
+}
+
+#today-time {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#today-seconds {
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+#today-ampm {
+    font-size: 14px;
+    text-transform: uppercase;
+    margin-left: 2px;
+    opacity: 0.7;
+}
+
+#today-weather {
+    font-size: 16px;
+    font-style: italic;
+}
+
+
+.weather-container {
+    /* border: 2px solid red; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 5px;
+}
+
+#today-icon img {
+    /* border:2px solid red; */
+    width: 50px; 
+    height: auto;
+}
 #today-temp {
-    font-size: 30px;
+    font-size: 25px;
     font-weight: bold;
 }
 
 #today-weather {
-    font-size: 12px;
+    font-size: 8px;
     font-style: italic;
 }
 
-#today-date {
-    font-size: 16px;
-}
 
-#today-time {
-    font-size: 18px;
-    font-weight: bold;
-}
 
 
 
