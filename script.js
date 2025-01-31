@@ -5,8 +5,17 @@ const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
 const submitTaskBtn = document.getElementById('submitTask');
 const hideAllButtons = document.querySelector(`.hide-all-buttons`);
+const templateTaskBtn = document.querySelector(`.template-task-btn`);
+const movableTemplate = document.getElementById(`movable-template`);
+
+
 
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
+
+templateTaskBtn.addEventListener('click', () => {
+    movableTemplate.style.display = 
+    movableTemplate.style.display === 'none' ? 'flex' : 'none';
+});
 
 // submitTaskBtn.disabled = true;
 // console.log(submitTaskBtn.disabled);
@@ -513,47 +522,11 @@ function submitTask() {
             // Update task text
             if (taskTitle !== ``) {
                 div.textContent = taskTitle;
-
-
-
-
-                //save task template here
-                const taskTemplate = {
-                    text: taskTitle,
-                    color: chosenColor
-                };
-
-                // Check if the task already exists in the array
-                const taskExists = taskClipboard.some(task => task.text === taskTemplate.text && task.color === taskTemplate.color);
-
-                if (!taskExists) {
-                    // If the task doesn't exist, push it to the array
-                    taskClipboard.push(taskTemplate);
-
-                    // Create the div and append it to the container
-                    const itemDiv = document.createElement('div');
-                    itemDiv.classList.add('items'); // Add the 'items' class
-
-                    // Set the background color of the div based on the task's color
-                    itemDiv.style.backgroundColor = taskTemplate.color;
-
-                    // Set the text content of the div based on the task's title
-                    itemDiv.textContent = taskTemplate.text;
-
-                    // Append the created item div to the container
-                    jobTemplateContainer.appendChild(itemDiv);
-                    // Save the updated taskClipboard to localStorage
-                    saveTemplate();
-                }
-
-
             } else {
-
                 taskTitle = div.textContent;
             }
-
-
-
+          
+            addTemplate(taskTitle);
             // Apply the chosen color to the selected divs
             // if (chosenColor) {
             div.style.backgroundColor = chosenColor; // Apply the selected color
@@ -583,6 +556,42 @@ function submitTask() {
 
 }
 
+function addTemplate (taskTitle) {
+
+          //save task template here
+          if (taskTitle !== ``) {
+
+            const taskTemplate = {
+                text: taskTitle,
+                color: chosenColor
+            };
+
+            // Check if the task already exists in the array
+            const taskExists = taskClipboard.some(task => task.text === taskTemplate.text && task.color === taskTemplate.color);
+
+            if (!taskExists) {
+                // If the task doesn't exist, push it to the array
+                taskClipboard.push(taskTemplate);
+
+                // Create the div and append it to the container
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('items'); // Add the 'items' class
+
+                // Set the background color of the div based on the task's color
+                itemDiv.style.backgroundColor = taskTemplate.color;
+
+                // Set the text content of the div based on the task's title
+                itemDiv.textContent = taskTemplate.text;
+
+                // Append the created item div to the container
+                jobTemplateContainer.appendChild(itemDiv);
+                // Save the updated taskClipboard to localStorage
+                saveTemplate();
+            }
+        }
+
+
+}
 
 function saveTemplate() {
     // Save the taskClipboard array to localStorage as a JSON string
