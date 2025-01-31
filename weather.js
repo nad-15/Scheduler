@@ -38,15 +38,21 @@ async function getWeather() {
             // Update the DOM with the correct information
             const todayNameContainer = document.getElementById('today-name');
             todayNameContainer.innerHTML = `
+            <div class="time-container"> 
                 <div id="today-location">Kitchener, CA</div>
-                <div id="today-temp">${temperature}°C</div>
-                <div id="today-weather">${weatherDescription}</div>  <!-- Weather description -->
                 <div id="today-date">${monthDay}, ${year}</div>
                 <div id="today-time">${time}</div>
+            </div>
+        
+            <div class="weather-container"> 
                 <div id="today-icon">
                     <img src="${iconUrl}" alt="Weather icon">
                 </div>
-            `;
+                <div id="today-temp">${temperature}°C</div>
+                <div id="today-weather">${weatherDescription}</div>
+            </div>
+        `;
+        
         }
 
         // Call updateTime immediately to show the current time and refresh every second

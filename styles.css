@@ -93,7 +93,7 @@ h1 {
 
 } */
 
-#today-name {
+/* #today-name {
     position: fixed;
     right: 8px;
     top: 8px;
@@ -124,13 +124,73 @@ h1 {
 
 #today-date {
     font-size: 16px;
-    /* font-weight: bold; */
+
+}
+
+#today-time {
+    font-size: 18px;
+    font-weight: bold;
+} */
+
+#today-name {
+    position: fixed;
+    right: 8px;
+    top: 8px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 8px;
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+    display: flex; 
+    align-items: center;
+    justify-content: space-between;
+    max-width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.time-container {
+    border: 2px solid green;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.weather-container {
+    border: 2px solid red;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#today-icon img {
+    width: 50px; 
+    height: auto;
+}
+
+#today-location {
+    font-size: 15px;
+}
+
+#today-temp {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+#today-weather {
+    font-size: 12px;
+    font-style: italic;
+}
+
+#today-date {
+    font-size: 16px;
 }
 
 #today-time {
     font-size: 18px;
     font-weight: bold;
 }
+
 
 
 
