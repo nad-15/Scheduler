@@ -13,8 +13,8 @@ const movableTemplate = document.getElementById(`movable-template`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
 
 templateTaskBtn.addEventListener('click', () => {
-    movableTemplate.style.display = 
-    movableTemplate.style.display === 'none' ? 'flex' : 'none';
+    movableTemplate.style.display =
+        movableTemplate.style.display === 'flex' ? 'none' : 'flex';
 });
 
 // submitTaskBtn.disabled = true;
@@ -517,6 +517,7 @@ function submitTask() {
     if (selectedDivs.length > 0) {
         selectedDivs.forEach(div => {
 
+            //add
             let taskTitle = document.getElementById('taskTitle').value;
 
             // Update task text
@@ -525,7 +526,7 @@ function submitTask() {
             } else {
                 taskTitle = div.textContent;
             }
-          
+
             addTemplate(taskTitle);
             // Apply the chosen color to the selected divs
             // if (chosenColor) {
@@ -543,8 +544,8 @@ function submitTask() {
         });
 
         // Clear selection and reset styles
-        selectedDivs.forEach(div => div.classList.remove('selected'));
-        selectedDivs = []; // Clear the array
+        // selectedDivs.forEach(div => div.classList.remove('selected'));
+        // selectedDivs = []; // Clear the array
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
 
         // Reset inputs and hide the sliding input view
@@ -556,42 +557,115 @@ function submitTask() {
 
 }
 
-function addTemplate (taskTitle) {
+function addTemplate(taskTitle) {
 
-          //save task template here
-          if (taskTitle !== ``) {
+    //save task template here
+    if (taskTitle !== ``) {
 
-            const taskTemplate = {
-                text: taskTitle,
-                color: chosenColor
-            };
+        const taskTemplate = {
+            text: taskTitle,
+            color: chosenColor
+        };
 
-            // Check if the task already exists in the array
-            const taskExists = taskClipboard.some(task => task.text === taskTemplate.text && task.color === taskTemplate.color);
+        // Check if the task already exists in the array
+        const taskExists = taskClipboard.some(task => task.text === taskTemplate.text && task.color === taskTemplate.color);
 
-            if (!taskExists) {
-                // If the task doesn't exist, push it to the array
-                taskClipboard.push(taskTemplate);
+        if (!taskExists) {
+            // If the task doesn't exist, push it to the array
+            taskClipboard.push(taskTemplate);
 
-                // Create the div and append it to the container
-                const itemDiv = document.createElement('div');
-                itemDiv.classList.add('items'); // Add the 'items' class
+            // Create the div and append it to the container
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('items'); // Add the 'items' class
 
-                // Set the background color of the div based on the task's color
-                itemDiv.style.backgroundColor = taskTemplate.color;
+            // Set the background color of the div based on the task's color
+            itemDiv.style.backgroundColor = taskTemplate.color;
 
-                // Set the text content of the div based on the task's title
-                itemDiv.textContent = taskTemplate.text;
+            // Set the text content of the div based on the task's title
+            itemDiv.textContent = taskTemplate.text;
 
-                // Append the created item div to the container
-                jobTemplateContainer.appendChild(itemDiv);
-                // Save the updated taskClipboard to localStorage
-                saveTemplate();
-            }
+            // Append the created item div to the container
+            jobTemplateContainer.prepend(itemDiv);
+            // Save the updated taskClipboard to localStorage
+            saveTemplate();
         }
-
-
+    }
 }
+
+jobTemplateContainer.addEventListener('dblclick', (event) => {
+    if (event.target.classList.contains('items')) {
+        removeTemplate(event.target);
+    }
+});
+
+jobTemplateContainer.addEventListener('click', (event) => {
+    if (event.target.classList.contains('items')) {
+        submitTemplate(event.target);
+    }
+});
+
+
+
+
+function submitTemplate(item) {
+    const taskText = item.textContent;
+    const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
+
+    if (selectedDivs.length > 0) {
+        selectedDivs.forEach(div => {
+
+            div.textContent = taskText;
+            div.style.backgroundColor = taskColor; 
+
+            const dayContainer = div.closest('.day-container');
+            const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
+            const taskType = div.classList.contains('morningTask') ? 'morning' :
+                div.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+
+
+            saveTaskData(date, taskType, taskText, taskColor); // Pass color along with other task data
+        });
+
+        selectedTaskCounter.textContent = `${selectedDivs.length}`;
+
+    } else {
+        triggerShakeEffect();
+    }
+}
+
+
+
+
+
+function removeTemplate(item) {
+    // Get task text and color from the clicked item
+    const taskText = item.textContent;
+    const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
+
+
+    console.log(taskText, taskColor);
+
+    // Load the current taskClipboard from localStorage
+    let savedTasks = JSON.parse(localStorage.getItem('taskClipboard')) || [];
+
+    // Filter out the clicked task
+    savedTasks = savedTasks.filter(task => !(task.text === taskText && task.color === taskColor));
+
+    // Save the updated taskClipboard back to localStorage
+    localStorage.setItem('taskClipboard', JSON.stringify(savedTasks));
+
+    // Update the taskClipboard array in memory
+    taskClipboard = savedTasks;
+
+    // Remove the item from the DOM
+    item.remove();
+}
+
+function rgbToHex(rgb) {
+    const match = rgb.match(/\d+/g); // Extract numbers
+    return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
+}
+
 
 function saveTemplate() {
     // Save the taskClipboard array to localStorage as a JSON string
@@ -653,7 +727,9 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
 
 let lastTapTime = 0;
 const delay = 300;
-clearButton.addEventListener(`touchend`, function () {
+clearButton.addEventListener(`touchend`, touchEnd);
+
+function touchEnd() {
 
     let currentTime = Date.now();
 
@@ -663,7 +739,7 @@ clearButton.addEventListener(`touchend`, function () {
 
     lastTapTime = currentTime;
 
-});
+}
 
 
 
@@ -684,6 +760,7 @@ function deleteFunction() {
 
         // Check if the data for this date exists, then remove the task data
         if (storedData[fullDate]) {
+            console.log(`deletefunciton deleting ${storedData[fullDate]}`);
             storedData[fullDate][taskType] = { task: '', color: '' }; // Clear task and color for this type
 
             if (!storedData[fullDate].morning.task && !storedData[fullDate].afternoon.task && !storedData[fullDate].evening.task) {
