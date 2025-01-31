@@ -73,15 +73,15 @@ h1 {
 
 #year-name {
     position: fixed;
-    right: 10px;
-    top: 10px;
+    right: 8px;
+    top: 8px;
     border-radius: 0px;
     display: flex;
     flex-direction: column;
-    background-color: rgba(204, 204, 204, 0.8);
+    background-color: rgb(0, 0, 0, 0.2);
     color: rgba(255, 255, 255, 0.9);
     padding: 10px;
-    font-size: 35px;
+    font-size: 20px;
     border-radius: 5px;
     user-select: none;
     /* Prevents text selection */
@@ -229,19 +229,26 @@ h2 {
     justify-content: center;
     align-items: center;
     position: fixed;
-    top: 20px;
-    left: 10px;
+    top: 8px;
+    left: 8px;
     background-color: rgba(204, 204, 204, 0.8);
+    background-color: rgb(0, 0, 0, 0.2);
     color: white;
     border: none;
     border-radius: 50%;
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
+    /* font-size: 180px; */
+    width: 30px;
+    height: 30px;
     cursor: pointer;
     z-index: 1000;
     transition: transform 1s ease, background-color 0.3s ease;
 }
+
+.material-icons.screen-size {
+    font-size: 18px;
+}
+
+
 
 .exit-flscreen-button {
     display: none;
