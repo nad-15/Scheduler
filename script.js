@@ -25,7 +25,7 @@ hideAllButtons.addEventListener(`click`, () => {
 
 
 
-    yearNameText.style.display = yearNameText.style.display === 'none' ? 'flex' : 'none';
+    todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
     clearButton.style.display = clearButton.style.display === 'none' ? 'flex' : 'none';
     floatingAddBtn.style.display = floatingAddBtn.style.display === 'none' ? '' : 'none';
     slidingInputView.style.display = slidingInputView.style.display !== 'none' ? 'none' : 'flex';
@@ -52,7 +52,6 @@ hideAllButtons.addEventListener(`click`, () => {
 
 });
 
-// const yearNameContainer = document.getElementById(`year-name-text-container`);
 const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
 
@@ -79,7 +78,7 @@ window.addEventListener('popstate', () => {
 
 fullScreenButton.addEventListener(`click`, enterFullScreen);
 
-let yearNameText = document.getElementById('year-name');
+let todayNameText = document.getElementById('today-name');
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
 let currentMonthContainer = null;
 let nextMonthContainer = null;
@@ -172,7 +171,7 @@ yearContainer.addEventListener('scroll', () => {
 
 function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "", yearDate) {
     // console.log(`current  is ${monthName}`);
-    yearNameText.textContent = currentDateYear;
+    // todayNameText.textContent = ;
 
 
     let monthNameDayContainer = document.createElement('div');
@@ -184,27 +183,27 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     let FormatMonthName = getMonthName(monthName % 12);
     let letters = FormatMonthName.split('');
     monthNameContainer.innerHTML = '';
-    
+
     // Create a wrapper for the letters
     let monthLetterContainer = document.createElement('div');
     monthLetterContainer.classList.add('month-letter-container'); // Add a class for styling
-    
+
     letters.forEach(letter => {
         let letterDiv = document.createElement('div');
         letterDiv.textContent = letter;
         monthLetterContainer.appendChild(letterDiv); // Append each letter to the wrapper
     });
-    
+
     // Append the wrapper to the main container
     monthNameContainer.appendChild(monthLetterContainer);
-    
+
     // Set background color based on monthName
     if (monthName % 2 == 0) {
         monthNameContainer.style.backgroundColor = '#82c6a2'; // Light green
     } else {
         monthNameContainer.style.backgroundColor = '#53ab8b'; // Dark green
     }
-    
+
     //monthdays and name container
 
 
@@ -214,7 +213,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     yearLetters.forEach(letter => {
         let letterDiv = document.createElement('div');
         letterDiv.textContent = letter;
-        yearLetterContainer.appendChild(letterDiv); 
+        yearLetterContainer.appendChild(letterDiv);
     });
 
     // yearLetterContainer.textContent = yearDate;
@@ -398,6 +397,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
+    getWeather();
 });
 
 
