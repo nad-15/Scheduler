@@ -9,22 +9,36 @@ async function getWeather() {
         const data = await response.json();
 
         const temperature = data.main.temp;  // Temperature in Celsius
-        const timezoneOffset = data.timezone;  // Timezone offset in seconds
 
-        // Function to update the current time
+        // Function to update the current time using Toronto timezone
         function updateTime() {
-            const today = new Date((Date.now() + timezoneOffset * 1000));  // Adjusting the time using the timezone offset
-            const todayDate = today.toLocaleString('en-US', { month: 'short', day: 'numeric' });  // Jan 31
-            const todayYear = today.getFullYear();  // 2025
-            const currentTime = today.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });  // 14:45:30
+            const today = new Date();
 
-            // Update the DOM
+            // Set the date and year to Toronto timezone
+            const timeOptions = {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,  // 24-hour format
+                timeZone: 'America/Toronto',  // Toronto timezone
+            };
+
+            // Format the time, date, and year to match the Toronto timezone
+            const formattedDate = new Intl.DateTimeFormat('en-US', timeOptions).format(today);
+
+            // Split the formatted string into its components
+            const [monthDay, year, time] = formattedDate.split(', ');
+
+            // Update the DOM with the correct information
             const todayNameContainer = document.getElementById('today-name');
             todayNameContainer.innerHTML = `
                 <div id="today-location">Kitchener, CA</div>
                 <div id="today-temp">${temperature}°C</div>
-                <div id="today-date">${todayDate}, ${todayYear}</div>
-                <div id="today-time">${currentTime}</div>
+                <div id="today-date">${monthDay}, ${year}</div>
+                <div id="today-time">${time}</div>
             `;
         }
 
@@ -36,5 +50,3 @@ async function getWeather() {
         console.error('Error fetching weather data:', error);
     }
 }
-
-document.addEventListener('DOMContentLoaded', getWeather);
