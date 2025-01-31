@@ -466,10 +466,27 @@ yearContainer.addEventListener('click', (event) => {
     }
 });
 
-submitTaskBtn.addEventListener('click', () => {
+const counterObserver = new MutationObserver(() => {
+    if (parseInt(selectedTaskCounter.textContent) > 0) {
+        submitTaskBtn.classList.remove('disabled-btn'); // Remove disabled styling
+        submitTaskBtn.disabled = false;
+        console.log('btn is enabled');
+    } else {
+        submitTaskBtn.classList.add('disabled-btn'); // Add disabled styling
+        submitTaskBtn.disabled = true;
+        console.log('btn is disabled');
+    }
+});
+
+// Start observing changes in the text of selectedTaskCounter
+counterObserver.observe(selectedTaskCounter, { childList: true });
 
 
-    if ((taskTitle || chosenColor != ``) && selectedDivs.length > 0) {
+submitTaskBtn.addEventListener('click', submitTask);
+
+function submitTask() {
+    // (taskTitle || chosenColor != ``) && 
+    if (selectedDivs.length > 0) {
         selectedDivs.forEach(div => {
 
             let taskTitle = document.getElementById('taskTitle').value;
@@ -483,9 +500,9 @@ submitTaskBtn.addEventListener('click', () => {
 
 
             // Apply the chosen color to the selected divs
-            if (chosenColor) {
+            // if (chosenColor) {
                 div.style.backgroundColor = chosenColor; // Apply the selected color
-            }
+            // }
 
             // Save the task data (including color)
             const dayContainer = div.closest('.day-container');
@@ -505,7 +522,7 @@ submitTaskBtn.addEventListener('click', () => {
         document.getElementById('taskTitle').value = '';
         isPopupOpen = true;
     }
-});
+}
 
 
 

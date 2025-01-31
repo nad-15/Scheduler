@@ -422,6 +422,14 @@ h2 {
 
         -webkit-tap-highlight-color: transparent;
 }
+
+#submitTask.disabled-btn {
+    background-color: gray;  /* Change background color */
+    color: white;            /* Adjust text color */
+    opacity: 0.5;            /* Make it look inactive */
+    cursor: not-allowed;     /* Change cursor to indicate disabled state */
+}
+
 .selected-task {
     box-sizing: border-box;
     display: flex;
