@@ -138,7 +138,7 @@ h1 {
     top: 8px;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    /* padding: 8px; */
+    padding: 8px;
     border-radius: 10px;
     font-family: Arial, sans-serif;
     display: flex; 
@@ -148,12 +148,14 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 10;
     gap: 10px;
+
 }
 
 .time-container {
     /* border: 2px solid green; */
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: flex-start;
     margin-left: 5px;
 }
@@ -164,26 +166,26 @@ h1 {
 
 #today-date {
     font-size: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 25px;
 
 
 }
 
 #today-time {
-    font-size: 15px;
+    font-size: 20px;
     font-weight: bold;
 }
 
 #today-seconds {
     font-size: 10px;
-    opacity: 0.7;
+    /* opacity: 0.7; */
 }
 
 #today-ampm {
     font-size: 14px;
     text-transform: uppercase;
-    margin-left: 2px;
-    opacity: 0.7;
+    /* margin-left: 2px; */
+    /* opacity: 0.7; */
 }
 
 #today-weather {
@@ -202,7 +204,7 @@ h1 {
 
 #today-icon img {
     /* border:2px solid red; */
-    width: 50px; 
+    width: 45px; 
     height: auto;
 }
 #today-temp {

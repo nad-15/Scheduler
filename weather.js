@@ -47,7 +47,7 @@ async function getWeather() {
             // Update the DOM
             document.getElementById('today-name').innerHTML = `
                 <div class="time-container">
-                    <div id="today-location">Kitchener, CA</div>
+                    <div id="today-location">Kitchener, ON</div>
                     <div id="today-date">${monthDay}, ${year}</div>
                     <div id="today-time">
                         <span id="today-hour-minute">${hour}:${minute}</span>
