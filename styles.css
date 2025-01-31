@@ -104,9 +104,9 @@ h1 {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
+    max-width: 120px;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-
     z-index: 10;
 }
 
@@ -128,7 +128,7 @@ h1 {
 }
 
 #today-time {
-    font-size: 25px;
+    font-size: 18px;
     font-weight: bold;
 }
 

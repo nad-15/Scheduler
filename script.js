@@ -15,6 +15,7 @@ const jobTemplateContainer = document.querySelector(`.job-template-container`);
 templateTaskBtn.addEventListener('click', () => {
     movableTemplate.style.display =
         movableTemplate.style.display === 'flex' ? 'none' : 'flex';
+        console.log(`drag is cllick`);
 });
 
 // submitTaskBtn.disabled = true;
@@ -84,12 +85,24 @@ let currentMonthContainer = null;
 let nextMonthContainer = null;
 let prevMonthContainer = null;
 
+const todayDateObj= new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
+
+// Convert it back to a Date object
+const  today = new Date(todayDateObj);
+
+let todayDayNumber = today.getDate(); // Get the day of the month
+let todayDay = getDayName(today.getDay()); // Get the weekday name
+let todayMonth = today.getMonth(); // Get the month (0-11)
+let todayYear = today.getFullYear(); // Get the year
+
 // Get the current date details
-let today = new Date();
-let todayDayNumber = today.getDate();
-let todayDay = getDayName(today.getDay());
-let todayMonth = today.getMonth();
-let todayYear = today.getFullYear();
+// let today = new Date();
+
+
+// let todayDayNumber = today.getDate();
+// let todayDay = getDayName(today.getDay());
+// let todayMonth = today.getMonth();
+// let todayYear = today.getFullYear();
 
 // Initialize calendar
 let currentDate = new Date(todayYear, todayMonth, 1);
@@ -170,9 +183,6 @@ yearContainer.addEventListener('scroll', () => {
 
 
 function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "", yearDate) {
-    // console.log(`current  is ${monthName}`);
-    // todayNameText.textContent = ;
-
 
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
@@ -236,18 +246,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         const dateDiv = document.createElement('div');
 
         if (today.toDateString() === new Date(yearDate, monthName, i).toDateString()) {
-            // const todayDiv = document.createElement(`div`);
-            // todayDiv.classList.add(`today-div`); 
-            // todayDiv.style.width = `25px`;
-            // todayDiv.style.height = `25px`;
-            // todayDiv.style.backgroundColor = `red`;
-            // todayDiv.style.borderRadius = "50%";
-            // todayDiv.textContent = date ;
-            // dateDiv.appendChild(todayDiv);
-            // dateDiv.style.backgroundColor = 'gray';
-            // dateDiv.style.borderRadius = `8px`;
             dateDiv.style.color = `white`;
-
             dateDiv.classList.add('aurora');
         }
 
@@ -468,7 +467,7 @@ let selectedDivs = []; // Array to track selected divs
 let chosenColor = '#e27396';  // Store the chosen color
 const selectedTaskCounter = document.querySelector(`.selected-task`);
 
-selectedTaskCounter.addEventListener('click', () => {
+selectedTaskCounter.addEventListener('dblclick', () => {
     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
     selectedDivs = []; // Clear the array of selected divs
     selectedTaskCounter.textContent = `${selectedDivs.length}`;

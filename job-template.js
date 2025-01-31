@@ -51,4 +51,5 @@ dragHandle.addEventListener('touchstart', startDrag);
 document.addEventListener('touchmove', onDrag);
 document.addEventListener('touchend', endDrag);
 
+// dragHandle.addEventListener('click', templateTaskBtn.click);
 
