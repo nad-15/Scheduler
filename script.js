@@ -7,7 +7,7 @@ const submitTaskBtn = document.getElementById('submitTask');
 const hideAllButtons = document.querySelector(`.hide-all-buttons`);
 const templateTaskBtn = document.querySelector(`.template-task-btn`);
 const movableTemplate = document.getElementById(`movable-template`);
-
+const flower = document.querySelector(`.flower`);
 
 
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
@@ -459,6 +459,7 @@ document.querySelectorAll('.color-option').forEach(button => {
         // Highlight the selected button
         document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected-color'));
         button.classList.add('selected-color');
+        flower.style.color = chosenColor;
     });
 });
 

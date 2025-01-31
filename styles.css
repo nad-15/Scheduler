@@ -353,9 +353,10 @@ h2 {
     border-radius: 25px;
     overflow: hidden;
     padding: 5px;
-    gap: 10px;
+    /* gap: 10px; */
 
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
+    background-color:  #f0f0f0;
     border: 1px solid #2277b0;
     /* border: 2px solid red; */
     /* border: none; */
@@ -458,9 +459,13 @@ h2 {
     cursor: pointer;
     font-weight: bold;
     flex-wrap: wrap;
+    flex-shrink: 0;
+    flex-grow: 0;
 
     -webkit-tap-highlight-color: transparent;
 }
+
+
 
 /* Apply the shake animation to the button when triggered */
 .selected-task.shake-btn {
@@ -476,6 +481,31 @@ h2 {
     border: 2px solid #0078FF;
 }
 
+
+
+
+
+.material-icons.flower {
+
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    width: 30px;
+    font-size: 20px;
+    border-radius: 50%;
+    font-weight: bold;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    flex-grow: 0;
+
+    -webkit-tap-highlight-color: transparent;
+
+    background-color: transparent;
+    border: none;
+    color: #c2185b;
+}
 
 .material-icons.arrow-upward {
     font-size: 20px;
