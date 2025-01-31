@@ -174,13 +174,6 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     // console.log(`current  is ${monthName}`);
     yearNameText.textContent = currentDateYear;
 
-    // let yearLetters = currentDateYear.toString().split('');
-    // yearNameText.innerHTML = '';
-    // yearLetters.forEach(letter => {
-    //     let letterDiv = document.createElement('div');
-    //     letterDiv.textContent = letter;
-    //     yearNameText.appendChild(letterDiv);
-    // });
 
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
@@ -189,18 +182,48 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     monthNameContainer.classList.add('month-name-container');
 
     let FormatMonthName = getMonthName(monthName % 12);
-    // console.log(FormatMonthName);
     let letters = FormatMonthName.split('');
     monthNameContainer.innerHTML = '';
+    
+    // Create a wrapper for the letters
+    let monthLetterContainer = document.createElement('div');
+    monthLetterContainer.classList.add('month-letter-container'); // Add a class for styling
+    
     letters.forEach(letter => {
         let letterDiv = document.createElement('div');
         letterDiv.textContent = letter;
-        monthNameContainer.appendChild(letterDiv);
-
-        if (monthName % 2 == 0) {
-            monthNameContainer.style.backgroundColor = '#82c6a2'; //lightgreen
-        } else monthNameContainer.style.backgroundColor = '#53ab8b'; //darkgreen
+        monthLetterContainer.appendChild(letterDiv); // Append each letter to the wrapper
     });
+    
+    // Append the wrapper to the main container
+    monthNameContainer.appendChild(monthLetterContainer);
+    
+    // Set background color based on monthName
+    if (monthName % 2 == 0) {
+        monthNameContainer.style.backgroundColor = '#82c6a2'; // Light green
+    } else {
+        monthNameContainer.style.backgroundColor = '#53ab8b'; // Dark green
+    }
+    
+    //monthdays and name container
+
+
+    let yearLetterContainer = document.createElement('div'); // Create a wrapper container
+    yearLetterContainer.classList.add('year-letter-container'); // Add a class for styling
+    let yearLetters = yearDate.toString().split('');
+    yearLetters.forEach(letter => {
+        let letterDiv = document.createElement('div');
+        letterDiv.textContent = letter;
+        yearLetterContainer.appendChild(letterDiv); 
+    });
+
+    // yearLetterContainer.textContent = yearDate;
+    monthNameContainer.appendChild(yearLetterContainer);
+
+
+
+
+
     const monthContainer = document.createElement('div');
     monthContainer.classList.add('month-container');
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
@@ -616,7 +639,7 @@ function submitTemplate(item) {
         selectedDivs.forEach(div => {
 
             div.textContent = taskText;
-            div.style.backgroundColor = taskColor; 
+            div.style.backgroundColor = taskColor;
 
             const dayContainer = div.closest('.day-container');
             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
