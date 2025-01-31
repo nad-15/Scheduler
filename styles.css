@@ -305,22 +305,42 @@ h2 {
 
 
 /* //original task tempalte */
-.task-template {
+.jumping-text-container {
     box-sizing: border-box;
-    /* border: 2px solid green; */
     display: flex;
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
     justify-content: center;
+    align-items: center;
     font-family: monospace;
     width: 100%;
-    flex-grow: 1;
-    /* margin: 0 100px 0 100px; */
-    overflow: scroll;
-    /* background-color: rgba(255, 255, 255, 0.9); */
-    display: none;
+    font-weight: bold;
+    /* border:2px solid red; */
 }
+
+
+.jumping-text span {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: bold;
+    animation: jump 1.5s ease-in-out infinite;
+  }
+  
+  .jumping-text span:nth-child(odd) {
+    animation-delay: 0.2s;
+  }
+  
+  .jumping-text span:nth-child(even) {
+    animation-delay: 0.4s;
+  }
+  
+  /* Keyframes for the jumping effect */
+  @keyframes jump {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px); /* Jump upwards by 10px */
+    }
+  }
 
 .template-title-submit-container {
     display: flex;
@@ -527,6 +547,7 @@ h2 {
     overflow: auto;
     gap: 10px;
     padding: 10px;
+    /* border: 2PX SOLID red   ; */
 }
 
 /* .color-option {
@@ -925,6 +946,7 @@ h2 {
     /* Add '...' if content overflows */
     /* flex-wrap: nowrap; */
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
     /* margin: 0px 0px 5px 5px; */
 }
 
@@ -935,20 +957,23 @@ h2 {
 }
 
 .hide-all-buttons {
+    box-sizing: border-box;
     display: flex;
     /* was 8px */
     font-size: 9px;
     background-color: transparent;
-    height: 15px;
+    height: 25px;
     /* was 90px */
-    width: 100px;
+    width: 120px;
     rotate: -90deg;
     position: fixed;
-    left: 17px;
-    bottom: 5px;
+    left: 30px;
+    bottom: 10px;
     font-weight: bold;
     transform-origin: bottom left;
     border: none;
+    /* border: 2px solid red; */
+    
 
 }
 
