@@ -531,11 +531,16 @@ const counterObserver = new MutationObserver(() => {
 
 // Function to trigger the shake effect
 function triggerShakeEffect() {
+    clearButtonTemplate.classList.add('shake-btn');
     selectedTaskCounter.classList.add('shake-btn'); // Add shake effect
 
     // Remove the class after the animation ends to allow for future shakes
-    selectedTaskCounter.addEventListener('animationend', () => {
+    clearButtonTemplate.addEventListener('animationend', () => {
         selectedTaskCounter.classList.remove('shake-btn');
+    });
+
+    clearButtonTemplate.addEventListener('animationend', () => {
+        clearButtonTemplate.classList.remove('shake-btn');
     });
 }
 
@@ -817,14 +822,17 @@ function handleTouchEnd(callback) {
 }
 
 // selectedTaskCounter touchend
-selectedTaskCounter.addEventListener('touchend', () => {
+selectedTaskCounter.addEventListener('touchend', clearSelection); 
+
+function clearSelection() {
+
     handleTouchEnd(() => {
         selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
         selectedDivs = []; // Clear the array of selected divs
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
         clearButtonTemplate.textContent = `${selectedDivs.length}`;
     });
-}); 
+}
 
 // clearButton touchend
 clearButton.addEventListener('touchend', () => {
