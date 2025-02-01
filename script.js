@@ -11,9 +11,18 @@ const flower = document.querySelector(`.flower`);
 const closeButton = document.querySelector('.btn-close');
 const addButton = document.querySelector('.btn-add');
 const deleteButton = document.querySelector('.btn-delete');
-const clearButtonTemplate = document.querySelector('.btn-clear');
+const deselectTemplateBtn = document.querySelector('.btn-clear');
 const todayName = document.getElementById('today-name');
 const hideWidgetBtn = document.querySelector(`.hide-widget`);
+const selectedTaskCounter = document.querySelector(`.selected-task`);
+const jobTemplateContainer = document.querySelector(`.job-template-container`);
+
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadTemplate();
+    getWeather();
+});
+
 
 // The 8px offset from the right
 const offset = 8;
@@ -26,24 +35,18 @@ hideWidgetBtn.addEventListener('click', () => {
     // Toggle the visibility and the arrow
     if (todayName.style.transform === `translateX(${todayNameWidth + offset}px)`) {
         todayName.style.transform = 'translateX(0)'; // Show it again
-        hideWidgetBtn.classList.remove('active'); // Reset the arrow and button style
+        hideWidgetBtn.classList.remove('is-true'); // Reset the arrow and button style
     } else {
         todayName.style.transform = `translateX(${todayNameWidth + offset}px)`; // Move it off-screen to the right including the offset
-        hideWidgetBtn.classList.add('active'); // Apply active class for arrow and background change
+        hideWidgetBtn.classList.add('is-true'); // Apply active class for arrow and background change
     }
 });
 
 
-
-
-
-
-const jobTemplateContainer = document.querySelector(`.job-template-container`);
-
 templateTaskBtn.addEventListener('click', () => {
     movableTemplate.style.display =
         movableTemplate.style.display === 'flex' ? 'none' : 'flex';
-        console.log(`drag is cllick`);
+    console.log(`drag is cllick`);
 });
 
 // submitTaskBtn.disabled = true;
@@ -51,8 +54,6 @@ templateTaskBtn.addEventListener('click', () => {
 
 let isHidden = false;
 hideAllButtons.addEventListener(`click`, () => {
-
-
 
     todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
     clearButton.style.display = clearButton.style.display === 'none' ? 'flex' : 'none';
@@ -97,16 +98,6 @@ taskInput.addEventListener('focus', () => {
 
 
 
-window.addEventListener('popstate', () => {
-    if (taskInput) {
-        taskInput.blur(); // Remove focus from the input field
-        console.log(`popstate`);
-    }
-});
-
-
-fullScreenButton.addEventListener(`click`, enterFullScreen);
-
 let todayNameText = document.getElementById('today-name');
 todayNameText.addEventListener('click', () => {
     location.reload();
@@ -117,10 +108,10 @@ let currentMonthContainer = null;
 let nextMonthContainer = null;
 let prevMonthContainer = null;
 
-const todayDateObj= new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
+const todayDateObj = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
 
 // Convert it back to a Date object
-const  today = new Date(todayDateObj);
+const today = new Date(todayDateObj);
 
 let todayDayNumber = today.getDate(); // Get the day of the month
 let todayDay = getDayName(today.getDay()); // Get the weekday name
@@ -427,16 +418,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 }
 
 
-window.addEventListener('DOMContentLoaded', () => {
-    loadTemplate();
-    getWeather();
-});
-
-
+fullScreenButton.addEventListener(`click`, enterFullScreen);
 exitFullscreenBtn.addEventListener("click", exitFullscreen);
-
-
-
 function enterFullScreen() {
     const docElement = document.documentElement;
     if (docElement.requestFullscreen) {
@@ -493,24 +476,14 @@ document.addEventListener('fullscreenchange', () => {
     }
 });
 
+let selectedDivs = [];
+let chosenColor = '#e27396';
 
-
-
-let selectedDivs = []; // Array to track selected divs
-let chosenColor = '#e27396';  // Store the chosen color
-const selectedTaskCounter = document.querySelector(`.selected-task`);
-
-// selectedTaskCounter.addEventListener('dblclick', () => {
-//     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
-//     selectedDivs = []; // Clear the array of selected divs
-//     selectedTaskCounter.textContent = `${selectedDivs.length}`;
-// });
-
-
-// Event listener for selecting colors
+//add click listener to colors
 document.querySelectorAll('.color-option').forEach(button => {
     button.addEventListener('click', () => {
-        chosenColor = button.getAttribute('data-color'); // Get the selected color
+        // Get the selected color
+        chosenColor = button.getAttribute('data-color');
         // Highlight the selected button
         document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected-color'));
         button.classList.add('selected-color');
@@ -518,7 +491,7 @@ document.querySelectorAll('.color-option').forEach(button => {
     });
 });
 
-//add click listeners to task divs
+//add click listeners to task(morning, afternoon, evening) divs
 yearContainer.addEventListener('click', (event) => {
     const taskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
@@ -533,7 +506,7 @@ yearContainer.addEventListener('click', (event) => {
         }
 
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
-        clearButtonTemplate.textContent = `${selectedDivs.length}`;
+        deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
     }
 });
@@ -551,22 +524,6 @@ const counterObserver = new MutationObserver(() => {
         triggerShakeEffect();
     }
 });
-
-// Function to trigger the shake effect
-function triggerShakeEffect() {
-    clearButtonTemplate.classList.add('shake-btn');
-    selectedTaskCounter.classList.add('shake-btn'); // Add shake effect
-
-    // Remove the class after the animation ends to allow for future shakes
-    clearButtonTemplate.addEventListener('animationend', () => {
-        selectedTaskCounter.classList.remove('shake-btn');
-    });
-
-    clearButtonTemplate.addEventListener('animationend', () => {
-        clearButtonTemplate.classList.remove('shake-btn');
-    });
-}
-
 
 // Start observing changes in the text of selectedTaskCounter
 counterObserver.observe(selectedTaskCounter, { childList: true });
@@ -610,7 +567,7 @@ function submitTask() {
         // selectedDivs.forEach(div => div.classList.remove('selected'));
         // selectedDivs = []; // Clear the array
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
-        clearButtonTemplate.textContent = `${selectedDivs.length}`;
+        deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
@@ -669,8 +626,6 @@ jobTemplateContainer.addEventListener('click', (event) => {
 });
 
 
-
-
 function submitTemplate(item) {
     const taskText = item.textContent;
     const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
@@ -691,15 +646,12 @@ function submitTemplate(item) {
         });
 
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
-        clearButtonTemplate.textContent = `${selectedDivs.length}`;
+        deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
     } else {
         triggerShakeEffect();
     }
 }
-
-
-
 
 
 function removeTemplate(item) {
@@ -724,11 +676,6 @@ function removeTemplate(item) {
 
     // Remove the item from the DOM
     item.remove();
-}
-
-function rgbToHex(rgb) {
-    const match = rgb.match(/\d+/g); // Extract numbers
-    return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
 }
 
 
@@ -764,9 +711,6 @@ function loadTemplate() {
 }
 
 
-
-
-
 function saveTaskData(date, taskType, updatedTask, taskColor) {
     // Get the current data from localStorage (or initialize as an empty object if not yet saved)
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
@@ -792,75 +736,32 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-// let lastTapTime = 0;
-// const delay = 300;
-// clearButton.addEventListener(`touchend`, touchEnd);
-
-// function touchEnd() {
-
-//     let currentTime = Date.now();
-
-//     if (currentTime - lastTapTime < delay) {
-//         deleteFunction();
-//     }
-
-//     lastTapTime = currentTime;
-
-// }
-
-
-selectedTaskCounter.addEventListener('dblclick', () => {
-    selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
-    selectedDivs = []; // Clear the array of selected divs
-    selectedTaskCounter.textContent = `${selectedDivs.length}`;
-    clearButtonTemplate.textContent = `${selectedDivs.length}`;
-});
-
-
-// Declare these variables once
 let lastTapTime = 0;
 const delay = 300;
 
 // Function for touchend event logic
 function handleTouchEnd(callback) {
     let currentTime = Date.now();
-    
+
     if (currentTime - lastTapTime < delay) {
         callback();
     }
-    
+
     lastTapTime = currentTime;
 }
 
-// selectedTaskCounter touchend
-selectedTaskCounter.addEventListener('touchend', clearSelection); 
+selectedTaskCounter.addEventListener('dblclick', clearSelection);
+selectedTaskCounter.addEventListener('touchend', () => {
+    handleTouchEnd(clearSelection);
+});
 
 function clearSelection() {
-
-    handleTouchEnd(() => {
-        selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
-        selectedDivs = []; // Clear the array of selected divs
-        selectedTaskCounter.textContent = `${selectedDivs.length}`;
-        clearButtonTemplate.textContent = `${selectedDivs.length}`;
-    });
+    selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
+    selectedDivs = []; // Clear the array of selected divs
+    selectedTaskCounter.textContent = `${selectedDivs.length}`;
+    deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+    console.log(`selection cleared`);
 }
-
-// clearButton touchend
-clearButton.addEventListener('touchend', () => {
-    handleTouchEnd(deleteFunction);
-});
 
 jobTemplateContainer.addEventListener('touchend', (event) => {
     handleTouchEnd(() => {
@@ -871,20 +772,10 @@ jobTemplateContainer.addEventListener('touchend', (event) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 clearButton.addEventListener('dblclick', deleteFunction);
+clearButton.addEventListener('touchend', () => {
+    handleTouchEnd(deleteFunction);
+});
 
 function deleteFunction() {
     // Loop through selected divs and clear their saved data
@@ -925,7 +816,7 @@ function deleteFunction() {
     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
     selectedDivs = []; // Clear the array of selected divs
     selectedTaskCounter.textContent = `${selectedDivs.length}`;
-    clearButtonTemplate.textContent = `${selectedDivs.length}`;
+    deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
     // Optionally reset UI elements (like task title input and any other related UI)
     // document.getElementById('taskTitle').value = ''; // Reset task input field
@@ -968,46 +859,105 @@ floatingAddBtn.addEventListener('click', () => {
     }
 });
 
-// Select all buttons by their class names
 
-
-// Add event listeners to each button
-
-// Close button double-click listener
 closeButton.addEventListener('click', () => {
-    // Call the dblclick functionality directly
-        templateTaskBtn.click(); // Assuming templateTaskBtn is a valid element with dblclick
-
-    console.log('Close button double-clicked');
-    // Add your functionality here
+    templateTaskBtn.click();
 });
 
-// Add button click listener
-addButton.addEventListener('click', () => {
+
+
+
+
+
+document.getElementById('overlay').style.display = 'none';//make this visible tomorrow
+
+// Clone the container
+const clonedSlidingInputView = slidingInputView.cloneNode(true);
+clonedSlidingInputView.classList.add('cloned-sliding-view');
+
+// Remove the elements you don't need from the clone
+const selectedTask = clonedSlidingInputView.querySelector('.selected-task');
+if (selectedTask) {
+    selectedTask.remove();  // Remove the selected-task button
+}
+
+const templateTaskBtnCloned = clonedSlidingInputView.querySelector('.template-task-btn');
+if (templateTaskBtnCloned) {
+    templateTaskBtnCloned.remove();  // Remove the template-task-btn div
+}
+
+// Change the submit button text to "+"
+const submitButtonCloned = clonedSlidingInputView.querySelector('#submitTask');
+submitButtonCloned.classList.add(`submit-btn-cloned`);
+if (submitButtonCloned) {
+    submitButtonCloned.textContent = "+";  // Change the text content to "+"
+}
+
+submitButtonCloned.addEventListener(`click`, () =>{
     alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
+});
 
+// Optionally, you can now append the modified clone to another location
+document.body.appendChild(clonedSlidingInputView);  // This will append to the body (or anywhere you like)
+
+
+
+const closeButtonCloned = document.createElement('button');
+closeButtonCloned.classList.add('close-btn-cloned');
+const closeButtonClonedIcon = document.createElement('span');
+closeButtonClonedIcon.classList.add('material-icons', 'close-btn-cloned');
+closeButtonClonedIcon.textContent = `close`;
+
+closeButtonCloned.appendChild(closeButtonClonedIcon);
+
+// Append the new div (close button) inside the cloned container
+clonedSlidingInputView.appendChild(closeButtonCloned);
+
+addButton.addEventListener('click', () => {
+    // clonedSlidingInputView.style.display = 'flex'; 
+    // document.getElementById('overlay').style.display = 'block';
+    alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
     console.log('Add button clicked');
-
-    // Add your functionality here
 });
 
-// Delete button double-click listener
+
+
+
+
+
+
+
+
 deleteButton.addEventListener('dblclick', deleteFunction);
-
-// Clear button double-click listener
-clearButtonTemplate.addEventListener('dblclick', () => {
-    selectedDivs.forEach(div => div.classList.remove('selected'));
-    selectedDivs = []; 
-    selectedTaskCounter.textContent = `${selectedDivs.length}`;
-    clearButtonTemplate.textContent = `${selectedDivs.length}`;
+deleteButton.addEventListener('touchend', () => {
+    handleTouchEnd(deleteFunction);
+    console.log(`deleteButton`);
 });
 
+deselectTemplateBtn.addEventListener('dblclick', clearSelection);
+deselectTemplateBtn.addEventListener('touchend', () => {
+    handleTouchEnd(clearSelection);
+});
 
+function rgbToHex(rgb) {
+    const match = rgb.match(/\d+/g); // Extract numbers
+    return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
+}
 
+// Function to trigger the shake effect
+function triggerShakeEffect() {
+    deselectTemplateBtn.classList.add('shake-btn');
+    selectedTaskCounter.classList.add('shake-btn'); // Add shake effect
 
+    // Remove the class after the animation ends to allow for future shakes
+    deselectTemplateBtn.addEventListener('animationend', () => {
+        selectedTaskCounter.classList.remove('shake-btn');
+    });
 
-
-
+    deselectTemplateBtn.addEventListener('animationend', () => {
+        deselectTemplateBtn.classList.remove('shake-btn');
+    });
+}
 
 function getDayName(value) {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -1030,3 +980,7 @@ function getMonthName(value) {
         case 11: return "DECEMBER";
     }
 }
+
+
+
+
