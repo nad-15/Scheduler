@@ -1106,6 +1106,33 @@ h2 {
     background-color: white;
     background-color: rgba(255, 255, 255, 0.9);
     background-color: rgb(0, 0, 0, 0.5);
+
+    background: linear-gradient(135deg,
+        rgba(3, 25, 70, 0.7),   /* Darker Navy Blue */
+        rgba(15, 70, 150, 0.7),  /* Darker Dodger Blue */
+        rgba(0, 150, 70, 0.7),   /* Darker Spring Green */
+        rgba(150, 50, 100, 0.7), /* Darker Hot Pink */
+        rgba(70, 20, 130, 0.7)   /* Darker Blue Violet */
+    );
+background-size: 400% 400%;
+animation: aurora 15s ease infinite;
+
+background: linear-gradient(135deg,
+        rgba(3, 25, 70, 0.7),   /* Darker Navy Blue */
+        rgba(15, 70, 150, 0.7),  /* Darker Dodger Blue */
+        rgba(0, 150, 70, 0.7),   /* Darker Spring Green */
+        rgba(150, 50, 100, 0.7), /* Darker Hot Pink */
+        rgba(70, 20, 130, 0.7),  /* Darker Blue Violet */
+        rgba(200, 80, 50, 0.7),  /* Darker Warm Red */
+        rgba(30, 100, 200, 0.7), /* Deep Ocean Blue */
+        rgba(10, 180, 180, 0.7), /* Darker Cyan */
+        rgba(180, 30, 180, 0.7)  /* Deep Purple */
+    );
+background-size: 400% 400%;
+animation: aurora 15s ease infinite;
+
+
+
     /* background-color: transparent; */
     cursor: move;
     /* user-select: none; */
