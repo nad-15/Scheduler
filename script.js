@@ -272,18 +272,20 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         if (dayName === 'Sun' || dayName === 'Sat') {
             dayDiv.style.fontSize = "12px";
             dayDiv.style.fontWeight = "bold";
-            dayDiv.style.color = "white";
             dayDiv.style.borderColor = ""; // Make the font larger
             if (dayName === 'Sun') {
                 // dayDiv.style.color = "red"; // Set the color for Sunday
-                dayDiv.style.backgroundColor = "#e57373"; //red
+                // dayDiv.style.backgroundColor = "#e57373"; //red
                 dateDiv.style.color = "red"; //red
+                dayDiv.style.backgroundColor = "#3388cc"; //sapphire
                 // dayDiv.style.borderColor = "#e57373";
+                dayDiv.style.color = "white";
 
             } else {
                 // dayDiv.style.color = "blue";
-                dayDiv.style.backgroundColor = "#3388cc";
-                dateDiv.style.color = "blue";// Set the color for Saturday
+
+                // dateDiv.style.color = "blue";// Set the color for Saturday
+
                 // dayDiv.style.borderColor = "#3388cc";
             }
         }

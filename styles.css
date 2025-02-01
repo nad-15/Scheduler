@@ -843,7 +843,7 @@ h2 {
 
     /* justify-content: space-evenly; */
     font-weight: bold;
-    padding: 0 5px 0px 5px;
+    padding: 0 7px 0px 7px;
     align-items: center;
     justify-content: center;
     height: 100%;
@@ -968,6 +968,7 @@ h2 {
 .day {
     font-size: 12px;
     font-family: monospace;
+    background-color: #52B2BF; /* sapphire */
 
 }
 
@@ -978,7 +979,7 @@ h2 {
     padding: 0;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
-    flex: 3;
+    flex: 2;
     font-weight: bold;
     cursor: pointer;
     align-items: center;
