@@ -1125,7 +1125,7 @@ h2 {
     background-size: 400% 400%;
     animation: aurora 15s ease infinite;
 
-    background: linear-gradient(135deg,
+    /* background: linear-gradient(135deg,
             rgba(3, 25, 70, 0.7),
             /* Darker Navy Blue */
             rgba(15, 70, 150, 0.7),
@@ -1146,7 +1146,7 @@ h2 {
             /* Deep Purple */
         );
     background-size: 400% 400%;
-    animation: aurora 15s ease infinite;
+    animation: aurora 15s ease infinite; */
 
 
 
