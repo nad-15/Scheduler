@@ -18,6 +18,8 @@ body {
 #main-container {
 
     background-color: #e5f5e0;
+    background-color: white;
+    /* background-color: red; */
     box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
     /* height: 100vh; */
     height: 100vh;

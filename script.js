@@ -473,11 +473,11 @@ let selectedDivs = []; // Array to track selected divs
 let chosenColor = '#e27396';  // Store the chosen color
 const selectedTaskCounter = document.querySelector(`.selected-task`);
 
-selectedTaskCounter.addEventListener('dblclick', () => {
-    selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
-    selectedDivs = []; // Clear the array of selected divs
-    selectedTaskCounter.textContent = `${selectedDivs.length}`;
-});
+// selectedTaskCounter.addEventListener('dblclick', () => {
+//     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
+//     selectedDivs = []; // Clear the array of selected divs
+//     selectedTaskCounter.textContent = `${selectedDivs.length}`;
+// });
 
 
 // Event listener for selecting colors
@@ -754,21 +754,92 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
     console.log(`Saved task for ${taskType} on ${date}: ${updatedTask} with color ${taskColor}`);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// let lastTapTime = 0;
+// const delay = 300;
+// clearButton.addEventListener(`touchend`, touchEnd);
+
+// function touchEnd() {
+
+//     let currentTime = Date.now();
+
+//     if (currentTime - lastTapTime < delay) {
+//         deleteFunction();
+//     }
+
+//     lastTapTime = currentTime;
+
+// }
+
+
+selectedTaskCounter.addEventListener('dblclick', () => {
+    selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
+    selectedDivs = []; // Clear the array of selected divs
+    selectedTaskCounter.textContent = `${selectedDivs.length}`;
+});
+
+
+// Declare these variables once
 let lastTapTime = 0;
 const delay = 300;
-clearButton.addEventListener(`touchend`, touchEnd);
 
-function touchEnd() {
-
+// Function for touchend event logic
+function handleTouchEnd(callback) {
     let currentTime = Date.now();
-
+    
     if (currentTime - lastTapTime < delay) {
-        deleteFunction();
+        callback();
     }
-
+    
     lastTapTime = currentTime;
-
 }
+
+// selectedTaskCounter touchend
+selectedTaskCounter.addEventListener('touchend', () => {
+    handleTouchEnd(() => {
+        selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
+        selectedDivs = []; // Clear the array of selected divs
+        selectedTaskCounter.textContent = `${selectedDivs.length}`;
+    });
+}); 
+
+// clearButton touchend
+clearButton.addEventListener('touchend', () => {
+    handleTouchEnd(deleteFunction);
+});
+
+jobTemplateContainer.addEventListener('touchend', (event) => {
+    handleTouchEnd(() => {
+        if (event.target.classList.contains('items')) {
+            removeTemplate(event.target);
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
