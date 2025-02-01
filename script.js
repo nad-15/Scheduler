@@ -277,7 +277,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 // dayDiv.style.color = "red"; // Set the color for Sunday
                 // dayDiv.style.backgroundColor = "#e57373"; //red
                 dateDiv.style.color = "red"; //red
-                dayDiv.style.backgroundColor = "#3388cc"; //sapphire
+                // dayDiv.style.backgroundColor = "#3388cc"; //sapphire
+                dayDiv.style.backgroundColor = "#1F456E"; //aegeon
                 // dayDiv.style.borderColor = "#e57373";
                 dayDiv.style.color = "white";
 
