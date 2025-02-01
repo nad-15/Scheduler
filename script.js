@@ -8,7 +8,10 @@ const hideAllButtons = document.querySelector(`.hide-all-buttons`);
 const templateTaskBtn = document.querySelector(`.template-task-btn`);
 const movableTemplate = document.getElementById(`movable-template`);
 const flower = document.querySelector(`.flower`);
-
+const closeButton = document.querySelector('.btn-close');
+const addButton = document.querySelector('.btn-add');
+const deleteButton = document.querySelector('.btn-delete');
+const clearButtonTemplate = document.querySelector('.btn-clear');
 
 
 
@@ -507,6 +510,8 @@ yearContainer.addEventListener('click', (event) => {
         }
 
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
+        clearButtonTemplate.textContent = `${selectedDivs.length}`;
+
     }
 });
 
@@ -577,6 +582,7 @@ function submitTask() {
         // selectedDivs.forEach(div => div.classList.remove('selected'));
         // selectedDivs = []; // Clear the array
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
+        clearButtonTemplate.textContent = `${selectedDivs.length}`;
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
@@ -657,6 +663,7 @@ function submitTemplate(item) {
         });
 
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
+        clearButtonTemplate.textContent = `${selectedDivs.length}`;
 
     } else {
         triggerShakeEffect();
@@ -790,6 +797,7 @@ selectedTaskCounter.addEventListener('dblclick', () => {
     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
     selectedDivs = []; // Clear the array of selected divs
     selectedTaskCounter.textContent = `${selectedDivs.length}`;
+    clearButtonTemplate.textContent = `${selectedDivs.length}`;
 });
 
 
@@ -814,6 +822,7 @@ selectedTaskCounter.addEventListener('touchend', () => {
         selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
         selectedDivs = []; // Clear the array of selected divs
         selectedTaskCounter.textContent = `${selectedDivs.length}`;
+        clearButtonTemplate.textContent = `${selectedDivs.length}`;
     });
 }); 
 
@@ -885,6 +894,7 @@ function deleteFunction() {
     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
     selectedDivs = []; // Clear the array of selected divs
     selectedTaskCounter.textContent = `${selectedDivs.length}`;
+    clearButtonTemplate.textContent = `${selectedDivs.length}`;
 
     // Optionally reset UI elements (like task title input and any other related UI)
     // document.getElementById('taskTitle').value = ''; // Reset task input field
@@ -928,10 +938,7 @@ floatingAddBtn.addEventListener('click', () => {
 });
 
 // Select all buttons by their class names
-const closeButton = document.querySelector('.btn-close');
-const addButton = document.querySelector('.btn-add');
-const deleteButton = document.querySelector('.btn-delete');
-const clearButtonTemplate = document.querySelector('.btn-clear');
+
 
 // Add event listeners to each button
 
@@ -951,24 +958,16 @@ addButton.addEventListener('click', () => {
 });
 
 // Delete button double-click listener
-deleteButton.addEventListener('dblclick', () => {
-    // Call the dblclick functionality directly
-    if (typeof clearButton.dblclick === 'function') {
-        clearButton.dblclick(); // Assuming clearButton is a valid element with dblclick
-    }
-    console.log('Delete button double-clicked');
-    // Add your functionality here
-});
+deleteButton.addEventListener('dblclick', deleteFunction);
 
 // Clear button double-click listener
 clearButtonTemplate.addEventListener('dblclick', () => {
-    // Call the dblclick functionality directly
-    if (typeof selectedTaskCounter.dblclick === 'function') {
-        selectedTaskCounter.dblclick(); // Assuming selectedTaskCounter is a valid element with dblclick
-    }
-    console.log('Clear button double-clicked');
-    // Add your functionality here
+    selectedDivs.forEach(div => div.classList.remove('selected'));
+    selectedDivs = []; 
+    selectedTaskCounter.textContent = `${selectedDivs.length}`;
+    clearButtonTemplate.textContent = `${selectedDivs.length}`;
 });
+
 
 
 
