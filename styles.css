@@ -1130,7 +1130,7 @@ h2 {
     /* justify-content: flex-start; */
     bottom: 140px;
     left: 10px;
-    width: 165px;
+    width: 160px;
     height: 160px;
     /* border-radius: 50%; */
     /* gap: 5px; */
@@ -1241,7 +1241,7 @@ h2 {
 
 
 .material-icons.template-btn {
-    font-size: 30px;
+    font-size: 27px;
     background-color: transparent;
     color: white;
     font-weight: bold;
@@ -1262,8 +1262,8 @@ h2 {
     font-size: 12px;
     font-weight: bold;
     color: white;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
     border: 2px solid white;
     /* border: 2px solid green; */

@@ -961,7 +961,10 @@ closeButton.addEventListener('click', () => {
 
 // Add button click listener
 addButton.addEventListener('click', () => {
+    alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
+
     console.log('Add button clicked');
+
     // Add your functionality here
 });
 
