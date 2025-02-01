@@ -1119,7 +1119,7 @@ h2 {
     /* justify-content: flex-start; */
     bottom: 140px;
     left: 10px;
-    width: 135px;
+    width: 160px;
     height: 150px;
     /* border-radius: 50%; */
     /* gap: 5px; */
@@ -1170,6 +1170,7 @@ h2 {
     cursor: move;
     border-radius: 4px;
     z-index: 2000;
+    /* border: 2px solid red; */
 }
 
 /* Style for the drag handle */
@@ -1184,17 +1185,34 @@ h2 {
     padding: 0;
     /* border: 2px solid red; */
     /* rotate: 90deg; */
+    /* border: 2px solid blue; */
 
 }
 
-/* .icon-container {
-    border: 2px solid green;
-    padding: 0;
-    margin: 0;
+.icon-container-template {
     display: flex;
+    flex-direction: column;
+    margin: 0;
     align-items: center;
-    justify-content: center;
-} */
+    justify-content: space-around;
+}
+
+.button-template {
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    margin-left: 5px;
+    border: none;
+}
+
+.material-icons.template-btn {
+    font-size: 20px;
+    background-color: transparent;
+    color: white;
+    font-weight: bold;
+}
+
+
 
 .material-icons.drag-icon {
     /* border: 2px solid red; */
@@ -1212,12 +1230,13 @@ h2 {
     margin-left: 5px;
     flex-direction: column;
     align-items: center;
-    padding-right: 5px;
+    /* padding-right: 5px; */
     background-color: transparent;
     gap: 5px;
     overflow: auto;
     color: white;
     font-size: 12px;
+    /* border: 2px solid black; */
 }
 
 .line {
