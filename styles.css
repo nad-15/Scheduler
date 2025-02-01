@@ -137,23 +137,34 @@ h1 {
     right: 8px;
     top: 8px;
     color: white;
-    background: linear-gradient(135deg, 
-    rgba(11, 61, 145, 0.9),  /* Dark Blue */
-    rgba(30, 144, 255, 0.9), /* Dodger Blue */
-    rgba(0, 255, 127, 0.9),  /* Spring Green */
-    rgba(255, 105, 180, 0.9), /* Hot Pink */
-    rgba(138, 43, 226, 0.9)  /* Blue Violet */
-);
-background-size: 400% 400%;
-animation: aurora 15s ease infinite;
+/* darker aurora */
+    background: linear-gradient(135deg,
+            rgba(5, 40, 100, 0.9),
+            rgba(20, 100, 200, 0.9),
+            rgba(0, 200, 100, 0.9),
+            rgba(200, 80, 150, 0.9),
+            rgba(100, 30, 180, 0.9));
+    background-size: 400% 400%;
+    animation: aurora 15s ease infinite;
 
+/* lighter aurora */
+    /* background: linear-gradient(135deg,
+            rgba(11, 61, 145, 0.9),
+            rgba(30, 144, 255, 0.9),
+            rgba(0, 255, 127, 0.9),
+            rgba(255, 105, 180, 0.9),
+            rgba(138, 43, 226, 0.9));
+    background-size: 400% 400%;
+    animation: aurora 15s ease infinite; */
+
+    /* darker blue */
     /* background: linear-gradient(to top, rgba(0, 51, 102, 0.7), rgba(0, 123, 255, 0.5));  */
-    color: white; /* White text for contrast */
+
 
     padding: 8px;
     border-radius: 10px;
     font-family: Arial, sans-serif;
-    display: flex; 
+    display: flex;
     align-items: center;
     justify-content: space-between;
     max-width: 160px;
@@ -219,9 +230,10 @@ animation: aurora 15s ease infinite;
 
 #today-icon img {
     /* border:2px solid red; */
-    width: 45px; 
+    width: 45px;
     height: auto;
 }
+
 #today-temp {
     font-size: 25px;
     font-weight: bold;
@@ -459,7 +471,7 @@ h2 {
     padding: 10px 10px;
     display: flex;
     flex-direction: column;
-     background-color: transparent;
+    background-color: transparent;
     /* box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);  */
 }
 
@@ -490,25 +502,29 @@ h2 {
     font-size: 12px;
     font-weight: bold;
     animation: jump 1.5s ease-in-out infinite;
-  }
-  
-  .jumping-text span:nth-child(odd) {
+}
+
+.jumping-text span:nth-child(odd) {
     animation-delay: 0.2s;
-  }
-  
-  .jumping-text span:nth-child(even) {
+}
+
+.jumping-text span:nth-child(even) {
     animation-delay: 0.4s;
-  }
-  
-  /* Keyframes for the jumping effect */
-  @keyframes jump {
-    0%, 100% {
-      transform: translateY(0);
+}
+
+/* Keyframes for the jumping effect */
+@keyframes jump {
+
+    0%,
+    100% {
+        transform: translateY(0);
     }
+
     50% {
-      transform: translateY(-10px); /* Jump upwards by 10px */
+        transform: translateY(-10px);
+        /* Jump upwards by 10px */
     }
-  }
+}
 
 .template-title-submit-container {
     display: flex;
@@ -536,7 +552,7 @@ h2 {
     /* gap: 10px; */
 
     /* border: 1px solid #ccc; */
-    background-color:  #f0f0f0;
+    background-color: #f0f0f0;
     border: 1px solid #2277b0;
     /* border: 2px solid red; */
     /* border: none; */
@@ -566,19 +582,19 @@ h2 {
 
 /* Hover effect */
 .task-btn:hover {
-    background-color: #005FCC; 
+    background-color: #005FCC;
 }
 
 /* Focus effect */
 .task-btn:focus {
-    outline: 2px solid rgba(0, 120, 255, 0.5); 
+    outline: 2px solid rgba(0, 120, 255, 0.5);
     outline-offset: 2px;
 }
 
 /* Active (when clicked) effect */
 .task-btn:active {
-    background-color: #0048A0; 
-    transform: scale(0.95); 
+    background-color: #0048A0;
+    transform: scale(0.95);
 }
 
 
@@ -622,20 +638,24 @@ h2 {
 
 /* Hover effect */
 #submitTask:hover {
-    background-color: #005FCC; /* Darker blue */
+    background-color: #005FCC;
+    /* Darker blue */
     border-color: #005FCC;
 }
 
 #submitTask:focus {
     outline: none;
-    box-shadow: 0 0 5px rgba(0, 120, 255, 0.5); /* Soft glow effect */
+    box-shadow: 0 0 5px rgba(0, 120, 255, 0.5);
+    /* Soft glow effect */
 }
 
 /* Active (when clicked) effect */
 #submitTask:active {
-    background-color: #0048A0; /* Even darker blue */
+    background-color: #0048A0;
+    /* Even darker blue */
     border-color: #0048A0;
-    transform: scale(0.9); /* Slight press-down effect */
+    transform: scale(0.9);
+    /* Slight press-down effect */
 }
 
 
@@ -800,7 +820,7 @@ h2 {
     font-family: monospace;
     display: flex;
     flex-direction: column;
-    
+
     /* justify-content: space-evenly; */
     font-weight: bold;
     padding: 0 7px 0px 7px;
@@ -1182,7 +1202,7 @@ h2 {
     transform-origin: bottom left;
     border: none;
     /* border: 2px solid red; */
-    
+
 
 }
 
