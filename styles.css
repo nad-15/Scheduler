@@ -137,7 +137,17 @@ h1 {
     right: 8px;
     top: 8px;
     color: white;
-    background: linear-gradient(to top, rgba(0, 51, 102, 0.7), rgba(0, 123, 255, 0.5)); /* Darker blue gradient */
+    background: linear-gradient(135deg, 
+    rgba(11, 61, 145, 0.9),  /* Dark Blue */
+    rgba(30, 144, 255, 0.9), /* Dodger Blue */
+    rgba(0, 255, 127, 0.9),  /* Spring Green */
+    rgba(255, 105, 180, 0.9), /* Hot Pink */
+    rgba(138, 43, 226, 0.9)  /* Blue Violet */
+);
+background-size: 400% 400%;
+animation: aurora 15s ease infinite;
+
+    /* background: linear-gradient(to top, rgba(0, 51, 102, 0.7), rgba(0, 123, 255, 0.5));  */
     color: white; /* White text for contrast */
 
     padding: 8px;
