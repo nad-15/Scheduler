@@ -10,6 +10,8 @@ const movableTemplate = document.getElementById(`movable-template`);
 const flower = document.querySelector(`.flower`);
 
 
+
+
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
 
 templateTaskBtn.addEventListener('click', () => {
@@ -80,6 +82,10 @@ window.addEventListener('popstate', () => {
 fullScreenButton.addEventListener(`click`, enterFullScreen);
 
 let todayNameText = document.getElementById('today-name');
+todayNameText.addEventListener('click', () => {
+    location.reload()
+});
+
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
 let currentMonthContainer = null;
 let nextMonthContainer = null;
