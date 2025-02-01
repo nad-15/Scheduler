@@ -99,7 +99,7 @@ h1 {
     right: 8px;
     top: 8px;
     color: white;
-/* darker aurora */
+    /* darker aurora */
     background: linear-gradient(135deg,
             rgba(5, 40, 100, 0.9),
             rgba(20, 100, 200, 0.9),
@@ -109,7 +109,7 @@ h1 {
     background-size: 400% 400%;
     animation: aurora 15s ease infinite;
 
-/* lighter aurora */
+    /* lighter aurora */
     /* background: linear-gradient(135deg,
             rgba(11, 61, 145, 0.9),
             rgba(30, 144, 255, 0.9),
@@ -675,20 +675,23 @@ h2 {
 
 /* Hover: Slightly darkens background and scales up */
 .selected-task:hover {
-    background-color: rgba(255, 0, 0, 0.1); /* Light red tint */
+    background-color: rgba(255, 0, 0, 0.1);
+    /* Light red tint */
     transform: scale(1.05);
 }
 
 /* Active: Press effect */
 .selected-task:active {
-    background-color: rgba(255, 0, 0, 0.2); /* Darker red tint */
+    background-color: rgba(255, 0, 0, 0.2);
+    /* Darker red tint */
     transform: scale(0.95);
 }
 
 /* Focus: Highlight border */
 .selected-task:focus {
     outline: none;
-    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Soft red glow */
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+    /* Soft red glow */
 }
 
 
@@ -1108,28 +1111,42 @@ h2 {
     background-color: rgb(0, 0, 0, 0.5);
 
     background: linear-gradient(135deg,
-        rgba(3, 25, 70, 0.7),   /* Darker Navy Blue */
-        rgba(15, 70, 150, 0.7),  /* Darker Dodger Blue */
-        rgba(0, 150, 70, 0.7),   /* Darker Spring Green */
-        rgba(150, 50, 100, 0.7), /* Darker Hot Pink */
-        rgba(70, 20, 130, 0.7)   /* Darker Blue Violet */
-    );
-background-size: 400% 400%;
-animation: aurora 15s ease infinite;
+            rgba(3, 25, 70, 0.7),
+            /* Darker Navy Blue */
+            rgba(15, 70, 150, 0.7),
+            /* Darker Dodger Blue */
+            rgba(0, 150, 70, 0.7),
+            /* Darker Spring Green */
+            rgba(150, 50, 100, 0.7),
+            /* Darker Hot Pink */
+            rgba(70, 20, 130, 0.7)
+            /* Darker Blue Violet */
+        );
+    background-size: 400% 400%;
+    animation: aurora 15s ease infinite;
 
-background: linear-gradient(135deg,
-        rgba(3, 25, 70, 0.7),   /* Darker Navy Blue */
-        rgba(15, 70, 150, 0.7),  /* Darker Dodger Blue */
-        rgba(0, 150, 70, 0.7),   /* Darker Spring Green */
-        rgba(150, 50, 100, 0.7), /* Darker Hot Pink */
-        rgba(70, 20, 130, 0.7),  /* Darker Blue Violet */
-        rgba(200, 80, 50, 0.7),  /* Darker Warm Red */
-        rgba(30, 100, 200, 0.7), /* Deep Ocean Blue */
-        rgba(10, 180, 180, 0.7), /* Darker Cyan */
-        rgba(180, 30, 180, 0.7)  /* Deep Purple */
-    );
-background-size: 400% 400%;
-animation: aurora 15s ease infinite;
+    background: linear-gradient(135deg,
+            rgba(3, 25, 70, 0.7),
+            /* Darker Navy Blue */
+            rgba(15, 70, 150, 0.7),
+            /* Darker Dodger Blue */
+            rgba(0, 150, 70, 0.7),
+            /* Darker Spring Green */
+            rgba(150, 50, 100, 0.7),
+            /* Darker Hot Pink */
+            rgba(70, 20, 130, 0.7),
+            /* Darker Blue Violet */
+            rgba(200, 80, 50, 0.7),
+            /* Darker Warm Red */
+            rgba(30, 100, 200, 0.7),
+            /* Deep Ocean Blue */
+            rgba(10, 180, 180, 0.7),
+            /* Darker Cyan */
+            rgba(180, 30, 180, 0.7)
+            /* Deep Purple */
+        );
+    background-size: 400% 400%;
+    animation: aurora 15s ease infinite;
 
 
 
@@ -1293,6 +1310,19 @@ animation: aurora 15s ease infinite;
     #today-name {
         right: calc(20px + 20vw);
     }
+
+
+    .movable-template {
+        bottom: calc(140px +20vw);
+        left: calc(10px + 20vw);
+    }
+
+    
+.hide-all-buttons {
+
+    /* left: calc(30px + 20vw);
+    bottom: calc(10px + 20vw); */
+}
 
 }
 

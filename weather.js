@@ -57,7 +57,7 @@ async function getWeather() {
 
                 <div class="weather-container">
                     <div id="today-icon">
-                        <img src="${iconUrl}" alt="Weather icon">
+                         <img src="${iconUrl}" alt="W.icon" onerror="this.onerror=null; this.src='https://fonts.gstatic.com/s/i/materialicons/cloudy/v1/24px.svg';">
                     </div>
                     <div id="today-temp">${temperature}°</div>
                     <div id="today-weather">${weatherDescription}</div>
