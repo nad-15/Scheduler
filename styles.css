@@ -990,9 +990,20 @@ h2 {
     justify-content: center;
     /* was 8px */
     font-size: 10px;
-    white-space: nowrap;
+    /* white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; */
+
+    overflow: auto;
+    word-wrap: break-word;
+    white-space: normal; 
+
+    
+
+
+
+
+    
 
     /* align-content: center; */
 }
@@ -1224,21 +1235,17 @@ h2 {
     box-sizing: border-box;
     height: 30px;
     width: 95px;
-    font-size: 13px;
+    font-size: 10px;
     /* overflow: auto; */
     color: black;
     border: 1px solid white;
     border-radius: 2px;
-    white-space: nowrap;
-    /* Prevent text from wrapping */
-    overflow: hidden;
-    /* Hide anything that overflows */
-    text-overflow: ellipsis;
-    /* Add '...' if content overflows */
-    /* flex-wrap: nowrap; */
     -webkit-tap-highlight-color: transparent;
     user-select: none;
-    /* margin: 0px 0px 5px 5px; */
+
+    overflow: auto;
+    word-wrap: break-word;
+    white-space: normal; 
 }
 
 .aurora {
