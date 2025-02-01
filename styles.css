@@ -843,7 +843,7 @@ h2 {
 
     /* justify-content: space-evenly; */
     font-weight: bold;
-    padding: 0 7px 0px 7px;
+    padding: 0 5px 0px 5px;
     align-items: center;
     justify-content: center;
     height: 100%;
@@ -956,6 +956,7 @@ h2 {
     /* For Firefox */
     -ms-user-select: none;
     /* For IE/Edge */
+    min-width: fit-content;
 
 }
 
@@ -977,7 +978,7 @@ h2 {
     padding: 0;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
-    flex: 2;
+    flex: 3;
     font-weight: bold;
     cursor: pointer;
     align-items: center;
