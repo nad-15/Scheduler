@@ -12,6 +12,29 @@ const closeButton = document.querySelector('.btn-close');
 const addButton = document.querySelector('.btn-add');
 const deleteButton = document.querySelector('.btn-delete');
 const clearButtonTemplate = document.querySelector('.btn-clear');
+const todayName = document.getElementById('today-name');
+const hideWidgetBtn = document.querySelector(`.hide-widget`);
+
+// The 8px offset from the right
+const offset = 8;
+
+// Add an event listener to hide the element on button click
+hideWidgetBtn.addEventListener('click', () => {
+    // Get the width of #today-name element
+    const todayNameWidth = todayName.offsetWidth;
+
+    // Toggle the visibility and the arrow
+    if (todayName.style.transform === `translateX(${todayNameWidth + offset}px)`) {
+        todayName.style.transform = 'translateX(0)'; // Show it again
+        hideWidgetBtn.classList.remove('active'); // Reset the arrow and button style
+    } else {
+        todayName.style.transform = `translateX(${todayNameWidth + offset}px)`; // Move it off-screen to the right including the offset
+        hideWidgetBtn.classList.add('active'); // Apply active class for arrow and background change
+    }
+});
+
+
+
 
 
 
@@ -86,7 +109,7 @@ fullScreenButton.addEventListener(`click`, enterFullScreen);
 
 let todayNameText = document.getElementById('today-name');
 todayNameText.addEventListener('click', () => {
-    location.reload()
+    location.reload();
 });
 
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
