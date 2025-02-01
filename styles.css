@@ -172,12 +172,14 @@ h1 {
 
 #today-seconds {
     font-size: 10px;
+    font-weight: bold;
     /* opacity: 0.7; */
 }
 
 #today-ampm {
     font-size: 14px;
     text-transform: uppercase;
+    font-weight: bold;
     /* margin-left: 2px; */
     /* opacity: 0.7; */
 }
@@ -198,8 +200,12 @@ h1 {
     width: fit-content;
 }
 
+#today-icon {
+    font-size: small;
+}
+
 #today-icon img {
-    /* border:2px solid red; */
+    /* border: .5px solid white; */
     width: 45px;
     height: auto;
 }
@@ -460,8 +466,8 @@ h2 {
     font-family: monospace;
     width: max-content;
     font-weight: bold;
-    height: 0px;
-    border: .1px solid red;
+    height: .5px;
+    border: .5px solid red;
     align-self: center;
     /* border:2px solid red; */
 }
@@ -531,7 +537,7 @@ h2 {
     /* border: none; */
 }
 
-.task-btn {
+.template-task-btn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -551,18 +557,18 @@ h2 {
 }
 
 /* Hover effect */
-.task-btn:hover {
+.template-task-btn:hover {
     background-color: #005FCC;
 }
 
 /* Focus effect */
-.task-btn:focus {
+.template-task-btn:focus {
     outline: 2px solid rgba(0, 120, 255, 0.5);
     outline-offset: 2px;
 }
 
 /* Active (when clicked) effect */
-.task-btn:active {
+.template-task-btn:active {
     background-color: #0048A0;
     transform: scale(0.95);
 }
@@ -652,6 +658,9 @@ h2 {
     border-radius: 50%;
     border: 2px solid red;
     background-color: white;
+    padding-left: 12px;
+    padding-right: 12px;
+    white-space: nowrap;
     color: black;
     cursor: pointer;
     font-weight: bold;
@@ -659,7 +668,45 @@ h2 {
     flex-shrink: 0;
     flex-grow: 0;
 
+    user-select: none;
     -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+/* Hover: Slightly darkens background and scales up */
+.selected-task:hover {
+    background-color: rgba(255, 0, 0, 0.1); /* Light red tint */
+    transform: scale(1.05);
+}
+
+/* Active: Press effect */
+.selected-task:active {
+    background-color: rgba(255, 0, 0, 0.2); /* Darker red tint */
+    transform: scale(0.95);
+}
+
+/* Focus: Highlight border */
+.selected-task:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Soft red glow */
+}
+
+
+/* Hover when selected */
+.selected-task.selection-true:hover {
+    background-color: rgba(0, 120, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Active when selected */
+.selected-task.selection-true:active {
+    background-color: rgba(0, 120, 255, 0.3);
+    transform: scale(0.95);
+}
+
+/* Focus when selected */
+.selected-task.selection-true:focus {
+    box-shadow: 0 0 5px rgba(0, 120, 255, 0.5);
 }
 
 
@@ -673,8 +720,6 @@ h2 {
 }
 
 .selected-task.selection-true {
-    /* background-color: #0078ff; */
-    /* color:white ; */
     border: 2px solid #0078FF;
 }
 
