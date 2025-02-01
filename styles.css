@@ -93,44 +93,6 @@ h1 {
 
 } */
 
-/* #today-name {
-    position: fixed;
-    right: 8px;
-    top: 8px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    padding: 8px;
-    border-radius: 10px;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    max-width: 120px;
-    align-items: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-}
-
-#today-name div {
-    margin-bottom: 3px;
-}
-
-.today-location {
-    font-size: 15px;
-}
-#today-temp {
-    font-size: 30px;
-    font-weight: bold;
-}
-
-#today-date {
-    font-size: 16px;
-
-}
-
-#today-time {
-    font-size: 18px;
-    font-weight: bold;
-} */
 
 #today-name {
     position: fixed;
@@ -167,13 +129,17 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 160px;
-    max-height: 90px;
+    width: 170px;
+    height: 100px;
+    height: fit-content;
+    width: fit-content;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     user-select: none;
+
     z-index: 10;
     gap: 10px;
+    -webkit-tap-highlight-color: transparent;
 
 }
 
@@ -184,6 +150,8 @@ h1 {
     justify-content: space-between;
     align-items: flex-start;
     margin-left: 5px;
+    height: fit-content;
+    width: fit-content;
 }
 
 #today-location {
@@ -226,6 +194,8 @@ h1 {
     flex-direction: column;
     align-items: center;
     margin-right: 5px;
+    height: fit-content;
+    width: fit-content;
 }
 
 #today-icon img {
