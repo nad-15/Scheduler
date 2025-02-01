@@ -1195,6 +1195,8 @@ h2 {
     margin: 0;
     align-items: center;
     justify-content: space-around;
+    flex-shrink: 0;
+    padding-right: 5px;
 }
 
 .button-template {
@@ -1203,7 +1205,18 @@ h2 {
     padding: 0;
     margin-left: 5px;
     border: none;
+    outline: none;  /* Remove default focus outline */
+    user-select: none; /* Prevent text selection */
 }
+
+
+
+.button-template:active {
+    transform: scale(0.7); 
+}
+
+
+
 
 .material-icons.template-btn {
     font-size: 20px;
@@ -1236,6 +1249,7 @@ h2 {
     overflow: auto;
     color: white;
     font-size: 12px;
+    flex-grow: 1;
     /* border: 2px solid black; */
 }
 

@@ -927,6 +927,48 @@ floatingAddBtn.addEventListener('click', () => {
     }
 });
 
+// Select all buttons by their class names
+const closeButton = document.querySelector('.btn-close');
+const addButton = document.querySelector('.btn-add');
+const deleteButton = document.querySelector('.btn-delete');
+const clearButtonTemplate = document.querySelector('.btn-clear');
+
+// Add event listeners to each button
+
+// Close button double-click listener
+closeButton.addEventListener('click', () => {
+    // Call the dblclick functionality directly
+        templateTaskBtn.click(); // Assuming templateTaskBtn is a valid element with dblclick
+
+    console.log('Close button double-clicked');
+    // Add your functionality here
+});
+
+// Add button click listener
+addButton.addEventListener('click', () => {
+    console.log('Add button clicked');
+    // Add your functionality here
+});
+
+// Delete button double-click listener
+deleteButton.addEventListener('dblclick', () => {
+    // Call the dblclick functionality directly
+    if (typeof clearButton.dblclick === 'function') {
+        clearButton.dblclick(); // Assuming clearButton is a valid element with dblclick
+    }
+    console.log('Delete button double-clicked');
+    // Add your functionality here
+});
+
+// Clear button double-click listener
+clearButtonTemplate.addEventListener('dblclick', () => {
+    // Call the dblclick functionality directly
+    if (typeof selectedTaskCounter.dblclick === 'function') {
+        selectedTaskCounter.dblclick(); // Assuming selectedTaskCounter is a valid element with dblclick
+    }
+    console.log('Clear button double-clicked');
+    // Add your functionality here
+});
 
 
 
