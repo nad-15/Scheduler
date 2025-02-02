@@ -477,7 +477,7 @@ document.addEventListener('fullscreenchange', () => {
 });
 
 let selectedDivs = [];
-let chosenColor = '#e27396';
+let chosenColor = '#c2185b';
 
 //add click listener to colors
 document.querySelectorAll('.color-option').forEach(button => {
@@ -868,9 +868,7 @@ closeButton.addEventListener('click', () => {
 
 
 
-
-document.getElementById('overlay').style.display = 'none';//make this visible tomorrow
-
+//start of TEMPALTE ADD POP UP
 // Clone the container
 const clonedSlidingInputView = slidingInputView.cloneNode(true);
 clonedSlidingInputView.classList.add('cloned-sliding-view');
@@ -887,38 +885,57 @@ if (templateTaskBtnCloned) {
 }
 
 // Change the submit button text to "+"
-const submitButtonCloned = clonedSlidingInputView.querySelector('#submitTask');
-submitButtonCloned.classList.add(`submit-btn-cloned`);
-if (submitButtonCloned) {
-    submitButtonCloned.textContent = "+";  // Change the text content to "+"
-}
+const addTemplateButton = clonedSlidingInputView.querySelector('#submitTask');
+addTemplateButton.id =``;
+addTemplateButton.classList.remove(`buttons` );
+addTemplateButton.classList.add(`submit-btn-cloned`);
 
-submitButtonCloned.addEventListener(`click`, () =>{
+const addTemplateButtonIcon = addTemplateButton.querySelector(`.arrow-upward`);
+console.log(addTemplateButtonIcon.classList);
+addTemplateButtonIcon.classList.remove(`arrow-upward`);
+addTemplateButtonIcon.classList.add(`add-template-btn-icon`);
+addTemplateButtonIcon.textContent = `add`;
+
+
+addTemplateButton.addEventListener(`click`, () =>{
+    addTemplate(`Let us find out`);
     alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
 });
 
-// Optionally, you can now append the modified clone to another location
-document.body.appendChild(clonedSlidingInputView);  // This will append to the body (or anywhere you like)
+
+document.body.appendChild(clonedSlidingInputView); 
 
 
 
 const closeButtonCloned = document.createElement('button');
 closeButtonCloned.classList.add('close-btn-cloned');
+clonedSlidingInputView.appendChild(closeButtonCloned);
 const closeButtonClonedIcon = document.createElement('span');
-closeButtonClonedIcon.classList.add('material-icons', 'close-btn-cloned');
+closeButtonClonedIcon.classList.add('material-icons', 'close-btn-cloned-icon');
 closeButtonClonedIcon.textContent = `close`;
 
 closeButtonCloned.appendChild(closeButtonClonedIcon);
 
-// Append the new div (close button) inside the cloned container
-clonedSlidingInputView.appendChild(closeButtonCloned);
 
+closeButtonCloned.addEventListener(`click`, ()=> {
+    clonedSlidingInputView.style.display = 'none'; 
+    document.getElementById('overlay').style.display = 'none';
+});
+
+
+//end of TEMPALTE ADD POP UP
+
+
+//the add button in movable template
 addButton.addEventListener('click', () => {
-    // clonedSlidingInputView.style.display = 'flex'; 
-    // document.getElementById('overlay').style.display = 'block';
+    clonedSlidingInputView.style.display = 'flex'; 
+    document.getElementById('overlay').style.display = 'block';
     alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
     console.log('Add button clicked');
 });
+
+
+
 
 
 
