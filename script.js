@@ -898,8 +898,8 @@ addTemplateButtonIcon.textContent = `add`;
 
 
 addTemplateButton.addEventListener(`click`, () =>{
-    addTemplate(`Let us find out`);
-    alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
+    // addTemplate(`Let us find out`);
+    alert('Development on-going/ functionality unstable yet. Please sleep.');
 });
 
 
