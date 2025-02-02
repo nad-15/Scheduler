@@ -158,7 +158,7 @@ h1 {
 } */
 
 .hide-widget {
-    position: absolute;
+    position: fixed;
     top: 8px;
     right: 8px;
     cursor: pointer;
