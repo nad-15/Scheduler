@@ -158,7 +158,7 @@ yearContainer.addEventListener('scroll', () => {
     const scrollHeight = yearContainer.scrollHeight;
     const clientHeight = yearContainer.clientHeight;
 
-    if (scrollTop < 25) {
+    if (scrollTop < 10) {
         // Scroll to the top
         nextDate = currentDate;
         currentDate = prevDate;
