@@ -56,6 +56,7 @@ let isHidden = false;
 hideAllButtons.addEventListener(`click`, () => {
 
     todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
+    hideWidgetBtn.style.display = hideWidgetBtn.style.display === 'none' ? 'flex' : 'none';
     clearButton.style.display = clearButton.style.display === 'none' ? 'flex' : 'none';
     floatingAddBtn.style.display = floatingAddBtn.style.display === 'none' ? '' : 'none';
     slidingInputView.style.display = slidingInputView.style.display !== 'none' ? 'none' : 'flex';
@@ -178,7 +179,7 @@ yearContainer.addEventListener('scroll', () => {
 
         addDays("prev", prevDateMonth, 1, prevDate.getDay(), prevDateLastDate, "", "", "", prevDateYear);
 
-        // console.log(`Scrolled to the top`);
+        console.log(`Scrolled to the top`);
         // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
         // console.log(`Previous Month: ${prevDateMonth}, Last Date: ${prevDateLastDate}`);
     } else if (scrollTop + clientHeight >= scrollHeight - 25) {
@@ -198,7 +199,7 @@ yearContainer.addEventListener('scroll', () => {
         nextDateLastDate = new Date(nextDateYear, nextDateMonth + 1, 0).getDate();
         addDays("next", nextDateMonth, 1, nextDate.getDay(), nextDateLastDate, "", "", "", nextDateYear);
 
-        // console.log(`Scrolled to the bottom`);
+        console.log(`Scrolled to the bottom`);
         // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
         // console.log(`Next Month: ${nextDateMonth}, Last Date: ${nextDateLastDate}`);
     }
@@ -371,7 +372,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
         if (prevMonthContainer) {
             prevMonthContainer.remove();
-            // console.log(`prev is remove`);
+            console.log(`prev is remove`);
         }
 
         prevMonthContainer = currentMonthContainer;
@@ -385,7 +386,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         // prevMonthContainer = monthContainer;
         if (nextMonthContainer) {
             nextMonthContainer.remove();
-            // console.log(`next is remove`);
+            console.log(`next is remove`);
         }
 
         nextMonthContainer = currentMonthContainer;
@@ -763,13 +764,13 @@ function clearSelection() {
     console.log(`selection cleared`);
 }
 
-jobTemplateContainer.addEventListener('touchend', (event) => {
-    handleTouchEnd(() => {
-        if (event.target.classList.contains('items')) {
-            removeTemplate(event.target);
-        }
-    });
-});
+// jobTemplateContainer.addEventListener('touchend', (event) => {
+//     handleTouchEnd(() => {
+//         if (event.target.classList.contains('items')) {
+//             removeTemplate(event.target);
+//         }
+//     });
+// });
 
 
 clearButton.addEventListener('dblclick', deleteFunction);
