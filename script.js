@@ -601,6 +601,9 @@ function addTemplate(taskTitle) {
 
             // Create the div and append it to the container
             const itemDiv = document.createElement('div');
+            itemDiv.addEventListener(`dblclick`, ()=>{
+                removeTemplate(itemDiv);
+            });
             itemDiv.classList.add('items'); // Add the 'items' class
 
             // Set the background color of the div based on the task's color
@@ -617,11 +620,11 @@ function addTemplate(taskTitle) {
     }
 }
 
-jobTemplateContainer.addEventListener('dblclick', (event) => {
-    if (event.target.classList.contains('items')) {
-        removeTemplate(event.target);
-    }
-});
+// jobTemplateContainer.addEventListener('dblclick', (event) => {
+//     if (event.target.classList.contains('items')) {
+//         removeTemplate(event.target);
+//     }
+// });
 
 // jobTemplateContainer.addEventListener('touchend', (event) => {
 //     handleTouchEnd(() => {
