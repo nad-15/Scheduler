@@ -466,20 +466,15 @@ function exitFullscreen() {
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
-        // slidingInputView.classList.toggle("show");
-
-        // floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
-        // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
-
-        // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        // floatingAddBtn.style.bottom = `${20}px`;
-        // clearButton.style.bottom = `${80}px`;
-        // isPopupOpen = true;
+        if(!isHidden){
         exitFullscreenBtn.style.display = `none`;
         fullScreenButton.style.display = 'flex';
+        }
     } else {
-        exitFullscreenBtn.style.display = `flex`;
-        fullScreenButton.style.display = 'none';
+        if(!isHidden){
+            exitFullscreenBtn.style.display = `flex`;
+            fullScreenButton.style.display = 'none';
+        }
     }
 });
 
