@@ -601,9 +601,13 @@ function addTemplate(taskTitle) {
 
             // Create the div and append it to the container
             const itemDiv = document.createElement('div');
+
+
             itemDiv.addEventListener(`dblclick`, ()=>{
                 removeTemplate(itemDiv);
             });
+
+
             itemDiv.classList.add('items'); // Add the 'items' class
 
             // Set the background color of the div based on the task's color
@@ -712,6 +716,10 @@ function loadTemplate() {
         taskClipboard.forEach(task => {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('items'); // Add the 'items' class
+            itemDiv.addEventListener(`dblclick`, ()=>{
+                removeTemplate(itemDiv);
+            });
+
 
             // Set the background color of the div based on the task's color
             itemDiv.style.backgroundColor = task.color;
