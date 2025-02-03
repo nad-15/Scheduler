@@ -421,6 +421,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 fullScreenButton.addEventListener(`click`, enterFullScreen);
 exitFullscreenBtn.addEventListener("click", exitFullscreen);
+
+
 function enterFullScreen() {
     const docElement = document.documentElement;
     if (docElement.requestFullscreen) {
@@ -474,11 +476,16 @@ document.addEventListener('fullscreenchange', () => {
         // clearButton.style.bottom = `${80}px`;
         // isPopupOpen = true;
         exitFullscreenBtn.style.display = `none`;
+        fullScreenButton.style.display = 'flex';
+    } else {
+        exitFullscreenBtn.style.display = `flex`;
+        fullScreenButton.style.display = 'none';
     }
 });
 
 let selectedDivs = [];
 let chosenColor = '#c2185b';
+
 
 //add click listener to colors
 document.querySelectorAll('.color-option').forEach(button => {
@@ -499,7 +506,7 @@ yearContainer.addEventListener('click', (event) => {
     if (taskElement) {
         // Toggle selection of task div
         if (selectedDivs.includes(taskElement)) {
-            selectedDivs = selectedDivs.filter(div => div !== taskElement);
+            selectedDivs = selectedDivs.filter(div => div !== taskElement); //learn
             taskElement.classList.remove('selected');
         } else {
             selectedDivs.push(taskElement);
@@ -527,6 +534,7 @@ const counterObserver = new MutationObserver(() => {
 });
 
 // Start observing changes in the text of selectedTaskCounter
+//learn
 counterObserver.observe(selectedTaskCounter, { childList: true });
 //for task template
 let taskClipboard = [];
@@ -619,6 +627,14 @@ jobTemplateContainer.addEventListener('dblclick', (event) => {
         removeTemplate(event.target);
     }
 });
+
+// jobTemplateContainer.addEventListener('touchend', (event) => {
+//     handleTouchEnd(() => {
+//         if (event.target.classList.contains('items')) {
+//             removeTemplate(event.target);
+//         }
+//     });
+// });
 
 jobTemplateContainer.addEventListener('click', (event) => {
     if (event.target.classList.contains('items')) {
@@ -764,13 +780,7 @@ function clearSelection() {
     console.log(`selection cleared`);
 }
 
-// jobTemplateContainer.addEventListener('touchend', (event) => {
-//     handleTouchEnd(() => {
-//         if (event.target.classList.contains('items')) {
-//             removeTemplate(event.target);
-//         }
-//     });
-// });
+
 
 
 clearButton.addEventListener('dblclick', deleteFunction);

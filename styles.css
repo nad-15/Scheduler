@@ -359,6 +359,9 @@ h2 {
 
 /* Floating Add Button */
 .floating-add-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: fixed;
     bottom: 20px;
     right: 20px;
