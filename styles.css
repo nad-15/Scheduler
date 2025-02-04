@@ -629,7 +629,7 @@ h2 {
 
 
 
-#taskTitle {
+.input-task-template {
     box-sizing: border-box;
     /* padding: 10px; */
     border: none;
@@ -645,7 +645,7 @@ h2 {
     border: none;
 }
 
-#taskTitle:focus {
+.input-task-template:focus {
     border: 2px solid #2277b0;
     border: none;
     outline: 0;
@@ -849,9 +849,7 @@ h2 {
 
 
 
-.color-option:hover {
-    transform: scale(.95);
-}
+
 
 /* .color-option.selected {
     border: 2px solid black;
@@ -1127,6 +1125,10 @@ h2 {
     /* Default background */
 
     -webkit-tap-highlight-color: transparent;
+}
+
+.color-option:hover {
+    transform: scale(.95);
 }
 
 .color-option.selected-color {
@@ -1574,4 +1576,34 @@ h2 {
 .material-icons.close-btn-cloned-icon {
     font-size: 20px;
     color: #ccc;
+}
+
+
+.color-option-template {
+    box-sizing: border-box;
+    display: flex;
+    flex-shrink: 0;
+    flex-grow: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    /* Ensures circular shape */
+    border: 2px solid transparent;
+    /* Default transparent border */
+    cursor: pointer;
+    transition: transform 0.3s ease, border 0.3s ease;
+    background-color: transparent;
+    /* Default background */
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+.color-option-template:hover {
+    transform: scale(.95);
+}
+
+.color-option-template.selected-color {
+    border: 5px solid transparent;
+    width: 25px;
+    height: 25px;
 }

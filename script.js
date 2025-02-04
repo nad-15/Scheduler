@@ -482,7 +482,7 @@ let selectedDivs = [];
 let chosenColor = '#c2185b';
 
 
-//add click listener to colors
+//add click listener to colors for task
 document.querySelectorAll('.color-option').forEach(button => {
     button.addEventListener('click', () => {
         // Get the selected color
@@ -551,7 +551,7 @@ function submitTask() {
                 taskTitle = div.textContent;
             }
 
-            addTemplate(taskTitle);
+            addTemplate(taskTitle, chosenColor);
             // Apply the chosen color to the selected divs
             // if (chosenColor) {
             div.style.backgroundColor = chosenColor; // Apply the selected color
@@ -582,14 +582,14 @@ function submitTask() {
 
 }
 
-function addTemplate(taskTitle) {
+function addTemplate(taskTitle, color) {
 
     //save task template here
     if (taskTitle !== ``) {
 
         const taskTemplate = {
             text: taskTitle,
-            color: chosenColor
+            color: color
         };
 
         // Check if the task already exists in the array
@@ -890,33 +890,64 @@ closeButton.addEventListener('click', () => {
 const clonedSlidingInputView = slidingInputView.cloneNode(true);
 clonedSlidingInputView.classList.add('cloned-sliding-view');
 
-// Remove the elements you don't need from the clone
+// Remove the selected task counter/button
 const selectedTask = clonedSlidingInputView.querySelector('.selected-task');
 if (selectedTask) {
     selectedTask.remove();  // Remove the selected-task button
 }
 
+//renive the template button toggle
 const templateTaskBtnCloned = clonedSlidingInputView.querySelector('.template-task-btn');
 if (templateTaskBtnCloned) {
     templateTaskBtnCloned.remove();  // Remove the template-task-btn div
 }
 
-// Change the submit button text to "+"
+//remove id of submittask change to submittemplate 
+const inputTemplate = clonedSlidingInputView.querySelector(`#taskTitle`);
+inputTemplate.id = `templateTitle`;
+inputTemplate.placeholder = `Enter New Template`;
+
+//get new id for submit button
 const addTemplateButton = clonedSlidingInputView.querySelector('#submitTask');
-addTemplateButton.id =``;
+addTemplateButton.id =`submitTemplate`;
 addTemplateButton.classList.remove(`buttons` );
 addTemplateButton.classList.add(`submit-btn-cloned`);
-
 const addTemplateButtonIcon = addTemplateButton.querySelector(`.arrow-upward`);
 console.log(addTemplateButtonIcon.classList);
 addTemplateButtonIcon.classList.remove(`arrow-upward`);
 addTemplateButtonIcon.classList.add(`add-template-btn-icon`);
 addTemplateButtonIcon.textContent = `add`;
 
+//get unique access to color-option
+const colorOptionTemplate = clonedSlidingInputView.querySelectorAll('.color-option');
+colorOptionTemplate.forEach(option => {
+    option.classList.remove('color-option');
+    option.classList.add('color-option-template');
+});
+
+
+let chosenColorTemplate = `#c2185b`;
+//add click listener to colors
+colorOptionTemplate.forEach(button => {
+    button.addEventListener('click', () => {
+        // Get the selected color
+        chosenColorTemplate = button.getAttribute('data-color');
+        // Highlight the selected button
+        colorOptionTemplate.forEach(btn => btn.classList.remove('selected-color'));
+        button.classList.add('selected-color');
+        console.log(`color option for template color is ${chosenColorTemplate}`);
+        // flower.style.color = chosenColor;
+    });
+});
+
+
 
 addTemplateButton.addEventListener(`click`, () =>{
-    // addTemplate(`Let us find out`);
-    alert('Development on-going/ functionality unstable yet. Please sleep.');
+    console.log(inputTemplate.value);
+    console.log(chosenColorTemplate);
+    addTemplate(inputTemplate.value, chosenColorTemplate);
+
+    // alert('Development on-going/ functionality unstable yet. Please sleep.');
 });
 
 
@@ -947,7 +978,7 @@ closeButtonCloned.addEventListener(`click`, ()=> {
 addButton.addEventListener('click', () => {
     clonedSlidingInputView.style.display = 'flex'; 
     document.getElementById('overlay').style.display = 'block';
-    alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
+    // alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
     console.log('Add button clicked');
 });
 
