@@ -907,7 +907,7 @@ const colorIndicatorTemplate = clonedSlidingInputView.querySelector(`.flower`);
 //change id of submittask to submittemplate 
 const inputTemplate = clonedSlidingInputView.querySelector(`#taskTitle`);
 inputTemplate.id = `templateTitle`;
-inputTemplate.placeholder = `Enter New Template`;
+inputTemplate.placeholder = `Add New Template`;
 
 //get new id for submit button
 const addTemplateButton = clonedSlidingInputView.querySelector('#submitTask');

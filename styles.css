@@ -1373,6 +1373,10 @@ h2 {
     white-space: normal;
 }
 
+.items:active { 
+    transform: scale(0.9);
+}
+
 .aurora {
     background: linear-gradient(135deg, #0b3d91, #1e90ff, #00ff7f, #ff69b4, #8a2be2);
     background-size: 400% 400%;
@@ -1559,9 +1563,20 @@ h2 {
     width: 30px;
     border-radius: 50%;
     flex-shrink: 0;
+    cursor: pointer;
     
     border: none;
 }
+
+
+.submit-btn-cloned:active {
+    transform: scale(0.9);
+}
+
+.submit-btn-cloned:hover {
+    background-color: #005FCC;
+}
+
 .submit-btn-cloned.disabled-btn {
     background-color: gray;
     border: gray;
@@ -1616,7 +1631,7 @@ h2 {
 }
 
 .color-option-template:hover {
-    transform: scale(.95);
+    transform: scale(.8);
 }
 
 .color-option-template.selected-color {
