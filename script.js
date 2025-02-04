@@ -896,13 +896,15 @@ if (selectedTask) {
     selectedTask.remove();  // Remove the selected-task button
 }
 
-//renive the template button toggle
+//remove the template button toggle
 const templateTaskBtnCloned = clonedSlidingInputView.querySelector('.template-task-btn');
 if (templateTaskBtnCloned) {
     templateTaskBtnCloned.remove();  // Remove the template-task-btn div
 }
 
-//remove id of submittask change to submittemplate 
+const colorIndicatorTemplate = clonedSlidingInputView.querySelector(`.flower`);
+
+//change id of submittask to submittemplate 
 const inputTemplate = clonedSlidingInputView.querySelector(`#taskTitle`);
 inputTemplate.id = `templateTitle`;
 inputTemplate.placeholder = `Enter New Template`;
@@ -936,7 +938,7 @@ colorOptionTemplate.forEach(button => {
         colorOptionTemplate.forEach(btn => btn.classList.remove('selected-color'));
         button.classList.add('selected-color');
         console.log(`color option for template color is ${chosenColorTemplate}`);
-        // flower.style.color = chosenColor;
+        colorIndicatorTemplate.style.color = chosenColorTemplate;
     });
 });
 
