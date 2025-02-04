@@ -1538,8 +1538,8 @@ h2 {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vh;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
     /* Semi-transparent background */
     z-index: 3000;
@@ -1631,7 +1631,7 @@ h2 {
 }
 
 .color-option-template:hover {
-    transform: scale(.8);
+    transform: scale(.95);
 }
 
 .color-option-template.selected-color {
