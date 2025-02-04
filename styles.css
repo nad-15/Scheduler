@@ -1523,7 +1523,7 @@ h2 {
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 6px;
-    width: 90vw;
+    width: 70vw;
     height: auto;
     z-index: 3001;
 }
