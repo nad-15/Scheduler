@@ -984,7 +984,7 @@ function triggerShakeEffect() {
     selectedTaskCounter.classList.add('shake-btn'); // Add shake effect
 
     // Remove the class after the animation ends to allow for future shakes
-    deselectTemplateBtn.addEventListener('animationend', () => {
+    selectedTaskCounter.addEventListener('animationend', () => {
         selectedTaskCounter.classList.remove('shake-btn');
     });
 
