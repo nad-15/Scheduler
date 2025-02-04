@@ -1512,15 +1512,18 @@ h2 {
 
 
 .cloned-sliding-view {
+    box-sizing: content-box;
+    gap: 5px;
+    /* border:2px solid red; */
     display: none;
-    /* display: flex; */
+    display: flex;
     padding: 10px;
     position: fixed;
     top: 35%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border-radius: 4px;
-    width: 300px;
+    border-radius: 6px;
+    width: 90vw;
     height: auto;
     z-index: 3001;
 }
