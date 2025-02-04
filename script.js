@@ -945,11 +945,21 @@ colorOptionTemplate.forEach(button => {
 
 
 addTemplateButton.addEventListener(`click`, () =>{
-    console.log(inputTemplate.value);
-    console.log(chosenColorTemplate);
+    // console.log(inputTemplate.value);
     addTemplate(inputTemplate.value, chosenColorTemplate);
+    inputTemplate.value ='';
+    addTemplateButton.classList.add(`disabled-btn`);
+
 
     // alert('Development on-going/ functionality unstable yet. Please sleep.');
+});
+inputTemplate.addEventListener(`input`, ()=> {
+    console.log(inputTemplate.value);
+    if (inputTemplate.value !=='') {
+        addTemplateButton.classList.remove(`disabled-btn`);
+    } else if (inputTemplate.value === ``) {
+        addTemplateButton.classList.add(`disabled-btn`);
+    }
 });
 
 

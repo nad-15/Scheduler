@@ -1543,14 +1543,27 @@ h2 {
 
 .submit-btn-cloned {
     display: flex;
-    color: #0078FF;
+    justify-content: center;
+    align-items: center;
+    color: white;
     font-size: 35px;
     font-weight: normal;
     padding: 0px;
     padding-top: 0;
-    background-color: transparent ;
+    background-color: #0078FF ;
     /* border: 2px solid red; */
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    
     border: none;
+}
+.submit-btn-cloned.disabled-btn {
+    background-color: gray;
+    border: gray;
+    color: white;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .material-icons.add-template-btn-icon {
