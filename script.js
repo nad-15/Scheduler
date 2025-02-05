@@ -313,6 +313,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
         const morningTaskDiv = document.createElement('div');
         morningTaskDiv.classList.add('morningTask');
+        // morningTaskDiv.setAttribute(`draggable`, true);
         if (taskData && taskData.morning) {
             morningTaskDiv.textContent = taskData.morning.task; // Set the task text
             morningTaskDiv.style.backgroundColor = taskData.morning.color;
@@ -1057,7 +1058,3 @@ function getMonthName(value) {
         case 11: return "DECEMBER";
     }
 }
-
-
-
-
