@@ -66,6 +66,7 @@ hideAllButtons.addEventListener(`click`, () => {
 
     todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
     hideWidgetBtn.style.display = hideWidgetBtn.style.display === 'none' ? 'flex' : 'none';
+    menuButton.style.display = menuButton.style.display === 'none' ? 'flex' : 'none';
     clearButton.style.display = clearButton.style.display === 'none' ? 'flex' : 'none';
     floatingAddBtn.style.display = floatingAddBtn.style.display === 'none' ? '' : 'none';
     slidingInputView.style.display = slidingInputView.style.display !== 'none' ? 'none' : 'flex';
