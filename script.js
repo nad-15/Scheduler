@@ -276,8 +276,6 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     monthContainer.classList.add('month-container');
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
-
-
 // Lock Button
 let lockButton = document.createElement("div");
 lockButton.classList.add("lock-button"); // Assign class for styling
@@ -285,26 +283,37 @@ const icon = document.createElement("span");
 icon.classList.add("material-icons");
 icon.textContent = "lock_open"; 
 lockButton.appendChild(icon); 
-monthNameContainer.prepend(lockButton); 
+monthNameContainer.prepend(lockButton);
+
+// Check if lock state exists in localStorage for this month container
+// Check if lock state exists in localStorage for this month container
+let isLocked = localStorage.getItem(`lockState-${FormatMonthName}`) === 'true' ? true : false; // Default to false if not found
+
+
+// Apply saved lock state when the page loads
+if (isLocked) {
+    console.log(`${FormatMonthName} is locked`);
+    monthContainer.style.pointerEvents = "none"; // Disable interaction for the month container
+    icon.textContent = "lock"; // Change icon to locked
+}
 
 // Lock/Unlock functionality
-let isLocked = false; // Track locked state
 lockButton.addEventListener("click", () => {
     isLocked = !isLocked; // Toggle the lock state
 
-
     if (isLocked) {
-        console.log(`${FormatMonthName} is lock`);
+        console.log(`${FormatMonthName} is locked`);
         monthContainer.style.pointerEvents = "none"; // Disable interaction for the month container
-        icon.textContent = "lock"; // Change icon to unlocked
+        icon.textContent = "lock"; // Change icon to locked
     } else {
-        console.log(`${FormatMonthName} is unlock`);
+        console.log(`${FormatMonthName} is unlocked`);
         monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
-        icon.textContent = "lock_open"; // Change icon back to locked
+        icon.textContent = "lock_open"; // Change icon back to unlocked
     }
+
+    // Save the lock state to localStorage
+    localStorage.setItem(`lockState-${FormatMonthName}`, isLocked.toString());
 });
-
-
 
 
 
