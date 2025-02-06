@@ -113,56 +113,65 @@ yearContainer.addEventListener('touchend', (e) => {
     clearTimeout(touchTimer);
 
     if (scrollable === `false`) {
-        // Reset opacity and remove highlight from the dragged item
-        draggedItem.style.opacity = "1"; // Restore original opacity
-        draggedItem.style.border = "";
 
-        // If there is a highlighted target, proceed with the swap or reset
-        if (highlightedTarget) {
-            // If the dragged item is dropped on the target, swap styles and content
-            if (highlightedTarget !== draggedItem) {
+        try {
+            // Reset opacity and remove highlight from the dragged item
+            draggedItem.style.opacity = "1"; // Restore original opacity
+            draggedItem.style.border = "";
 
-
-                //set properties to be saved for draggedItem
-                const dayContainerOfDraggedItem = draggedItem.closest('.day-container');
-                const dateOfDraggedItem = dayContainerOfDraggedItem.querySelector('.date').getAttribute('data-full-date');
-                const taskTypeOfDraggedItem = draggedItem.classList.contains('morningTask') ? 'morning' :
-                    draggedItem.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
-                const taskTextOfDraggedItem = draggedItem.textContent;
-                const taskColorOfDraggedItem = rgbToHex(draggedItem.style.backgroundColor);
-
-                //set properties to be saved for targeItem
-                const dayContainerOfTargetItem = highlightedTarget.closest('.day-container');
-                const dateOfTargetItem = dayContainerOfTargetItem.querySelector('.date').getAttribute('data-full-date');
-                const taskTypeOfTargetItem = highlightedTarget.classList.contains('morningTask') ? 'morning' :
-                    highlightedTarget.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
-                const taskTextOfTargetItem = highlightedTarget.textContent;
-                const taskColorOfTargetItem = rgbToHex(highlightedTarget.style.backgroundColor);
+            // If there is a highlighted target, proceed with the swap or reset
+            if (highlightedTarget) {
+                // If the dragged item is dropped on the target, swap styles and content
+                if (highlightedTarget !== draggedItem) {
 
 
+                    //set properties to be saved for draggedItem
+                    const dayContainerOfDraggedItem = draggedItem.closest('.day-container');
+                    const dateOfDraggedItem = dayContainerOfDraggedItem.querySelector('.date').getAttribute('data-full-date');
+                    const taskTypeOfDraggedItem = draggedItem.classList.contains('morningTask') ? 'morning' :
+                        draggedItem.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+                    const taskTextOfDraggedItem = draggedItem.textContent;
+                    const taskColorOfDraggedItem = rgbToHex(draggedItem.style.backgroundColor);
+
+                    //set properties to be saved for targeItem
+                    const dayContainerOfTargetItem = highlightedTarget.closest('.day-container');
+                    const dateOfTargetItem = dayContainerOfTargetItem.querySelector('.date').getAttribute('data-full-date');
+                    const taskTypeOfTargetItem = highlightedTarget.classList.contains('morningTask') ? 'morning' :
+                        highlightedTarget.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+                    const taskTextOfTargetItem = highlightedTarget.textContent;
+                    const taskColorOfTargetItem = rgbToHex(highlightedTarget.style.backgroundColor);
 
 
 
-                // Save the dragged item data
-                saveTaskData(dateOfDraggedItem, taskTypeOfDraggedItem, taskTextOfTargetItem, taskColorOfTargetItem);
-
-                // Save the target item data
-                saveTaskData(dateOfTargetItem, taskTypeOfTargetItem, taskTextOfDraggedItem, taskColorOfDraggedItem);
 
 
-                [draggedItem.style.backgroundColor, highlightedTarget.style.backgroundColor] =
-                    [highlightedTarget.style.backgroundColor, draggedItem.style.backgroundColor];
+                    // Save the dragged item data
+                    saveTaskData(dateOfDraggedItem, taskTypeOfDraggedItem, taskTextOfTargetItem, taskColorOfTargetItem);
 
-                [draggedItem.textContent, highlightedTarget.textContent] =
-                    [highlightedTarget.textContent, draggedItem.textContent];
+                    // Save the target item data
+                    saveTaskData(dateOfTargetItem, taskTypeOfTargetItem, taskTextOfDraggedItem, taskColorOfDraggedItem);
+
+
+                    [draggedItem.style.backgroundColor, highlightedTarget.style.backgroundColor] =
+                        [highlightedTarget.style.backgroundColor, draggedItem.style.backgroundColor];
+
+                    [draggedItem.textContent, highlightedTarget.textContent] =
+                        [highlightedTarget.textContent, draggedItem.textContent];
+                }
+
+                // Remove the target highlight border
+                highlightedTarget.style.border = "";
+                highlightedTarget = null; // Reset the highlighted target
             }
 
-            // Remove the target highlight border
-            highlightedTarget.style.border = "";
-            highlightedTarget = null; // Reset the highlighted target
+        } finally {
+
+            if (shadowElement && shadowElement.parentNode) {
+                document.body.removeChild(shadowElement);
+            }
+
         }
 
-        document.body.removeChild(shadowElement);
         isDraggingTask = false;
 
         // Reset scrollable to true after touch ends

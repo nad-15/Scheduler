@@ -1077,19 +1077,26 @@ h2 {
 } */
 
 .selected {
-    border: 2px solid transparent;
-    /* Transparent border for fallback */
-    /* background-color: rgba(76, 175, 80, 0.1);  */
-    /* background-color: rgb(129, 231, 129); */
-    background-color: #ADD8E6;
-    /*highlight blue */
+
+    border: 3px solid transparent;
+    border-image-slice: 1;
+    animation: rainbow-border 1.5s linear infinite;
+
+
+    /* border: 2px solid transparent; 
+    background-color: #ADD8E6; 
     transition: background-color 0.3s ease;
     border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1;
-    /* border-image: conic-gradient(red, yellow,lime,aqua, blue, magenta, red); */
-    /* Gradient applied as border */
-    border-image-slice: 1;
-    /* Ensures the gradient fills the border */
+    border-image-slice: 1;  */
+
+    /* Other options for background colors */
+    /* background-color: rgba(76, 175, 80, 0.1); */
+    /* background-color: rgb(129, 231, 129); */
+
+    /* Alternative gradient border */
+    /* border-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); */
 }
+
 
 .color-option {
     box-sizing: border-box;
@@ -1656,3 +1663,52 @@ h2 {
     top: 43px;
     left: 8px;
 }
+
+
+@keyframes rainbow-border {
+    0% { border-image-source: linear-gradient(0deg, red, orange, yellow, green, blue, indigo, violet); }
+    25% { border-image-source: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); }
+    50% { border-image-source: linear-gradient(180deg, red, orange, yellow, green, blue, indigo, violet); }
+    75% { border-image-source: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet); }
+    100% { border-image-source: linear-gradient(360deg, red, orange, yellow, green, blue, indigo, violet); }
+  }
+  
+  .animated-border {
+    border: 3px solid transparent;
+    border-image-slice: 1;
+    animation: rainbow-border 1.5s linear infinite;
+  }
+  
+
+
+
+@keyframes glowing-border {
+    0% { box-shadow: 0 0 5px red; }
+    25% { box-shadow: 0 0 10px orange; }
+    50% { box-shadow: 0 0 15px yellow; }
+    75% { box-shadow: 0 0 10px green; }
+    100% { box-shadow: 0 0 5px blue; }
+  }
+  
+  .glowing-border {
+    border: 3px solid transparent;
+    animation: glowing-border 1.5s ease-in-out infinite;
+  }
+
+  
+
+  @keyframes dashed-border {
+    0% { border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet); }
+    50% { border-image-source: linear-gradient(135deg, violet, indigo, blue, green, yellow, orange, red); }
+    100% { border-image-source: linear-gradient(225deg, red, orange, yellow, green, blue, indigo, violet); }
+  }
+  
+  .moving-dashed-border {
+    border: 3px dashed transparent;
+    border-image-slice: 1;
+    animation: dashed-border 2s linear infinite;
+  }
+  
+
+
+  
