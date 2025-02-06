@@ -17,10 +17,14 @@ const hideWidgetBtn = document.querySelector(`.hide-widget`);
 const selectedTaskCounter = document.querySelector(`.selected-task`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
 
+const menuButton = document.querySelector(`.menu-button`);
 
+menuButton.addEventListener(`click`, showMenu);
 
+function showMenu() {
+    alert(`samgy soon....`);
+}
 
-// Get color for dragged item
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -1070,15 +1074,6 @@ addButton.addEventListener('click', () => {
 
 
 
-
-
-
-
-
-
-
-
-
 deleteButton.addEventListener('dblclick', deleteFunction);
 deleteButton.addEventListener('touchend', () => {
     handleTouchEnd(deleteFunction);
@@ -1089,36 +1084,6 @@ deselectTemplateBtn.addEventListener('dblclick', clearSelection);
 deselectTemplateBtn.addEventListener('touchend', () => {
     handleTouchEnd(clearSelection);
 });
-
-
-yearContainer.addEventListener('click', (e) => {
-    const day = e.target.closest('.day');
-    const date = e.target.closest('.date');
-    
-    if (day && !yearContainer.classList.contains('hide-days')) {
-        // If .day is visible, toggle visibility of .date
-        if (!yearContainer.classList.contains('hide-dates')) {
-            yearContainer.classList.add('hide-dates');
-            console.log('day click - hide date');
-        } else {
-            yearContainer.classList.remove('hide-dates');
-            console.log('day click - show date');
-        }
-    }
-    
-    if (date && !yearContainer.classList.contains('hide-dates')) {
-        // If .date is visible, toggle visibility of .day
-        if (!yearContainer.classList.contains('hide-days')) {
-            yearContainer.classList.add('hide-days');
-            console.log('date click - hide day');
-        } else {
-            yearContainer.classList.remove('hide-days');
-            console.log('date click - show day');
-        }
-    }
-});
-
-
 
 
 function rgbToHex(rgb) {
@@ -1177,3 +1142,5 @@ function getMonthName(value) {
         case 11: return "DECEMBER";
     }
 }
+
+
