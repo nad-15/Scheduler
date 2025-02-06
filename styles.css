@@ -878,7 +878,7 @@ h2 {
 
 .month-name-container {
 
-    border: 1px solid red;
+    /* border: 1px solid red; */
     font-family: monospace;
     display: flex;
     flex-direction: column;

@@ -14,6 +14,8 @@ yearContainer.addEventListener('touchstart', (e) => {
         // Start the timer for 1 second hold
         touchTimer = setTimeout(() => {
             yearContainer.style.overflow = "hidden";
+            document.body.style.overflow = 'hidden'; // Prevent page scrolling
+
             // Trigger drag logic only after 1 second
             draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
@@ -177,6 +179,8 @@ yearContainer.addEventListener('touchend', (e) => {
         // Reset scrollable to true after touch ends
         scrollable = `true`;
         yearContainer.style.overflow = "scroll";
+
+        document.body.style.overflow = '';
         dragButton.innerHTML = `Drag<br>OFF`;
     }
 });
