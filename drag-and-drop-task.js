@@ -7,6 +7,7 @@ let highlightedTarget = null; // Track the currently highlighted target
 
 const dragButton = document.querySelector(`.drag-button`);
 
+
 dragButton.addEventListener(`click`, () => {
     if (scrollable === `false`) {
         dragButton.innerHTML = `Drag<br>OFF`;
@@ -80,6 +81,16 @@ yearContainer.addEventListener('touchmove', (e) => {
                 e.changedTouches[0].pageY - 30
             )?.closest('.morningTask, .afternoonTask, .eveningTask');
 
+            // If the touch is outside the valid target divs, cancel the highlight
+            if (!targetTaskDiv) {
+                if (highlightedTarget) {
+                    highlightedTarget.style.border = "";
+                    highlightedTarget = null;
+                }
+
+            }
+
+            // Only highlight a valid target
             if (targetTaskDiv && targetTaskDiv !== draggedItem) {
                 // If the target is different, remove highlight from the previous target
                 if (highlightedTarget && highlightedTarget !== targetTaskDiv) {
@@ -104,6 +115,7 @@ yearContainer.addEventListener('touchend', (e) => {
         draggedItem.style.opacity = "1"; // Restore original opacity
         draggedItem.style.border = "";
 
+        // If there is a highlighted target, proceed with the swap or reset
         if (highlightedTarget) {
             // If the dragged item is dropped on the target, swap styles and content
             if (highlightedTarget !== draggedItem) {
