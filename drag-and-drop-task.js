@@ -54,7 +54,7 @@ yearContainer.addEventListener('touchstart', (e) => {
             shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 30}px`;
 
             // Add border highlight to the dragged item
-            draggedItem.style.border = "2px dashed #007bff"; // Highlight dragged item with dashed blue border
+            draggedItem.style.border = "3px dashed #007bff"; // Highlight dragged item with dashed blue border
         });
     }
 });
@@ -98,7 +98,11 @@ yearContainer.addEventListener('touchmove', (e) => {
                 }
 
                 // Highlight the new target
-                targetTaskDiv.style.border = "2px dashed #28a745"; // Highlight target item with green dashed border
+                // targetTaskDiv.style.border = "2px dashed #28a745"; 
+                // Highlight target item with green dashed border
+                targetTaskDiv.style.border = "2px solid transparent"; // Create space for border
+                targetTaskDiv.style.borderImage = "linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1";
+
                 highlightedTarget = targetTaskDiv; // Update the highlighted target
             }
 
