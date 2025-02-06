@@ -17,14 +17,20 @@ const dragButton = document.querySelector(`.drag-button`);
 
 yearContainer.addEventListener('touchstart', (e) => {
 
+    console.log('touch start triggered at task divs');
+
     draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
+    console.log('touch start triggered at task divs');
 
     if (draggedItem && scrollable === 'true') {
+
+        console.log('touch start goes through');
 
         // Start the timer for 1 second hold
         touchTimer = setTimeout(() => {
             yearContainer.style.overflow = "hidden";
-            // document.body.style.overflow = 'hidden'; // Prevent page scrolling
+            document.body.style.overflow = 'hidden'; // Prevent page scrolling
+            console.log(document.body.style.overflow );
             console.log(`yearContainer is NOT scrollable`);
 
             // Trigger drag logic only after 1 second
@@ -70,6 +76,8 @@ yearContainer.addEventListener('touchstart', (e) => {
 
         }, 1500); // Trigger after 1 second
     }
+
+    console.log(`touchstart is out`);
 });
 
 yearContainer.addEventListener('touchmove', (e) => {
@@ -189,9 +197,10 @@ yearContainer.addEventListener('touchend', (e) => {
             scrollable = `true`;
             yearContainer.style.overflow = "scroll";
     
-            // document.body.style.overflow = '';
+            document.body.style.overflow = '';
             dragButton.innerHTML = `Drag<br>OFF`;
             console.log(`year container is scrollable`);
+            console.log(document.body.style.overflow );
 
         }
     }

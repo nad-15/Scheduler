@@ -219,8 +219,10 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
 
+
     const monthNameContainer = document.createElement('div');
     monthNameContainer.classList.add('month-name-container');
+
 
 
     let FormatMonthName = getMonthName(monthName % 12);
@@ -826,7 +828,7 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
     // Store the updated data back to localStorage
     localStorage.setItem('tasks', JSON.stringify(storedData));
 
-    console.log(`Saved task for ${taskType} on ${date}: ${updatedTask} with color ${taskColor}`);
+    // console.log(`Saved task for ${taskType} on ${date}: ${updatedTask} with color ${taskColor}`);
 }
 
 
