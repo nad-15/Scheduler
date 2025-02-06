@@ -32,11 +32,15 @@ yearContainer.addEventListener('touchstart', (e) => {
         // Clone the dragged item
         shadowElement = draggedItem.cloneNode(true);
         shadowElement.style.position = "fixed";
-        shadowElement.style.opacity = "0.5";
+        shadowElement.style.opacity = "0.5"; // Adjust opacity for shadow
         shadowElement.style.pointerEvents = "none";
         shadowElement.style.zIndex = "1000";
 
         document.body.appendChild(shadowElement);
+
+        // Apply a darkened overlay effect on the dragged item
+        draggedItem.style.transition = "opacity 0.3s ease"; // Smooth opacity change
+        draggedItem.style.opacity = "0.7"; // Darken the dragged item slightly
 
         // Ensure correct positioning AFTER it has been rendered
         requestAnimationFrame(() => {
@@ -49,7 +53,7 @@ yearContainer.addEventListener('touchstart', (e) => {
             shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 30}px`;
 
             // Add border highlight to the dragged item
-            draggedItem.style.border = "2px dashed #007bff"; // Highlight dragged item
+            draggedItem.style.border = "2px dashed #007bff"; // Highlight dragged item with dashed blue border
         });
     }
 });
@@ -83,7 +87,7 @@ yearContainer.addEventListener('touchmove', (e) => {
                 }
 
                 // Highlight the new target
-                targetTaskDiv.style.border = "2px dashed #28a745"; // Highlight target item
+                targetTaskDiv.style.border = "2px dashed #28a745"; // Highlight target item with green dashed border
                 highlightedTarget = targetTaskDiv; // Update the highlighted target
             }
 
@@ -96,9 +100,10 @@ yearContainer.addEventListener('touchend', (e) => {
     if (scrollable === `false`) {
         if (!draggedItem) return;
 
-        // Remove the highlight borders
+        // Reset opacity and remove highlight from the dragged item
+        draggedItem.style.opacity = "1"; // Restore original opacity
         draggedItem.style.border = "";
-        
+
         if (highlightedTarget) {
             // If the dragged item is dropped on the target, swap styles and content
             if (highlightedTarget !== draggedItem) {
