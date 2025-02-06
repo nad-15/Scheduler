@@ -2,7 +2,7 @@ let isDraggingTask = false;
 let startX, startY;
 let touchStartTime, touchEndTime;
 let draggedItem, shadowElement;
-let scrollable = false;
+let scrollable = true;
 
 yearContainer.addEventListener('touchstart', (e) => {
     if (!scrollable) {
