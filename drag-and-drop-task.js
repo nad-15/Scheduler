@@ -1,24 +1,4 @@
 
-yearContainer.addEventListener('click', (e) => {
-    const day = e.target.closest('.day');
-    
-    if (day && !yearContainer.classList.contains('hide-days')) {
-        // If the 'hide-days' class is not already present, add it
-        console.log(`day click`);
-        yearContainer.classList.add('hide-days');
-    }
-});
-
-yearContainer.addEventListener('click', (e) => {
-    const date = e.target.closest('.date');
-    
-    if (date && yearContainer.classList.contains('hide-days')) {
-        // If the 'hide-days' class is present, remove it
-        console.log(`date click`);
-        yearContainer.classList.remove('hide-days');
-    }
-});
-
 
 
 let isDraggingTask = false;

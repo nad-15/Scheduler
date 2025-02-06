@@ -1724,6 +1724,22 @@ h2 {
 
 
 /* When .hide-days class is added to the parent container */
+/* #year-container.hide-days .day {
+    display: none;
+} */
+
+
+/* When .hide-days class is added to the parent container */
 #year-container.hide-days .day {
     display: none;
+}
+
+/* When .hide-days is active, make the .date elements have smaller flex */
+#year-container.hide-days .date {
+    flex: 0.5;
+}
+
+/* Reset the flex value for .date when hide-days is not active */
+#year-container:not(.hide-days) .date {
+    flex: 1;
 }
