@@ -55,7 +55,7 @@ yearContainer.addEventListener('touchstart', (e) => {
             scrollable = `false`;
             dragButton.innerHTML = `Drag<br>ON`;
 
-        }, 1000); // Trigger after 1 second
+        }, 1500); // Trigger after 1 second
     }
 });
 
