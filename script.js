@@ -1091,24 +1091,30 @@ deselectTemplateBtn.addEventListener('touchend', () => {
 });
 
 
-
 yearContainer.addEventListener('click', (e) => {
     const day = e.target.closest('.day');
-    
-    if (day && !yearContainer.classList.contains('hide-days')) {
-        // If the 'hide-days' class is not already present, add it
-        console.log(`day click`);
-        yearContainer.classList.add('hide-days');
-    }
-});
-
-yearContainer.addEventListener('click', (e) => {
     const date = e.target.closest('.date');
     
-    if (date && yearContainer.classList.contains('hide-days')) {
-        // If the 'hide-days' class is present, remove it
-        console.log(`date click`);
-        yearContainer.classList.remove('hide-days');
+    if (day && !yearContainer.classList.contains('hide-days')) {
+        // If .day is visible, toggle visibility of .date
+        if (!yearContainer.classList.contains('hide-dates')) {
+            yearContainer.classList.add('hide-dates');
+            console.log('day click - hide date');
+        } else {
+            yearContainer.classList.remove('hide-dates');
+            console.log('day click - show date');
+        }
+    }
+    
+    if (date && !yearContainer.classList.contains('hide-dates')) {
+        // If .date is visible, toggle visibility of .day
+        if (!yearContainer.classList.contains('hide-days')) {
+            yearContainer.classList.add('hide-days');
+            console.log('date click - hide day');
+        } else {
+            yearContainer.classList.remove('hide-days');
+            console.log('date click - show day');
+        }
     }
 });
 

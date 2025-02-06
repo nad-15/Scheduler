@@ -1721,25 +1721,28 @@ h2 {
   }
   
 
-
-
-/* When .hide-days class is added to the parent container */
-/* #year-container.hide-days .day {
-    display: none;
-} */
-
-
-/* When .hide-days class is added to the parent container */
+/* When .hide-days class is added to the parent container, hide the .day elements */
 #year-container.hide-days .day {
     display: none;
 }
 
-/* When .hide-days is active, make the .date elements have smaller flex */
+/* When .hide-days class is active, reduce the flex of .date */
 #year-container.hide-days .date {
     flex: 0.85;
 }
 
-/* Reset the flex value for .date when hide-days is not active */
-#year-container:not(.hide-days) .date {
+/* When .hide-dates class is added to the parent container, hide the .date elements */
+#year-container.hide-dates .date {
+    display: none;
+}
+
+/* When .hide-dates class is active, reduce the flex of .day */
+#year-container.hide-dates .day {
+    flex: 0.85;
+}
+
+/* When both .hide-days and .hide-dates are not active, set flex to 1 */
+#year-container:not(.hide-days) .date,
+#year-container:not(.hide-dates) .day {
     flex: 1;
 }
