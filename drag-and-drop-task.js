@@ -14,7 +14,6 @@ yearContainer.addEventListener('touchstart', (e) => {
         // Start the timer for 1 second hold
         touchTimer = setTimeout(() => {
             yearContainer.style.overflow = "hidden";
-
             // Trigger drag logic only after 1 second
             draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
@@ -53,7 +52,7 @@ yearContainer.addEventListener('touchstart', (e) => {
             });
 
             // Set scrollable to false after 1 second
-            scrollable = `false`; 
+            scrollable = `false`;
             dragButton.innerHTML = `Drag<br>ON`;
 
         }, 1000); // Trigger after 1 second
@@ -122,6 +121,35 @@ yearContainer.addEventListener('touchend', (e) => {
         if (highlightedTarget) {
             // If the dragged item is dropped on the target, swap styles and content
             if (highlightedTarget !== draggedItem) {
+
+
+                //set properties to be saved for draggedItem
+                const dayContainerOfDraggedItem = draggedItem.closest('.day-container');
+                const dateOfDraggedItem = dayContainerOfDraggedItem.querySelector('.date').getAttribute('data-full-date');
+                const taskTypeOfDraggedItem = draggedItem.classList.contains('morningTask') ? 'morning' :
+                    draggedItem.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+                const taskTextOfDraggedItem = draggedItem.textContent;
+                const taskColorOfDraggedItem = draggedItem.style.backgroundColor;
+
+                //set properties to be saved for targeItem
+                const dayContainerOfTargetItem = highlightedTarget.closest('.day-container');
+                const dateOfTargetItem = dayContainerOfTargetItem.querySelector('.date').getAttribute('data-full-date');
+                const taskTypeOfTargetItem = highlightedTarget.classList.contains('morningTask') ? 'morning' :
+                    highlightedTarget.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
+                const taskTextOfTargetItem = highlightedTarget.textContent;
+                const taskColorOfTargetItem = highlightedTarget.style.backgroundColor;
+
+
+
+
+
+                // Save the dragged item data
+                saveTaskData(dateOfDraggedItem, taskTypeOfDraggedItem, taskTextOfTargetItem, taskColorOfTargetItem);
+
+                // Save the target item data
+                saveTaskData(dateOfTargetItem, taskTypeOfTargetItem, taskTextOfDraggedItem, taskColorOfDraggedItem);
+
+
                 [draggedItem.style.backgroundColor, highlightedTarget.style.backgroundColor] =
                     [highlightedTarget.style.backgroundColor, draggedItem.style.backgroundColor];
 

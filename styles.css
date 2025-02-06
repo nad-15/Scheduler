@@ -1650,6 +1650,7 @@ h2 {
 
 
 .drag-button {
+    display: none;
     position: fixed;
     position: fixed;
     top: 43px;
