@@ -1736,7 +1736,7 @@ h2 {
 
 /* When .hide-days is active, make the .date elements have smaller flex */
 #year-container.hide-days .date {
-    flex: 0.5;
+    flex: 0.85;
 }
 
 /* Reset the flex value for .date when hide-days is not active */
