@@ -10,8 +10,11 @@ const dragButton = document.querySelector(`.drag-button`);
 
 yearContainer.addEventListener('touchstart', (e) => {
     if (scrollable === `true`) {
+
         // Start the timer for 1 second hold
         touchTimer = setTimeout(() => {
+            yearContainer.style.overflow = "hidden";
+
             // Trigger drag logic only after 1 second
             draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
@@ -51,7 +54,7 @@ yearContainer.addEventListener('touchstart', (e) => {
 
             // Set scrollable to false after 1 second
             scrollable = `false`; 
-            dragButton.innerHTML = `Drag<br>OFF`;
+            dragButton.innerHTML = `Drag<br>ON`;
 
         }, 1000); // Trigger after 1 second
     }
@@ -136,6 +139,7 @@ yearContainer.addEventListener('touchend', (e) => {
 
         // Reset scrollable to true after touch ends
         scrollable = `true`;
-        dragButton.innerHTML = `Drag<br>ON`;
+        yearContainer.style.overflow = "scroll";
+        dragButton.innerHTML = `Drag<br>OFF`;
     }
 });
