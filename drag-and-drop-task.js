@@ -4,58 +4,56 @@ let touchStartTime;
 let draggedItem, shadowElement;
 let scrollable = `true`;
 let highlightedTarget = null; // Track the currently highlighted target
+let touchTimer = null; // Variable to store the timeout ID
 
 const dragButton = document.querySelector(`.drag-button`);
 
-
-dragButton.addEventListener(`click`, () => {
-    if (scrollable === `false`) {
-        dragButton.innerHTML = `Drag<br>OFF`;
-        scrollable = `true`;
-    } else {
-        alert(`this functionality is currently unstable`);
-        dragButton.innerHTML = `Drag<br>ON`;
-        scrollable = `false`;
-    }
-});
-
 yearContainer.addEventListener('touchstart', (e) => {
-    if (scrollable === `false`) {
-        draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
+    if (scrollable === `true`) {
+        // Start the timer for 1 second hold
+        touchTimer = setTimeout(() => {
+            // Trigger drag logic only after 1 second
+            draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
-        if (!draggedItem) return;
+            if (!draggedItem) return;
 
-        isDraggingTask = false;
-        touchStartTime = Date.now();
-        startX = e.touches[0].pageX;
-        startY = e.touches[0].pageY;
+            isDraggingTask = false;
+            touchStartTime = Date.now();
+            startX = e.touches[0].pageX;
+            startY = e.touches[0].pageY;
 
-        // Clone the dragged item
-        shadowElement = draggedItem.cloneNode(true);
-        shadowElement.style.position = "fixed";
-        shadowElement.style.opacity = "0.5"; // Adjust opacity for shadow
-        shadowElement.style.pointerEvents = "none";
-        shadowElement.style.zIndex = "1000";
+            // Clone the dragged item
+            shadowElement = draggedItem.cloneNode(true);
+            shadowElement.style.position = "fixed";
+            shadowElement.style.opacity = "0.5"; // Adjust opacity for shadow
+            shadowElement.style.pointerEvents = "none";
+            shadowElement.style.zIndex = "1000";
 
-        document.body.appendChild(shadowElement);
+            document.body.appendChild(shadowElement);
 
-        // Apply a darkened overlay effect on the dragged item
-        draggedItem.style.transition = "opacity 0.3s ease"; // Smooth opacity change
-        draggedItem.style.opacity = "0.7"; // Darken the dragged item slightly
+            // Apply a darkened overlay effect on the dragged item
+            draggedItem.style.transition = "opacity 0.3s ease"; // Smooth opacity change
+            draggedItem.style.opacity = "0.7"; // Darken the dragged item slightly
 
-        // Ensure correct positioning AFTER it has been rendered
-        requestAnimationFrame(() => {
-            const rect = draggedItem.getBoundingClientRect();
+            // Ensure correct positioning AFTER it has been rendered
+            requestAnimationFrame(() => {
+                const rect = draggedItem.getBoundingClientRect();
 
-            shadowElement.style.height = `${rect.height}px`;
-            shadowElement.style.width = `${rect.width}px`;
+                shadowElement.style.height = `${rect.height}px`;
+                shadowElement.style.width = `${rect.width}px`;
 
-            shadowElement.style.left = `${startX - shadowElement.offsetWidth / 2}px`;
-            shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 30}px`;
+                shadowElement.style.left = `${startX - shadowElement.offsetWidth / 2}px`;
+                shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 30}px`;
 
-            // Add border highlight to the dragged item
-            draggedItem.style.border = "3px dashed #007bff"; // Highlight dragged item with dashed blue border
-        });
+                // Add border highlight to the dragged item
+                draggedItem.style.border = "3px dashed #007bff"; // Highlight dragged item with dashed blue border
+            });
+
+            // Set scrollable to false after 1 second
+            scrollable = `false`; 
+            dragButton.innerHTML = `Drag<br>OFF`;
+
+        }, 1000); // Trigger after 1 second
     }
 });
 
@@ -87,7 +85,6 @@ yearContainer.addEventListener('touchmove', (e) => {
                     highlightedTarget.style.border = "";
                     highlightedTarget = null;
                 }
-
             }
 
             // Only highlight a valid target
@@ -97,9 +94,7 @@ yearContainer.addEventListener('touchmove', (e) => {
                     highlightedTarget.style.border = "";
                 }
 
-                // Highlight the new target
-                // targetTaskDiv.style.border = "2px dashed #28a745"; 
-                // Highlight target item with green dashed border
+                // Apply the border image gradient highlight
                 targetTaskDiv.style.border = "2px solid transparent"; // Create space for border
                 targetTaskDiv.style.borderImage = "linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1";
 
@@ -112,9 +107,10 @@ yearContainer.addEventListener('touchmove', (e) => {
 });
 
 yearContainer.addEventListener('touchend', (e) => {
-    if (scrollable === `false`) {
-        if (!draggedItem) return;
+    // Clear the touch timer if the user ends the touch before 1 second
+    clearTimeout(touchTimer);
 
+    if (scrollable === `false`) {
         // Reset opacity and remove highlight from the dragged item
         draggedItem.style.opacity = "1"; // Restore original opacity
         draggedItem.style.border = "";
@@ -137,5 +133,9 @@ yearContainer.addEventListener('touchend', (e) => {
 
         document.body.removeChild(shadowElement);
         isDraggingTask = false;
+
+        // Reset scrollable to true after touch ends
+        scrollable = `true`;
+        dragButton.innerHTML = `Drag<br>ON`;
     }
 });
