@@ -18,6 +18,9 @@ const selectedTaskCounter = document.querySelector(`.selected-task`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
 
 
+// Get color for dragged item
+
+
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
     getWeather();
@@ -915,7 +918,7 @@ addTemplateButton.id =`submitTemplate`;
 addTemplateButton.classList.remove(`buttons` );
 addTemplateButton.classList.add(`submit-btn-cloned`);
 const addTemplateButtonIcon = addTemplateButton.querySelector(`.arrow-upward`);
-console.log(addTemplateButtonIcon.classList);
+// console.log(addTemplateButtonIcon.classList);
 addTemplateButtonIcon.classList.remove(`arrow-upward`);
 addTemplateButtonIcon.classList.add(`add-template-btn-icon`);
 addTemplateButtonIcon.textContent = `add`;
@@ -1017,8 +1020,23 @@ deselectTemplateBtn.addEventListener('touchend', () => {
 });
 
 function rgbToHex(rgb) {
-    const match = rgb.match(/\d+/g); // Extract numbers
-    return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
+
+    
+    // const match = rgb.match(/\d+/g); // Extract numbers
+    // return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
+
+    // If rgb is null or empty, use the default color
+    if (!rgb) {
+        const mainContainer = document.querySelector('#main-container');
+        rgb = mainContainer.style.backgroundColor || 'rgb(255, 255, 255)';  // Default color as fallback
+    }
+
+    // Extract the RGB values and convert to hex
+    const match = rgb.match(/\d+/g); 
+    if (match) {
+        return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
+    } 
+
 }
 
 // Function to trigger the shake effect

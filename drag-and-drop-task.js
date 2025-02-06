@@ -103,7 +103,7 @@ yearContainer.addEventListener('touchmove', (e) => {
                 highlightedTarget = targetTaskDiv; // Update the highlighted target
             }
 
-            e.preventDefault();
+            // e.preventDefault();
         }
     }
 });
@@ -129,7 +129,7 @@ yearContainer.addEventListener('touchend', (e) => {
                 const taskTypeOfDraggedItem = draggedItem.classList.contains('morningTask') ? 'morning' :
                     draggedItem.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
                 const taskTextOfDraggedItem = draggedItem.textContent;
-                const taskColorOfDraggedItem = draggedItem.style.backgroundColor;
+                const taskColorOfDraggedItem = rgbToHex(draggedItem.style.backgroundColor);
 
                 //set properties to be saved for targeItem
                 const dayContainerOfTargetItem = highlightedTarget.closest('.day-container');
@@ -137,7 +137,7 @@ yearContainer.addEventListener('touchend', (e) => {
                 const taskTypeOfTargetItem = highlightedTarget.classList.contains('morningTask') ? 'morning' :
                     highlightedTarget.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
                 const taskTextOfTargetItem = highlightedTarget.textContent;
-                const taskColorOfTargetItem = highlightedTarget.style.backgroundColor;
+                const taskColorOfTargetItem = rgbToHex(highlightedTarget.style.backgroundColor);
 
 
 
