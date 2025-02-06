@@ -1,4 +1,25 @@
 
+yearContainer.addEventListener('click', (e) => {
+    const day = e.target.closest('.day');
+    
+    if (day && !yearContainer.classList.contains('hide-days')) {
+        // If the 'hide-days' class is not already present, add it
+        console.log(`day click`);
+        yearContainer.classList.add('hide-days');
+    }
+});
+
+yearContainer.addEventListener('click', (e) => {
+    const date = e.target.closest('.date');
+    
+    if (date && yearContainer.classList.contains('hide-days')) {
+        // If the 'hide-days' class is present, remove it
+        console.log(`date click`);
+        yearContainer.classList.remove('hide-days');
+    }
+});
+
+
 
 let isDraggingTask = false;
 let startX, startY;
@@ -12,19 +33,15 @@ const dragButton = document.querySelector(`.drag-button`);
 
 
 
-
-
-
 yearContainer.addEventListener('touchstart', (e) => {
 
-    console.log('touch start triggered at task divs');
 
     draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
-    console.log('touch start triggered at task divs');
+
 
     if (draggedItem && scrollable === 'true') {
+        console.log('touch start goes through triggered at task divs');
 
-        console.log('touch start goes through');
 
         // Start the timer for 1 second hold
         touchTimer = setTimeout(() => {
