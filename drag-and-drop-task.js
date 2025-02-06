@@ -3,6 +3,7 @@ let startX, startY;
 let touchStartTime;
 let draggedItem, shadowElement;
 let scrollable = `true`;
+let highlightedTarget = null; // Track the currently highlighted target
 
 const dragButton = document.querySelector(`.drag-button`);
 
@@ -46,10 +47,12 @@ yearContainer.addEventListener('touchstart', (e) => {
 
             shadowElement.style.left = `${startX - shadowElement.offsetWidth / 2}px`;
             shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 30}px`;
+
+            // Add border highlight to the dragged item
+            draggedItem.style.border = "2px dashed #007bff"; // Highlight dragged item
         });
     }
 });
-
 
 yearContainer.addEventListener('touchmove', (e) => {
     if (scrollable === `false`) {
@@ -67,6 +70,23 @@ yearContainer.addEventListener('touchmove', (e) => {
             shadowElement.style.left = `${e.touches[0].pageX - shadowElement.offsetWidth / 2}px`;
             shadowElement.style.top = `${e.touches[0].pageY - shadowElement.offsetHeight / 2 - 30}px`;
 
+            // Highlight the target item
+            const targetTaskDiv = document.elementFromPoint(
+                e.changedTouches[0].pageX,
+                e.changedTouches[0].pageY - 30
+            )?.closest('.morningTask, .afternoonTask, .eveningTask');
+
+            if (targetTaskDiv && targetTaskDiv !== draggedItem) {
+                // If the target is different, remove highlight from the previous target
+                if (highlightedTarget && highlightedTarget !== targetTaskDiv) {
+                    highlightedTarget.style.border = "";
+                }
+
+                // Highlight the new target
+                targetTaskDiv.style.border = "2px dashed #28a745"; // Highlight target item
+                highlightedTarget = targetTaskDiv; // Update the highlighted target
+            }
+
             e.preventDefault();
         }
     }
@@ -76,21 +96,22 @@ yearContainer.addEventListener('touchend', (e) => {
     if (scrollable === `false`) {
         if (!draggedItem) return;
 
-        if (isDraggingTask) {
-            // Find the target div slightly above the touch point (30px)
-            const targetTaskDiv = document.elementFromPoint(
-                e.changedTouches[0].pageX,
-                e.changedTouches[0].pageY - 30 // Shift detection upwards
-            )?.closest('.morningTask, .afternoonTask, .eveningTask');
+        // Remove the highlight borders
+        draggedItem.style.border = "";
+        
+        if (highlightedTarget) {
+            // If the dragged item is dropped on the target, swap styles and content
+            if (highlightedTarget !== draggedItem) {
+                [draggedItem.style.backgroundColor, highlightedTarget.style.backgroundColor] =
+                    [highlightedTarget.style.backgroundColor, draggedItem.style.backgroundColor];
 
-            if (targetTaskDiv && targetTaskDiv !== draggedItem) {
-                // Swap styles & text
-                [draggedItem.style.backgroundColor, targetTaskDiv.style.backgroundColor] =
-                    [targetTaskDiv.style.backgroundColor, draggedItem.style.backgroundColor];
-
-                [draggedItem.textContent, targetTaskDiv.textContent] =
-                    [targetTaskDiv.textContent, draggedItem.textContent];
+                [draggedItem.textContent, highlightedTarget.textContent] =
+                    [highlightedTarget.textContent, draggedItem.textContent];
             }
+
+            // Remove the target highlight border
+            highlightedTarget.style.border = "";
+            highlightedTarget = null; // Reset the highlighted target
         }
 
         document.body.removeChild(shadowElement);
