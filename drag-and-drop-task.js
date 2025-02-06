@@ -31,24 +31,25 @@ yearContainer.addEventListener('touchstart', (e) => {
         // Clone the dragged item
         shadowElement = draggedItem.cloneNode(true);
         shadowElement.style.position = "fixed";
-
-        // Get the bounding rectangle of the dragged item
-        const rect = draggedItem.getBoundingClientRect();
-
-        // Set size & appearance
-        shadowElement.style.height = `${rect.height}px`;
-        shadowElement.style.width = `${rect.width}px`;
         shadowElement.style.opacity = "0.5";
         shadowElement.style.pointerEvents = "none";
         shadowElement.style.zIndex = "1000";
 
-        // Adjust shadow position slightly above the touch point
-        shadowElement.style.left = `${startX - shadowElement.offsetWidth / 2}px`;
-        shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 20}px`;
-
         document.body.appendChild(shadowElement);
+
+        // Ensure correct positioning AFTER it has been rendered
+        requestAnimationFrame(() => {
+            const rect = draggedItem.getBoundingClientRect();
+
+            shadowElement.style.height = `${rect.height}px`;
+            shadowElement.style.width = `${rect.width}px`;
+
+            shadowElement.style.left = `${startX - shadowElement.offsetWidth / 2}px`;
+            shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 30}px`;
+        });
     }
 });
+
 
 yearContainer.addEventListener('touchmove', (e) => {
     if (scrollable === `false`) {
@@ -62,9 +63,9 @@ yearContainer.addEventListener('touchmove', (e) => {
         }
 
         if (isDraggingTask) {
-            // Move shadow slightly above the finger
+            // Move shadow slightly above the finger (30px)
             shadowElement.style.left = `${e.touches[0].pageX - shadowElement.offsetWidth / 2}px`;
-            shadowElement.style.top = `${e.touches[0].pageY - shadowElement.offsetHeight / 2 - 20}px`;
+            shadowElement.style.top = `${e.touches[0].pageY - shadowElement.offsetHeight / 2 - 30}px`;
 
             e.preventDefault();
         }
@@ -76,10 +77,10 @@ yearContainer.addEventListener('touchend', (e) => {
         if (!draggedItem) return;
 
         if (isDraggingTask) {
-            // Find the target div slightly above the touch point
+            // Find the target div slightly above the touch point (30px)
             const targetTaskDiv = document.elementFromPoint(
                 e.changedTouches[0].pageX,
-                e.changedTouches[0].pageY - 20 // Shift detection upwards
+                e.changedTouches[0].pageY - 30 // Shift detection upwards
             )?.closest('.morningTask, .afternoonTask, .eveningTask');
 
             if (targetTaskDiv && targetTaskDiv !== draggedItem) {
