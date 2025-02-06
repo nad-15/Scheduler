@@ -878,7 +878,7 @@ h2 {
 
 .month-name-container {
 
-    /* border: 1px solid red; */
+    border: 1px solid red;
     font-family: monospace;
     display: flex;
     flex-direction: column;
@@ -905,6 +905,10 @@ h2 {
     /* flex: 1;         */
 }
 
+.lock-button { 
+    /* border: 2px solid violet; */
+}
+
 .year-letter-container {
     /* border: 1px solid blue; */
     /* display: flex; */
@@ -916,7 +920,13 @@ h2 {
     /* align-content: center; */
 }
 
+
+.month-letter-container {
+    /* border: 2px solid black; */
+}
+
 .month-container {
+    /* border: 1px solid blue; */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;

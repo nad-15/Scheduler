@@ -18,6 +18,8 @@ const selectedTaskCounter = document.querySelector(`.selected-task`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
 
 
+
+
 // Get color for dragged item
 
 
@@ -154,6 +156,9 @@ let prevDateYear = prevDate.getFullYear();
 // console.log(prevDateYear);
 let prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
 
+
+
+
 addDays("initPrev", prevDateMonth, 1, prevDate.getDay(), prevDateLastDate, "", "", "", prevDateYear);
 
 // Handle scroll event
@@ -217,9 +222,16 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     const monthNameContainer = document.createElement('div');
     monthNameContainer.classList.add('month-name-container');
 
+
     let FormatMonthName = getMonthName(monthName % 12);
     let letters = FormatMonthName.split('');
     monthNameContainer.innerHTML = '';
+
+
+
+
+
+
 
     // Create a wrapper for the letters
     let monthLetterContainer = document.createElement('div');
@@ -263,6 +275,49 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     const monthContainer = document.createElement('div');
     monthContainer.classList.add('month-container');
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
+
+
+
+// Lock Button
+let lockButton = document.createElement("div");
+lockButton.classList.add("lock-button"); // Assign class for styling
+const icon = document.createElement("span");
+icon.classList.add("material-icons");
+icon.textContent = "lock_open"; 
+lockButton.appendChild(icon); 
+monthNameContainer.prepend(lockButton); 
+
+// Lock/Unlock functionality
+let isLocked = false; // Track locked state
+lockButton.addEventListener("click", () => {
+    isLocked = !isLocked; // Toggle the lock state
+
+
+    if (isLocked) {
+        console.log(`${FormatMonthName} is lock`);
+        monthContainer.style.pointerEvents = "none"; // Disable interaction for the month container
+        icon.textContent = "lock"; // Change icon to unlocked
+    } else {
+        console.log(`${FormatMonthName} is unlock`);
+        monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
+        icon.textContent = "lock_open"; // Change icon back to locked
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     for (i = 1; i <= lastDateOfMonth; i++) {
 
@@ -419,7 +474,12 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         // console.log(`prev is init`);
     }
 
+    // console.log(monthNameContainer.innerHTML);
+
 }
+
+
+
 
 
 fullScreenButton.addEventListener(`click`, enterFullScreen);
