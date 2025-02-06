@@ -1,3 +1,5 @@
+
+
 let isDraggingTask = false;
 let startX, startY;
 let touchStartTime;
@@ -8,16 +10,25 @@ let touchTimer = null; // Variable to store the timeout ID
 
 const dragButton = document.querySelector(`.drag-button`);
 
+
+
+
+
+
 yearContainer.addEventListener('touchstart', (e) => {
-    if (scrollable === `true`) {
+
+    draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
+
+    if (draggedItem && scrollable === 'true') {
 
         // Start the timer for 1 second hold
         touchTimer = setTimeout(() => {
             yearContainer.style.overflow = "hidden";
-            document.body.style.overflow = 'hidden'; // Prevent page scrolling
+            // document.body.style.overflow = 'hidden'; // Prevent page scrolling
+            console.log(`yearContainer is NOT scrollable`);
 
             // Trigger drag logic only after 1 second
-            draggedItem = e.target.closest('.morningTask, .afternoonTask, .eveningTask');
+           
 
             if (!draggedItem) return;
 
@@ -172,15 +183,16 @@ yearContainer.addEventListener('touchend', (e) => {
                 document.body.removeChild(shadowElement);
             }
 
+            isDraggingTask = false;
+
+            // Reset scrollable to true after touch ends
+            scrollable = `true`;
+            yearContainer.style.overflow = "scroll";
+    
+            // document.body.style.overflow = '';
+            dragButton.innerHTML = `Drag<br>OFF`;
+            console.log(`year container is scrollable`);
+
         }
-
-        isDraggingTask = false;
-
-        // Reset scrollable to true after touch ends
-        scrollable = `true`;
-        yearContainer.style.overflow = "scroll";
-
-        document.body.style.overflow = '';
-        dragButton.innerHTML = `Drag<br>OFF`;
     }
 });
