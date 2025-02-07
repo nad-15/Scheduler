@@ -44,5 +44,5 @@ const colorThemes = {
 
 
 // Get the saved theme from localStorage, or use a default
-const selectedTheme = localStorage.getItem('theme') || 'mocha';
+const selectedTheme = localStorage.getItem('theme') || 'earthy';
 
