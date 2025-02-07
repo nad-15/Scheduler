@@ -17,13 +17,6 @@ const hideWidgetBtn = document.querySelector(`.hide-widget`);
 const selectedTaskCounter = document.querySelector(`.selected-task`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
 
-const menuButton = document.querySelector(`.menu-button`);
-
-menuButton.addEventListener(`click`, showMenu);
-
-function showMenu() {
-    alert(`samgy soon....`);
-}
 
 
 
@@ -96,7 +89,7 @@ hideAllButtons.addEventListener(`click`, () => {
 const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
 
-let isPopupOpen = false;
+
 
 taskInput.addEventListener('focus', () => {
     const isFullScreen = window.innerHeight === screen.height; // Check if full screen
@@ -685,7 +678,7 @@ function submitTask() {
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
-        isPopupOpen = true;
+        // isPopupOpen = true;
     } else {
         triggerShakeEffect();
     }
@@ -969,7 +962,7 @@ function deleteFunction() {
 
 
 
-
+let isPopupOpen = false;
 floatingAddBtn.addEventListener('click', () => {
     isPopupOpen = !isPopupOpen;
 

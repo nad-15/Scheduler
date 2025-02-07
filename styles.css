@@ -33,7 +33,7 @@ body {
 }
 
 
-
+/* 
 .menu-container {
     display: flex;
     display: none;
@@ -45,25 +45,8 @@ body {
     font-size: 7px;
     padding: 10px 4px 10px 4px;
     padding: 10px;
-}
-
-/* .hamburger-menu {
-    width: 12px;
-    height: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    cursor: pointer;
-    margin-right: 10px;
-    margin-left: 10px;
-}
-
-.line {
-    width: 100%;
-    height: 1px;
-    background-color: black;
-    border-radius: 2px;
 } */
+
 
 h1 {
     margin: 0;
@@ -143,15 +126,6 @@ h1 {
 
 }
 
-/* .hide-widget {
-    position: absolute;
-    top: 10px; 
-    right: 10px; 
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 20;
-} */
 
 .hide-widget {
     position: fixed;
@@ -267,12 +241,6 @@ h1 {
     font-style: italic;
 }
 
-
-
-
-
-
-
 /* .today-name-text-container {
     box-sizing: border-box;
     display: flex;
@@ -334,24 +302,6 @@ h2 {
     text-align: center;
 }
 
-/* .floating-add-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background-color: #41ab5d;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(65, 171, 93, 0.19);
-    z-index: 1000;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-
-} */
 
 /* Floating Add Button */
 .floating-add-btn {
@@ -407,6 +357,27 @@ h2 {
 }
 
 
+
+.menu-slider {
+    position: fixed;
+    top: 0;
+    left: 0;
+    /* Start hidden */
+
+    width: 60vw;
+    height: 100%;
+    background: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 1001;
+
+
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+
+
 .menu-button {
     display: flex;
     justify-content: center;
@@ -415,6 +386,7 @@ h2 {
     top: 8px;
     left: 8px;
     border-radius: 50%;
+    cursor: pointer;
 
     width: 30px;
     height: 30px;
@@ -426,6 +398,41 @@ h2 {
     background-color: rgba(204, 204, 204, 0.8);
     background-color: rgb(0, 0, 0, 0.2);
 }
+
+
+.menu-slider.open {
+    /* Slide in */
+    transform: translateX(0);
+}
+
+.overlay-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.overlay-menu.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.close-button-menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 
 .material-icons.menu-icon {
     font-size: 20px;
@@ -516,6 +523,11 @@ h2 {
 
 }
 
+.show {
+    transform: translateY(0);
+    /* Slide up smoothly */
+}
+
 .taskinput-color-container {
     /* border: 2px solid blue; */
     box-sizing: border-box;
@@ -528,10 +540,7 @@ h2 {
     /* box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);  */
 }
 
-.show {
-    transform: translateY(0);
-    /* Slide up smoothly */
-}
+
 
 
 /* //original task tempalte */
@@ -933,7 +942,7 @@ h2 {
     /* flex: 1;         */
 }
 
-.lock-button { 
+.lock-button {
     /* border: 2px solid violet; */
 }
 
@@ -1035,7 +1044,7 @@ h2 {
     -ms-user-select: none;
     /* For IE/Edge */
     min-width: fit-content;
-  
+
 
 }
 
@@ -1073,6 +1082,8 @@ h2 {
     overflow: auto;
     word-wrap: break-word;
     white-space: normal;
+
+ 
 
     user-select: none;
     -webkit-user-select: none;
@@ -1124,19 +1135,19 @@ h2 {
 } */
 
 .selected {
-    border: 2px solid transparent; 
-    background-color: #ADD8E6; 
+    border: 2px solid transparent;
+    background-color: #ADD8E6;
     transition: background-color 0.3s ease;
     border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1;
-    border-image-slice: 1; 
+    border-image-slice: 1;
 }
 
-    /* Other options for background colors */
-    /* background-color: rgba(76, 175, 80, 0.1); */
-    /* background-color: rgb(129, 231, 129); */
+/* Other options for background colors */
+/* background-color: rgba(76, 175, 80, 0.1); */
+/* background-color: rgb(129, 231, 129); */
 
-    /* Alternative gradient border */
-    /* border-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); */
+/* Alternative gradient border */
+/* border-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); */
 
 
 
@@ -1632,6 +1643,7 @@ h2 {
         width: 48% !important;
         height: auto !important;
     }
+
     .overlay {
         top: 0;
         left: 20vw;
@@ -1714,49 +1726,85 @@ h2 {
 
 
 @keyframes rainbow-border {
-    0% { border-image-source: linear-gradient(0deg, red, orange, yellow, green, blue, indigo, violet); }
-    25% { border-image-source: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); }
-    50% { border-image-source: linear-gradient(180deg, red, orange, yellow, green, blue, indigo, violet); }
-    75% { border-image-source: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet); }
-    100% { border-image-source: linear-gradient(360deg, red, orange, yellow, green, blue, indigo, violet); }
-  }
-  
-  .animated-border {
+    0% {
+        border-image-source: linear-gradient(0deg, red, orange, yellow, green, blue, indigo, violet);
+    }
+
+    25% {
+        border-image-source: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+    }
+
+    50% {
+        border-image-source: linear-gradient(180deg, red, orange, yellow, green, blue, indigo, violet);
+    }
+
+    75% {
+        border-image-source: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
+    }
+
+    100% {
+        border-image-source: linear-gradient(360deg, red, orange, yellow, green, blue, indigo, violet);
+    }
+}
+
+.animated-border {
     border: 3px solid transparent;
     border-image-slice: 1;
     animation: rainbow-border 1.5s linear infinite;
-  }
-  
+}
+
 
 
 
 @keyframes glowing-border {
-    0% { box-shadow: 0 0 5px red; }
-    25% { box-shadow: 0 0 10px orange; }
-    50% { box-shadow: 0 0 15px yellow; }
-    75% { box-shadow: 0 0 10px green; }
-    100% { box-shadow: 0 0 5px blue; }
-  }
-  
-  .glowing-border {
+    0% {
+        box-shadow: 0 0 5px red;
+    }
+
+    25% {
+        box-shadow: 0 0 10px orange;
+    }
+
+    50% {
+        box-shadow: 0 0 15px yellow;
+    }
+
+    75% {
+        box-shadow: 0 0 10px green;
+    }
+
+    100% {
+        box-shadow: 0 0 5px blue;
+    }
+}
+
+.glowing-border {
     border: 3px solid transparent;
     animation: glowing-border 1.5s ease-in-out infinite;
-  }
+}
 
-  
 
-  @keyframes dashed-border {
-    0% { border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet); }
-    50% { border-image-source: linear-gradient(135deg, violet, indigo, blue, green, yellow, orange, red); }
-    100% { border-image-source: linear-gradient(225deg, red, orange, yellow, green, blue, indigo, violet); }
-  }
-  
-  .moving-dashed-border {
+
+@keyframes dashed-border {
+    0% {
+        border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+    }
+
+    50% {
+        border-image-source: linear-gradient(135deg, violet, indigo, blue, green, yellow, orange, red);
+    }
+
+    100% {
+        border-image-source: linear-gradient(225deg, red, orange, yellow, green, blue, indigo, violet);
+    }
+}
+
+.moving-dashed-border {
     border: 3px dashed transparent;
     border-image-slice: 1;
     animation: dashed-border 2s linear infinite;
-  }
-  
+}
+
 
 /* When .hide-days class is added to the parent container, hide the .day elements */
 #year-container.hide-days .day {
