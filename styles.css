@@ -1114,18 +1114,21 @@ h2 {
     transition: all 0.3s ease;
 } */
 
-.selected {
+/* .selected {
 
     border: 2px solid transparent;
     border-image-slice: 1;
     animation: rainbow-border 1.5s linear infinite;
 
+} */
 
-    /* border: 2px solid transparent; 
+.selected {
+    border: 2px solid transparent; 
     background-color: #ADD8E6; 
     transition: background-color 0.3s ease;
     border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1;
-    border-image-slice: 1;  */
+    border-image-slice: 1; 
+}
 
     /* Other options for background colors */
     /* background-color: rgba(76, 175, 80, 0.1); */
@@ -1133,7 +1136,8 @@ h2 {
 
     /* Alternative gradient border */
     /* border-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); */
-}
+
+
 
 
 .color-option {
