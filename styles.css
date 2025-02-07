@@ -1006,7 +1006,7 @@ h2 {
 .month-name-day-container {
 
     /* border: 1px solid #636363; */
-    border: 1px solid green;
+    /* border: 1px solid green; */
     display: flex;
     flex-direction: row;
 }

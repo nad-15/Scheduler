@@ -17,6 +17,48 @@ const hideWidgetBtn = document.querySelector(`.hide-widget`);
 const selectedTaskCounter = document.querySelector(`.selected-task`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
 
+
+const colorThemes = {
+    green: { even: '#82c6a2', odd: '#53ab8b' },   // Light & Dark Green
+    orange: { even: '#f5a623', odd: '#d48806' },  // Light & Dark Orange
+    blue: { even: '#6a8caf', odd: '#4a6a8a' },    // Light & Dark Blue
+    purple: { even: '#b39ddb', odd: '#9575cd' },  // Light & Dark Purple
+    red: { even: '#ef9a9a', odd: '#e57373' },     // Light & Dark Red
+    yellow: { even: '#fff176', odd: '#ffd54f' },  // Light & Dark Yellow
+    teal: { even: '#4db6ac', odd: '#00897b' },    // Light & Dark Teal
+    pink: { even: '#f48fb1', odd: '#f06292' },    // Light & Dark Pink
+    gray: { even: '#bdbdbd', odd: '#9e9e9e' },    // Light & Dark Gray
+    slate: { even: '#90a4ae', odd: '#455a64' },    // Soft Slate & Deep Charcoal
+    earthy: { even: '#d7ccc8', odd: '#8d6e63' },  // Soft Beige & Deep Brown
+    cocoa: { even: '#bcaaa4', odd: '#6d4c41' },   // Muted Taupe & Warm Cocoa
+    mocha: { even: '#a1887f', odd: '#5d4037' },   // Earthy Mocha & Rich Mahogany
+    tan: { even: '#ccb59d', odd: '#795548' },     // Sandy Tan & Classic Brown
+    latte: { even: '#e0c3a5', odd: '#8b5e3c' },    // Warm Latte & Chestnut
+    espresso: { even: '#bfa58a', odd: '#704214' }, // Light Coffee & Dark Espresso
+    rustic: { even: '#c8b7a6', odd: '#5c4033' },   // Elegant Ivory & Rustic Brown
+    almond: { even: '#dac0a3', odd: '#6f4e37' },   // Almond Cream & Coffee Brown
+    coral: { even: '#ff8a65', odd: '#d32f2f' },   // Soft Coral & Strong Red
+    lavender: { even: '#e1bee7', odd: '#ab47bc' }, // Pastel Lavender & Bold Purple
+    mint: { even: '#a5d6a7', odd: '#388e3c' },     // Soft Mint & Dark Green
+    peach: { even: '#ffcc80', odd: '#f57c00' },    // Soft Peach & Bold Orange
+    indigo: { even: '#7986cb', odd: '#3f51b5' },   // Light Indigo & Rich Indigo
+    cyan: { even: '#4dd0e1', odd: '#0288d1' },     // Light Cyan & Bold Blue
+    lime: { even: '#dce775', odd: '#8bc34a' },     // Light Lime & Fresh Green
+    gold: { even: '#ffb74d', odd: '#f57c00' },     // Light Gold & Strong Orange
+    turquoise: { even: '#80deea', odd: '#00bcd4' }, // Light Turquoise & Bold Cyan
+    fatigue: { even: '#6c7c47', odd: '#3e4d34' }, 
+
+};
+
+// Get the saved theme from localStorage, or use a default
+const selectedTheme = localStorage.getItem('theme') || 'slate';
+
+
+
+
+
+
+
 const menuButton = document.querySelector(`.menu-button`);
 
 menuButton.addEventListener(`click`, showMenu);
@@ -229,15 +271,9 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     monthNameContainer.classList.add('month-name-container');
 
 
-
     let FormatMonthName = getMonthName(monthName % 12);
     let letters = FormatMonthName.split('');
     monthNameContainer.innerHTML = '';
-
-
-
-
-
 
 
     // Create a wrapper for the letters
@@ -254,15 +290,17 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     monthNameContainer.appendChild(monthLetterContainer);
 
     // Set background color based on monthName
-    if (monthName % 2 == 0) {
-        monthNameContainer.style.backgroundColor = '#82c6a2'; // Light green
-    } else {
-        monthNameContainer.style.backgroundColor = '#53ab8b'; // Dark green
-    }
+    // if (monthName % 2 == 0) {
+    //     monthNameContainer.style.backgroundColor = '#82c6a2'; // Light green
+    // } else {
+    //     monthNameContainer.style.backgroundColor = '#53ab8b'; // Dark green
+    // }
+
+    monthNameContainer.style.backgroundColor = 
+    monthName % 2 === 0 ? colorThemes[selectedTheme].even : colorThemes[selectedTheme].odd;
+
 
     //monthdays and name container
-
-
     let yearLetterContainer = document.createElement('div'); // Create a wrapper container
     yearLetterContainer.classList.add('year-letter-container'); // Add a class for styling
     let yearLetters = yearDate.toString().split('');
@@ -274,9 +312,6 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
     // yearLetterContainer.textContent = yearDate;
     monthNameContainer.appendChild(yearLetterContainer);
-
-
-
 
 
     const monthContainer = document.createElement('div');
@@ -323,18 +358,6 @@ lockButton.addEventListener("click", () => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     for (i = 1; i <= lastDateOfMonth; i++) {
 
 
@@ -352,11 +375,8 @@ lockButton.addEventListener("click", () => {
         dateDiv.classList.add('date');
         dateDiv.setAttribute('data-full-date', `${yearDate}-${monthName}-${date}`); // Store the full date as a data attribute
 
-
-
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
-        //make sun and sat differenct colors and bigger
         // Get the day name
         const dayName = getDayName(day % 7);
 
@@ -587,8 +607,11 @@ yearContainer.addEventListener('click', (event) => {
             taskElement.classList.add('selected');
         }
 
-        selectedTaskCounter.textContent = `${selectedDivs.length}`;
-        deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+        // selectedTaskCounter.textContent = `${selectedDivs.length}`;
+        // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+
+        [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+
 
     }
 });
@@ -649,8 +672,13 @@ function submitTask() {
         // Clear selection and reset styles
         // selectedDivs.forEach(div => div.classList.remove('selected'));
         // selectedDivs = []; // Clear the array
-        selectedTaskCounter.textContent = `${selectedDivs.length}`;
-        deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+
+
+        // selectedTaskCounter.textContent = `${selectedDivs.length}`;
+        // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+
+        [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+
 
         // Reset inputs and hide the sliding input view
         document.getElementById('taskTitle').value = '';
@@ -743,8 +771,11 @@ function submitTemplate(item) {
             saveTaskData(date, taskType, taskText, taskColor); // Pass color along with other task data
         });
 
-        selectedTaskCounter.textContent = `${selectedDivs.length}`;
-        deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+        // selectedTaskCounter.textContent = `${selectedDivs.length}`;
+        // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+
+        [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+
 
     } else {
         triggerShakeEffect();
@@ -860,8 +891,11 @@ selectedTaskCounter.addEventListener('touchend', () => {
 function clearSelection() {
     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
     selectedDivs = []; // Clear the array of selected divs
-    selectedTaskCounter.textContent = `${selectedDivs.length}`;
-    deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+    // selectedTaskCounter.textContent = `${selectedDivs.length}`;
+    // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+
+    [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+
     console.log(`selection cleared`);
 }
 
@@ -911,8 +945,11 @@ function deleteFunction() {
     // Clear the selected divs list and update the UI
     selectedDivs.forEach(div => div.classList.remove('selected')); // Remove selected class
     selectedDivs = []; // Clear the array of selected divs
-    selectedTaskCounter.textContent = `${selectedDivs.length}`;
-    deselectTemplateBtn.textContent = `${selectedDivs.length}`;
+
+    [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+
+    // selectedTaskCounter.textContent = `${selectedDivs.length}`;
+    // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
     // Optionally reset UI elements (like task title input and any other related UI)
     // document.getElementById('taskTitle').value = ''; // Reset task input field
