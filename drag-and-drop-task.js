@@ -48,7 +48,7 @@ yearContainer.addEventListener('touchstart', (e) => {
 
 
     if (draggedItem && scrollable === 'true') {
-        console.log('touch start goes through triggered at task divs');
+        console.log(`touch start goes through triggered at ${draggedItem.classList}`);
 
 
         // Start the timer for 1 second hold
@@ -187,11 +187,8 @@ yearContainer.addEventListener('touchend', (e) => {
                     const taskTextOfTargetItem = highlightedTarget.textContent;
                     const taskColorOfTargetItem = rgbToHex(highlightedTarget.style.backgroundColor);
 
-
-
-
-
                     // Save the dragged item data
+                
                     saveTaskData(dateOfDraggedItem, taskTypeOfDraggedItem, taskTextOfTargetItem, taskColorOfTargetItem);
 
                     // Save the target item data

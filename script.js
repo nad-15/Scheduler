@@ -596,9 +596,18 @@ yearContainer.addEventListener('click', (event) => {
         if (selectedDivs.includes(taskElement)) {
             selectedDivs = selectedDivs.filter(div => div !== taskElement); //learn
             taskElement.classList.remove('selected');
+            // console.log(`colored`);
+            // console.log(`Color of Selected Task: ${taskElement.style.backgroundColor ? taskElement.style.backgroundColor : 'none'}`);
+
+            // console.log(getComputedStyle(taskElement).backgroundColor);
+
         } else {
             selectedDivs.push(taskElement);
             taskElement.classList.add('selected');
+            // console.log(`colored`);
+            // console.log(`Color of Selected Task: ${taskElement.style.backgroundColor ? taskElement.style.backgroundColor : 'none'}`);
+
+            // console.log(getComputedStyle(taskElement).backgroundColor);
         }
 
         // selectedTaskCounter.textContent = `${selectedDivs.length}`;
@@ -1119,15 +1128,10 @@ deselectTemplateBtn.addEventListener('touchend', () => {
 
 
 function rgbToHex(rgb) {
-
-    
-    // const match = rgb.match(/\d+/g); // Extract numbers
-    // return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
-
-    // If rgb is null or empty, use the default color
+    //if transparent return ""
     if (!rgb) {
-        const mainContainer = document.querySelector('#main-container');
-        rgb = mainContainer.style.backgroundColor || 'rgb(255, 255, 255)';  // Default color as fallback
+        // console.log(`color is undefined`);
+        return "";
     }
 
     // Extract the RGB values and convert to hex
