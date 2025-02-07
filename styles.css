@@ -358,6 +358,8 @@ h2 {
 
 
 
+
+
 .menu-slider {
     position: fixed;
     top: 0;
@@ -369,14 +371,53 @@ h2 {
     background: white;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
     padding: 20px;
-    z-index: 1001;
-
+    z-index: 4001;
+    padding: 30px 20px;
 
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
 }
 
+.menu-slider h2 {
+    /* border: 2px solid red; */
+    text-align: left;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
 
+
+.theme-list {
+    display: none;
+        /* border: 2px solid red; */
+    list-style: none;
+    margin: 0;
+    padding: 12px;
+    /* display: flex; */
+    display: none;
+background-color: #ccc;
+    max-height: 200px; /* Adjust height as needed */
+    overflow-y: auto;  /* Enable scrolling if content exceeds the height */
+    margin-left: 10px;
+}
+
+.theme-list.show {
+    display: block;
+}
+
+
+.menu-slider li {
+    /* border: 2px solid green; */
+    font-size: 1.2rem;
+    color: #555;
+    margin: 15px 0;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.menu-slider li:hover {
+    color: #000;
+}
 
 .menu-button {
     display: flex;
@@ -410,12 +451,12 @@ h2 {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease-in-out;
-    z-index: 1000;
+    z-index: 4000;
 }
 
 .overlay-menu.show {
@@ -424,12 +465,13 @@ h2 {
 }
 
 .close-button-menu {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: 2rem;
+    color: #333;
+    position: absolute;
+    top: 20px;
+    right: 20px;
     cursor: pointer;
 }
 
@@ -438,6 +480,11 @@ h2 {
     font-size: 20px;
 
 }
+
+
+
+
+
 
 
 .screen-size-change {

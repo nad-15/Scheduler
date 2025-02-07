@@ -39,23 +39,53 @@ const colorThemes = {
 // Load the selected theme from localStorage or use 'default'
 let selectedTheme = localStorage.getItem('theme') || 'default';
 
-
+// Select elements
 const menuButton = document.querySelector('.menu-button');
 const menuSlider = document.querySelector('.menu-slider');
 const overlayMenu = document.querySelector('.overlay-menu');
 const closeButtonMenu = document.querySelector('.close-button-menu');
+const themeList = document.querySelector('.theme-list'); // Make sure this matches your HTML
+const themeItem = document.querySelector('.theme-item'); // "Theme" li element to toggle the list
 
+// Populate the theme list
+for (const theme in colorThemes) {
+    const li = document.createElement('li');
+    li.textContent = theme.charAt(0).toUpperCase() + theme.slice(1); // Capitalize the theme name
+    li.dataset.theme = theme; // Assign the theme name to the data-theme attribute
+    themeList.appendChild(li);
+}
+
+// Menu button to toggle the menu
 menuButton.addEventListener('click', () => {
-    alert(`soooonnnnn...`);
-    // menuSlider.classList.toggle('open');
-    // overlay.classList.add('show');
+    menuSlider.classList.toggle('open');
+    overlayMenu.classList.add('show');
 });
 
+// Close the menu
 closeButtonMenu.addEventListener('click', closeMenu);
-overlay.addEventListener('click', closeMenu);
+overlayMenu.addEventListener('click', closeMenu);
 
 function closeMenu() {
     menuSlider.classList.remove('open');
-    overlay.classList.remove('show');
+    overlayMenu.classList.remove('show');
 }
+
+// Toggle the theme list visibility when "Theme" item is clicked
+themeItem.addEventListener('click', () => {
+    themeList.classList.toggle('show'); // Toggle the theme list visibility
+});
+
+// Change theme when a theme is clicked
+themeList.addEventListener('click', (event) => {
+    const theme = event.target.dataset.theme;
+    if (theme && colorThemes[theme]) {
+        // Update the selected theme
+        selectedTheme = theme;
+        localStorage.setItem('theme', theme); // Save to localStorage
+        // applyTheme(theme);
+        themeList.classList.remove('show'); // Hide the theme list after selection
+
+        window.location.reload();
+    }
+});
 
