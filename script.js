@@ -17,48 +17,6 @@ const hideWidgetBtn = document.querySelector(`.hide-widget`);
 const selectedTaskCounter = document.querySelector(`.selected-task`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
 
-
-const colorThemes = {
-    green: { even: '#82c6a2', odd: '#53ab8b' },   // Light & Dark Green
-    orange: { even: '#f5a623', odd: '#d48806' },  // Light & Dark Orange
-    blue: { even: '#6a8caf', odd: '#4a6a8a' },    // Light & Dark Blue
-    purple: { even: '#b39ddb', odd: '#9575cd' },  // Light & Dark Purple
-    red: { even: '#ef9a9a', odd: '#e57373' },     // Light & Dark Red
-    yellow: { even: '#fff176', odd: '#ffd54f' },  // Light & Dark Yellow
-    teal: { even: '#4db6ac', odd: '#00897b' },    // Light & Dark Teal
-    pink: { even: '#f48fb1', odd: '#f06292' },    // Light & Dark Pink
-    gray: { even: '#bdbdbd', odd: '#9e9e9e' },    // Light & Dark Gray
-    slate: { even: '#90a4ae', odd: '#455a64' },    // Soft Slate & Deep Charcoal
-    earthy: { even: '#d7ccc8', odd: '#8d6e63' },  // Soft Beige & Deep Brown
-    cocoa: { even: '#bcaaa4', odd: '#6d4c41' },   // Muted Taupe & Warm Cocoa
-    mocha: { even: '#a1887f', odd: '#5d4037' },   // Earthy Mocha & Rich Mahogany
-    tan: { even: '#ccb59d', odd: '#795548' },     // Sandy Tan & Classic Brown
-    latte: { even: '#e0c3a5', odd: '#8b5e3c' },    // Warm Latte & Chestnut
-    espresso: { even: '#bfa58a', odd: '#704214' }, // Light Coffee & Dark Espresso
-    rustic: { even: '#c8b7a6', odd: '#5c4033' },   // Elegant Ivory & Rustic Brown
-    almond: { even: '#dac0a3', odd: '#6f4e37' },   // Almond Cream & Coffee Brown
-    coral: { even: '#ff8a65', odd: '#d32f2f' },   // Soft Coral & Strong Red
-    lavender: { even: '#e1bee7', odd: '#ab47bc' }, // Pastel Lavender & Bold Purple
-    mint: { even: '#a5d6a7', odd: '#388e3c' },     // Soft Mint & Dark Green
-    peach: { even: '#ffcc80', odd: '#f57c00' },    // Soft Peach & Bold Orange
-    indigo: { even: '#7986cb', odd: '#3f51b5' },   // Light Indigo & Rich Indigo
-    cyan: { even: '#4dd0e1', odd: '#0288d1' },     // Light Cyan & Bold Blue
-    lime: { even: '#dce775', odd: '#8bc34a' },     // Light Lime & Fresh Green
-    gold: { even: '#ffb74d', odd: '#f57c00' },     // Light Gold & Strong Orange
-    turquoise: { even: '#80deea', odd: '#00bcd4' }, // Light Turquoise & Bold Cyan
-    fatigue: { even: '#6c7c47', odd: '#3e4d34' }, 
-
-};
-
-// Get the saved theme from localStorage, or use a default
-const selectedTheme = localStorage.getItem('theme') || 'slate';
-
-
-
-
-
-
-
 const menuButton = document.querySelector(`.menu-button`);
 
 menuButton.addEventListener(`click`, showMenu);
@@ -380,26 +338,62 @@ lockButton.addEventListener("click", () => {
         // Get the day name
         const dayName = getDayName(day % 7);
 
+
+
+
+
+
+
+
+
         // Make Sunday and Saturday different colors and bigger
+
         if (dayName === 'Sun' || dayName === 'Sat') {
             dayDiv.style.fontSize = "12px";
             dayDiv.style.fontWeight = "bold";
             dayDiv.style.borderColor = ""; // Make the font larger
+        
             if (dayName === 'Sun') {
-                // dayDiv.style.color = "red"; // Set the color for Sunday
-                // dayDiv.style.backgroundColor = "#e57373"; //red
-                dateDiv.style.color = "red"; //red
-                dayDiv.style.backgroundColor = "#3388cc"; //sapphire
-                // dayDiv.style.backgroundColor = "#1F456E"; //aegeon
-                // dayDiv.style.borderColor = "#e57373"; //muted red 
-                dayDiv.style.color = "white";
-
-            } else {
-                // dayDiv.style.color = "blue";
-                // dateDiv.style.color = "blue";// Set the color for Saturday
-                // dayDiv.style.borderColor = "#3388cc";
+                dateDiv.style.color = "red"; // Keep the red text color
+                dayDiv.style.backgroundColor = colorThemes[selectedTheme].sunday; // Use theme color
+                dayDiv.style.color = "white"; // Ensure text remains readable
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // if (dayName === 'Sun' || dayName === 'Sat') {
+        //     dayDiv.style.fontSize = "12px";
+        //     dayDiv.style.fontWeight = "bold";
+        //     dayDiv.style.borderColor = ""; // Make the font larger
+        //     if (dayName === 'Sun') {
+        //         // dayDiv.style.color = "red"; // Set the color for Sunday
+        //         // dayDiv.style.backgroundColor = "#e57373"; //red
+        //         dateDiv.style.color = "red"; //red
+        //         dayDiv.style.backgroundColor = "#3388cc"; //sapphire
+        //         // dayDiv.style.backgroundColor = "#1F456E"; //aegeon
+        //         // dayDiv.style.borderColor = "#e57373"; //muted red 
+        //         dayDiv.style.color = "white";
+
+        //     } else {
+        //         // dayDiv.style.color = "blue";
+        //         // dateDiv.style.color = "blue";// Set the color for Saturday
+        //         // dayDiv.style.borderColor = "#3388cc";
+        //     }
+        // }
 
         dayDiv.textContent = dayName;
 
