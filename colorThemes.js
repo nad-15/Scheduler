@@ -1,7 +1,11 @@
 
 
-const colorThemes = {
 
+
+
+const colorThemes = {
+    // #1F456E // aegon
+    default: { even: '#82c6a2', odd: '#53ab8b', sunday: '#3388cc' },   
     rustic: { even: '#c8b7a6', odd: '#5c4033', sunday: '#3e2723' },   
     almond: { even: '#dac0a3', odd: '#6f4e37', sunday: '#5d4037' },   
     mocha: { even: '#a1887f', odd: '#5d4037', sunday: '#3e2723' },   
@@ -32,10 +36,8 @@ const colorThemes = {
     fatigue: { even: '#6c7c47', odd: '#3e4d34', sunday: '#2b3d28' },  
 };
 
-
-// Get the saved theme from localStorage, or use a default
-const selectedTheme = localStorage.getItem('theme') || 'earthy';
-
+// Load the selected theme from localStorage or use 'default'
+let selectedTheme = localStorage.getItem('theme') || 'default';
 
 
 const menuButton = document.querySelector('.menu-button');
