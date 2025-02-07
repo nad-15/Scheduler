@@ -254,8 +254,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     //     monthNameContainer.style.backgroundColor = '#53ab8b'; // Dark green
     // }
 
-    monthNameContainer.style.backgroundColor = 
-    monthName % 2 === 0 ? colorThemes[selectedTheme].even : colorThemes[selectedTheme].odd;
+    monthNameContainer.style.backgroundColor =
+        monthName % 2 === 0 ? colorThemes[selectedTheme].even : colorThemes[selectedTheme].odd;
 
 
     //monthdays and name container
@@ -276,44 +276,44 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     monthContainer.classList.add('month-container');
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
-// Lock Button
-let lockButton = document.createElement("div");
-lockButton.classList.add("lock-button"); // Assign class for styling
-const icon = document.createElement("span");
-icon.classList.add("material-icons");
-icon.textContent = "lock_open"; 
-lockButton.appendChild(icon); 
-monthNameContainer.prepend(lockButton);
+    // Lock Button
+    let lockButton = document.createElement("div");
+    lockButton.classList.add("lock-button"); // Assign class for styling
+    const icon = document.createElement("span");
+    icon.classList.add("material-icons");
+    icon.textContent = "lock_open";
+    lockButton.appendChild(icon);
+    monthNameContainer.prepend(lockButton);
 
-// Check if lock state exists in localStorage for this month container
-// Check if lock state exists in localStorage for this month container
-let isLocked = localStorage.getItem(`lockState-${FormatMonthName}`) === 'true' ? true : false; // Default to false if not found
+    // Check if lock state exists in localStorage for this month container
+    // Check if lock state exists in localStorage for this month container
+    let isLocked = localStorage.getItem(`lockState-${FormatMonthName}`) === 'true' ? true : false; // Default to false if not found
 
 
-// Apply saved lock state when the page loads
-if (isLocked) {
-    console.log(`${FormatMonthName} is locked`);
-    monthContainer.style.pointerEvents = "none"; // Disable interaction for the month container
-    icon.textContent = "lock"; // Change icon to locked
-}
-
-// Lock/Unlock functionality
-lockButton.addEventListener("click", () => {
-    isLocked = !isLocked; // Toggle the lock state
-
+    // Apply saved lock state when the page loads
     if (isLocked) {
         console.log(`${FormatMonthName} is locked`);
         monthContainer.style.pointerEvents = "none"; // Disable interaction for the month container
         icon.textContent = "lock"; // Change icon to locked
-    } else {
-        console.log(`${FormatMonthName} is unlocked`);
-        monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
-        icon.textContent = "lock_open"; // Change icon back to unlocked
     }
 
-    // Save the lock state to localStorage
-    localStorage.setItem(`lockState-${FormatMonthName}`, isLocked.toString());
-});
+    // Lock/Unlock functionality
+    lockButton.addEventListener("click", () => {
+        isLocked = !isLocked; // Toggle the lock state
+
+        if (isLocked) {
+            console.log(`${FormatMonthName} is locked`);
+            monthContainer.style.pointerEvents = "none"; // Disable interaction for the month container
+            icon.textContent = "lock"; // Change icon to locked
+        } else {
+            console.log(`${FormatMonthName} is unlocked`);
+            monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
+            icon.textContent = "lock_open"; // Change icon back to unlocked
+        }
+
+        // Save the lock state to localStorage
+        localStorage.setItem(`lockState-${FormatMonthName}`, isLocked.toString());
+    });
 
 
     for (i = 1; i <= lastDateOfMonth; i++) {
@@ -352,7 +352,7 @@ lockButton.addEventListener("click", () => {
             dayDiv.style.fontSize = "12px";
             dayDiv.style.fontWeight = "bold";
             dayDiv.style.borderColor = ""; // Make the font larger
-        
+
             if (dayName === 'Sun') {
                 dateDiv.style.color = "red"; // Keep the red text color
                 dayDiv.style.backgroundColor = colorThemes[selectedTheme].sunday; // Use theme color
@@ -559,12 +559,12 @@ function exitFullscreen() {
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
-        if(!isHidden){
-        exitFullscreenBtn.style.display = `none`;
-        fullScreenButton.style.display = 'flex';
+        if (!isHidden) {
+            exitFullscreenBtn.style.display = `none`;
+            fullScreenButton.style.display = 'flex';
         }
     } else {
-        if(!isHidden){
+        if (!isHidden) {
             exitFullscreenBtn.style.display = `flex`;
             fullScreenButton.style.display = 'none';
         }
@@ -713,7 +713,7 @@ function addTemplate(taskTitle, color) {
             const itemDiv = document.createElement('div');
 
 
-            itemDiv.addEventListener(`dblclick`, ()=>{
+            itemDiv.addEventListener(`dblclick`, () => {
                 removeTemplate(itemDiv);
             });
 
@@ -829,7 +829,7 @@ function loadTemplate() {
         taskClipboard.forEach(task => {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('items'); // Add the 'items' class
-            itemDiv.addEventListener(`dblclick`, ()=>{
+            itemDiv.addEventListener(`dblclick`, () => {
                 removeTemplate(itemDiv);
             });
 
@@ -852,7 +852,7 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
     // Check if the date already exists in stored data
-    if (!storedData[date]) {
+    if (!storedData.hasOwnProperty(date)) {
         // If the date doesn't exist, initialize it with empty tasks and colors
         storedData[date] = {
             morning: { task: '', color: '' },
@@ -861,16 +861,29 @@ function saveTaskData(date, taskType, updatedTask, taskColor) {
         };
     }
 
-    // Update the task and color for the specific type (morning, afternoon, or evening)
-    storedData[date][taskType] = { task: updatedTask, color: taskColor };
+    if (taskColor === "" && updatedTask === "") {
+        storedData[date][taskType] = { task: '', color: '' }; // Clear task and color for this type
 
-    // Store the updated data back to localStorage
+        if (isEmptyTasks(storedData[date])) {
+            delete storedData[date];
+        }
+    } else {
+        // Update the task and color for the specific type (morning, afternoon, or evening)
+        storedData[date][taskType] = { task: updatedTask, color: taskColor };
+            // Store the updated data back to localStorage
+    }
+
     localStorage.setItem('tasks', JSON.stringify(storedData));
-
     // console.log(`Saved task for ${taskType} on ${date}: ${updatedTask} with color ${taskColor}`);
 }
 
-
+function isEmptyTasks(dateTasks) {
+    return (
+        !dateTasks.morning.task && !dateTasks.morning.color &&
+        !dateTasks.afternoon.task && !dateTasks.afternoon.color &&
+        !dateTasks.evening.task && !dateTasks.evening.color
+    );
+}
 
 let lastTapTime = 0;
 const delay = 300;
@@ -925,10 +938,12 @@ function deleteFunction() {
 
         // Check if the data for this date exists, then remove the task data
         if (storedData[fullDate]) {
-            console.log(`deletefunciton deleting ${storedData[fullDate]}`);
+            console.log(`Deleted Task: ${storedData[fullDate][taskType].task} on ${fullDate}`);
+            console.log(`Deleted Color: ${storedData[fullDate][taskType].color} on ${fullDate}`);
             storedData[fullDate][taskType] = { task: '', color: '' }; // Clear task and color for this type
 
-            if (!storedData[fullDate].morning.task && !storedData[fullDate].afternoon.task && !storedData[fullDate].evening.task) {
+            if (isEmptyTasks(storedData[fullDate])) {
+                console.log(`deleteFunction deleting ALL task on ${fullDate}`);
                 delete storedData[fullDate]; // Remove date if no tasks are left
             }
         }
@@ -950,18 +965,6 @@ function deleteFunction() {
     selectedDivs = []; // Clear the array of selected divs
 
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-
-    // selectedTaskCounter.textContent = `${selectedDivs.length}`;
-    // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
-
-    // Optionally reset UI elements (like task title input and any other related UI)
-    // document.getElementById('taskTitle').value = ''; // Reset task input field
-    // slidingInputView.classList.toggle("show");
-    // floatingAddBtn.style.transform = 'rotate(0)'; // Reset add button
-    // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset add button color
-    // floatingAddBtn.style.bottom = `${20}px`; // Reset button position
-    // clearButton.style.bottom = `${80}px`; // Reset clear button position
-    // isPopupOpen = true; 
 }
 
 
@@ -1030,8 +1033,8 @@ inputTemplate.placeholder = `Add New Template`;
 
 //get new id for submit button
 const addTemplateButton = clonedSlidingInputView.querySelector('#submitTask');
-addTemplateButton.id =`submitTemplate`;
-addTemplateButton.classList.remove(`buttons` );
+addTemplateButton.id = `submitTemplate`;
+addTemplateButton.classList.remove(`buttons`);
 addTemplateButton.classList.add(`submit-btn-cloned`);
 const addTemplateButtonIcon = addTemplateButton.querySelector(`.arrow-upward`);
 // console.log(addTemplateButtonIcon.classList);
@@ -1063,18 +1066,18 @@ colorOptionTemplate.forEach(button => {
 
 
 
-addTemplateButton.addEventListener(`click`, () =>{
+addTemplateButton.addEventListener(`click`, () => {
     // console.log(inputTemplate.value);
     addTemplate(inputTemplate.value, chosenColorTemplate);
-    inputTemplate.value ='';
+    inputTemplate.value = '';
     addTemplateButton.classList.add(`disabled-btn`);
 
 
     // alert('Development on-going/ functionality unstable yet. Please sleep.');
 });
-inputTemplate.addEventListener(`input`, ()=> {
+inputTemplate.addEventListener(`input`, () => {
     console.log(inputTemplate.value);
-    if (inputTemplate.value !=='') {
+    if (inputTemplate.value !== '') {
         addTemplateButton.classList.remove(`disabled-btn`);
     } else if (inputTemplate.value === ``) {
         addTemplateButton.classList.add(`disabled-btn`);
@@ -1082,7 +1085,7 @@ inputTemplate.addEventListener(`input`, ()=> {
 });
 
 
-document.body.appendChild(clonedSlidingInputView); 
+document.body.appendChild(clonedSlidingInputView);
 
 
 
@@ -1096,8 +1099,8 @@ closeButtonClonedIcon.textContent = `close`;
 closeButtonCloned.appendChild(closeButtonClonedIcon);
 
 
-closeButtonCloned.addEventListener(`click`, ()=> {
-    clonedSlidingInputView.style.display = 'none'; 
+closeButtonCloned.addEventListener(`click`, () => {
+    clonedSlidingInputView.style.display = 'none';
     document.getElementById('overlay').style.display = 'none';
 });
 
@@ -1107,7 +1110,7 @@ closeButtonCloned.addEventListener(`click`, ()=> {
 
 //the add button in movable template
 addButton.addEventListener('click', () => {
-    clonedSlidingInputView.style.display = 'flex'; 
+    clonedSlidingInputView.style.display = 'flex';
     document.getElementById('overlay').style.display = 'block';
     // alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
     console.log('Add button clicked');
@@ -1135,10 +1138,10 @@ function rgbToHex(rgb) {
     }
 
     // Extract the RGB values and convert to hex
-    const match = rgb.match(/\d+/g); 
+    const match = rgb.match(/\d+/g);
     if (match) {
         return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
-    } 
+    }
 
 }
 
