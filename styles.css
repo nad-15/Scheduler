@@ -440,6 +440,37 @@ background-color: #ccc;
     background-color: rgb(0, 0, 0, 0.2);
 }
 
+/* Initially hide the submenu */
+.submenu.size-submenu {
+    display: none;
+  }
+  
+  /* When 'show' class is added, the submenu is displayed */
+  .submenu.size-submenu.show {
+    display: block;
+  }
+  
+/* Define height classes */
+.day-container.small {
+    height: 25px;
+  }
+  
+  .day-container.medium {
+    height: 28px;
+  }
+  
+  .day-container.large {
+    height: 31px;
+  }
+  
+  .day-container.extra-large {
+    height: 35px;
+  }
+  
+  .day-container.extra-small {
+    height: 20px;
+  }
+  
 
 .menu-slider.open {
     /* Slide in */
