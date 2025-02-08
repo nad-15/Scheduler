@@ -41,7 +41,7 @@ const menuSlider = document.querySelector('.menu-slider');
 const overlayMenu = document.querySelector('.overlay-menu');
 const closeButtonMenu = document.querySelector('.close-button-menu');
 const themeList = document.querySelector('.theme-list'); // Make sure this matches your HTML
-const themeItem = document.querySelector('.theme-item'); // "Theme" li element to toggle the list
+const theme = document.querySelector('.theme'); // "Theme" li element to toggle the list
 
 // Populate the theme list
 for (const theme in colorThemes) {
@@ -67,7 +67,7 @@ function closeMenu() {
 }
 
 // Toggle the theme list visibility when "Theme" item is clicked
-themeItem.addEventListener('click', () => {
+theme.addEventListener('click', () => {
     themeList.classList.toggle('show'); // Toggle the theme list visibility
 });
 
@@ -85,13 +85,13 @@ themeList.addEventListener('click', (event) => {
 });
 
 // Select the 'Size' menu toggle
-const sizeToggle = document.querySelector('.size-toggle');
+const size = document.querySelector('.size');
 
 // Select the size submenu
 const sizeSubmenu = document.querySelector('.size-submenu');
 
 // Add a click event to toggle the visibility of the size submenu
-sizeToggle.addEventListener('click', () => {
+size.addEventListener('click', () => {
   // Toggle the class to show or hide the submenu
   sizeSubmenu.classList.toggle('show');
 });
