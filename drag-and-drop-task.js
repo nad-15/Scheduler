@@ -99,7 +99,7 @@ yearContainer.addEventListener('touchstart', (e) => {
             scrollable = `false`;
             dragButton.innerHTML = `Drag<br>ON`;
 
-        }, 1500); // Trigger after 1 second
+        }, 2000); // Trigger after 2 second
     }
 
     console.log(`touchstart is out`);
