@@ -382,21 +382,44 @@ h2 {
 
 
 .menu-slider {
-    border: 2px solid red;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    /* border: 2px solid red; */
     position: fixed;
     top: 0;
     left: 0;
     width: 60vw;
     height: 100vh;
+    max-height: 100vh;
     background: white;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-    padding: 20px;
     z-index: 4001;
     padding: 30px 20px;
+    /* margin-bottom: 50vh; */
     /* Start hidden */
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
 }
+
+.theme {
+    display: flex;
+    width: 100%;
+    /* background-color: green; */
+
+}
+
+.size {
+    display: flex;
+    width: 100%;
+}
+
+.about {
+    display: flex;
+    width: 100%;
+}
+
+
 
 .menu-slider.open {
     /* Slide in */
@@ -412,28 +435,28 @@ h2 {
 }
 
 .menu-slider li {
-    border: 2px solid green;
+    /* border: 2px solid green; */
     font-size: 1.2rem;
     color: #555;
     margin: 15px 0;
     cursor: pointer;
     transition: color 0.3s ease;
     user-select: none;
+    flex-grow: 1;
+    flex-shrink: 0;
 }
 
 .theme-list {
     /* border: 2px solid red; */
     /* list-style: none; */
     margin: 0;
-    padding: 12px;
+    max-height: 200px;
     /* display: flex; */
     display: none;
-    /* background-color: #ccc; */
-    max-height: 200px;
-    /* Adjust height as needed */
-    overflow-y: auto;
-    /* Enable scrolling if content exceeds the height */
-    margin-left: 10px;
+
+
+
+    overflow: auto;
 }
 
 .theme-list.show {

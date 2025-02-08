@@ -118,7 +118,7 @@ sizeItems.forEach(item => {
 
 
 // Add event listener for the "About" list item
-document.querySelector('.about-item').addEventListener('click', function() {
+document.querySelector('.about').addEventListener('click', function() {
     alert("All about you...");
   });
   
