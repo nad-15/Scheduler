@@ -358,7 +358,7 @@ h2 {
 
 
 
-
+/* MENU SLIDER Start */
 
 .menu-slider {
     position: fixed;
@@ -388,16 +388,17 @@ h2 {
 
 
 .theme-list {
-    display: none;
-        /* border: 2px solid red; */
-    list-style: none;
+    /* border: 2px solid red; */
+    /* list-style: none; */
     margin: 0;
     padding: 12px;
     /* display: flex; */
     display: none;
-background-color: #ccc;
-    max-height: 200px; /* Adjust height as needed */
-    overflow-y: auto;  /* Enable scrolling if content exceeds the height */
+    /* background-color: #ccc; */
+    max-height: 200px;
+    /* Adjust height as needed */
+    overflow-y: auto;
+    /* Enable scrolling if content exceeds the height */
     margin-left: 10px;
 }
 
@@ -407,7 +408,7 @@ background-color: #ccc;
 
 
 .menu-slider li {
-    /* border: 2px solid green; */
+    border: 2px solid green;
     font-size: 1.2rem;
     color: #555;
     margin: 15px 0;
@@ -443,34 +444,34 @@ background-color: #ccc;
 /* Initially hide the submenu */
 .submenu.size-submenu {
     display: none;
-  }
-  
-  /* When 'show' class is added, the submenu is displayed */
-  .submenu.size-submenu.show {
+}
+
+/* When 'show' class is added, the submenu is displayed */
+.submenu.size-submenu.show {
     display: block;
-  }
-  
+}
+
 /* Define height classes */
 .day-container.small {
     height: 25px;
-  }
-  
-  .day-container.medium {
+}
+
+.day-container.medium {
     height: 28px;
-  }
-  
-  .day-container.large {
+}
+
+.day-container.large {
     height: 31px;
-  }
-  
-  .day-container.extra-large {
+}
+
+.day-container.extra-large {
     height: 35px;
-  }
-  
-  .day-container.extra-small {
+}
+
+.day-container.extra-small {
     height: 20px;
-  }
-  
+}
+
 
 .menu-slider.open {
     /* Slide in */
@@ -511,6 +512,9 @@ background-color: #ccc;
     font-size: 20px;
 
 }
+
+
+/* MENU SLIDER Start */
 
 
 
@@ -1161,7 +1165,7 @@ background-color: #ccc;
     word-wrap: break-word;
     white-space: normal;
 
- 
+
 
     user-select: none;
     -webkit-user-select: none;
