@@ -89,7 +89,7 @@ yearContainer.addEventListener('touchstart', (e) => {
                 shadowElement.style.width = `${rect.width}px`;
 
                 shadowElement.style.left = `${startX - shadowElement.offsetWidth / 2}px`;
-                shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 30}px`;
+                shadowElement.style.top = `${startY - shadowElement.offsetHeight / 2 - 40}px`;
 
                 // Add border highlight to the dragged item
                 draggedItem.style.border = "3px dashed #007bff"; // Highlight dragged item with dashed blue border
@@ -117,14 +117,14 @@ yearContainer.addEventListener('touchmove', (e) => {
         }
 
         if (isDraggingTask) {
-            // Move shadow slightly above the finger (30px)
+            // Move shadow slightly above the finger (40px)
             shadowElement.style.left = `${e.touches[0].pageX - shadowElement.offsetWidth / 2}px`;
-            shadowElement.style.top = `${e.touches[0].pageY - shadowElement.offsetHeight / 2 - 30}px`;
+            shadowElement.style.top = `${e.touches[0].pageY - shadowElement.offsetHeight / 2 - 40}px`;
 
             // Highlight the target item
             const targetTaskDiv = document.elementFromPoint(
                 e.changedTouches[0].pageX,
-                e.changedTouches[0].pageY - 30
+                e.changedTouches[0].pageY - 40
             )?.closest('.morningTask, .afternoonTask, .eveningTask');
 
             // If the touch is outside the valid target divs, cancel the highlight

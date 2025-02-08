@@ -1,8 +1,4 @@
 
-
-
-
-
 const colorThemes = {
     // #1F456E // aegon
     default: { even: '#82c6a2', odd: '#53ab8b', sunday: '#3388cc' },   
