@@ -589,6 +589,8 @@ yearContainer.addEventListener('click', (event) => {
         if (selectedDivs.includes(taskElement)) {
             selectedDivs = selectedDivs.filter(div => div !== taskElement); //learn
             taskElement.classList.remove('selected');
+            taskInput.value = selectedDivs[selectedDivs.length-1].textContent || '';
+
             // console.log(`colored`);
             // console.log(`Color of Selected Task: ${taskElement.style.backgroundColor ? taskElement.style.backgroundColor : 'none'}`);
 
@@ -597,6 +599,7 @@ yearContainer.addEventListener('click', (event) => {
         } else {
             selectedDivs.push(taskElement);
             taskElement.classList.add('selected');
+            taskInput.value = selectedDivs[selectedDivs.length-1].textContent || '';
             // console.log(`colored`);
             // console.log(`Color of Selected Task: ${taskElement.style.backgroundColor ? taskElement.style.backgroundColor : 'none'}`);
 
