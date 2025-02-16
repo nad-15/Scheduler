@@ -626,24 +626,31 @@ yearContainer.addEventListener('click', (event) => {
     }
 });
 
-arrowLeftSelectedTask.addEventListener(`click`, ()=>{
-    // alert(`still working this out`);
-    if(currentTask!=0){
-        currentTask -= 1;
-        taskInput.value = selectedDivs[currentTask].textContent || '';
-    }
 
-
+arrowLeftSelectedTask.addEventListener("click", () => {
+    do {
+        if (currentTask > 0) {
+            currentTask -= 1;
+        } else {
+            break;
+        }
+    } while (taskInput.value === selectedDivs[currentTask].textContent);
+    
+    taskInput.value = selectedDivs[currentTask].textContent || '';
 });
 
-arrowRightSelectedTask.addEventListener(`click`, ()=>{
-    // alert(`still working this out`);
-    if(currentTask != selectedDivs.length-1) {
-        currentTask += 1;
-        taskInput.value = selectedDivs[currentTask].textContent || '';
-    }     
-
+arrowRightSelectedTask.addEventListener("click", () => {
+    do {
+        if (currentTask < selectedDivs.length - 1) {
+            currentTask += 1;
+        } else {
+            break;
+        }
+    } while (taskInput.value === selectedDivs[currentTask].textContent);
+    
+    taskInput.value = selectedDivs[currentTask].textContent || '';
 });
+
 
 
 const counterObserver = new MutationObserver(() => {
