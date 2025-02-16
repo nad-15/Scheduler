@@ -97,7 +97,7 @@ async function getWeather() {
         const temperature = data.main.temp.toFixed(1); // Temperature in Celsius (rounded to 1 decimal)
         let weatherDescription = data.weather[0].description;
         const iconCode = data.weather[0].icon;
-        const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}.png`;
 
         // Capitalize first letter and add period
         weatherDescription = weatherDescription.charAt(0).toUpperCase() + weatherDescription.slice(1) + ".";
