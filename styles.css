@@ -337,9 +337,16 @@ h2 {
     user-select: none;
 
 }
-.material-symbols-outlined {
 
+.material-symbols-outlined.arrows {
 
+    /* border: 1px solid red; */
+    font-size: 25px;
+    padding: 0;
+}
+
+.material-symbols-outlined.arrows:active {
+    transform: scale(.8);
 }
 
 /* Floating Add Button */
@@ -765,14 +772,15 @@ h2 {
     border-radius: 17px;
     background-color: #0078FF;
     border: none;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 2px;
+    padding-right: 2px;
     white-space: nowrap;
     color: white;
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.2s, transform 0.1s;
+    gap: 12px;
 }
 
 /* Hover effect */
