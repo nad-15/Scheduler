@@ -333,6 +333,8 @@ h2 {
     font-size: 30px;
     z-index: 1000;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 
 }
 .material-symbols-outlined {
@@ -775,13 +777,13 @@ h2 {
 
 /* Hover effect */
 .template-task-btn:hover {
-    background-color: #005FCC;
+    /* background-color: #005FCC; */
 }
 
 /* Focus effect */
 .template-task-btn:focus {
-    outline: 2px solid rgba(0, 120, 255, 0.5);
-    outline-offset: 2px;
+    /* outline: 2px solid rgba(0, 120, 255, 0.5); */
+    /* outline-offset: 2px; */
 }
 
 /* Active (when clicked) effect */
