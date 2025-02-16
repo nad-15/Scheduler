@@ -1,3 +1,4 @@
+
 const taskInput = document.getElementById('taskTitle');
 const exitFullscreenBtn = document.getElementById(`exit-flscreen-button`);
 const clearButton = document.getElementById('clear-button');
@@ -16,6 +17,12 @@ const todayName = document.getElementById('today-name');
 const hideWidgetBtn = document.querySelector(`.hide-widget`);
 const selectedTaskCounter = document.querySelector(`.selected-task`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
+const taskToolbar = document.querySelector(`.task-toolbar-container`);
+const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
+const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
+
+
+
 
 
 
@@ -566,6 +573,7 @@ document.addEventListener('fullscreenchange', () => {
 
 let selectedDivs = [];
 let chosenColor = '#c2185b';
+let currentTask  = '';
 
 
 //add click listener to colors for task
@@ -590,6 +598,7 @@ yearContainer.addEventListener('click', (event) => {
             selectedDivs = selectedDivs.filter(div => div !== taskElement); //learn
             taskElement.classList.remove('selected');
             taskInput.value = selectedDivs[selectedDivs.length-1].textContent || '';
+            currentTask = selectedDivs.length-1;
 
             // console.log(`colored`);
             // console.log(`Color of Selected Task: ${taskElement.style.backgroundColor ? taskElement.style.backgroundColor : 'none'}`);
@@ -600,6 +609,7 @@ yearContainer.addEventListener('click', (event) => {
             selectedDivs.push(taskElement);
             taskElement.classList.add('selected');
             taskInput.value = selectedDivs[selectedDivs.length-1].textContent || '';
+            currentTask = selectedDivs.length-1;
             // console.log(`colored`);
             // console.log(`Color of Selected Task: ${taskElement.style.backgroundColor ? taskElement.style.backgroundColor : 'none'}`);
 
@@ -614,6 +624,26 @@ yearContainer.addEventListener('click', (event) => {
 
     }
 });
+
+arrowLeftSelectedTask.addEventListener(`click`, ()=>{
+    // alert(`still working this out`);
+    if(currentTask!=0){
+        currentTask -= 1;
+        taskInput.value = selectedDivs[currentTask].textContent || '';
+    }
+
+
+});
+
+arrowRightSelectedTask.addEventListener(`click`, ()=>{
+    // alert(`still working this out`);
+    if(currentTask != selectedDivs.length-1) {
+        currentTask += 1;
+        taskInput.value = selectedDivs[currentTask].textContent || '';
+    }     
+
+});
+
 
 const counterObserver = new MutationObserver(() => {
     if (parseInt(selectedTaskCounter.textContent) > 0) {
@@ -980,8 +1010,11 @@ floatingAddBtn.addEventListener('click', () => {
 
         // Adjust the button positions based on the sliding input view
         // const slidingInputHeight = 33 * window.innerHeight / 100;
-        floatingAddBtn.style.bottom = `${130 + 10}px`;
-        clearButton.style.bottom = `${130 + 70}px`;
+
+        //repositioning
+        // floatingAddBtn.style.bottom = `${130 + 10}px`;
+        // clearButton.style.bottom = `${130 + 70}px`;
+        taskToolbar.style.bottom = `${130 + 10}px`;
     } else {
         slidingInputView.classList.toggle("show");
 
@@ -989,8 +1022,9 @@ floatingAddBtn.addEventListener('click', () => {
         floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
 
         // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        floatingAddBtn.style.bottom = `${20}px`;
-        clearButton.style.bottom = `${80}px`;
+        // floatingAddBtn.style.bottom = `${20}px`;
+        // clearButton.style.bottom = `${80}px`;
+        taskToolbar.style.bottom = `${20}px`;
     }
 });
 
