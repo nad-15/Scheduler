@@ -640,6 +640,7 @@ arrowLeftSelectedTask.addEventListener("click", () => {
 });
 
 arrowRightSelectedTask.addEventListener("click", () => {
+    if(selectedDivs)
     do {
         if (currentTask < selectedDivs.length - 1) {
             currentTask += 1;
