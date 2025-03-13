@@ -15,6 +15,11 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+
+#alert-for-desktop {
+    display: none;
+}
+
 #main-container {
 
     background-color: #e5f5e0;
@@ -1787,14 +1792,23 @@ h2 {
     }
 }
 
-@media screen and (min-width: 1024px) {
+@media screen and (min-width: 768px) {
 
-
-    /* body {
+    #main-container {
         display: none;
-    } */
+    }
 
-    .cloned-sliding-view {
+    #alert-for-desktop {
+        display: block;
+    text-align: center;
+    }
+
+
+    body {
+        align-items: center;
+    }
+
+    /* .cloned-sliding-view {
         width: 48% !important;
         height: auto !important;
     }
@@ -1821,7 +1835,7 @@ h2 {
 
     #year-container::-webkit-scrollbar {
         display: auto;
-        /* For Chrome, Safari, and Edge */
+
     }
 
     #year-container {
@@ -1849,7 +1863,7 @@ h2 {
 
     .screen-size-change {
 
-        /* display: none; */
+
         top: 20px;
         left: calc(20px + 20vw);
 
@@ -1863,7 +1877,7 @@ h2 {
     .movable-template {
         bottom: calc(140px +20vw);
         left: calc(10px + 20vw);
-    }
+    } */
 
 }
 
