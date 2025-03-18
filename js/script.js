@@ -598,7 +598,7 @@ yearContainer.addEventListener('click', (event) => {
         if (selectedDivs.includes(taskElement)) {
             selectedDivs = selectedDivs.filter(div => div !== taskElement); //learn
             taskElement.classList.remove('selected');
-            taskInput.value = selectedDivs[selectedDivs.length-1].textContent || '';
+            taskInput.value = selectedDivs[selectedDivs.length-1]?.textContent || '';
             currentTask = selectedDivs.length-1;
 
             // console.log(`colored`);
@@ -609,7 +609,7 @@ yearContainer.addEventListener('click', (event) => {
         } else {
             selectedDivs.push(taskElement);
             taskElement.classList.add('selected');
-            taskInput.value = selectedDivs[selectedDivs.length-1].textContent || '';
+            taskInput.value = selectedDivs[selectedDivs.length-1]?.textContent || '';
             currentTask = selectedDivs.length-1;
             // console.log(`colored`);
             // console.log(`Color of Selected Task: ${taskElement.style.backgroundColor ? taskElement.style.backgroundColor : 'none'}`);
@@ -619,7 +619,7 @@ yearContainer.addEventListener('click', (event) => {
 
         // selectedTaskCounter.textContent = `${selectedDivs.length}`;
         // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
-
+        console.log(selectedDivs.length);
         [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
 
 
