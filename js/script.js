@@ -1057,6 +1057,15 @@ if (selectedTask) {
     selectedTask.remove();  // Remove the selected-task button
 }
 
+
+// Select both arrows
+const arrows = clonedSlidingInputView.querySelector('.template-task-btn1 ');
+
+//Remove arrow .arrow_right_selected and .arrow_left_selected conatiner
+arrows.remove();
+
+
+
 //remove the template button toggle
 const templateTaskBtnCloned = clonedSlidingInputView.querySelector('.template-task-btn');
 if (templateTaskBtnCloned) {
