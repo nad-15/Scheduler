@@ -870,9 +870,9 @@ function toggleSelection(div) {
     }
 }
 // Add the touchend event listener
-yearContainer.addEventListener('dblclick', (event) => {
-    handleSubtaskGroupToggle(event);  // Handle double-click directly
-});
+// yearContainer.addEventListener('dblclick', (event) => {
+//     handleSubtaskGroupToggle(event);  // Handle double-click directly
+// });
 
 yearContainer.addEventListener('touchend', (event) => {
 
