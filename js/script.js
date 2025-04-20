@@ -255,6 +255,8 @@ hideWidgetBtn.addEventListener('click', () => {
 });
 
 
+
+
 templateTaskBtn.addEventListener('click', () => {
     movableTemplate.style.display =
         movableTemplate.style.display === 'flex' ? 'none' : 'flex';
