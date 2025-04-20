@@ -116,7 +116,7 @@ addTaskBtn.addEventListener('click', () => {
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
     const uniqueParents = new Set();
 
-    // 🔹 Store parent elements before clearing selectedDivs
+    // 🔹 Collect parent elements first
     selectedDivs.forEach(selected => {
         const parent = selected.classList.contains('morningTaskSub') ||
                        selected.classList.contains('afternoonTaskSub') ||
@@ -127,7 +127,7 @@ addTaskBtn.addEventListener('click', () => {
         uniqueParents.add(parent);
     });
 
-    // 🔹 Deselect AFTER collecting parents
+    // 🔹 Clear selectedDivs
     selectedDivs.forEach(div => div.classList.remove('selected'));
     selectedDivs.length = 0;
 
@@ -153,11 +153,17 @@ addTaskBtn.addEventListener('click', () => {
         if (!storedData[date]) storedData[date] = {};
         if (!Array.isArray(storedData[date][taskKey])) storedData[date][taskKey] = [];
 
+        // 🔍 Find the first visually empty div (no text AND no color)
         let taskDivToUse = Array.from(parent.children).find(child =>
-            child.classList.contains(`${taskType}Sub`) && child.textContent.trim() === ''
+            child.classList.contains(`${taskType}Sub`) &&
+            child.textContent.trim() === '' &&
+            (!child.style.backgroundColor || child.style.backgroundColor === 'transparent')
         );
 
-        const emptyIndex = storedData[date][taskKey].findIndex(t => t.task.trim() === '');
+        // 🔍 Find matching "empty" task object in storage
+        const emptyIndex = storedData[date][taskKey].findIndex(t =>
+            t.task.trim() === '' && (!t.color || t.color.trim() === '')
+        );
 
         if (taskDivToUse) {
             taskDivToUse.textContent = taskInput.value;
@@ -187,7 +193,7 @@ addTaskBtn.addEventListener('click', () => {
             });
         }
 
-        // 🔹 Only select the new/updated task div
+        // 🔹 Select only the newly added/updated task
         taskDivToUse.classList.add('selected');
         selectedDivs.push(taskDivToUse);
     });
@@ -195,7 +201,6 @@ addTaskBtn.addEventListener('click', () => {
     localStorage.setItem("tasks", JSON.stringify(storedData));
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
 });
-
 
 
 

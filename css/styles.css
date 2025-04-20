@@ -1240,7 +1240,7 @@ h2 {
     font-weight: bold;
     cursor: pointer;
     /* align-items: center; */
-    /* justify-content: center; */
+    justify-content: center;
     /* was 8px */
     font-size: 10px;
     /* padding-bottom: 8px; */
