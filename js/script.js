@@ -23,6 +23,51 @@ const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 
 
 
+function revertToOldStructure() {
+    const storedData = JSON.parse(localStorage.getItem("tasks"));
+    if (!storedData) return;
+
+    let shouldMigrate = false;
+
+    for (const date in storedData) {
+        const periods = storedData[date];
+        for (const period of ["morning", "afternoon", "evening"]) {
+            const value = periods[period];
+            if (Array.isArray(value)) {
+                // New structure - already an array, so we need to migrate
+                shouldMigrate = true;
+            }
+        }
+    }
+
+    if (!shouldMigrate) return; // It's in original format, do nothing
+
+    const newData = {};
+
+    for (const date in storedData) {
+        newData[date] = {
+            morning: [],
+            afternoon: [],
+            evening: []
+        };
+
+        for (const period of ["morning", "afternoon", "evening"]) {
+            const periodData = storedData[date][period];
+            if (Array.isArray(periodData)) {
+                // Already new format
+                newData[date][period] = periodData;
+            } else if (typeof periodData === "object" && periodData !== null) {
+                for (const key in periodData) {
+                    newData[date][period].push(periodData[key]);
+                }
+            }
+        }
+    }
+
+    localStorage.setItem("tasks", JSON.stringify(newData));
+}
+
+revertToOldStructure();
 
 
 
