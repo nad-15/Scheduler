@@ -613,8 +613,13 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 taskDiv.textContent = task;
                 // taskDiv.style.backgroundColor = color;
                 // morningTaskDiv.appendChild(taskDiv);
-                taskDiv.style.borderLeft = `4px solid ${color}`;
-                taskDiv.style.backgroundColor = fadeColor(color); // fading background
+                if (color) {
+                    taskDiv.style.borderLeft = `4px solid ${color}`;
+                    taskDiv.style.backgroundColor = fadeColor(color);
+                } else {
+                    taskDiv.style.borderLeft = `4px solid transparent`;
+                    taskDiv.style.backgroundColor = 'transparent';
+                }
                 morningTaskDiv.appendChild(taskDiv);
             });
         } else {
@@ -634,8 +639,13 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 taskDiv.textContent = task;
                 // taskDiv.style.backgroundColor = color;
                 // afternoonTaskDiv.appendChild(taskDiv);
-                taskDiv.style.borderLeft = `4px solid ${color}`;
-                taskDiv.style.backgroundColor = fadeColor(color);
+                if (color) {
+                    taskDiv.style.borderLeft = `4px solid ${color}`;
+                    taskDiv.style.backgroundColor = fadeColor(color);
+                } else {
+                    taskDiv.style.borderLeft = `4px solid transparent`;
+                    taskDiv.style.backgroundColor = 'transparent';
+                }
                 afternoonTaskDiv.appendChild(taskDiv);
             });
         } else {
@@ -655,8 +665,13 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 taskDiv.textContent = task;
                 // taskDiv.style.backgroundColor = color;
                 // eveningTaskDiv.appendChild(taskDiv);
-                taskDiv.style.borderLeft = `4px solid ${color}`;
-                taskDiv.style.backgroundColor = fadeColor(color);
+                if (color) {
+                    taskDiv.style.borderLeft = `4px solid ${color}`;
+                    taskDiv.style.backgroundColor = fadeColor(color);
+                } else {
+                    taskDiv.style.borderLeft = `4px solid transparent`;
+                    taskDiv.style.backgroundColor = 'transparent';
+                }
                 eveningTaskDiv.appendChild(taskDiv);
             });
         } else {
