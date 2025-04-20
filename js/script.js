@@ -24,51 +24,54 @@ const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 
 
 function revertToOldStructure() {
-    const storedData = JSON.parse(localStorage.getItem("tasks"));
-    if (!storedData) return;
+    const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
 
-    let shouldMigrate = false;
+    // Check if the data is already in the original structure (i.e., not an array)
+    let isInOldFormat = true;
 
     for (const date in storedData) {
-        const periods = storedData[date];
-        for (const period of ["morning", "afternoon", "evening"]) {
-            const value = periods[period];
-            if (Array.isArray(value)) {
-                // New structure - already an array, so we need to migrate
-                shouldMigrate = true;
+        const dayData = storedData[date];
+        for (const period in dayData) {
+            if (Array.isArray(dayData[period]) && dayData[period].length > 0) {
+                isInOldFormat = false;  // Data is already in the new format
+                break;
             }
         }
+        if (!isInOldFormat) break;
     }
 
-    if (!shouldMigrate) return; // It's in original format, do nothing
+    if (isInOldFormat) return; // Data is already in the old format, do nothing
 
-    const newData = {};
+    const revertedData = {};
 
+    // Loop through each date in the stored data
     for (const date in storedData) {
-        newData[date] = {
-            morning: [],
-            afternoon: [],
-            evening: []
+        const dayData = storedData[date];
+        const revertedDayData = {
+            morning: {},
+            afternoon: {},
+            evening: {}
         };
 
-        for (const period of ["morning", "afternoon", "evening"]) {
-            const periodData = storedData[date][period];
-            if (Array.isArray(periodData)) {
-                // Already new format
-                newData[date][period] = periodData;
-            } else if (typeof periodData === "object" && periodData !== null) {
-                for (const key in periodData) {
-                    newData[date][period].push(periodData[key]);
-                }
+        // Loop through morning, afternoon, evening and select the first task if multiple exist
+        for (const period in dayData) {
+            if (Array.isArray(dayData[period]) && dayData[period].length > 0) {
+                const firstTask = dayData[period][0];  // Take the first task if available
+                revertedDayData[period] = {
+                    task: firstTask.task,
+                    color: firstTask.color
+                };
             }
         }
+
+        revertedData[date] = revertedDayData;
     }
 
-    localStorage.setItem("tasks", JSON.stringify(newData));
+    // Store the reverted data back to localStorage
+    localStorage.setItem("tasks", JSON.stringify(revertedData));
 }
 
 revertToOldStructure();
-
 
 
 
