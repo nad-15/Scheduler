@@ -1269,7 +1269,7 @@ h2 {
 .afternoonTaskSub,
 .eveningTaskSub {
     display: flex;
-    padding: 1.5px;
+    padding: 3px;
     /* border: .5px solid #ccc; */
     /* border: .5px solid gray; */
     font-weight: bold;
@@ -1283,7 +1283,7 @@ h2 {
     text-overflow: ellipsis; */
     margin: 1px;
     border-radius: 3px;
-    height: 13px;
+    height: 18px;
 
     overflow: auto;
     word-wrap: break-word;
