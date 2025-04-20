@@ -874,10 +874,10 @@ function toggleSelection(div) {
 //     handleSubtaskGroupToggle(event);  // Handle double-click directly
 // });
 
-yearContainer.addEventListener('touchend', (event) => {
+// yearContainer.addEventListener('touchend', (event) => {
 
-    handleTouchEnd(() => handleSubtaskGroupToggle(event));  
-});
+//     handleTouchEnd(() => handleSubtaskGroupToggle(event));  
+// });
 
 function handleSubtaskGroupToggle(event) {
     const subTaskElement = event.target.closest('.morningTaskSub, .afternoonTaskSub, .eveningTaskSub');
