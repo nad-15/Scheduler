@@ -1628,6 +1628,7 @@ h2 {
     border-radius: 2px;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    text-align: center;  
 
     overflow: auto;
     word-wrap: break-word;
