@@ -20,7 +20,7 @@ const jobTemplateContainer = document.querySelector(`.job-template-container`);
 const taskToolbar = document.querySelector(`.task-toolbar-container`);
 const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
-const addTaskBtn  = document.getElementById(`addTask`);
+const addTaskBtn = document.getElementById(`addTask`);
 
 
 
@@ -31,35 +31,35 @@ migrateTaskDataToArrayFormat();
 function migrateTaskDataToArrayFormat() {
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
     const migratedData = {};
-  
+
     for (const date in storedData) {
-      migratedData[date] = {};
-  
-      ["morning", "afternoon", "evening"].forEach(period => {
-        const value = storedData[date][period];
-  
-        // If it's NOT an array already AND it has task/color keys
-        if (value && typeof value === "object" && !Array.isArray(value)) {
-          const { task = "", color = "" } = value;
-          migratedData[date][period] = [{ task, color }];
-        } 
-        
-        // If it's already in correct format (array of objects), keep as-is
-        else if (Array.isArray(value)) {
-          migratedData[date][period] = value;
-        } 
-        
-        // If missing or invalid, default to empty array
-        else {
-          migratedData[date][period] = [];
-        }
-      });
+        migratedData[date] = {};
+
+        ["morning", "afternoon", "evening"].forEach(period => {
+            const value = storedData[date][period];
+
+            // If it's NOT an array already AND it has task/color keys
+            if (value && typeof value === "object" && !Array.isArray(value)) {
+                const { task = "", color = "" } = value;
+                migratedData[date][period] = [{ task, color }];
+            }
+
+            // If it's already in correct format (array of objects), keep as-is
+            else if (Array.isArray(value)) {
+                migratedData[date][period] = value;
+            }
+
+            // If missing or invalid, default to empty array
+            else {
+                migratedData[date][period] = [];
+            }
+        });
     }
-  
+
     localStorage.setItem("tasks", JSON.stringify(migratedData));
     console.log("✅ Task data migrated to array-of-objects format.");
-  }
-  
+}
+
 
 
 
@@ -119,8 +119,8 @@ addTaskBtn.addEventListener('click', () => {
     // 🔹 Collect parent elements first
     selectedDivs.forEach(selected => {
         const parent = selected.classList.contains('morningTaskSub') ||
-                       selected.classList.contains('afternoonTaskSub') ||
-                       selected.classList.contains('eveningTaskSub')
+            selected.classList.contains('afternoonTaskSub') ||
+            selected.classList.contains('eveningTaskSub')
             ? selected.parentElement
             : selected;
 
@@ -192,6 +192,9 @@ addTaskBtn.addEventListener('click', () => {
                 color: taskDivToUse.style.backgroundColor
             });
         }
+
+        taskDivToUse.style.borderLeft = `4px solid ${chosenColor}`;
+        taskDivToUse.style.backgroundColor = fadeColor(chosenColor); 
 
         // 🔹 Select only the newly added/updated task
         taskDivToUse.classList.add('selected');
@@ -599,61 +602,70 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         dayDiv.textContent = dayName;
 
         const taskData = storedData[`${yearDate}-${monthName}-${date}`];
-// === MORNING TASKS ===
-const morningTaskDiv = document.createElement('div');
-morningTaskDiv.classList.add('morningTask');
+        // === MORNING TASKS ===
+        const morningTaskDiv = document.createElement('div');
+        morningTaskDiv.classList.add('morningTask');
 
-if (taskData && Array.isArray(taskData.morning) && taskData.morning.length > 0) {
-    taskData.morning.forEach(({ task, color }) => {
-        const taskDiv = document.createElement('div');
-        taskDiv.classList.add('morningTaskSub');
-        taskDiv.textContent = task;
-        taskDiv.style.backgroundColor = color;
-        morningTaskDiv.appendChild(taskDiv);
-    });
-} else {
-    const blankTaskDiv = document.createElement('div');
-    blankTaskDiv.classList.add('morningTaskSub');
-    morningTaskDiv.appendChild(blankTaskDiv);
-}
+        if (taskData && Array.isArray(taskData.morning) && taskData.morning.length > 0) {
+            taskData.morning.forEach(({ task, color }) => {
+                const taskDiv = document.createElement('div');
+                taskDiv.classList.add('morningTaskSub');
+                taskDiv.textContent = task;
+                // taskDiv.style.backgroundColor = color;
+                // morningTaskDiv.appendChild(taskDiv);
+                taskDiv.style.borderLeft = `4px solid ${color}`;
+                taskDiv.style.backgroundColor = fadeColor(color); // fading background
+                morningTaskDiv.appendChild(taskDiv);
+            });
+        } else {
+            const blankTaskDiv = document.createElement('div');
+            blankTaskDiv.classList.add('morningTaskSub');
+            morningTaskDiv.appendChild(blankTaskDiv);
+        }
 
-// === AFTERNOON TASKS ===
-const afternoonTaskDiv = document.createElement('div');
-afternoonTaskDiv.classList.add('afternoonTask');
+        // === AFTERNOON TASKS ===
+        const afternoonTaskDiv = document.createElement('div');
+        afternoonTaskDiv.classList.add('afternoonTask');
 
-if (taskData && Array.isArray(taskData.afternoon) && taskData.afternoon.length > 0) {
-    taskData.afternoon.forEach(({ task, color }) => {
-        const taskDiv = document.createElement('div');
-        taskDiv.classList.add('afternoonTaskSub');
-        taskDiv.textContent = task;
-        taskDiv.style.backgroundColor = color;
-        afternoonTaskDiv.appendChild(taskDiv);
-    });
-} else {
-    const blankTaskDiv = document.createElement('div');
-    blankTaskDiv.classList.add('afternoonTaskSub');
-    afternoonTaskDiv.appendChild(blankTaskDiv);
-}
+        if (taskData && Array.isArray(taskData.afternoon) && taskData.afternoon.length > 0) {
+            taskData.afternoon.forEach(({ task, color }) => {
+                const taskDiv = document.createElement('div');
+                taskDiv.classList.add('afternoonTaskSub');
+                taskDiv.textContent = task;
+                // taskDiv.style.backgroundColor = color;
+                // afternoonTaskDiv.appendChild(taskDiv);
+                taskDiv.style.borderLeft = `4px solid ${color}`;
+                taskDiv.style.backgroundColor = fadeColor(color);
+                afternoonTaskDiv.appendChild(taskDiv);
+            });
+        } else {
+            const blankTaskDiv = document.createElement('div');
+            blankTaskDiv.classList.add('afternoonTaskSub');
+            afternoonTaskDiv.appendChild(blankTaskDiv);
+        }
 
-// === EVENING TASKS ===
-const eveningTaskDiv = document.createElement('div');
-eveningTaskDiv.classList.add('eveningTask');
+        // === EVENING TASKS ===
+        const eveningTaskDiv = document.createElement('div');
+        eveningTaskDiv.classList.add('eveningTask');
 
-if (taskData && Array.isArray(taskData.evening) && taskData.evening.length > 0) {
-    taskData.evening.forEach(({ task, color }) => {
-        const taskDiv = document.createElement('div');
-        taskDiv.classList.add('eveningTaskSub');
-        taskDiv.textContent = task;
-        taskDiv.style.backgroundColor = color;
-        eveningTaskDiv.appendChild(taskDiv);
-    });
-} else {
-    const blankTaskDiv = document.createElement('div');
-    blankTaskDiv.classList.add('eveningTaskSub');
-    eveningTaskDiv.appendChild(blankTaskDiv);
-}
+        if (taskData && Array.isArray(taskData.evening) && taskData.evening.length > 0) {
+            taskData.evening.forEach(({ task, color }) => {
+                const taskDiv = document.createElement('div');
+                taskDiv.classList.add('eveningTaskSub');
+                taskDiv.textContent = task;
+                // taskDiv.style.backgroundColor = color;
+                // eveningTaskDiv.appendChild(taskDiv);
+                taskDiv.style.borderLeft = `4px solid ${color}`;
+                taskDiv.style.backgroundColor = fadeColor(color);
+                eveningTaskDiv.appendChild(taskDiv);
+            });
+        } else {
+            const blankTaskDiv = document.createElement('div');
+            blankTaskDiv.classList.add('eveningTaskSub');
+            eveningTaskDiv.appendChild(blankTaskDiv);
+        }
 
-        
+
         // eveningTaskDiv.textContent = taskData ? taskData.evening : eveningTask;
         // eveningTaskDiv.textContent = eveningTask;
 
@@ -794,7 +806,7 @@ document.addEventListener('fullscreenchange', () => {
 
 let selectedDivs = [];
 let chosenColor = '#a48374';
-let currentTask  = '';
+let currentTask = '';
 
 
 //add click listener to colors for task
@@ -817,14 +829,14 @@ yearContainer.addEventListener('click', (event) => {
 
     if (subTaskElement) {
         handleSubtaskClick(subTaskElement); // Handle child click
-        updateUICounters(); 
-        taskInput.value = selectedDivs[selectedDivs.length-1]?.textContent || '';
+        updateUICounters();
+        taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
         return; // prevent bubbling to parent logic
     }
 
     if (mainTaskElement) {
         handleParentClick(mainTaskElement); // Handle parent click
-        taskInput.value = selectedDivs[selectedDivs.length-1]?.textContent || '';
+        taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
         updateUICounters(); // Update the UI counters
     }
 
@@ -881,7 +893,7 @@ function toggleSelection(div) {
 
 function handleSubtaskGroupToggle(event) {
     const subTaskElement = event.target.closest('.morningTaskSub, .afternoonTaskSub, .eveningTaskSub');
-    
+
     if (subTaskElement) {
         const mainTaskElement = subTaskElement.closest('.morningTask, .afternoonTask, .eveningTask');
         if (mainTaskElement) {
@@ -911,7 +923,7 @@ function handleSubtaskGroupToggle(event) {
 //             break;
 //         }
 //     } while (taskInput.value === selectedDivs[currentTask].textContent);
-    
+
 //     taskInput.value = selectedDivs[currentTask].textContent || '';
 // });
 
@@ -924,7 +936,7 @@ function handleSubtaskGroupToggle(event) {
 //             break;
 //         }
 //     } while (taskInput.value === selectedDivs[currentTask].textContent);
-    
+
 //     taskInput.value = selectedDivs[currentTask].textContent || '';
 // });
 
@@ -968,7 +980,12 @@ function submitTask() {
             }
 
             addTemplate(taskTitle, chosenColor);
-            div.style.backgroundColor = chosenColor;
+            // div.style.backgroundColor = chosenColor;
+
+            div.style.borderLeft = `4px solid ${chosenColor}`;
+            div.style.backgroundColor = fadeColor(chosenColor);
+
+
 
             // === Save to localStorage ===
             const dayContainer = div.closest('.day-container');
@@ -976,8 +993,8 @@ function submitTask() {
             const parent = div.parentElement;
 
             const taskType = parent.classList.contains('morningTask') ? 'morning' :
-                             parent.classList.contains('afternoonTask') ? 'afternoon' :
-                             parent.classList.contains('eveningTask') ? 'evening' : null;
+                parent.classList.contains('afternoonTask') ? 'afternoon' :
+                    parent.classList.contains('eveningTask') ? 'evening' : null;
 
             if (!taskType) return;
 
@@ -1041,6 +1058,7 @@ function addTemplate(taskTitle, color) {
             // Set the background color of the div based on the task's color
             itemDiv.style.backgroundColor = taskTemplate.color;
 
+
             // Set the text content of the div based on the task's title
             itemDiv.textContent = taskTemplate.text;
 
@@ -1082,7 +1100,10 @@ function submitTemplate(item) {
 
         selectedDivs.forEach(div => {
             div.textContent = taskText;
-            div.style.backgroundColor = taskColor;
+            // div.style.backgroundColor = taskColor;
+            div.style.borderLeft = `4px solid ${taskColor}`;
+            div.style.backgroundColor = fadeColor(taskColor);
+
 
             const dayContainer = div.closest('.day-container');
             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
@@ -1250,8 +1271,8 @@ function deleteFunction() {
         const parent = selectedDiv.parentElement;
 
         const taskType = parent.classList.contains('morningTask') ? 'morning' :
-                         parent.classList.contains('afternoonTask') ? 'afternoon' :
-                         parent.classList.contains('eveningTask') ? 'evening' : null;
+            parent.classList.contains('afternoonTask') ? 'afternoon' :
+                parent.classList.contains('eveningTask') ? 'evening' : null;
 
         if (!taskType || !storedData[fullDate]) return;
 
@@ -1474,6 +1495,10 @@ deselectTemplateBtn.addEventListener('touchend', () => {
 
 
 function rgbToHex(rgb) {
+
+    if (rgb.startsWith('#')) {
+        return color;
+    }
     //if transparent return ""
     if (!rgb) {
         // console.log(`color is undefined`);
@@ -1526,3 +1551,16 @@ function getMonthName(value) {
 }
 
 
+
+function fadeColor(color, alpha = 0.6) {
+    // If color is in rgb format, return it with the alpha applied
+    if (color.startsWith('rgb')) {
+        return color.replace(')', `, ${alpha})`).replace('rgba', 'rgb');
+    }
+
+    // Otherwise, treat it as a hex color and convert to rgba
+    const r = parseInt(color.substr(1, 2), 16);
+    const g = parseInt(color.substr(3, 2), 16);
+    const b = parseInt(color.substr(5, 2), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
