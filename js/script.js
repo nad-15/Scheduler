@@ -105,10 +105,10 @@ function migrateTaskDataToArrayFormat() {
 
 
 
+//revert here again
 
 
-
-  addTaskBtn.addEventListener('click', () => {
+addTaskBtn.addEventListener('click', () => {
     console.log('add task btn is clicked');
 
     if (selectedDivs.length === 0) return;
@@ -116,6 +116,7 @@ function migrateTaskDataToArrayFormat() {
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
     const uniqueParents = new Set();
 
+    // 🔹 Store parent elements before clearing selectedDivs
     selectedDivs.forEach(selected => {
         const parent = selected.classList.contains('morningTaskSub') ||
                        selected.classList.contains('afternoonTaskSub') ||
@@ -125,6 +126,10 @@ function migrateTaskDataToArrayFormat() {
 
         uniqueParents.add(parent);
     });
+
+    // 🔹 Deselect AFTER collecting parents
+    selectedDivs.forEach(div => div.classList.remove('selected'));
+    selectedDivs.length = 0;
 
     uniqueParents.forEach(parent => {
         let taskType, taskKey;
@@ -148,46 +153,43 @@ function migrateTaskDataToArrayFormat() {
         if (!storedData[date]) storedData[date] = {};
         if (!Array.isArray(storedData[date][taskKey])) storedData[date][taskKey] = [];
 
-        // Find empty task div in DOM
         let taskDivToUse = Array.from(parent.children).find(child =>
             child.classList.contains(`${taskType}Sub`) && child.textContent.trim() === ''
         );
 
-        // Find empty entry in localStorage
         const emptyIndex = storedData[date][taskKey].findIndex(t => t.task.trim() === '');
 
         if (taskDivToUse) {
-            taskDivToUse.textContent = 'New Task';
+            taskDivToUse.textContent = taskInput.value;
             taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
 
             if (emptyIndex !== -1) {
                 storedData[date][taskKey][emptyIndex] = {
-                    task: taskDivToUse.textContent,
+                    task: taskInput.value,
                     color: taskDivToUse.style.backgroundColor
                 };
             } else {
                 storedData[date][taskKey].push({
-                    task: taskDivToUse.textContent,
+                    task: taskInput.value,
                     color: taskDivToUse.style.backgroundColor
                 });
             }
         } else {
             taskDivToUse = document.createElement('div');
-            taskDivToUse.textContent = 'New Task';
+            taskDivToUse.textContent = taskInput.value;
             taskDivToUse.classList.add(`${taskType}Sub`);
             taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
             parent.appendChild(taskDivToUse);
 
             storedData[date][taskKey].push({
-                task: taskDivToUse.textContent,
+                task: taskInput.value,
                 color: taskDivToUse.style.backgroundColor
             });
         }
 
-        if (!selectedDivs.includes(taskDivToUse)) {
-            selectedDivs.push(taskDivToUse);
-            taskDivToUse.classList.add('selected');
-        }
+        // 🔹 Only select the new/updated task div
+        taskDivToUse.classList.add('selected');
+        selectedDivs.push(taskDivToUse);
     });
 
     localStorage.setItem("tasks", JSON.stringify(storedData));
@@ -807,17 +809,21 @@ yearContainer.addEventListener('click', (event) => {
     const subTaskElement = event.target.closest('.morningTaskSub, .afternoonTaskSub, .eveningTaskSub');
     const mainTaskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
+
     if (subTaskElement) {
         handleSubtaskClick(subTaskElement); // Handle child click
         updateUICounters(); 
+        taskInput.value = selectedDivs[selectedDivs.length-1]?.textContent || '';
         return; // prevent bubbling to parent logic
     }
 
     if (mainTaskElement) {
         handleParentClick(mainTaskElement); // Handle parent click
+        taskInput.value = selectedDivs[selectedDivs.length-1]?.textContent || '';
+        updateUICounters(); // Update the UI counters
     }
 
-    updateUICounters(); // Update the UI counters
+
 });
 
 
@@ -864,6 +870,7 @@ yearContainer.addEventListener('dblclick', (event) => {
 });
 
 yearContainer.addEventListener('touchend', (event) => {
+
     handleTouchEnd(() => handleSubtaskGroupToggle(event));  
 });
 
@@ -1066,30 +1073,34 @@ function submitTemplate(item) {
     const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
 
     if (selectedDivs.length > 0) {
-        selectedDivs.forEach(div => {
+        const storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
+        selectedDivs.forEach(div => {
             div.textContent = taskText;
             div.style.backgroundColor = taskColor;
 
             const dayContainer = div.closest('.day-container');
             const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
-            const taskType = div.classList.contains('morningTask') ? 'morning' :
-                div.classList.contains('afternoonTask') ? 'afternoon' : 'evening';
 
+            let taskKey;
+            if (div.classList.contains('morningTaskSub')) taskKey = 'morning';
+            else if (div.classList.contains('afternoonTaskSub')) taskKey = 'afternoon';
+            else if (div.classList.contains('eveningTaskSub')) taskKey = 'evening';
+            else return;
 
-            saveTaskData(date, taskType, taskText, taskColor); // Pass color along with other task data
+            const parent = div.parentElement;
+            const taskDivs = Array.from(parent.querySelectorAll(`.${taskKey}TaskSub`));
+            const index = taskDivs.indexOf(div); // this is key: find position of this subtask in the DOM
+
+            saveTaskData(date, taskKey, taskText, taskColor, index);
         });
 
-        // selectedTaskCounter.textContent = `${selectedDivs.length}`;
-        // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
-
         [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-
-
     } else {
         triggerShakeEffect();
     }
 }
+
 
 
 function removeTemplate(item) {
@@ -1131,6 +1142,9 @@ function loadTemplate() {
     if (savedTemplate) {
         taskClipboard = savedTemplate;
 
+        // Reverse the order of tasks before rendering
+        taskClipboard.reverse();
+
         // Loop through each saved task and create the corresponding div
         taskClipboard.forEach(task => {
             const itemDiv = document.createElement('div');
@@ -1138,7 +1152,6 @@ function loadTemplate() {
             itemDiv.addEventListener(`dblclick`, () => {
                 removeTemplate(itemDiv);
             });
-
 
             // Set the background color of the div based on the task's color
             itemDiv.style.backgroundColor = task.color;
@@ -1153,46 +1166,19 @@ function loadTemplate() {
 }
 
 
-function saveTaskData(date, taskType, updatedTask, taskColor, taskIndex = null) {
+
+function saveTaskData(date, taskType, updatedTask, taskColor, taskIndex) {
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
-    // Initialize structure if it doesn't exist
-    if (!storedData[date]) {
-        storedData[date] = {
-            morning: {},
-            afternoon: {},
-            evening: {}
-        };
-    }
+    // Ensure structure
+    if (!storedData[date]) storedData[date] = {};
+    if (!Array.isArray(storedData[date][taskType])) storedData[date][taskType] = [];
 
-    // Delete the whole time block if nothing is passed
     if (updatedTask === "" && taskColor === "") {
         if (taskIndex !== null) {
-            // Remove a specific task index
-            delete storedData[date][taskType][taskIndex];
-
-            // If that time block is now empty, delete the whole time block
-            if (Object.keys(storedData[date][taskType]).length === 0) {
-                delete storedData[date][taskType];
-            }
-
-        } else {
-            // No task index means wipe the entire time block
-            storedData[date][taskType] = {};
+            storedData[date][taskType].splice(taskIndex, 1);
         }
-
-        // If all time blocks are empty, remove the entire date
-        if (isEmptyTasks(storedData[date])) {
-            delete storedData[date];
-        }
-
     } else {
-        // Assign a new index if not passed
-        if (taskIndex === null) {
-            const keys = Object.keys(storedData[date][taskType]);
-            taskIndex = keys.length > 0 ? Math.max(...keys.map(Number)) + 1 : 1;
-        }
-
         storedData[date][taskType][taskIndex] = {
             task: updatedTask,
             color: taskColor
