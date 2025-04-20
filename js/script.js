@@ -805,7 +805,7 @@ document.addEventListener('fullscreenchange', () => {
 });
 
 let selectedDivs = [];
-let chosenColor = '#a48374';
+let chosenColor = '#6a5044';
 let currentTask = '';
 
 
@@ -1414,7 +1414,7 @@ colorOptionTemplate.forEach(option => {
 });
 
 
-let chosenColorTemplate = `#a48374`;
+let chosenColorTemplate = `#6a5044`;
 //add click listener to colors
 colorOptionTemplate.forEach(button => {
     button.addEventListener('click', () => {
