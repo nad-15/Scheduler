@@ -22,97 +22,177 @@ const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn  = document.getElementById(`addTask`);
 
-addTaskBtn.addEventListener('click', () => {
+
+
+
+
+
+migrateTaskDataToArrayFormat();
+function migrateTaskDataToArrayFormat() {
+    const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
+    const migratedData = {};
+  
+    for (const date in storedData) {
+      migratedData[date] = {};
+  
+      ["morning", "afternoon", "evening"].forEach(period => {
+        const value = storedData[date][period];
+  
+        // If it's NOT an array already AND it has task/color keys
+        if (value && typeof value === "object" && !Array.isArray(value)) {
+          const { task = "", color = "" } = value;
+          migratedData[date][period] = [{ task, color }];
+        } 
+        
+        // If it's already in correct format (array of objects), keep as-is
+        else if (Array.isArray(value)) {
+          migratedData[date][period] = value;
+        } 
+        
+        // If missing or invalid, default to empty array
+        else {
+          migratedData[date][period] = [];
+        }
+      });
+    }
+  
+    localStorage.setItem("tasks", JSON.stringify(migratedData));
+    console.log("✅ Task data migrated to array-of-objects format.");
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  addTaskBtn.addEventListener('click', () => {
     console.log('add task btn is clicked');
 
     if (selectedDivs.length === 0) return;
 
-    const selected = selectedDivs[selectedDivs.length - 1];
-
-    const parent = selected.classList.contains('morningTaskSub') ||
-                   selected.classList.contains('afternoonTaskSub') ||
-                   selected.classList.contains('eveningTaskSub')
-        ? selected.parentElement
-        : selected;
-
-    // taskType for class names (e.g., 'morningTask'), taskKey for storage (e.g., 'morning')
-    let taskType, taskKey;
-
-    if (parent.classList.contains('morningTask')) {
-        taskType = 'morningTask';
-        taskKey = 'morning';
-    } else if (parent.classList.contains('afternoonTask')) {
-        taskType = 'afternoonTask';
-        taskKey = 'afternoon';
-    } else if (parent.classList.contains('eveningTask')) {
-        taskType = 'eveningTask';
-        taskKey = 'evening';
-    } else {
-        return; // invalid parent
-    }
-
-    const dayContainer = parent.closest('.day-container');
-    const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
-
-    const newTaskDiv = document.createElement('div');
-    newTaskDiv.textContent = "New Task";
-    newTaskDiv.classList.add(`${taskType}Sub`);
-    newTaskDiv.style.backgroundColor = chosenColor || '#ccc';
-    parent.appendChild(newTaskDiv);
-
-    // Save to localStorage
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
+    const uniqueParents = new Set();
 
-    if (!storedData[date]) storedData[date] = {};
-    if (!Array.isArray(storedData[date][taskKey])) storedData[date][taskKey] = [];
+    selectedDivs.forEach(selected => {
+        const parent = selected.classList.contains('morningTaskSub') ||
+                       selected.classList.contains('afternoonTaskSub') ||
+                       selected.classList.contains('eveningTaskSub')
+            ? selected.parentElement
+            : selected;
 
-    storedData[date][taskKey].push({
-        task: newTaskDiv.textContent,
-        color: newTaskDiv.style.backgroundColor
+        uniqueParents.add(parent);
+    });
+
+    uniqueParents.forEach(parent => {
+        let taskType, taskKey;
+
+        if (parent.classList.contains('morningTask')) {
+            taskType = 'morningTask';
+            taskKey = 'morning';
+        } else if (parent.classList.contains('afternoonTask')) {
+            taskType = 'afternoonTask';
+            taskKey = 'afternoon';
+        } else if (parent.classList.contains('eveningTask')) {
+            taskType = 'eveningTask';
+            taskKey = 'evening';
+        } else {
+            return;
+        }
+
+        const dayContainer = parent.closest('.day-container');
+        const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
+
+        if (!storedData[date]) storedData[date] = {};
+        if (!Array.isArray(storedData[date][taskKey])) storedData[date][taskKey] = [];
+
+        // Find empty task div in DOM
+        let taskDivToUse = Array.from(parent.children).find(child =>
+            child.classList.contains(`${taskType}Sub`) && child.textContent.trim() === ''
+        );
+
+        // Find empty entry in localStorage
+        const emptyIndex = storedData[date][taskKey].findIndex(t => t.task.trim() === '');
+
+        if (taskDivToUse) {
+            taskDivToUse.textContent = 'New Task';
+            taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
+
+            if (emptyIndex !== -1) {
+                storedData[date][taskKey][emptyIndex] = {
+                    task: taskDivToUse.textContent,
+                    color: taskDivToUse.style.backgroundColor
+                };
+            } else {
+                storedData[date][taskKey].push({
+                    task: taskDivToUse.textContent,
+                    color: taskDivToUse.style.backgroundColor
+                });
+            }
+        } else {
+            taskDivToUse = document.createElement('div');
+            taskDivToUse.textContent = 'New Task';
+            taskDivToUse.classList.add(`${taskType}Sub`);
+            taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
+            parent.appendChild(taskDivToUse);
+
+            storedData[date][taskKey].push({
+                task: taskDivToUse.textContent,
+                color: taskDivToUse.style.backgroundColor
+            });
+        }
+
+        if (!selectedDivs.includes(taskDivToUse)) {
+            selectedDivs.push(taskDivToUse);
+            taskDivToUse.classList.add('selected');
+        }
     });
 
     localStorage.setItem("tasks", JSON.stringify(storedData));
-
-    selectedDivs.push(newTaskDiv);
-    newTaskDiv.classList.add('selected');
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
 });
-
-
-
-
-
-
-function migrateOldTaskFormat() {
-    let storedData = JSON.parse(localStorage.getItem("tasks")) || {};
-    let migrated = false;
-  
-    Object.keys(storedData).forEach(date => {
-      ['morning', 'afternoon', 'evening'].forEach(period => {
-        const data = storedData[date][period];
-  
-        // Check if it's in the object-based format (like {1: { task: ..., color: ... }})
-        if (data && typeof data === "object" && !Array.isArray(data)) {
-          // Convert the object into an array
-          storedData[date][period] = Object.values(data);
-          migrated = true;
-        }
-      });
-    });
-  
-    if (migrated) {
-      console.log("Task data migrated to array format ✅");
-      localStorage.setItem("tasks", JSON.stringify(storedData));
-    }
-  }
-  
-  // Only run once per user
-  if (!localStorage.getItem("tasksMigrated")) {
-    migrateOldTaskFormat();
-    localStorage.setItem("tasksMigrated", "true");
-  }
-  
-
 
 
 
@@ -727,37 +807,85 @@ yearContainer.addEventListener('click', (event) => {
     const subTaskElement = event.target.closest('.morningTaskSub, .afternoonTaskSub, .eveningTaskSub');
     const mainTaskElement = event.target.closest('.morningTask, .afternoonTask, .eveningTask');
 
-    let targetElement = null;
-
     if (subTaskElement) {
-        // Always allow selecting a subtask
-        targetElement = subTaskElement;
-    } else if (mainTaskElement && mainTaskElement.children.length === 0) {
-        // Only allow selecting the main container if it has NO subtasks
-        targetElement = mainTaskElement;
+        handleSubtaskClick(subTaskElement); // Handle child click
+        return; // prevent bubbling to parent logic
     }
 
-    if (targetElement) {
-        if (selectedDivs.includes(targetElement)) {
-            // Deselect
-            selectedDivs = selectedDivs.filter(div => div !== targetElement);
-            targetElement.classList.remove('selected');
-
-            taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
-            currentTask = selectedDivs.length - 1;
-        } else {
-            // Select
-            selectedDivs.push(targetElement);
-            targetElement.classList.add('selected');
-
-            taskInput.value = targetElement.textContent || '';
-            currentTask = selectedDivs.length - 1;
-        }
-
-        // Update UI counters
-        [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+    if (mainTaskElement) {
+        handleParentClick(mainTaskElement); // Handle parent click
     }
+
+    updateUICounters(); // Update the UI counters
 });
+
+
+// Handle selection/deselection for the subtask (child)
+function handleSubtaskClick(subTaskElement) {
+    toggleSelection(subTaskElement);
+}
+
+// Handle selection/deselection for the parent task
+function handleParentClick(mainTaskElement) {
+    const subtasks = Array.from(mainTaskElement.children);
+    const allSelected = subtasks.every(task => selectedDivs.includes(task));
+
+    subtasks.forEach(task => {
+        if (allSelected) {
+            selectedDivs = selectedDivs.filter(div => div !== task);
+            task.classList.remove('selected');
+        } else if (!selectedDivs.includes(task)) {
+            selectedDivs.push(task);
+            task.classList.add('selected');
+        }
+    });
+}
+
+// Update UI counters
+function updateUICounters() {
+    [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+}
+
+
+
+function toggleSelection(div) {
+    if (selectedDivs.includes(div)) {
+        selectedDivs = selectedDivs.filter(d => d !== div);
+        div.classList.remove('selected');
+    } else {
+        selectedDivs.push(div);
+        div.classList.add('selected');
+    }
+}
+// Add the touchend event listener
+yearContainer.addEventListener('dblclick', (event) => {
+    handleSubtaskGroupToggle(event);  // Handle double-click directly
+});
+
+yearContainer.addEventListener('touchend', (event) => {
+    handleTouchEnd(() => handleSubtaskGroupToggle(event));  
+});
+
+function handleSubtaskGroupToggle(event) {
+    const subTaskElement = event.target.closest('.morningTaskSub, .afternoonTaskSub, .eveningTaskSub');
+    
+    if (subTaskElement) {
+        const mainTaskElement = subTaskElement.closest('.morningTask, .afternoonTask, .eveningTask');
+        if (mainTaskElement) {
+            handleParentClick(mainTaskElement);  // Call the parent click handler for double-clicked subtask
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

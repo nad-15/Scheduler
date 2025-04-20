@@ -1187,6 +1187,7 @@ h2 {
     display: flex;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
+    border: .5px solid rgba(0, 0, 0, 0.3);
     /* background-color: aqua; */
     align-items: center;
     justify-content: center;
@@ -1230,8 +1231,10 @@ h2 {
     display: flex;
     flex-direction: column;
     padding: 0;
+    padding: 1.5px;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
+    border: .5px solid rgba(0, 0, 0, 0.3);
     flex: 2;
     font-weight: bold;
     cursor: pointer;
@@ -1239,6 +1242,7 @@ h2 {
     /* justify-content: center; */
     /* was 8px */
     font-size: 10px;
+    /* padding-bottom: 8px; */
     /* white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; */
@@ -1246,6 +1250,7 @@ h2 {
     overflow: auto;
     word-wrap: break-word;
     white-space: normal;
+
 
 
 
@@ -1263,7 +1268,7 @@ h2 {
 .afternoonTaskSub,
 .eveningTaskSub {
     display: flex;
-    padding: 2px;
+    padding: 1.5px;
     /* border: .5px solid #ccc; */
     /* border: .5px solid gray; */
     font-weight: bold;
@@ -1295,16 +1300,22 @@ h2 {
 }
 
 
+.morningTaskSub:active,
+.afternoonTaskSub:active,
+.eveningTaskSub:active {
+    transform: scale(0.95); /* Slightly shrink the element */
+    background-color: rgba(0, 0, 0, 0.1); /* Add a temporary overlay */
+    transition: transform 0.1s ease, background-color 0.1s ease;
+}
 
-.morningTask:active,
+
+/* .morningTask:active,
 .afternoonTask:active,
 .eveningTask:active {
     transform: scale(0.95);
-    /* Slightly shrink the element */
     background-color: rgba(0, 0, 0, 0.1);
-    /* Add a temporary overlay */
     transition: transform 0.1s ease, background-color 0.1s ease;
-}
+} */
 
 
 .morningTask.dragging,
