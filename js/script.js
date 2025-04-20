@@ -1293,6 +1293,7 @@ function deleteFunction() {
         } else {
             selectedDiv.textContent = '';
             selectedDiv.style.backgroundColor = '';
+            selectedDiv.style.borderLeft = '';
         }
 
         // If now empty, add one blank subtask to maintain structure
