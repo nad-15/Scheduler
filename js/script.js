@@ -23,39 +23,6 @@ const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 
 
 
-function revertToOldStructure() {
-    const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
-
-    const revertedData = {};
-
-    // Loop through each date in the stored data
-    for (const date in storedData) {
-        const dayData = storedData[date];
-        const revertedDayData = {
-            morning: {},
-            afternoon: {},
-            evening: {}
-        };
-
-        // Loop through morning, afternoon, evening and select the first task if multiple exist
-        for (const period in dayData) {
-            if (Array.isArray(dayData[period]) && dayData[period].length > 0) {
-                const firstTask = dayData[period][0];  // Take the first task if available
-                revertedDayData[period] = {
-                    task: firstTask.task,
-                    color: firstTask.color
-                };
-            }
-        }
-
-        revertedData[date] = revertedDayData;
-    }
-
-    // Store the reverted data back to localStorage
-    localStorage.setItem("tasks", JSON.stringify(revertedData));
-}
-
-revertToOldStructure();
 
 
 
