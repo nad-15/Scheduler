@@ -809,6 +809,7 @@ yearContainer.addEventListener('click', (event) => {
 
     if (subTaskElement) {
         handleSubtaskClick(subTaskElement); // Handle child click
+        updateUICounters(); 
         return; // prevent bubbling to parent logic
     }
 
@@ -920,11 +921,14 @@ function handleSubtaskGroupToggle(event) {
 const counterObserver = new MutationObserver(() => {
     if (parseInt(selectedTaskCounter.textContent) > 0) {
         submitTaskBtn.classList.remove('disabled-btn'); // Remove disabled styling
+        addTaskBtn.classList.remove('disabled-btn'); // Remove 
         selectedTaskCounter.classList.add(`selection-true`);
         // submitTaskBtn.disabled = false;
         // selectedTaskCounter.classList.remove('shake-btn'); // Remove shake effect when counter is > 0
     } else {
-        submitTaskBtn.classList.add('disabled-btn'); // Add disabled styling
+        submitTaskBtn.classList.add('disabled-btn'); // Add 
+        addTaskBtn.classList.add('disabled-btn'); // Remove 
+        // disabled styling
         // submitTaskBtn.disabled = true;
         selectedTaskCounter.classList.remove(`selection-true`);
         triggerShakeEffect();

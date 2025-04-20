@@ -867,7 +867,8 @@ h2 {
 }
 
 
-#submitTask.disabled-btn {
+#submitTask.disabled-btn,
+#addTask.disabled-btn {
     background-color: gray;
     /* Change background color */
     border: gray;
