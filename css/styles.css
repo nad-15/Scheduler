@@ -1188,7 +1188,7 @@ h2 {
     display: flex;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
-    border: .5px solid rgba(0, 0, 0, 0.3);
+    /* border: .5px solid rgba(0, 0, 0, 0.3); */
     /* background-color: aqua; */
     align-items: center;
     justify-content: center;
@@ -1235,7 +1235,7 @@ h2 {
     padding: 1px;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
-    border: .5px solid rgba(0, 0, 0, 0.3);
+    /* border: .5px solid rgba(0, 0, 0, 0.3); */
     flex: 2;
     font-weight: bold;
     cursor: pointer;
