@@ -423,6 +423,33 @@ yearContainer.addEventListener('scroll', () => {
         // console.log(`Next Month: ${nextDateMonth}, Last Date: ${nextDateLastDate}`);
     }
 });
+todayScroll();
+function todayScroll() {
+    const nowTodayElement = new Date();
+  
+    const yearTodayElement = nowTodayElement.getFullYear();
+    const monthTodayElement = nowTodayElement.getMonth();
+    const dayTodayElement = nowTodayElement.getDate();
+  
+    const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
+  
+    console.log('Built todayDate:', todayDate);
+  
+    const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
+    console.log('Found todayElement:', todayElement);
+  
+    if (todayElement) {
+      console.log("ENTERED todayElement");
+      todayElement.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+  }
+  
+
+
+
 
 
 function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "", yearDate) {
@@ -538,7 +565,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         dateDiv.textContent = date;
         dateDiv.classList.add('date');
         dateDiv.setAttribute('data-full-date', `${yearDate}-${monthName}-${date}`); // Store the full date as a data attribute
-
+        // console.log(dateDiv.getAttribute('data-full-date')); // ✅ See the real value
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
         // Get the day name
@@ -617,7 +644,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 // morningTaskDiv.appendChild(taskDiv);
                 if (color) {
                     taskDiv.style.borderLeft = `4px solid ${color}`;
-                    taskDiv.style.backgroundColor = fadeColor(color);
+                     taskDiv.style.backgroundColor = fadeColor(color);
                 } else {
                     taskDiv.style.borderLeft = `4px solid transparent`;
                     taskDiv.style.backgroundColor = 'transparent';
