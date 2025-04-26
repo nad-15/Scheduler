@@ -842,6 +842,11 @@ h2 {
     font-weight: normal;
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* Hover effect */
@@ -1288,6 +1293,7 @@ h2 {
     overflow: auto;
     word-wrap: break-word;
     white-space: normal;
+    scrollbar-width: none;
     
     text-align: center;  
     user-select: none;
