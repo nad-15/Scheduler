@@ -226,7 +226,7 @@ addTaskBtn.addEventListener('click', () => {
         }
 
         taskDivToUse.style.borderLeft = `4px solid ${chosenColor}`;
-        taskDivToUse.style.backgroundColor = fadeColor(chosenColor); 
+        taskDivToUse.style.backgroundColor = fadeColor(chosenColor);
 
         // 🔹 Select only the newly added/updated task
         taskDivToUse.classList.add('selected');
@@ -461,18 +461,18 @@ yearContainer.addEventListener('scroll', () => {
 // todayScroll();
 // function todayScroll() {
 //     const nowTodayElement = new Date();
-  
+
 //     const yearTodayElement = nowTodayElement.getFullYear();
 //     const monthTodayElement = nowTodayElement.getMonth();
 //     const dayTodayElement = nowTodayElement.getDate();
-  
+
 //     const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
-  
+
 //     console.log('Built todayDate:', todayDate);
-  
+
 //     const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
 //     console.log('Found todayElement:', todayElement);
-  
+
 //     if (todayElement) {
 //       console.log("ENTERED todayElement");
 //       todayElement.scrollIntoView({
@@ -482,7 +482,7 @@ yearContainer.addEventListener('scroll', () => {
 //     // showDayTasks(todayElement);
 //     }
 //   }
-  
+
 
 
 
@@ -681,7 +681,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 // morningTaskDiv.appendChild(taskDiv);
                 if (color) {
                     taskDiv.style.borderLeft = `4px solid ${color}`;
-                     taskDiv.style.backgroundColor = fadeColor(color);
+                    taskDiv.style.backgroundColor = fadeColor(color);
                 } else {
                     taskDiv.style.borderLeft = `4px solid transparent`;
                     taskDiv.style.backgroundColor = 'transparent';
@@ -1660,7 +1660,7 @@ function showCalHorView() {
         return;
     }
 
-    main.style.display = 'flex';
+    main.style.display = 'block';
     vert.style.display = 'none'; // Assuming your flex styles are defined in CSS
 }
 
@@ -1675,7 +1675,8 @@ function showCalVertView() {
         console.error('One or both containers are missing in the DOM.');
         return;
     }
-
+    createCalendarGrid();
+    updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
     main.style.display = 'none';
     vert.style.display = 'flex'; // Assuming your flex styles are defined in CSS
 }
