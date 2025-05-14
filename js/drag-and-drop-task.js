@@ -1,32 +1,166 @@
 
+// yearContainer.addEventListener('click', (e) => {
+//     const day = e.target.closest('.day');
+//     const date = e.target.closest('.date');
+    
+//     if (day && !yearContainer.classList.contains('hide-days')) {
+//         // If .day is visible, toggle visibility of .date
+//         if (!yearContainer.classList.contains('hide-dates')) {
+//             yearContainer.classList.add('hide-dates');
+//             console.log('day click - hide date');
+//         } else {
+//             yearContainer.classList.remove('hide-dates');
+//             console.log('day click - show date');
+//         }
+//     }
+    
+//     if (date && !yearContainer.classList.contains('hide-dates')) {
+//         // If .date is visible, toggle visibility of .day
+//         if (!yearContainer.classList.contains('hide-days')) {
+//             yearContainer.classList.add('hide-days');
+//             console.log('date click - hide day');
+//         } else {
+//             yearContainer.classList.remove('hide-days');
+//             console.log('date click - show day');
+//         }
+//     }
+// });
+
+
+// === RESIZE THE CALENDAR VIEW MINUS THE ADDRESS BAR ===
+function adjustCalendarHeight() {
+//   calendarContainerVertView.style.height = `${window.innerHeight}px`;
+
+  // Adjust popup max-height as well
+  const popup = document.getElementById("calendar-pop-up");
+  if (popup) {
+    popup.style.maxHeight = `${window.innerHeight * 0.8}px`;
+    popup.style.height = `${window.innerHeight * 0.8}px`;
+  }
+}
+
+
+// Call initially and on resize
+adjustCalendarHeight();
+window.addEventListener('resize', adjustCalendarHeight);
+
 yearContainer.addEventListener('click', (e) => {
-    const day = e.target.closest('.day');
-    const date = e.target.closest('.date');
-    
-    if (day && !yearContainer.classList.contains('hide-days')) {
-        // If .day is visible, toggle visibility of .date
-        if (!yearContainer.classList.contains('hide-dates')) {
-            yearContainer.classList.add('hide-dates');
-            console.log('day click - hide date');
-        } else {
-            yearContainer.classList.remove('hide-dates');
-            console.log('day click - show date');
-        }
-    }
-    
-    if (date && !yearContainer.classList.contains('hide-dates')) {
-        // If .date is visible, toggle visibility of .day
-        if (!yearContainer.classList.contains('hide-days')) {
-            yearContainer.classList.add('hide-days');
-            console.log('date click - hide day');
-        } else {
-            yearContainer.classList.remove('hide-days');
-            console.log('date click - show day');
-        }
-    }
+  const dateEl = e.target.closest('.date');
+  if (dateEl) {
+    const fullDate = dateEl.dataset.fullDate;
+    console.log("DATE IS CLICKED:", fullDate);
+    showDayTasks(e);
+  }
 });
 
 
+  function showDayTasks(e) {
+  const target = e.target.closest('[data-full-date]');
+  if (!target) return;
+
+  const date = target.dataset.fullDate;
+  if (!date) return;
+
+    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+    const dayTasks = storedTasks[date];
+
+    const dateObj = new Date(date);
+    dateObj.setMonth(dateObj.getMonth() + 1); // Add 1 to the month
+
+    const readable = dateObj.toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    document.getElementById("popup-date").textContent = readable;
+
+    const popupTasks = document.getElementById("popup-tasks");
+    popupTasks.innerHTML = "";
+
+    if (!dayTasks) {
+      const noTask = document.createElement("p");
+      noTask.textContent = "No tasks for this day.";
+      popupTasks.appendChild(noTask);
+    } else {
+      const periods = ["morning", "afternoon", "evening"];
+
+      periods.forEach(period => {
+        const section = document.createElement("div");
+        section.classList.add("period-section");
+
+        // const heading = document.createElement("h3");
+        // heading.textContent = period.charAt(0).toUpperCase() + period.slice(1);
+        // section.appendChild(heading);
+
+        // const dashedLine = document.createElement("hr");
+        // dashedLine.classList.add("dashed-line");
+        // section.appendChild(dashedLine);
+
+        const divider = document.createElement("div");
+        divider.className = "section-divider";
+        divider.textContent = period.charAt(0).toUpperCase() + period.slice(1);
+        section.appendChild(divider);
+
+
+        const periodTasks = dayTasks[period];
+if (periodTasks && periodTasks.length > 0) {
+  periodTasks.forEach(({ task, color }) => {
+    const eventDiv = document.createElement("div");
+    eventDiv.className = "event";
+
+    const content = document.createElement("div");
+    content.className = "event-content";
+
+    const title = document.createElement("span");
+    title.className = "event-title";
+
+    const hasText = task && task.trim() !== "";
+    const hasColor = color && color.trim() !== "";
+
+    if (hasText && hasColor) {
+      content.style.borderLeft = `5px solid ${color}`;
+      title.textContent = task;
+    } else if (!hasText && hasColor) {
+      content.style.borderLeft = `5px solid ${color}`;
+      title.textContent = "No Title";
+    } else {
+      // No text and no color
+      content.style.borderLeft = "none";
+      title.textContent = "No Task";
+    }
+
+    content.appendChild(title);
+    eventDiv.appendChild(content);
+    section.appendChild(eventDiv);
+  });
+}
+else {
+          const noTask = document.createElement("p");
+          noTask.className = "no-tasks-text";
+          noTask.textContent = "No tasks for this period.";
+          section.appendChild(noTask);
+        }
+
+        popupTasks.appendChild(section);
+      });
+    }
+
+    document.getElementById("calendar-pop-up").style.display = "block";
+    document.getElementById("backdrop").style.display = "block";
+  }
+
+
+
+  
+  // === CLOSE FUNCITONALITY FOR POP UP
+  document.getElementById("closePopupBtn").addEventListener("click", () => {
+    document.getElementById("calendar-pop-up").style.display = "none";
+    document.getElementById("backdrop").style.display = "none";
+  });
+
+  document.getElementById("backdrop").addEventListener("click", () => {
+    document.getElementById("calendar-pop-up").style.display = "none";
+    document.getElementById("backdrop").style.display = "none";
+  });
 
 
 // let isDraggingTask = false;

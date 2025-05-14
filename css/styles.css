@@ -1804,6 +1804,128 @@ h2 {
 }
 
 
+/* ===========DAYTASK SINGLE DIV */
+
+#calendar-pop-up {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  overflow-y: auto;
+  background-color: white;
+  color: black;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  padding: 20px;
+  padding-top: 0px;
+  z-index: 2000;
+}
+
+.popup-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  /* border-bottom: 2px solid #ccc; */
+  padding-bottom: 5px;
+  padding-top: 20px;
+}
+
+#popup-date {
+  font-size: 15px; /* 1.3rem */
+  font-weight: bold;
+  display: inline-block;
+  color: black;
+}
+
+#closePopupBtn {
+  border: transparent;
+  background-color: transparent;
+  height: 100%;
+  aspect-ratio: 1/1;
+}
+
+.popup-tasks {
+  /* background-color: red; */
+  display: flex;
+  flex-direction: column;
+  margin: 2px;
+flex-grow: 1;
+}
+
+.period-section {
+      /* background-color: red; */
+  /* margin-bottom: 20px; */
+  font-size: 14px; /* 1.2rem */
+  color: #333;
+}
+
+.dashed-line {
+  border: none;
+  border-top: 1px dashed #aaa;
+  margin: 5px 0 10px 0;
+}
+
+.section-divider {
+      /* background-color: red; */
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: black;
+  font-weight: bold;
+  /* margin: 10px  0; */
+  margin-bottom: 10px;
+  font-size: 8px;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px dashed #aaa;
+  margin: 0 0px;
+}
+
+
+.event-content {
+  font-size: 12px; /* 1rem */
+  padding: 5px 10px;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.event-title {
+  color: black;
+}
+
+.no-tasks-text {
+  color: #777;
+  margin: 5px 10px;
+}
+
+
+.backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  /* Dark overlay */
+  z-index: 1999;
+  /* Just below the popup */
+}
+
+/* ===========DAYTASK SINGLE DIV */
+
+
 
 @keyframes aurora {
     0% {
