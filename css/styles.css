@@ -1837,15 +1837,30 @@ h2 {
 }
 
 #popup-date {
+    /* background-color: red; */
   font-size: 15px; /* 1.3rem */
   font-weight: bold;
   display: inline-block;
   color: black;
 }
 
+
+#popup-date .weekday {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+#popup-date .month-year {
+  font-size: 0.85em;
+  color: black;
+}
+
+
 #closePopupBtn {
   border: transparent;
+  
   background-color: transparent;
+      /* background-color: red; */
   height: 100%;
   aspect-ratio: 1/1;
 }

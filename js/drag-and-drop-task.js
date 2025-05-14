@@ -94,14 +94,18 @@ function adjustCalendarHeight() {
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
     const dayTasks = storedTasks[date];
 
+   
     const dateObj = new Date(date);
-    dateObj.setMonth(dateObj.getMonth() + 1); // Add 1 to the month
+    dateObj.setMonth(dateObj.getMonth() + 1); // If needed
 
-    const readable = dateObj.toLocaleDateString('en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
+    const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+    const rest = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-    document.getElementById("popup-date").textContent = readable;
+document.getElementById("popup-date").innerHTML = `
+  <div class="weekday">${weekday}</div>
+  <div class="month-year">${rest}</div>
+`;
+
 
     const popupTasks = document.getElementById("popup-tasks");
     popupTasks.innerHTML = "";
