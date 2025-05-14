@@ -1,6 +1,25 @@
+:root {
+  --calendar-bg: #ffffff;
+  --calendar-text: #333;
+  --calendar-accent: #007bff;
+  --calendar-border: #ddd;
+  --calendar-header-bg: #f8f8f8;
+  --calendar-day-bg: #f0f0f0;
+  --muted-text: #999;
+}
+
 /* * {
     border: 1px solid limegreen;
 } */
+
+/* Reset common spacing */
+/* * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: monospace; */
+  /* border: 2px solid lime; */
+/* } */
 
 body {
     box-sizing: border-box;
@@ -1805,6 +1824,190 @@ h2 {
 
 
 /* ===========DAYTASK SINGLE DIV */
+
+
+/* Calendar Container */
+.calendar-container-vert-view {
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  /* height: 100vh; */
+  background-color: var(--calendar-bg);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+  box-sizing: border-box;
+  /* overflow: hidden;  */
+  overflow-y: auto;
+  scrollbar-width: none;
+
+}
+
+/* Header */
+.calendar-header-vert-view {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--calendar-header-bg);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  /* margin-bottom: 0.5rem; */
+}
+
+.month-label-vert-view {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.nav-button-vert-view {
+  background-color: var(--calendar-accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+/* Day Names */
+.calendar-vert-view {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: bold;
+  /* padding: 0.25rem 0; */
+  color: var(--calendar-text);
+}
+
+.day-name-vert-view {
+  background-color: var(--calendar-day-bg);
+  padding: 0.5rem 0;
+  border: 1px solid var(--calendar-border);
+}
+
+/* Days Grid */
+.days-grid-vert-view {
+  /* background: red; */
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  height: 100%;
+  border-top: 2px solid var(--calendar-border);
+  border-bottom: 2px solid var(--calendar-border);
+  border-collapse: collapse;
+  /* Makes the grid scrollable */
+  /* overflow-y: auto;  */
+  flex-grow: 1;
+  /* Allow it to grow and fill available space */
+  overflow: hidden;
+}
+
+/* Cell Style */
+.days-grid-vert-view>div {
+  background-color: white;
+  border: 1px solid var(--calendar-border);
+  /* padding: 0.5rem; */
+  text-align: center;
+  /* font-size: 1rem; */
+  box-sizing: border-box;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* Single Line Divider for Date Grid */
+.days-grid-vert-view>div {
+  border-top: 1px solid var(--calendar-border);
+  border-left: 1px solid var(--calendar-border);
+}
+
+/* Previous/next month day style */
+.adjacent-month-vert-view {
+  color: var(--muted-text);
+  opacity: 0.5;
+}
+
+/* Day box container (holds date + task container) */
+.day-vert-view {
+  /* background-color: red; */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1px;
+  text-align: center;
+  font-size: 0.7rem;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  flex-grow: 1;
+  /* Ensure the cells grow to fill available space */
+}
+
+/* Task container scrollable area */
+.task-container-vert-view {
+  /* background: red; */
+  margin-top: 4px;
+  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: calc(100% - 1.2rem);
+  /* Leaves space for the date number */
+  scrollbar-width: none;
+}
+
+/* Task styling */
+.task-morning,
+.task-afternoon,
+.task-evening {
+
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: bold;
+  min-height: 13px;
+  height: 13px;
+  /* Fix height */
+  line-height: 13px;
+  /* Vertically center text */
+  width: 100%;
+  /* border: 1px solid var(--calendar-border); */
+  border-radius: 3px;
+  box-sizing: border-box;
+  padding: 0 2px;
+  /* Optional small padding */
+
+  /* background-color: #f9f9f9; */
+  color: #333;
+
+  display: block;
+  /* Simplify ellipsis behavior */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-left: 3px solid transparent;
+  background-color: transparent;
+  text-align: left;
+}
+
+
+.today-vert-view .day-number {
+  background-color: #2196F3;
+  color: white;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-weight: bold;
+}
+
 
 #calendar-pop-up {
   display: none;

@@ -495,6 +495,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 
     const monthNameContainer = document.createElement('div');
+    monthNameContainer.addEventListener('click', showCalVertView);
     monthNameContainer.classList.add('month-name-container');
 
 
@@ -1644,4 +1645,37 @@ function fadeColor(color, alpha = 0.6) {
     const g = parseInt(color.substr(3, 2), 16);
     const b = parseInt(color.substr(5, 2), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+monthLabelVertView.addEventListener('click', showCalHorView);
+function showCalHorView() {
+    console.log("Vert View Showing");
+
+    // Make sure both elements exist
+    const main = document.getElementById('main-container');
+    const vert = document.getElementById('calendar-container-vert-view');
+
+    if (!main || !vert) {
+        console.error('One or both containers are missing in the DOM.');
+        return;
+    }
+
+    main.style.display = 'flex';
+    vert.style.display = 'none'; // Assuming your flex styles are defined in CSS
+}
+
+function showCalVertView() {
+    console.log("Vert View Showing");
+
+    // Make sure both elements exist
+    const main = document.getElementById('main-container');
+    const vert = document.getElementById('calendar-container-vert-view');
+
+    if (!main || !vert) {
+        console.error('One or both containers are missing in the DOM.');
+        return;
+    }
+
+    main.style.display = 'none';
+    vert.style.display = 'flex'; // Assuming your flex styles are defined in CSS
 }

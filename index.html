@@ -425,7 +425,52 @@
                     <button class="btn-clear button-template template-btn clear-btn">0</button>
                 </div>
             </div>
+
+
+
+    </div>
+
+    
+
             <!-- ===========DAYTASK SINGLE DIV -->
+
+
+            <!-- vertical view calendar -->
+
+            <!-- Button to Toggle Calendar Visibility -->
+            <!-- <button id="show-vert-calendar-btn" class="show-vert-calendar-btn">Show Calendar</button> -->
+
+            <!-- Calendar Container -->
+            <div class="calendar-container-vert-view" id="calendar-container-vert-view">
+                <div class="calendar-header-vert-view">
+                    <button id="prev-month-vert-view" class="nav-button-vert-view">Prev</button>
+                    <div class="month-label-vert-view" id="month-label-vert-view">May 2025</div>
+                    <button id="next-month-vert-view" class="nav-button-vert-view">Next</button>
+                </div>
+
+                <!-- Grid for days of the week -->
+                <div class="calendar-vert-view">
+                    <div class="day-name-vert-view">Sun</div>
+                    <div class="day-name-vert-view">Mon</div>
+                    <div class="day-name-vert-view">Tue</div>
+                    <div class="day-name-vert-view">Wed</div>
+                    <div class="day-name-vert-view">Thu</div>
+                    <div class="day-name-vert-view">Fri</div>
+                    <div class="day-name-vert-view">Sat</div>
+                </div>
+
+                <!-- Calendar Days Grid (Filled Dynamically) -->
+                <div class="days-grid-vert-view" id="days-grid-vert-view">
+                    <!-- Days will be inserted dynamically here -->
+                </div>
+            </div>
+
+
+
+
+
+
+
             <div id="calendar-pop-up">
                 <div class="popup-header">
                     <span class="popup-date" id="popup-date">May 21, 2025</span>
@@ -436,27 +481,21 @@
 
 
                 <div class="popup-tasks" id="popup-tasks">
-                    <!-- Tasks will be injected here dynamically -->
-                    <!-- <div class="event">
-      <span class="event-title">My event</span>
-      <span class="event-date">May 21 - May 23</span>
-    </div>
-    <div class="event">
-      <span class="event-title">Leave</span>
-      <span class="event-date">All day</span>
-    </div> -->
                 </div>
 
 
             </div>
 
             <div id="backdrop" class="backdrop"></div>
-            <!-- ===========DAYTASK SINGLE DIV -->
 
-    </div>
+
+
+
+            <!-- ===========DAYTASK SINGLE DIV -->
     <footer></footer>
     </main>
     </div>
+    <script src="./js/calVertView.js"></script>
     <script src="./js/colorThemes.js"></script>
     <script src="./js/script.js"></script>
     <script src="./js/job-template.js"></script>
