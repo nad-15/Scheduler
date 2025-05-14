@@ -563,8 +563,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     // Apply saved lock state when the page loads
     if (isLocked) {
         console.log(`${FormatMonthName} is locked`);
-        monthContainer.style.pointerEvents = "none"; // Disable interaction for the month container
-        icon.textContent = "lock"; // Change icon to locked
+        monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
+        icon.textContent = "lock_open"; // Change icon to locked
     }
 
     // Lock/Unlock functionality
@@ -573,8 +573,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
         if (isLocked) {
             console.log(`${FormatMonthName} is locked`);
-            monthContainer.style.pointerEvents = "none"; // Disable interaction for the month container
-            icon.textContent = "lock"; // Change icon to locked
+            monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
+            icon.textContent = "lock_open"; // Change icon to locked
         } else {
             console.log(`${FormatMonthName} is unlocked`);
             monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
