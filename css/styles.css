@@ -830,7 +830,7 @@ h2 {
 }
 
 /* submitTask  button  */
-#submitTask {
+#submitTask, #addTask {
     box-sizing: border-box;
     background-color: #0078FF;
     color: white;
@@ -842,6 +842,11 @@ h2 {
     font-weight: normal;
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* Hover effect */
@@ -867,7 +872,8 @@ h2 {
 }
 
 
-#submitTask.disabled-btn {
+#submitTask.disabled-btn,
+#addTask.disabled-btn {
     background-color: gray;
     /* Change background color */
     border: gray;
@@ -988,10 +994,10 @@ h2 {
 
     background-color: transparent;
     border: none;
-    color: #c2185b;
+    color: #6a5044;
 }
 
-.material-icons.arrow-upward {
+.material-icons.arrow-upward, .material-icons.add-btn {
     font-size: 20px;
 }
 
@@ -1135,10 +1141,12 @@ h2 {
     box-sizing: border-box;
     flex-direction: row;
     width: 100%;
-    height: 28px;
+    min-height: 28px;  /* default size */
+    height: auto;      /* allows expansion when needed */
+    align-items: stretch;
     border: none;
-    /* background-color: red; */
 }
+
 
 
 
@@ -1185,6 +1193,7 @@ h2 {
     display: flex;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
+    /* border: .5px solid rgba(0, 0, 0, 0.3); */
     /* background-color: aqua; */
     align-items: center;
     justify-content: center;
@@ -1219,20 +1228,27 @@ h2 {
 
 }
 
+
+
+
 .morningTask,
 .afternoonTask,
 .eveningTask {
     display: flex;
+    flex-direction: column;
     padding: 0;
+    padding: 1px;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
+    /* border: .5px solid rgba(0, 0, 0, 0.3); */
     flex: 2;
     font-weight: bold;
     cursor: pointer;
-    align-items: center;
-    justify-content: center;
+    /* align-items: center; */
+    /* justify-content: center; */
     /* was 8px */
     font-size: 10px;
+    /* padding-bottom: 8px; */
     /* white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; */
@@ -1240,6 +1256,7 @@ h2 {
     overflow: auto;
     word-wrap: break-word;
     white-space: normal;
+
 
 
 
@@ -1252,15 +1269,63 @@ h2 {
     /* align-content: center; */
 }
 
-.morningTask:active,
+
+.morningTaskSub,
+.afternoonTaskSub,
+.eveningTaskSub {
+    display: flex;
+    padding: 3px;
+    /* border: .5px solid #ccc; */
+    /* border: .5px solid gray; */
+    font-weight: bold;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    /* was 8px */
+    font-size: 10px;
+    /* white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; */
+    margin: 1px;
+    border-radius: 3px;
+    height: 18px;
+
+    overflow: auto;
+    word-wrap: break-word;
+    white-space: normal;
+    scrollbar-width: none;
+    
+    text-align: center;  
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+    border-left: 4px solid transparent; 
+    background-color: transparent;
+    
+
+
+    /* align-content: center; */
+}
+
+
+.morningTaskSub:active,
+.afternoonTaskSub:active,
+.eveningTaskSub:active {
+    transform: scale(0.95); /* Slightly shrink the element */
+    background-color: rgba(0, 0, 0, 0.1); /* Add a temporary overlay */
+    transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+
+/* .morningTask:active,
 .afternoonTask:active,
 .eveningTask:active {
     transform: scale(0.95);
-    /* Slightly shrink the element */
     background-color: rgba(0, 0, 0, 0.1);
-    /* Add a temporary overlay */
     transition: transform 0.1s ease, background-color 0.1s ease;
-}
+} */
 
 
 .morningTask.dragging,
@@ -1571,6 +1636,7 @@ h2 {
     border-radius: 2px;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    text-align: center;  
 
     overflow: auto;
     word-wrap: break-word;
