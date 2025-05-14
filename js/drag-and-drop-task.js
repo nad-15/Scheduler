@@ -43,7 +43,9 @@ yearContainer.addEventListener('click', (e) => {
 
 todayScroll();
 function todayScroll() {
-    const nowTodayElement = new Date();
+
+    const todayDateObj = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
+    const nowTodayElement = new Date(todayDateObj);
   
     const yearTodayElement = nowTodayElement.getFullYear();
     const monthTodayElement = nowTodayElement.getMonth();
