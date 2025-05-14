@@ -27,57 +27,38 @@ const addTaskBtn = document.getElementById(`addTask`);
 
 
 
-migrateTaskDataToArrayFormat();
-function migrateTaskDataToArrayFormat() {
-    const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
-    const migratedData = {};
+// migrateTaskDataToArrayFormat();
+// function migrateTaskDataToArrayFormat() {
+//     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
+//     const migratedData = {};
 
-    for (const date in storedData) {
-        migratedData[date] = {};
+//     for (const date in storedData) {
+//         migratedData[date] = {};
 
-        ["morning", "afternoon", "evening"].forEach(period => {
-            const value = storedData[date][period];
+//         ["morning", "afternoon", "evening"].forEach(period => {
+//             const value = storedData[date][period];
 
-            // If it's NOT an array already AND it has task/color keys
-            if (value && typeof value === "object" && !Array.isArray(value)) {
-                const { task = "", color = "" } = value;
-                migratedData[date][period] = [{ task, color }];
-            }
+//             // If it's NOT an array already AND it has task/color keys
+//             if (value && typeof value === "object" && !Array.isArray(value)) {
+//                 const { task = "", color = "" } = value;
+//                 migratedData[date][period] = [{ task, color }];
+//             }
 
-            // If it's already in correct format (array of objects), keep as-is
-            else if (Array.isArray(value)) {
-                migratedData[date][period] = value;
-            }
+//             // If it's already in correct format (array of objects), keep as-is
+//             else if (Array.isArray(value)) {
+//                 migratedData[date][period] = value;
+//             }
 
-            // If missing or invalid, default to empty array
-            else {
-                migratedData[date][period] = [];
-            }
-        });
-    }
+//             // If missing or invalid, default to empty array
+//             else {
+//                 migratedData[date][period] = [];
+//             }
+//         });
+//     }
 
-    localStorage.setItem("tasks", JSON.stringify(migratedData));
-    console.log("✅ Task data migrated to array-of-objects format.");
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//     localStorage.setItem("tasks", JSON.stringify(migratedData));
+//     console.log("✅ Task data migrated to array-of-objects format.");
+// }
 
 
 
@@ -226,55 +207,7 @@ addTaskBtn.addEventListener('click', () => {
 
 
 
-function revertToOldStructure() {
-    const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
 
-    // Check if the data is already in the original structure (i.e., not an array)
-    let isInOldFormat = true;
-
-    for (const date in storedData) {
-        const dayData = storedData[date];
-        for (const period in dayData) {
-            if (Array.isArray(dayData[period]) && dayData[period].length > 0) {
-                isInOldFormat = false;  // Data is already in the new format
-                break;
-            }
-        }
-        if (!isInOldFormat) break;
-    }
-
-    if (isInOldFormat) return; // Data is already in the old format, do nothing
-
-    const revertedData = {};
-
-    // Loop through each date in the stored data
-    for (const date in storedData) {
-        const dayData = storedData[date];
-        const revertedDayData = {
-            morning: {},
-            afternoon: {},
-            evening: {}
-        };
-
-        // Loop through morning, afternoon, evening and select the first task if multiple exist
-        for (const period in dayData) {
-            if (Array.isArray(dayData[period]) && dayData[period].length > 0) {
-                const firstTask = dayData[period][0];  // Take the first task if available
-                revertedDayData[period] = {
-                    task: firstTask.task,
-                    color: firstTask.color
-                };
-            }
-        }
-
-        revertedData[date] = revertedDayData;
-    }
-
-    // Store the reverted data back to localStorage
-    localStorage.setItem("tasks", JSON.stringify(revertedData));
-}
-
-revertToOldStructure();
 
 
 
