@@ -26,6 +26,47 @@
 //     }
 // });
 
+// Call initially and on resize
+adjustCalendarHeight();
+window.addEventListener('resize', adjustCalendarHeight);
+
+yearContainer.addEventListener('click', (e) => {
+  const dateEl = e.target.closest('.date');
+  if (dateEl) {
+    const fullDate = dateEl.dataset.fullDate;
+    console.log("DATE IS CLICKED:", fullDate);
+    showDayTasks(e);
+  }
+});
+
+
+
+todayScroll();
+function todayScroll() {
+    const nowTodayElement = new Date();
+  
+    const yearTodayElement = nowTodayElement.getFullYear();
+    const monthTodayElement = nowTodayElement.getMonth();
+    const dayTodayElement = nowTodayElement.getDate();
+  
+    const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
+  
+    console.log('Built todayDate:', todayDate);
+  
+    const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
+    console.log('Found todayElement:', todayElement);
+  
+    if (todayElement) {
+      console.log("ENTERED todayElement");
+      todayElement.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    todayElement.click(); 
+    }
+  }
+  
+
 
 // === RESIZE THE CALENDAR VIEW MINUS THE ADDRESS BAR ===
 function adjustCalendarHeight() {
@@ -40,18 +81,7 @@ function adjustCalendarHeight() {
 }
 
 
-// Call initially and on resize
-adjustCalendarHeight();
-window.addEventListener('resize', adjustCalendarHeight);
 
-yearContainer.addEventListener('click', (e) => {
-  const dateEl = e.target.closest('.date');
-  if (dateEl) {
-    const fullDate = dateEl.dataset.fullDate;
-    console.log("DATE IS CLICKED:", fullDate);
-    showDayTasks(e);
-  }
-});
 
 
   function showDayTasks(e) {

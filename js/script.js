@@ -265,6 +265,7 @@ addTaskBtn.addEventListener('click', () => {
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
     getWeather();
+
 });
 
 
@@ -455,29 +456,32 @@ yearContainer.addEventListener('scroll', () => {
         // console.log(`Next Month: ${nextDateMonth}, Last Date: ${nextDateLastDate}`);
     }
 });
-todayScroll();
-function todayScroll() {
-    const nowTodayElement = new Date();
+
+
+// todayScroll();
+// function todayScroll() {
+//     const nowTodayElement = new Date();
   
-    const yearTodayElement = nowTodayElement.getFullYear();
-    const monthTodayElement = nowTodayElement.getMonth();
-    const dayTodayElement = nowTodayElement.getDate();
+//     const yearTodayElement = nowTodayElement.getFullYear();
+//     const monthTodayElement = nowTodayElement.getMonth();
+//     const dayTodayElement = nowTodayElement.getDate();
   
-    const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
+//     const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
   
-    console.log('Built todayDate:', todayDate);
+//     console.log('Built todayDate:', todayDate);
   
-    const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
-    console.log('Found todayElement:', todayElement);
+//     const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
+//     console.log('Found todayElement:', todayElement);
   
-    if (todayElement) {
-      console.log("ENTERED todayElement");
-      todayElement.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-    }
-  }
+//     if (todayElement) {
+//       console.log("ENTERED todayElement");
+//       todayElement.scrollIntoView({
+//         behavior: "smooth",
+//         block: "center"
+//       });
+//     // showDayTasks(todayElement);
+//     }
+//   }
   
 
 
