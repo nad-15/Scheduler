@@ -24,7 +24,7 @@ const addTaskBtn = document.getElementById(`addTask`);
 
 
 
-
+console.log("Success");
 migrateTaskDataToArrayFormat();
 function migrateTaskDataToArrayFormat() {
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
