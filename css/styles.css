@@ -2153,6 +2153,7 @@ flex-grow: 1;
 }
 
 .pop-up-calview-navi {
+    box-sizing: border-box;
     position: absolute;
     bottom: 0;
     left: 0;
