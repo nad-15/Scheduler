@@ -22,6 +22,24 @@ const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
 
+const showVertViewBtn = document.getElementById('calendar-icon-vertview');
+const showHorViewBtn = document.getElementById('calendar-icon-horview');
+
+showVertViewBtn.addEventListener('click', ()=>{
+    document.getElementById("calendar-pop-up").style.display = "none";
+    document.getElementById("backdrop").style.display = "none";
+    showCalVertView();
+});
+
+
+showHorViewBtn.addEventListener('click', ()=>{
+    document.getElementById("calendar-pop-up").style.display = "none";
+    document.getElementById("backdrop").style.display = "none";
+    showCalHorView();
+});
+
+
+
 
 
 console.log("Success");

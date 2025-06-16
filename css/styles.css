@@ -2061,6 +2061,7 @@ color: white;
   /* border-bottom: 2px solid #ccc; */
   padding-bottom: 5px;
   padding-top: 20px;
+  
 }
 
 #popup-date {
@@ -2151,6 +2152,19 @@ flex-grow: 1;
   margin: 5px 10px;
 }
 
+.pop-up-calview-navi {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 12px 16px;
+    background: #f9f9f9;
+    border-top: 1px solid #ccc;
+    display: flex;
+    justify-content: space-around;
+    z-index: 10;
+  }
+  
 
 .backdrop {
   display: none;
