@@ -2,7 +2,8 @@
   --calendar-bg: #ffffff;
   --calendar-text: #333;
   --calendar-accent: #007bff;
-  --calendar-border: #ddd;
+  /* --calendar-border: #ddd; */
+  --calendar-border: black;
   --calendar-header-bg: #f8f8f8;
   --calendar-day-bg: #f0f0f0;
   --muted-text: #999;
@@ -1900,7 +1901,9 @@ h2 {
 }
 
 .day-name-vert-view {
-  background-color: var(--calendar-day-bg);
+  /* background-color: var(--calendar-day-bg); */
+  background-color: var(--calendar-accent);
+color: white;
   padding: 0.5rem 0;
   border: 1px solid var(--calendar-border);
 }
