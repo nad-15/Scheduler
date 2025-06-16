@@ -1,11 +1,11 @@
 :root {
   --calendar-bg: #ffffff;
   --calendar-text: #333;
-  --calendar-accent: #007bff;
+  --calendar-accent: white;
   /* --calendar-border: #ddd; */
-  --calendar-border: black;
+  --calendar-border: rgb(235, 231, 231);
   --calendar-header-bg: #f8f8f8;
-  --calendar-day-bg: #f0f0f0;
+  --calendar-day-bg: white;
   --muted-text: #999;
 }
 
@@ -1851,8 +1851,8 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* background: var(--calendar-header-bg); */
-  background-color: rgb(223, 223, 223);
+  background: white;
+  /* background-color: rgb(223, 223, 223); */
   padding: 1rem 1rem;
   /* border-radius: 10px; */
   /* margin-bottom: 0.5rem; */
@@ -1883,7 +1883,7 @@ h2 {
   /* padding: 0.5rem 1rem; */
   border-radius: 6px;
   font-size: 1rem;
-  background-color: transparent;
+  background-color: rgb(235, 231, 231);
   
 }
 
@@ -1904,9 +1904,14 @@ h2 {
 .day-name-vert-view {
   /* background-color: var(--calendar-day-bg); */
   background-color: var(--calendar-accent);
-color: white;
+color: black;
   padding: 0.5rem 0;
-  border: 1px solid var(--calendar-border);
+  border: 0.5px solid var(--calendar-border);
+  /* background-color: red; */
+  border-top: none;
+  border-bottom: none;
+
+  /* border: none; */
 }
 
 /* Days Grid */
@@ -1924,13 +1929,14 @@ color: white;
   flex-grow: 1;
   /* Allow it to grow and fill available space */
   overflow: hidden;
+
 }
 
 /* Cell Style */
 .days-grid-vert-view>div {
   background-color: white;
   /* border: 1px solid var(--calendar-border); */
-  border: 0.5px solid black;
+  border: 0.5px solid rgb(235, 231, 231);
   /* padding: 0.5rem; */
   text-align: center;
   /* font-size: 1rem; */
@@ -1947,6 +1953,7 @@ color: white;
 .days-grid-vert-view>div {
   border-top: 1px solid var(--calendar-border);
   border-left: 1px solid var(--calendar-border);
+  
 }
 
 /* Previous/next month day style */
@@ -1963,12 +1970,14 @@ color: white;
   justify-content: flex-start;
   padding: 1px;
   text-align: center;
-  font-size: 12px;
+  font-size: 16px;
+  font-weight: bold;
   height: 100%;
   position: relative;
   overflow: hidden;
   flex-grow: 1;
   /* Ensure the cells grow to fill available space */
+
 }
 
 /* Task container scrollable area */
