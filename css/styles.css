@@ -1914,6 +1914,10 @@ color: black;
   /* border: none; */
 }
 
+.day-name-vert-view.sunday{
+    color: red;
+}
+
 /* Days Grid */
 .days-grid-vert-view {
   /* background: red; */
