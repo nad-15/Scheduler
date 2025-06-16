@@ -1906,7 +1906,7 @@ h2 {
   background-color: var(--calendar-accent);
 color: black;
   padding: 0.5rem 0;
-  border: 1px solid var(--calendar-border);
+  border: 0.5px solid var(--calendar-border);
   /* background-color: red; */
   border-top: none;
   border-bottom: none;
