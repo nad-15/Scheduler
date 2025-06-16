@@ -1858,6 +1858,11 @@ h2 {
 
 .navigation-vertview-container{
     display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: 1px solid black;
+    border-radius: 6px;
 }
 
 .month-label-vert-view {
@@ -1868,12 +1873,22 @@ h2 {
 .nav-button-vert-view {
   background-color: var(--calendar-accent);
   color: white;
-  border: none;
-  padding: 0.5rem 1rem;
+  border: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 2px solid black; */
+  /* padding: 0.5rem 1rem; */
   border-radius: 6px;
   font-size: 1rem;
+  background-color: transparent;
+  
 }
 
+.navi-span-vertview{
+    font-size: 1.2rem;
+    color: black;
+}
 /* Day Names */
 .calendar-vert-view {
   display: grid;
@@ -1910,7 +1925,8 @@ h2 {
 /* Cell Style */
 .days-grid-vert-view>div {
   background-color: white;
-  border: 1px solid var(--calendar-border);
+  /* border: 1px solid var(--calendar-border); */
+  border: 1px solid black;
   /* padding: 0.5rem; */
   text-align: center;
   /* font-size: 1rem; */
