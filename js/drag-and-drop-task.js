@@ -32,10 +32,23 @@ window.addEventListener('resize', adjustCalendarHeight);
 
 yearContainer.addEventListener('click', (e) => {
   const dateEl = e.target.closest('.date');
+  const dayEl = e.target.closest('.day');
+
+  let fullDate = null;
+
   if (dateEl) {
-    const fullDate = dateEl.dataset.fullDate;
+    fullDate = dateEl.dataset.fullDate;
+  } else if (dayEl) {
+    // Find sibling .date (assumes .day and .date share a common parent)
+    const siblingDateEl = dayEl.parentElement.querySelector('.date');
+    if (siblingDateEl) {
+      fullDate = siblingDateEl.dataset.fullDate;
+    }
+  }
+
+  if (fullDate) {
     console.log("DATE IS CLICKED:", fullDate);
-    showDayTasks(e);
+    showDayTasks(fullDate);
   }
 });
 
@@ -88,10 +101,11 @@ function adjustCalendarHeight() {
 
 
   function showDayTasks(e) {
-  const target = e.target.closest('[data-full-date]');
-  if (!target) return;
+  // const target = e.target.closest('[data-full-date]');
+  // if (!target) return;
 
-  const date = target.dataset.fullDate;
+  // const date = target.dataset.fullDate;
+  const date = e;
   if (!date) return;
 
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
