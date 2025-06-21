@@ -431,34 +431,42 @@
 
     </div>
 
-    
-
-            <!-- ===========DAYTASK SINGLE DIV -->
 
 
-            <!-- vertical view calendar -->
+    <!-- ===========DAYTASK SINGLE DIV -->
 
-            <!-- Button to Toggle Calendar Visibility -->
-            <!-- <button id="show-vert-calendar-btn" class="show-vert-calendar-btn">Show Calendar</button> -->
 
-            <!-- Calendar Container -->
-            <div class="calendar-container-vert-view" id="calendar-container-vert-view">
-                <div class="calendar-header-vert-view">
-                    <div class="month-label-vert-view" id="month-label-vert-view">May 2025</div>
-                    <div class="navigation-vertview-container">
-                        <button id="prev-month-vert-view" class="nav-button-vert-view"><span class="material-symbols-outlined navi-span-vertview">
-                            chevron_left
-                            </span></button>
-                        <button id="next-month-vert-view" class="nav-button-vert-view"><span class="material-symbols-outlined navi-span-vertview">
-                            chevron_right
-                            </span></button>
-                    </div>
+    <!-- vertical view calendar -->
 
-                </div>
+    <!-- Button to Toggle Calendar Visibility -->
+    <!-- <button id="show-vert-calendar-btn" class="show-vert-calendar-btn">Show Calendar</button> -->
 
-                <!-- Grid for days of the week -->
-                <div class="calendar-vert-view">
-                    <!-- <div class="day-name-vert-view">Sun</div>
+    <!-- Calendar Container -->
+    <div class="calendar-container-vert-view" id="calendar-container-vert-view">
+        <div class="calendar-header-vert-view">
+            <div style="display: flex; gap: 0.5rem;">
+                <span class="material-symbols-outlined" id="icon-month-label-vert-view">
+                    event_note
+                </span>
+                <div class="month-label-vert-view" id="month-label-vert-view">May 2025</div>
+            </div>
+
+            <div class="navigation-vertview-container">
+                <button id="prev-month-vert-view" class="nav-button-vert-view"><span
+                        class="material-symbols-outlined navi-span-vertview">
+                        chevron_left
+                    </span></button>
+                <button id="next-month-vert-view" class="nav-button-vert-view"><span
+                        class="material-symbols-outlined navi-span-vertview">
+                        chevron_right
+                    </span></button>
+            </div>
+
+        </div>
+
+        <!-- Grid for days of the week -->
+        <div class="calendar-vert-view">
+            <!-- <div class="day-name-vert-view">Sun</div>
                     <div class="day-name-vert-view">Mon</div>
                     <div class="day-name-vert-view">Tue</div>
                     <div class="day-name-vert-view">Wed</div>
@@ -466,55 +474,60 @@
                     <div class="day-name-vert-view">Fri</div>
                     <div class="day-name-vert-view">Sat</div> -->
 
-                    <div class="day-name-vert-view sunday">S</div>
-                    <div class="day-name-vert-view">M</div>
-                    <div class="day-name-vert-view">T</div>
-                    <div class="day-name-vert-view">W</div>
-                    <div class="day-name-vert-view">T</div>
-                    <div class="day-name-vert-view">F</div>
-                    <div class="day-name-vert-view">S</div>
-                </div>
+            <div class="day-name-vert-view sunday">S</div>
+            <div class="day-name-vert-view">M</div>
+            <div class="day-name-vert-view">T</div>
+            <div class="day-name-vert-view">W</div>
+            <div class="day-name-vert-view">T</div>
+            <div class="day-name-vert-view">F</div>
+            <div class="day-name-vert-view">S</div>
+        </div>
 
-                <!-- Calendar Days Grid (Filled Dynamically) -->
-                <div class="days-grid-vert-view" id="days-grid-vert-view">
-                    <!-- Days will be inserted dynamically here -->
-                </div>
-            </div>
-
-
+        <!-- Calendar Days Grid (Filled Dynamically) -->
+        <div class="days-grid-vert-view" id="days-grid-vert-view">
+            <!-- Days will be inserted dynamically here -->
+        </div>
+    </div>
 
 
 
 
 
-            <div id="calendar-pop-up">
-                <div class="popup-header">
-                    <span class="popup-date" id="popup-date">May 21, 2025</span>
-                    <button class="close-popup" id="closePopupBtn">
-                        <span class="material-icons close-button-menu-icon">close</span>
-                    </button>
-                </div>
 
 
-                <div class="popup-tasks" id="popup-tasks">
-                </div>
-
-                <div class="pop-up-calview-navi">
-                    <span class="material-symbols-outlined" id="calendar-icon-vertview">
-                        calendar_month
-                        </span>
-                        <span class="material-symbols-outlined" id="calendar-icon-horview">
-                            event_note
-                            </span>
-                </div>
-            </div>
-
-            <div id="backdrop" class="backdrop"></div>
+    <div id="calendar-pop-up">
+        <div class="popup-header">
+            <span class="popup-date" id="popup-date">May 21, 2025</span>
+            <button class="close-popup" id="closePopupBtn">
+                <span class="material-icons close-button-menu-icon">close</span>
+            </button>
+        </div>
 
 
+        <div class="popup-tasks" id="popup-tasks">
+        </div>
+
+        <div class="pop-up-calview-navi">
+            <button class=" calendar-icon-button">
+                <span class="material-symbols-outlined" id="calendar-icon-vertview">
+                    calendar_month
+                </span>
+            </button>
+            <button class=" calendar-icon-button">
+                <span class="material-symbols-outlined" id="calendar-icon-horview">
+                    event_note
+                </span>
+            </button>
+
+        </div>
+    </div>
+
+    <div id="backdrop" class="backdrop"></div>
 
 
-            <!-- ===========DAYTASK SINGLE DIV -->
+
+
+    <!-- ===========DAYTASK SINGLE DIV -->
     <footer></footer>
     </main>
     </div>

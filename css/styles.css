@@ -1837,7 +1837,6 @@ h2 {
 
 /* Calendar Container */
 .calendar-container-vert-view {
-
     position: fixed;
     top: 0;
     left: 0;
@@ -1851,6 +1850,7 @@ h2 {
     /* overflow: hidden;  */
     overflow-y: auto;
     scrollbar-width: none;
+    transition: opacity 0.3s ease;
 
 }
 
@@ -1918,7 +1918,7 @@ h2 {
     background-color: #e6e6e6;
 }
 
-.nav-button-vert-view:active {
+.nav-button-vert-view:active{
     background-color: #dcdcdc;
 }
 
@@ -2215,14 +2215,29 @@ h2 {
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: 12px 16px;
+    /* padding: 12px 16px; */
     background: #f9f9f9;
     border-top: 1px solid #ccc;
     display: flex;
-    justify-content: space-around;
+    /* justify-content: space-around; */
     z-index: 10;
 }
 
+.calendar-icon-button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+
+.calendar-icon-button:active{
+    background-color: #dcdcdc;
+}
 
 .backdrop {
     display: none;

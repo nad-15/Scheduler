@@ -569,7 +569,10 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     lockButton.classList.add("lock-button"); // Assign class for styling
     const icon = document.createElement("span");
     icon.classList.add("material-icons");
-    icon.textContent = "lock_open";
+    // icon.textContent = "lock_open";
+    icon.textContent = "calendar_month";
+
+
     lockButton.appendChild(icon);
     monthNameContainer.prepend(lockButton);
 
@@ -582,7 +585,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     if (isLocked) {
         console.log(`${FormatMonthName} is locked`);
         monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
-        icon.textContent = "lock_open"; // Change icon to locked
+        // icon.textContent = "lock_open"; // Change icon to locked
+        icon.textContent = "calendar_month";
     }
 
     // Lock/Unlock functionality
@@ -592,11 +596,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         if (isLocked) {
             console.log(`${FormatMonthName} is locked`);
             monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
-            icon.textContent = "lock_open"; // Change icon to locked
+            icon.textContent = "calendar_month"; // Change icon to locked
         } else {
             console.log(`${FormatMonthName} is unlocked`);
             monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
-            icon.textContent = "lock_open"; // Change icon back to unlocked
+            icon.textContent = "calendar_month"; // Change icon back to unlocked
         }
 
         // Save the lock state to localStorage
@@ -1666,6 +1670,7 @@ function fadeColor(color, alpha = 0.6) {
 }
 
 monthLabelVertView.addEventListener('click', showCalHorView);
+calIconVertView.addEventListener('click', showCalHorView);
 function showCalHorView() {
     console.log("Vert View Showing");
 

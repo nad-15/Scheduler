@@ -3,6 +3,7 @@ const calendarContainerVertView = document.getElementById("calendar-container-ve
 // const showCalendarBtnVertView = document.getElementById("show-vert-calendar-btn");
 const daysGridVertView = document.getElementById("days-grid-vert-view");
 const monthLabelVertView = document.getElementById("month-label-vert-view");
+const calIconVertView = document.getElementById("icon-month-label-vert-view");
 const prevMonthBtnVertView = document.getElementById("prev-month-vert-view");
 const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 
