@@ -247,10 +247,8 @@ function updateCalendarWithTasks(month, year) {
         month === todayVertView.getMonth() &&
         year === todayVertView.getFullYear()
       ) {
-        // cell.classList.add("today-vert-view");
-        cell.style.border = "2px solid"; // set the base border
-        cell.style.borderImage = "linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1";
-        cell.style.borderImageSlice = "1";
+        cell.classList.add("today-vert-view");
+
       }
     }
 
