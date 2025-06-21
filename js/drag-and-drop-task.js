@@ -67,13 +67,13 @@ function todayScroll() {
   
     const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
   
-    console.log('Built todayDate:', todayDate);
+    // console.log('Built todayDate:', todayDate);
   
     const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
-    console.log('Found todayElement:', todayElement);
+    // console.log('Found todayElement:', todayElement);
   
     if (todayElement) {
-      console.log("ENTERED todayElement");
+      // console.log("ENTERED todayElement");
       todayElement.scrollIntoView({
         behavior: "smooth",
         block: "center"
@@ -116,6 +116,9 @@ function adjustCalendarHeight() {
       const paddedMonth = String(Number(month) + 1).padStart(2, '0'); // Add 1 to fix 0-indexed month
       const paddedDay = String(day).padStart(2, '0');
       const fixedDate = `${year}-${paddedMonth}-${paddedDay}`; // "2025-01-30"
+
+      currentMonthVertView = month;
+      currentYearVertView = year;
   
       const dateObj = new Date(fixedDate);
 

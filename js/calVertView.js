@@ -7,6 +7,16 @@ const calIconVertView = document.getElementById("icon-month-label-vert-view");
 const prevMonthBtnVertView = document.getElementById("prev-month-vert-view");
 const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 
+let currentMonthContainer = null;
+let nextMonthContainer = null;
+let prevMonthContainer = null;
+
+
+// === TIME VARIABLES ===
+let todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+let currentMonthVertView = todayVertView.getMonth();
+let currentYearVertView = todayVertView.getFullYear();
+
 
 let touchStartX = 0;
 let touchEndX = 0;
@@ -64,10 +74,7 @@ window.addEventListener('resize', adjustCalendarHeight);
 
 
 
-// === TIME VARIABLES ===
-let todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
-let currentMonthVertView = todayVertView.getMonth();
-let currentYearVertView = todayVertView.getFullYear();
+
 
 
 
@@ -107,6 +114,10 @@ function createCalendarGrid() {
     const paddedMonth = String(Number(month) + 1).padStart(2, '0'); // Add 1 to fix 0-indexed month
     const paddedDay = String(day).padStart(2, '0');
     const fixedDate = `${year}-${paddedMonth}-${paddedDay}`; // "2025-01-30"
+
+
+    currentMonthVertView = month;
+    currentYearVertView = year;
 
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
     const dayTasks = storedTasks[date];
@@ -363,5 +374,5 @@ nextMonthBtnVertView.addEventListener("click", () => {
 
 
 // === INITIAL SETUP ===
-createCalendarGrid();
-updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+// createCalendarGrid();
+// updateCalendarWithTasks(currentMonthVertView, currentYearVertView);

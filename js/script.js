@@ -25,14 +25,14 @@ const addTaskBtn = document.getElementById(`addTask`);
 const showVertViewBtn = document.getElementById('calendar-icon-vertview');
 const showHorViewBtn = document.getElementById('calendar-icon-horview');
 
-showVertViewBtn.addEventListener('click', ()=>{
+showVertViewBtn.addEventListener('click', () => {
     document.getElementById("calendar-pop-up").style.display = "none";
     document.getElementById("backdrop").style.display = "none";
-    showCalVertView();
+    showCalVertView(currentMonthVertView, currentYearVertView);
 });
 
 
-showHorViewBtn.addEventListener('click', ()=>{
+showHorViewBtn.addEventListener('click', () => {
     document.getElementById("calendar-pop-up").style.display = "none";
     document.getElementById("backdrop").style.display = "none";
     showCalHorView();
@@ -42,7 +42,7 @@ showHorViewBtn.addEventListener('click', ()=>{
 
 
 
-console.log("Success");
+// console.log("Success");
 migrateTaskDataToArrayFormat();
 function migrateTaskDataToArrayFormat() {
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
@@ -72,7 +72,7 @@ function migrateTaskDataToArrayFormat() {
         });
     }
     localStorage.setItem("tasks", JSON.stringify(migratedData));
-    console.log("✅ Task data migrated to array-of-objects format.");
+    // console.log("✅ Task data migrated to array-of-objects format.");
 }
 
 
@@ -372,9 +372,9 @@ todayNameText.addEventListener('click', () => {
 });
 
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
-let currentMonthContainer = null;
-let nextMonthContainer = null;
-let prevMonthContainer = null;
+// let currentMonthContainer = null;
+// let nextMonthContainer = null;
+// let prevMonthContainer = null;
 
 const todayDateObj = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
 
@@ -403,6 +403,7 @@ let currentDateFirstDay = getDayName(currentDate.getDay());
 let currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
 
 addDays("initCurrent", currentDateMonth, 1, currentDate.getDay(), currentDateLastDate, "", "", "", currentDateYear);
+// console.log("real current month at init", currentDateMonth);
 
 let nextDate = new Date(currentDateYear, currentDateMonth + 1, 1);
 let nextDateMonth = nextDate.getMonth();
@@ -424,7 +425,9 @@ let prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
 addDays("initPrev", prevDateMonth, 1, prevDate.getDay(), prevDateLastDate, "", "", "", prevDateYear);
 
 // Handle scroll event
-yearContainer.addEventListener('scroll', () => {
+yearContainer.addEventListener('scroll', handleYearContainerScroll);
+
+function handleYearContainerScroll() {
     const scrollTop = yearContainer.scrollTop;
     const scrollHeight = yearContainer.scrollHeight;
     const clientHeight = yearContainer.clientHeight;
@@ -473,7 +476,7 @@ yearContainer.addEventListener('scroll', () => {
         // console.log(`Current Month: ${currentDateMonth}, Last Date: ${currentDateLastDate}`);
         // console.log(`Next Month: ${nextDateMonth}, Last Date: ${nextDateLastDate}`);
     }
-});
+}
 
 
 // todayScroll();
@@ -507,13 +510,21 @@ yearContainer.addEventListener('scroll', () => {
 
 
 function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "", yearDate) {
-
+    console.log("SCROLL IS:", scroll);
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
 
 
     const monthNameContainer = document.createElement('div');
-    monthNameContainer.addEventListener('click', showCalVertView);
+
+
+    monthNameContainer.addEventListener('click', () => {
+        currentMonthVertView = monthName;
+        currentYearVertView = yearDate;
+        showCalVertView(monthName, yearDate);
+    });
+
+
     monthNameContainer.classList.add('month-name-container');
 
 
@@ -583,7 +594,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
     // Apply saved lock state when the page loads
     if (isLocked) {
-        console.log(`${FormatMonthName} is locked`);
+        // console.log(`${FormatMonthName} is locked`);
         monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
         // icon.textContent = "lock_open"; // Change icon to locked
         icon.textContent = "calendar_month";
@@ -594,11 +605,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         isLocked = !isLocked; // Toggle the lock state
 
         if (isLocked) {
-            console.log(`${FormatMonthName} is locked`);
+            // console.log(`${FormatMonthName} is locked`);
             monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
             icon.textContent = "calendar_month"; // Change icon to locked
         } else {
-            console.log(`${FormatMonthName} is unlocked`);
+            // console.log(`${FormatMonthName} is unlocked`);
             monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
             icon.textContent = "calendar_month"; // Change icon back to unlocked
         }
@@ -784,7 +795,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             const weekSpacer = document.createElement('div');
             weekSpacer.classList.add(`week-spacer`);
             monthContainer.appendChild(weekSpacer);
-            console.log(`week spacer added`);
+            // console.log(`week spacer added`);
         }
         day++;
 
@@ -825,19 +836,20 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     } else if (scroll === "initCurrent") {
         currentMonthContainer = monthNameDayContainer;
         yearContainer.appendChild(monthNameDayContainer);
-        // console.log(`current is init`);
+        console.log(`current is init`, currentDate);
     } else if (scroll === "initNext") {
         nextMonthContainer = monthNameDayContainer;
         yearContainer.appendChild(monthNameDayContainer);
-        // console.log(`next is init`);
+        console.log(`next is init`, nextDate);
     } else if (scroll === "initPrev") {
         prevMonthContainer = monthNameDayContainer;
 
         const previousScrollHeight = yearContainer.scrollHeight;
         yearContainer.prepend(monthNameDayContainer);
         const newScrollHeight = yearContainer.scrollHeight;
-        yearContainer.scrollTop += newScrollHeight - previousScrollHeight;
-        // console.log(`prev is init`);
+        // yearContainer.scrollTop += newScrollHeight - previousScrollHeight;
+        console.log(`prev is init`, prevDate);
+
     }
 
     // console.log(monthNameContainer.innerHTML);
@@ -1669,7 +1681,9 @@ function fadeColor(color, alpha = 0.6) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-monthLabelVertView.addEventListener('click', showCalHorView);
+monthLabelVertView.addEventListener('click', () => {
+    showCalHorView();
+});
 calIconVertView.addEventListener('click', showCalHorView);
 function showCalHorView() {
     console.log("Vert View Showing");
@@ -1677,17 +1691,33 @@ function showCalHorView() {
     // Make sure both elements exist
     const main = document.getElementById('main-container');
     const vert = document.getElementById('calendar-container-vert-view');
-
+    main.style.display = 'block';
+    vert.style.display = 'none'; // Assuming your flex styles are defined in CSS
     if (!main || !vert) {
         console.error('One or both containers are missing in the DOM.');
         return;
     }
-
-    main.style.display = 'block';
-    vert.style.display = 'none'; // Assuming your flex styles are defined in CSS
+    // yearContainer.innerHTML = "";
+    yearContainer.removeEventListener('scroll', handleYearContainerScroll);
+    while (yearContainer.firstChild) {
+        yearContainer.removeChild(yearContainer.firstChild);
+    }
+    console.log("All children removed:", yearContainer.childNodes.length); // Should be 0
+    updateVertViewCalendarFromMonthYear(currentMonthVertView, currentYearVertView);
+    requestAnimationFrame(() => {
+        currentMonthContainer.scrollIntoView({
+          block: "center",
+          behavior: "instant"
+        });
+      
+        // Delay listener until after scroll finishes
+        requestAnimationFrame(() => {
+          yearContainer.addEventListener('scroll', handleYearContainerScroll);
+        });
+      });
 }
 
-function showCalVertView() {
+function showCalVertView(month, year) {
     console.log("Vert View Showing");
 
     // Make sure both elements exist
@@ -1699,7 +1729,76 @@ function showCalVertView() {
         return;
     }
     createCalendarGrid();
-    updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+    updateCalendarWithTasks(month, year);
     main.style.display = 'none';
     vert.style.display = 'flex'; // Assuming your flex styles are defined in CSS
 }
+
+
+function updateVertViewCalendarFromMonthYear(currentMonth, currentYear) {
+    console.log("FIND ERROR the current now is:");
+    console.log(currentMonth);
+    console.log(currentYear);
+
+    // 🔵 Current Month
+    currentDate = new Date(currentYear, currentMonth, 1);
+    const currentDateMonth = currentDate.getMonth();
+    const currentDateYear = currentDate.getFullYear();
+    const currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
+
+    // 🔴 Next Month
+    nextDate = new Date(currentDateYear, currentDateMonth + 1, 1);
+    const nextDateMonth = nextDate.getMonth();
+    const nextDateYear = nextDate.getFullYear();
+    const nextDateLastDate = new Date(nextDateYear, nextDateMonth + 1, 0).getDate();
+
+    // 🟢 Previous Month
+    prevDate = new Date(currentDateYear, currentDateMonth - 1, 1);
+    const prevDateMonth = prevDate.getMonth();
+    const prevDateYear = prevDate.getFullYear();
+    const prevDateLastDate = new Date(prevDateYear, prevDateMonth + 1, 0).getDate();
+
+
+
+    addDays(
+        "initPrev",
+        prevDateMonth,
+        1,
+        prevDate.getDay(),
+        prevDateLastDate,
+        "",
+        "",
+        "",
+        prevDateYear
+    );
+
+
+    addDays(
+        "initCurrent",
+        currentDateMonth,
+        1,
+        currentDate.getDay(),
+        currentDateLastDate,
+        "",
+        "",
+        "",
+        currentDateYear
+    );
+
+
+    addDays(
+        "initNext",
+        nextDateMonth,
+        1,
+        nextDate.getDay(),
+        nextDateLastDate,
+        "",
+        "",
+        "",
+        nextDateYear
+    );
+
+
+}
+
+
