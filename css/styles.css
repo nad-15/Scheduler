@@ -1,11 +1,11 @@
 :root {
-  --calendar-bg: #ffffff;
+  --calendar-bg: #f0fff0;
   --calendar-text: #333;
   --calendar-accent: white;
   /* --calendar-border: #ddd; */
   --calendar-border: rgb(235, 231, 231);
-  --calendar-header-bg: #f8f8f8;
-  --calendar-day-bg: white;
+  --calendar-header-bg: #f0fff0;
+  --calendar-day-bg: f0fff0;
   --muted-text: #999;
 }
 
@@ -1851,8 +1851,7 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
-  background-color: #fcfcfc	;
+  background-color: var(--calendar-day-bg);
   /* background-color: rgb(223, 223, 223); */
   padding: 1rem 1rem;
   /* border-radius: 10px; */
@@ -1925,9 +1924,9 @@ h2 {
 }
 
 .day-name-vert-view {
-  /* background-color: var(--calendar-day-bg); */
+  background-color: var(--calendar-day-bg);
   /* background-color: var(--calendar-accent); */
-  background-color: #fcfcfc	;
+  /* background-color: #f0fff0; */
   color: #333;
   padding: 0.5rem 0;
   border: 0.5px solid var(--calendar-border);
@@ -1962,7 +1961,7 @@ h2 {
 
 /* Cell Style */
 .days-grid-vert-view>div {
-  background-color: white;
+  background-color: var(--calendar-bg);
   /* border: 1px solid var(--calendar-border); */
   border: 0.5px solid rgb(235, 231, 231);
   /* padding: 0.5rem; */
