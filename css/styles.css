@@ -2171,48 +2171,25 @@ h2 {
     margin: 5px 0 10px 0;
 }
 
-/* .section-divider {
-
+.section-divider {
+    /* background-color: red; */
     display: flex;
     align-items: center;
     text-align: center;
     color: black;
-
     font-weight: bold;
-
+    /* margin: 10px  0; */
     margin-bottom: 10px;
     font-size: 8px;
-} */
+}
 
-/* .section-divider::before,
+.section-divider::before,
 .section-divider::after {
     content: '';
     flex: 1;
     border-top: 1px dashed #aaa;
     margin: 0 0px;
-} */
-
-
-.section-divider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px; /* spacing between stars and label */
-    font-size: 8px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: black;
-  }
-  
-  .section-divider .side-stars {
-    color: #aaa;  
-    font-weight: normal;   /* not bold like label */
-  }
-  
-  .section-divider .divider-label {
-    color: black;          /* keeps main label dark */
-  }
-  
+}
 
 
 .event-content {
