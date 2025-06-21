@@ -444,7 +444,7 @@
     <!-- Calendar Container -->
     <div class="calendar-container-vert-view" id="calendar-container-vert-view">
         <div class="calendar-header-vert-view">
-            <div style="display: flex; gap: 0.5rem;">
+            <div style="display: flex; gap: 0.4rem;">
                 <span class="material-symbols-outlined" id="icon-month-label-vert-view">
                     event_note
                 </span>
@@ -508,18 +508,24 @@
         </div>
 
         <div class="pop-up-calview-navi">
-            <button class=" calendar-icon-button">
+            <button class="calendar-icon-button" title="Month View">
+              <div class="calendar-icon-wrapper">
                 <span class="material-symbols-outlined" id="calendar-icon-vertview">
-                    calendar_month
+                  calendar_month
                 </span>
+                <span class="calendar-icon-label">Month View</span>
+              </div>
             </button>
-            <button class=" calendar-icon-button">
+            <button class="calendar-icon-button" title="List View">
+              <div class="calendar-icon-wrapper">
                 <span class="material-symbols-outlined" id="calendar-icon-horview">
-                    event_note
+                  event_note
                 </span>
+                <span class="calendar-icon-label">List View</span>
+              </div>
             </button>
-
-        </div>
+          </div>
+          
     </div>
 
     <div id="backdrop" class="backdrop"></div>
