@@ -1872,25 +1872,61 @@ h2 {
   font-weight: bold;
 }
 
-.nav-button-vert-view {
+/* .nav-button-vert-view {
   background-color: var(--calendar-accent);
   color: white;
   border: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* border: 2px solid black; */
-  /* padding: 0.5rem 1rem; */
   border-radius: 6px;
   font-size: 1rem;
   background-color: rgb(235, 231, 231);
   
-}
-
-.navi-span-vertview{
+} */
+.navigation-vertview-container {
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    width: fit-content;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-button-vert-view {
+    background-color: #f4f4f4;
+    color: #333;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.2rem;
-    color: black;
-}
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    outline: none;
+  }
+  
+  .nav-button-vert-view:first-child {
+    border-right: 1px solid #ccc;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+  
+  .nav-button-vert-view:last-child {
+    border-left: 1px solid #ccc;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  
+  .nav-button-vert-view:hover {
+    background-color: #e6e6e6;
+  }
+  
+  .nav-button-vert-view:active {
+    background-color: #dcdcdc;
+  }
+  
 /* Day Names */
 .calendar-vert-view {
   display: grid;
