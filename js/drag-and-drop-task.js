@@ -97,9 +97,13 @@ function adjustCalendarHeight() {
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
     const dayTasks = storedTasks[date];
 
-   
-    const dateObj = new Date(date);
-    dateObj.setMonth(dateObj.getMonth() + 1); // If needed
+      // Split and pad manually
+      const [year, month, day] = date.split('-');
+      const paddedMonth = String(Number(month) + 1).padStart(2, '0'); // Add 1 to fix 0-indexed month
+      const paddedDay = String(day).padStart(2, '0');
+      const fixedDate = `${year}-${paddedMonth}-${paddedDay}`; // "2025-01-30"
+  
+      const dateObj = new Date(fixedDate);
 
     const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
     const rest = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });

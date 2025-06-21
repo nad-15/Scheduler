@@ -62,16 +62,25 @@ function createCalendarGrid() {
     const dayElement = e.target.closest('.day-vert-view');
     const date = dayElement.dataset.fullDate;
 
+    console.log(date);
+
+    // Split and pad manually
+    const [year, month, day] = date.split('-');
+    const paddedMonth = String(Number(month) + 1).padStart(2, '0'); // Add 1 to fix 0-indexed month
+    const paddedDay = String(day).padStart(2, '0');
+    const fixedDate = `${year}-${paddedMonth}-${paddedDay}`; // "2025-01-30"
+
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
     const dayTasks = storedTasks[date];
 
-    const dateObj = new Date(date);
-    dateObj.setMonth(dateObj.getMonth() + 1); // If needed
+    const dateObj = new Date(fixedDate);
+    // dateObj.setMonth(dateObj.getMonth() + 1); 
 
     const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+    console.log(weekday);
     const rest = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-
-document.getElementById("popup-date").innerHTML = `
+    console.log(rest);
+    document.getElementById("popup-date").innerHTML = `
   <div class="weekday">${weekday}</div>
   <div class="month-year">${rest}</div>
 `;
@@ -238,6 +247,7 @@ function updateCalendarWithTasks(month, year) {
         month === todayVertView.getMonth() &&
         year === todayVertView.getFullYear()
       ) {
+        // cell.classList.add("today-vert-view");
         cell.style.border = "2px solid"; // set the base border
         cell.style.borderImage = "linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1";
         cell.style.borderImageSlice = "1";
