@@ -1939,7 +1939,8 @@ h2 {
     /* background-color: red; */
     border-top: none;
     border-bottom: none;
-
+    font-weight: normal;
+    font-size: 0.8rem;
     /* border: none; */
 }
 
@@ -1962,6 +1963,7 @@ h2 {
     flex-grow: 1;
     /* Allow it to grow and fill available space */
     overflow: hidden;
+
 
 }
 
@@ -1986,6 +1988,7 @@ h2 {
 .days-grid-vert-view>div {
     border-top: 1px solid var(--calendar-border);
     border-left: 1px solid var(--calendar-border);
+    padding-top: 0.6rem;
 
 }
 
@@ -2003,7 +2006,7 @@ h2 {
     justify-content: flex-start;
     padding: 1px;
     text-align: center;
-    font-size: 16px;
+    font-size: 1rem;
     /* font-weight: bold; */
     height: 100%;
     position: relative;
