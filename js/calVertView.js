@@ -7,6 +7,43 @@ const prevMonthBtnVertView = document.getElementById("prev-month-vert-view");
 const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 
 
+let touchStartX = 0;
+let touchEndX = 0;
+
+calendarContainerVertView.addEventListener("touchstart", (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+
+calendarContainerVertView.addEventListener("touchend", (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleMobileSwipe();
+});
+
+function handleMobileSwipe() {
+  const swipeDistance = touchEndX - touchStartX;
+
+  if (Math.abs(swipeDistance) > 50) { // threshold for detecting swipe
+    if (swipeDistance < 0) {
+      // Swipe left → next month
+      currentMonthVertView++;
+      if (currentMonthVertView > 11) {
+        currentMonthVertView = 0;
+        currentYearVertView++;
+      }
+    } else {
+      // Swipe right → previous month
+      currentMonthVertView--;
+      if (currentMonthVertView < 0) {
+        currentMonthVertView = 11;
+        currentYearVertView--;
+      }
+    }
+
+    updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+  }
+}
+
+
 // === RESIZE THE CALENDAR VIEW MINUS THE ADDRESS BAR ===
 function adjustCalendarHeight() {
   calendarContainerVertView.style.height = `${window.innerHeight}px`;
