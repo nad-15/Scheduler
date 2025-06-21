@@ -1897,9 +1897,10 @@ h2 {
 }
 
 .material-symbols-outlined.navi-span-vertview {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: #333;
     font-weight: lighter;
+    
 }
 
 .nav-button-vert-view:first-child {
