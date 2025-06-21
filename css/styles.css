@@ -2228,7 +2228,7 @@ h2 {
   flex: 1;
   background: none;
   border: none;
-  padding: 12px 0;
+  padding: 8px 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2243,7 +2243,7 @@ h2 {
   }
   
   .calendar-icon-label {
-    font-size: 0.7rem;
+    font-size: 0.5rem;
     color: #444;
     pointer-events: none; /* makes sure only the button itself handles clicks */
   }
