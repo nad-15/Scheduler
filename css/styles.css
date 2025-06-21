@@ -1,13 +1,15 @@
 :root {
-    --calendar-bg: #f5faff;
+    --calendar-bg: #f9fcff;
     --calendar-text: #333;
     --calendar-accent: white;
     /* --calendar-border: #ddd; */
     --calendar-border: rgb(235, 231, 231);
-    --calendar-header-bg: #f5faff;
-    --calendar-day-bg: #f5faff;
+    --calendar-header-bg: #f9fcff;
+    --calendar-day-bg: #f9fcff;
     --muted-text: #999;
 }
+
+/* Blue Tint	#f5faff */
 
 /* * {
     border: 1px solid limegreen;
@@ -1865,8 +1867,9 @@ h2 {
 }
 
 .month-label-vert-view {
+    font-family: 'Roboto', sans-serif;
     font-size: 1.2rem;
-    font-weight: bold;
+    font-weight:800;
     color: #333;
 
 }
