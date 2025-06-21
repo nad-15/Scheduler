@@ -2031,10 +2031,10 @@ color: black;
   text-align: left;
 }
 
-
-.today-vert-view .day-number {
-  background-color: #2196F3;
-  color: white;
+/*  .day-number  is the class of day number only */
+.today-vert-view{
+  /* background-color: #2196F3; */
+  /* color: white;
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -2042,7 +2042,12 @@ color: black;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  font-weight: bold;
+  font-weight: bold; */
+  border: 2px solid transparent;
+  background-color: #ADD8E6;
+  transition: background-color 0.3s ease;
+  border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1;
+  border-image-slice: 1;
 }
 
 
