@@ -149,7 +149,13 @@ function createCalendarGrid() {
 
         const divider = document.createElement("div");
         divider.className = "section-divider";
-        divider.textContent = period.charAt(0).toUpperCase() + period.slice(1);
+        // divider.textContent = period.charAt(0).toUpperCase() + period.slice(1);
+        const capitalized = period.charAt(0).toUpperCase() + period.slice(1);
+        divider.innerHTML = `
+  <span class="side-stars">* * *</span>
+  <span class="divider-label">${capitalized}</span>
+  <span class="side-stars">* * *</span>
+`;
         section.appendChild(divider);
 
 
