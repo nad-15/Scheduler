@@ -1852,7 +1852,7 @@ h2 {
   justify-content: space-between;
   align-items: center;
   background: white;
-  background-color: #fafafa;
+  background-color: #fcfcfc	;
   /* background-color: rgb(223, 223, 223); */
   padding: 1rem 1rem;
   /* border-radius: 10px; */
@@ -1927,7 +1927,7 @@ h2 {
 .day-name-vert-view {
   /* background-color: var(--calendar-day-bg); */
   /* background-color: var(--calendar-accent); */
-  background-color: #fafafa	;
+  background-color: #fcfcfc	;
   color: #333;
   padding: 0.5rem 0;
   border: 0.5px solid var(--calendar-border);
