@@ -1861,6 +1861,7 @@ h2 {
 .month-label-vert-view {
   font-size: 1.2rem;
   font-weight: bold;
+  color: #333;
 }
 
 .navigation-vertview-container {
@@ -1888,6 +1889,7 @@ h2 {
   .material-symbols-outlined.navi-span-vertview{
     font-size: 2rem;
     color: #333;
+    font-weight:lighter;
 }
   
   .nav-button-vert-view:first-child {
@@ -1922,8 +1924,9 @@ h2 {
 
 .day-name-vert-view {
   /* background-color: var(--calendar-day-bg); */
-  background-color: var(--calendar-accent);
-color: black;
+  /* background-color: var(--calendar-accent); */
+  background-color: #f4f4f4;
+  color: #333;
   padding: 0.5rem 0;
   border: 0.5px solid var(--calendar-border);
   /* background-color: red; */
