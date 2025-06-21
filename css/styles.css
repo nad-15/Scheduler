@@ -1852,6 +1852,7 @@ h2 {
   justify-content: space-between;
   align-items: center;
   background: white;
+  background-color: #fafafa;
   /* background-color: rgb(223, 223, 223); */
   padding: 1rem 1rem;
   /* border-radius: 10px; */
@@ -1862,6 +1863,7 @@ h2 {
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
+
 }
 
 .navigation-vertview-container {
