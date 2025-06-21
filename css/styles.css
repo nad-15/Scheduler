@@ -1858,32 +1858,11 @@ h2 {
   /* margin-bottom: 0.5rem; */
 }
 
-.navigation-vertview-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: transparent;
-    border: 1px solid black;
-    border-radius: 6px;
-}
-
 .month-label-vert-view {
   font-size: 1.2rem;
   font-weight: bold;
 }
 
-/* .nav-button-vert-view {
-  background-color: var(--calendar-accent);
-  color: white;
-  border: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 6px;
-  font-size: 1rem;
-  background-color: rgb(235, 231, 231);
-  
-} */
 .navigation-vertview-container {
     display: flex;
     border: 1px solid #ccc;
@@ -1897,15 +1876,19 @@ h2 {
     background-color: #f4f4f4;
     color: #333;
     border: none;
-    padding: 0.5rem 0.75rem;
+    /* padding: 0.5rem 0.75rem; */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
     outline: none;
   }
+
+  .material-symbols-outlined.navi-span-vertview{
+    font-size: 2rem;
+    color: #333;
+}
   
   .nav-button-vert-view:first-child {
     border-right: 1px solid #ccc;
