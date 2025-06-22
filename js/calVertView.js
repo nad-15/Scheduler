@@ -17,6 +17,11 @@ let todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'Ame
 let currentMonthVertView = todayVertView.getMonth();
 let currentYearVertView = todayVertView.getFullYear();
 
+let popUpDate = `${todayVertView.getFullYear()}-${todayVertView.getMonth()}-${todayVertView.getDate()}`;
+  console.log("POPUPDATE IS:", popUpDate);
+
+
+
 
 let touchStartX = 0;
 let touchEndX = 0;

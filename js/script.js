@@ -39,8 +39,46 @@ showHorViewBtn.addEventListener('click', () => {
 });
 
 
+const calendarPopup = document.getElementById('calendar-pop-up');
 
+calendarPopup.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+});
 
+calendarPopup.addEventListener('touchend', (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  const diffX = touchEndX - touchStartX;
+
+  if (Math.abs(diffX) > 50) {
+    if (diffX < 0) {
+      goToNextDay(); // swipe left → next
+    } else {
+      goToPreviousDay(); // swipe right → previous
+    }
+  }
+});
+
+function goToNextDay() {
+  const dateObj = safeDateFromPopUpDate(popUpDate);
+  dateObj.setDate(dateObj.getDate() + 1);
+  popUpDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+  console.log("POPUPDATE IS:", popUpDate);
+  showDayTasks(popUpDate);
+}
+
+function goToPreviousDay() {
+  const dateObj = safeDateFromPopUpDate(popUpDate);
+  dateObj.setDate(dateObj.getDate() - 1);
+  popUpDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+  console.log("POPUPDATE IS:", popUpDate);
+
+  showDayTasks(popUpDate);
+}
+
+function safeDateFromPopUpDate(str) {
+  const [year, month, day] = str.split('-').map(Number);
+  return new Date(year, month, day);
+}
 
 // console.log("Success");
 migrateTaskDataToArrayFormat();
@@ -515,7 +553,7 @@ function handleYearContainerScroll() {
 
 
 function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth = 0, morningTask = "", afternoonTask = "", eveningTask = "", yearDate) {
-    console.log("SCROLL IS:", scroll);
+    // console.log("SCROLL IS:", scroll);
     let monthNameDayContainer = document.createElement('div');
     monthNameDayContainer.classList.add('month-name-day-container');
 
@@ -841,11 +879,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     } else if (scroll === "initCurrent") {
         currentMonthContainer = monthNameDayContainer;
         yearContainer.appendChild(monthNameDayContainer);
-        console.log(`current is init`, currentDate);
+        // console.log(`current is init`, currentDate);
     } else if (scroll === "initNext") {
         nextMonthContainer = monthNameDayContainer;
         yearContainer.appendChild(monthNameDayContainer);
-        console.log(`next is init`, nextDate);
+        // console.log(`next is init`, nextDate);
     } else if (scroll === "initPrev") {
         prevMonthContainer = monthNameDayContainer;
 
@@ -853,7 +891,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         yearContainer.prepend(monthNameDayContainer);
         const newScrollHeight = yearContainer.scrollHeight;
         // yearContainer.scrollTop += newScrollHeight - previousScrollHeight;
-        console.log(`prev is init`, prevDate);
+        // console.log(`prev is init`, prevDate);
 
     }
 
