@@ -2149,7 +2149,7 @@ h2 {
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: white;
+    background-color: transparent;
     display: flex;
     justify-content: space-between;
     width: 100%;

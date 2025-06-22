@@ -93,32 +93,32 @@ function showDayTasks(d) {
   currentMonthValue = dateObj.getMonth();
   currentYearValue = dateObj.getFullYear();
 
-const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
-const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+  const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
 
-const dayDiff = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24));
+  const dayDiff = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24));
 
-let label;
-let bottomLine;
+  let label;
+  let bottomLine;
 
-if (dayDiff === 0) {
-  label = "Today";
-} else if (dayDiff === -1) {
-  label = "Yesterday";
-} else if (dayDiff === 1) {
-  label = "Tomorrow";
-}
+  if (dayDiff === 0) {
+    label = "Today";
+  } else if (dayDiff === -1) {
+    label = "Yesterday";
+  } else if (dayDiff === 1) {
+    label = "Tomorrow";
+  }
 
-if (label) {
-  const shortWeekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' }); // "Mon"
-  const shortDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }); // "June 22"
-  bottomLine = `${shortWeekday}, ${shortDate}`;
-} else {
-  label = dateObj.toLocaleDateString('en-US', { weekday: 'long' }); // "Monday"
-  bottomLine = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-}
+  if (label) {
+    const shortWeekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' }); // "Mon"
+    const shortDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }); // "June 22"
+    bottomLine = `${shortWeekday}, ${shortDate}`;
+  } else {
+    label = dateObj.toLocaleDateString('en-US', { weekday: 'long' }); // "Monday"
+    bottomLine = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
 
-document.getElementById("popup-date").innerHTML = `
+  document.getElementById("popup-date").innerHTML = `
   <div class="weekday">${label}</div>
   <div class="month-year">${bottomLine}</div>
 `;
@@ -202,9 +202,11 @@ document.getElementById("popup-date").innerHTML = `
 document.getElementById("closePopupBtn").addEventListener("click", () => {
   document.getElementById("calendar-pop-up").style.display = "none";
   document.getElementById("backdrop").style.display = "none";
+  clearFallingLeaves();
 });
 
 document.getElementById("backdrop").addEventListener("click", () => {
   document.getElementById("calendar-pop-up").style.display = "none";
   document.getElementById("backdrop").style.display = "none";
+  clearFallingLeaves();
 });

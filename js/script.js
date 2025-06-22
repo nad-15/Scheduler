@@ -28,6 +28,7 @@ const showHorViewBtn = document.getElementById('calendar-icon-horview');
 showVertViewBtn.addEventListener('click', () => {
     document.getElementById("calendar-pop-up").style.display = "none";
     document.getElementById("backdrop").style.display = "none";
+    clearFallingLeaves();
     showCalVertView(currentMonthValue, currentYearValue);
 });
 
@@ -35,6 +36,7 @@ showVertViewBtn.addEventListener('click', () => {
 showHorViewBtn.addEventListener('click', () => {
     document.getElementById("calendar-pop-up").style.display = "none";
     document.getElementById("backdrop").style.display = "none";
+    clearFallingLeaves();
     showCalHorView(currentMonthValue, currentYearValue);
 });
 
@@ -286,6 +288,10 @@ function createFallingLeaf() {
 }
 
 
+function clearFallingLeaves() {
+  const leafContainer = document.getElementById("leafContainer");
+  leafContainer.innerHTML = ""; // removes all .falling-leaf divs
+}
 
 // Generate leaves every 0.5–1.5 seconds randomly
 setInterval(() => {
