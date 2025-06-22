@@ -100,12 +100,12 @@ function adjustCalendarHeight() {
 
 
 
-  function showDayTasks(e) {
+  function showDayTasks(d) {
   // const target = e.target.closest('[data-full-date]');
   // if (!target) return;
     // console.log("call to showDayTask succesful from grid");
   // const date = target.dataset.fullDate;
-  const date = e;
+  const date = d;
   popUpDate = date;
   // console.log("POPUPDATE IS:", date);
   if (!date) return;
@@ -187,7 +187,8 @@ if (periodTasks && periodTasks.length > 0) {
     } else {
       // No text and no color
       content.style.borderLeft = "none";
-      title.textContent = "No Task";
+      // title.textContent = "No Task";
+      title.textContent ="No tasks for this period.";
     }
 
     content.appendChild(title);

@@ -71,7 +71,6 @@ function goToPreviousDay() {
   dateObj.setDate(dateObj.getDate() - 1);
   const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
   console.log("POPUPDATE IS:", popUpDate);
-
   showDayTasks(fixedDate);
 }
 
