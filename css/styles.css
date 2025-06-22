@@ -1866,6 +1866,10 @@ h2 {
     /* margin-bottom: 0.5rem; */
 }
 
+.material-symbols-outlined.header-icon-vert-view{
+    font-size: 1.2rem;
+}
+
 .month-label-vert-view {
     font-family: 'Roboto', sans-serif;
     font-size: 1.2rem;
