@@ -758,6 +758,20 @@ h2 {
     user-select: none;
 }
 
+@keyframes wiggle {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-10px); }
+  50%  { transform: translateX(10px); }
+  75%  { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+
+.jumping-text.wiggle span {
+  display: inline-block;
+  animation: wiggle 0.6s ease-in-out;
+}
+
+
 .template-title-submit-container {
     display: flex;
     /* border:2px solid #00ff7f; */

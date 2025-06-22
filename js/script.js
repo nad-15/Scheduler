@@ -250,47 +250,47 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 function createFallingLeaf() {
-  const leafContainer = document.getElementById("leafContainer");
+    const leafContainer = document.getElementById("leafContainer");
 
-  // Create multiple flakes at once for denser snowfall
-  const flakesCount = Math.floor(Math.random() * 2) + 2; // 2 to 3 snowflakes per call
+    // Create multiple flakes at once for denser snowfall
+    const flakesCount = Math.floor(Math.random() * 2) + 2; // 2 to 3 snowflakes per call
 
-  for (let i = 0; i < flakesCount; i++) {
-    const leaf = document.createElement("div");
-    leaf.className = "falling-leaf";
+    for (let i = 0; i < flakesCount; i++) {
+        const leaf = document.createElement("div");
+        leaf.className = "falling-leaf";
 
-    // ❄ Random snowflake shape
-    const snowShapes = ["❄️", "❅", "❆", "✼", "✻"];
-    leaf.textContent = snowShapes[Math.floor(Math.random() * snowShapes.length)];
+        // ❄ Random snowflake shape
+        const snowShapes = ["❄️", "❅", "❆", "✼", "✻"];
+        leaf.textContent = snowShapes[Math.floor(Math.random() * snowShapes.length)];
 
-    // 🎯 Random horizontal position
-    leaf.style.left = Math.random() * 100 + "vw";
+        // 🎯 Random horizontal position
+        leaf.style.left = Math.random() * 100 + "vw";
 
-    // 📏 Random size (16–40px)
-    const size = 16 + Math.random() * 24;
-    leaf.style.fontSize = `${size}px`;
+        // 📏 Random size (16–40px)
+        const size = 16 + Math.random() * 24;
+        leaf.style.fontSize = `${size}px`;
 
-    // ⏳ Slower fall
-    const duration = 8 + Math.random() * 7; // 8 to 15 seconds
-    const delay = Math.random() * 2;
-    leaf.style.animationDuration = `${duration}s`;
-    leaf.style.animationDelay = `${delay}s`;
+        // ⏳ Slower fall
+        const duration = 8 + Math.random() * 7; // 8 to 15 seconds
+        const delay = Math.random() * 2;
+        leaf.style.animationDuration = `${duration}s`;
+        leaf.style.animationDelay = `${delay}s`;
 
-    // 🎨 Random icy blue color
-    const blues = ["#cceeff", "#bbddff", "#aaddff", "#99ccff", "#b3e0f2"];
-    leaf.style.color = blues[Math.floor(Math.random() * blues.length)];
+        // 🎨 Random icy blue color
+        const blues = ["#cceeff", "#bbddff", "#aaddff", "#99ccff", "#b3e0f2"];
+        leaf.style.color = blues[Math.floor(Math.random() * blues.length)];
 
-    leafContainer.appendChild(leaf);
+        leafContainer.appendChild(leaf);
 
-    // 🧹 Cleanup
-    setTimeout(() => leaf.remove(), (duration + delay) * 1000);
-  }
+        // 🧹 Cleanup
+        setTimeout(() => leaf.remove(), (duration + delay) * 1000);
+    }
 }
 
 
 function clearFallingLeaves() {
-  const leafContainer = document.getElementById("leafContainer");
-  leafContainer.innerHTML = ""; // removes all .falling-leaf divs
+    const leafContainer = document.getElementById("leafContainer");
+    leafContainer.innerHTML = ""; // removes all .falling-leaf divs
 }
 
 // Generate leaves every 0.5–1.5 seconds randomly
@@ -298,7 +298,7 @@ setInterval(() => {
     if (document.getElementById("calendar-pop-up").style.display === "block") {
         createFallingLeaf();
     }
-}, 500);
+}, 800);
 
 
 
@@ -1657,8 +1657,17 @@ deselectTemplateBtn.addEventListener('touchend', () => {
 });
 
 jumPingText.addEventListener("click", () => {
+
+    jumPingText.classList.add("wiggle");
+
+    // Remove the class after animation ends so it can be triggered again
+    setTimeout(() => {
+        jumPingText.classList.remove("wiggle");
+    }, 600);
     console.log("jumping text is clicked");
     taskInput.value = '';
+
+
 });
 
 
