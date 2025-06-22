@@ -908,12 +908,42 @@ yearContainer.addEventListener('click', (event) => {
         handleSubtaskClick(subTaskElement); // Handle child click
         updateUICounters();
         taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
+
+
+        const lastDiv = selectedDivs[selectedDivs.length - 1];
+        if (lastDiv) {
+            const computedStyle = getComputedStyle(lastDiv);
+            const rgbColor = computedStyle.borderLeftColor;
+            const hexColor = rgbToHex(rgbColor);
+
+            if (hexColor) {
+                const colorBtn = document.querySelector(`button.color-option[data-color="${hexColor}"]`);
+                if (colorBtn) colorBtn.click();
+            }
+        }
+
+
         return; // prevent bubbling to parent logic
     }
 
     if (mainTaskElement) {
         handleParentClick(mainTaskElement); // Handle parent click
         taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
+
+
+        const lastDiv = selectedDivs[selectedDivs.length - 1];
+        if (lastDiv) {
+            const computedStyle = getComputedStyle(lastDiv);
+            const rgbColor = computedStyle.borderLeftColor;
+            const hexColor = rgbToHex(rgbColor);
+
+            if (hexColor) {
+                const colorBtn = document.querySelector(`button.color-option[data-color="${hexColor}"]`);
+                if (colorBtn) colorBtn.click();
+            }
+        }
+
+        
         updateUICounters(); // Update the UI counters
     }
 
@@ -1652,7 +1682,7 @@ calIconVertView.addEventListener('click', () => {
 });
 
 function showCalHorView(m, y) {
-    
+
 
     // Make sure both elements exist
     const main = document.getElementById('main-container');
