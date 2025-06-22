@@ -753,7 +753,10 @@ h2 {
     animation-delay: 0.4s;
 }
 
-
+.jumping-text {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
 
 .template-title-submit-container {
     display: flex;
@@ -1866,7 +1869,7 @@ h2 {
     /* margin-bottom: 0.5rem; */
 }
 
-.material-symbols-outlined.header-icon-vert-view{
+.material-symbols-outlined.header-icon-vert-view {
     font-size: 1.2rem;
 }
 

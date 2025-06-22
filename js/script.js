@@ -1,4 +1,4 @@
-
+const jumPingText = document.querySelector(".jumping-text");
 const taskInput = document.getElementById('taskTitle');
 const exitFullscreenBtn = document.getElementById(`exit-flscreen-button`);
 const clearButton = document.getElementById('clear-button');
@@ -1356,7 +1356,7 @@ function clearSelection() {
     // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-    taskInput.value="";
+    taskInput.value = "";
     console.log(`selection cleared`);
 }
 
@@ -1599,6 +1599,11 @@ deleteButton.addEventListener('touchend', () => {
 deselectTemplateBtn.addEventListener('dblclick', clearSelection);
 deselectTemplateBtn.addEventListener('touchend', () => {
     handleTouchEnd(clearSelection);
+});
+
+jumPingText.addEventListener("click", () => {
+    console.log("jumping text is clicked");
+    taskInput.value = '';
 });
 
 
