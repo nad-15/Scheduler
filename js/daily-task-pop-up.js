@@ -26,9 +26,8 @@ yearContainer.addEventListener('click', (e) => {
 });
 
 
-
-
 todayScroll();
+
 function todayScroll() {
 
   const todayDateObj = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
@@ -89,15 +88,10 @@ function showDayTasks(d) {
   const paddedDay = String(day).padStart(2, '0');
   const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
 
-
   const dateObj = new Date(fixedDate);
 
-  //for overlay click 
-  prevMonthVertView = currentMonthVertView;
-  prevYearVertView = currentYearVertView;
-
-  currentMonthVertView = dateObj.getMonth();
-  currentYearVertView = dateObj.getFullYear();
+  currentMonthValue = dateObj.getMonth();
+  currentYearValue = dateObj.getFullYear();
 
 const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
 const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
@@ -145,13 +139,6 @@ document.getElementById("popup-date").innerHTML = `
       const section = document.createElement("div");
       section.classList.add("period-section");
 
-      // const heading = document.createElement("h3");
-      // heading.textContent = period.charAt(0).toUpperCase() + period.slice(1);
-      // section.appendChild(heading);
-
-      // const dashedLine = document.createElement("hr");
-      // dashedLine.classList.add("dashed-line");
-      // section.appendChild(dashedLine);
 
       const divider = document.createElement("div");
       divider.className = "section-divider";
@@ -212,23 +199,11 @@ document.getElementById("popup-date").innerHTML = `
 
 // === CLOSE FUNCITONALITY FOR POP UP
 document.getElementById("closePopupBtn").addEventListener("click", () => {
-
-  currentMonthVertView = prevMonthVertView;
-  currentYearVertView = prevYearVertView;
-
-  console.log("CurrentMonthver", currentMonthVertView);
-
   document.getElementById("calendar-pop-up").style.display = "none";
   document.getElementById("backdrop").style.display = "none";
 });
 
 document.getElementById("backdrop").addEventListener("click", () => {
-
-  currentMonthVertView = prevMonthVertView;
-  currentYearVertView = prevYearVertView;
-
-    console.log("CurrentMonthver", currentMonthVertView);
-
   document.getElementById("calendar-pop-up").style.display = "none";
   document.getElementById("backdrop").style.display = "none";
 });

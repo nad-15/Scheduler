@@ -28,55 +28,55 @@ const showHorViewBtn = document.getElementById('calendar-icon-horview');
 showVertViewBtn.addEventListener('click', () => {
     document.getElementById("calendar-pop-up").style.display = "none";
     document.getElementById("backdrop").style.display = "none";
-    showCalVertView(currentMonthVertView, currentYearVertView);
+    showCalVertView(currentMonthValue, currentYearValue);
 });
 
 
 showHorViewBtn.addEventListener('click', () => {
     document.getElementById("calendar-pop-up").style.display = "none";
     document.getElementById("backdrop").style.display = "none";
-    showCalHorView();
+    showCalHorView(currentMonthValue, currentYearValue);
 });
 
 
 const calendarPopup = document.getElementById('calendar-pop-up');
 
 calendarPopup.addEventListener('touchstart', (e) => {
-  touchStartX = e.changedTouches[0].screenX;
+    touchStartX = e.changedTouches[0].screenX;
 });
 
 calendarPopup.addEventListener('touchend', (e) => {
-  touchEndX = e.changedTouches[0].screenX;
-  const diffX = touchEndX - touchStartX;
+    touchEndX = e.changedTouches[0].screenX;
+    const diffX = touchEndX - touchStartX;
 
-  if (Math.abs(diffX) > 50) {
-    if (diffX < 0) {
-      goToNextDay(); // swipe left → next
-    } else {
-      goToPreviousDay(); // swipe right → previous
+    if (Math.abs(diffX) > 50) {
+        if (diffX < 0) {
+            goToNextDay(); // swipe left → next
+        } else {
+            goToPreviousDay(); // swipe right → previous
+        }
     }
-  }
 });
 
 function goToNextDay() {
-  const dateObj = safeDateFromPopUpDate(popUpDate);
-  dateObj.setDate(dateObj.getDate() + 1);
-  const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
-//   console.log("POPUPDATE IS:", popUpDate);
-  showDayTasks(fixedDate);
+    const dateObj = safeDateFromPopUpDate(popUpDate);
+    dateObj.setDate(dateObj.getDate() + 1);
+    const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+    //   console.log("POPUPDATE IS:", popUpDate);
+    showDayTasks(fixedDate);
 }
 
 function goToPreviousDay() {
-  const dateObj = safeDateFromPopUpDate(popUpDate);
-  dateObj.setDate(dateObj.getDate() - 1);
-  const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
-//   console.log("POPUPDATE IS:", popUpDate);
-  showDayTasks(fixedDate);
+    const dateObj = safeDateFromPopUpDate(popUpDate);
+    dateObj.setDate(dateObj.getDate() - 1);
+    const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+    //   console.log("POPUPDATE IS:", popUpDate);
+    showDayTasks(fixedDate);
 }
 
 function safeDateFromPopUpDate(str) {
-  const [year, month, day] = str.split('-').map(Number);
-  return new Date(year, month, day);
+    const [year, month, day] = str.split('-').map(Number);
+    return new Date(year, month, day);
 }
 
 // console.log("Success");
@@ -479,6 +479,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 
     monthNameContainer.addEventListener('click', () => {
+        currentMonthValue = monthName;
+        currentYearValue = yearDate;
         currentMonthVertView = monthName;
         currentYearVertView = yearDate;
         showCalVertView(monthName, yearDate);
@@ -1642,11 +1644,15 @@ function fadeColor(color, alpha = 0.6) {
 }
 
 monthLabelVertView.addEventListener('click', () => {
-    showCalHorView();
+    showCalHorView(currentMonthVertView, currentYearVertView);
 });
-calIconVertView.addEventListener('click', showCalHorView);
-function showCalHorView() {
-    console.log("Vert View Showing");
+calIconVertView.addEventListener('click', () => {
+    showCalHorView(currentMonthVertView, currentYearVertView);
+
+});
+
+function showCalHorView(m, y) {
+    
 
     // Make sure both elements exist
     const main = document.getElementById('main-container');
@@ -1662,8 +1668,7 @@ function showCalHorView() {
     while (yearContainer.firstChild) {
         yearContainer.removeChild(yearContainer.firstChild);
     }
-    console.log("All children removed:", yearContainer.childNodes.length); // Should be 0
-    updateVertViewCalendarFromMonthYear(currentMonthVertView, currentYearVertView);
+    updateVertViewCalendarFromMonthYear(m, y);
     requestAnimationFrame(() => {
         currentMonthContainer.scrollIntoView({
             block: "start",

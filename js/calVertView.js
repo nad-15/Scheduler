@@ -14,12 +14,14 @@ let currentMonthContainer = null;
 let nextMonthContainer = null;
 let prevMonthContainer = null;
 
-let prevMonthVertView = null;
-let prevYearVertView = null;
 
 let todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
 let currentMonthVertView = todayVertView.getMonth();
 let currentYearVertView = todayVertView.getFullYear();
+
+let currentMonthValue = currentMonthVertView;
+let currentYearValue = currentYearVertView;
+
 
 let popUpDate = `${todayVertView.getFullYear()}-${todayVertView.getMonth()}-${todayVertView.getDate()}`;
   console.log("POPUPDATE IS:", popUpDate);
