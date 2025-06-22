@@ -110,20 +110,30 @@ function createCalendarGrid() {
     console.log(date);
 
     // Split and pad manually
+    // const [year, month, day] = date.split('-');
+    // const paddedMonth = String(Number(month) + 1).padStart(2, '0'); // Add 1 to fix 0-indexed month
+    // const paddedDay = String(day).padStart(2, '0');
+    // const fixedDate = `${year}-${paddedMonth}-${paddedDay}`; // "2025-01-30"
+
+
+    // currentMonthVertView = month;
+    // currentYearVertView = year;
+
+    // Split and pad manually
     const [year, month, day] = date.split('-');
-    const paddedMonth = String(Number(month) + 1).padStart(2, '0'); // Add 1 to fix 0-indexed month
+    const paddedMonth = String(Number(month) + 1).padStart(2, '0');
     const paddedDay = String(day).padStart(2, '0');
-    const fixedDate = `${year}-${paddedMonth}-${paddedDay}`; // "2025-01-30"
+    const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
 
 
-    currentMonthVertView = month;
-    currentYearVertView = year;
+    const dateObj = new Date(fixedDate);
+
+    currentMonthVertView = dateObj.getMonth();
+    currentYearVertView = dateObj.getFullYear();
 
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
     const dayTasks = storedTasks[date];
 
-    const dateObj = new Date(fixedDate);
-    // dateObj.setMonth(dateObj.getMonth() + 1); 
 
     const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
     console.log(weekday);
@@ -291,6 +301,8 @@ function updateCalendarWithTasks(month, year) {
 
 
       // Restore the "today" highlight
+      const todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+
       if (
         currentDay === todayVertView.getDate() &&
         month === todayVertView.getMonth() &&
