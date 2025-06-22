@@ -90,7 +90,7 @@ function createCalendarGrid() {
   for (let i = 0; i < 42; i++) {
     const dayCell = document.createElement("div");
     dayCell.classList.add("day-vert-view");
-    dayCell.addEventListener(`click`, showDayTasks);
+    // dayCell.addEventListener(`click`, showDayTasks);
 
     const dayNumber = document.createElement("div");
     dayNumber.classList.add("day-number");
@@ -103,138 +103,126 @@ function createCalendarGrid() {
     daysGridVertView.appendChild(dayCell);
   }
   // === SHOW POP UP FOR THE DAY ===
-  function showDayTasks(e) {
-    const dayElement = e.target.closest('.day-vert-view');
-    const date = dayElement.dataset.fullDate;
+//   function showDayTasks(e) {
+//     const dayElement = e.target.closest('.day-vert-view');
+//     const date = dayElement.dataset.fullDate;
 
-    console.log(date);
+//     console.log(date);
 
-    // Split and pad manually
-    // const [year, month, day] = date.split('-');
-    // const paddedMonth = String(Number(month) + 1).padStart(2, '0'); // Add 1 to fix 0-indexed month
-    // const paddedDay = String(day).padStart(2, '0');
-    // const fixedDate = `${year}-${paddedMonth}-${paddedDay}`; // "2025-01-30"
-
-
-    // currentMonthVertView = month;
-    // currentYearVertView = year;
-
-    // Split and pad manually
-    const [year, month, day] = date.split('-');
-    const paddedMonth = String(Number(month) + 1).padStart(2, '0');
-    const paddedDay = String(day).padStart(2, '0');
-    const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
+//     // Split and pad manually
+//     // const [year, month, day] = date.split('-');
+//     // const paddedMonth = String(Number(month) + 1).padStart(2, '0'); // Add 1 to fix 0-indexed month
+//     // const paddedDay = String(day).padStart(2, '0');
+//     // const fixedDate = `${year}-${paddedMonth}-${paddedDay}`; // "2025-01-30"
 
 
-    const dateObj = new Date(fixedDate);
+//     // currentMonthVertView = month;
+//     // currentYearVertView = year;
 
-    currentMonthVertView = dateObj.getMonth();
-    currentYearVertView = dateObj.getFullYear();
-
-    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-    const dayTasks = storedTasks[date];
-
-
-    const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-    console.log(weekday);
-    const rest = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    console.log(rest);
-    document.getElementById("popup-date").innerHTML = `
-  <div class="weekday">${weekday}</div>
-  <div class="month-year">${rest}</div>
-`;
+//     // Split and pad manually
+//     const [year, month, day] = date.split('-');
+//     const paddedMonth = String(Number(month) + 1).padStart(2, '0');
+//     const paddedDay = String(day).padStart(2, '0');
+//     const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
 
 
+//     const dateObj = new Date(fixedDate);
 
-    const popupTasks = document.getElementById("popup-tasks");
-    popupTasks.innerHTML = "";
+//     currentMonthVertView = dateObj.getMonth();
+//     currentYearVertView = dateObj.getFullYear();
 
-    if (!dayTasks) {
-      const noTask = document.createElement("p");
-      noTask.textContent = "No tasks for this day.";
-      popupTasks.appendChild(noTask);
-    } else {
-      const periods = ["morning", "afternoon", "evening"];
-
-      periods.forEach(period => {
-        const section = document.createElement("div");
-        section.classList.add("period-section");
-
-        // const heading = document.createElement("h3");
-        // heading.textContent = period.charAt(0).toUpperCase() + period.slice(1);
-        // section.appendChild(heading);
-
-        // const dashedLine = document.createElement("hr");
-        // dashedLine.classList.add("dashed-line");
-        // section.appendChild(dashedLine);
-
-        const divider = document.createElement("div");
-        divider.className = "section-divider";
-        divider.textContent = period.charAt(0).toUpperCase() + period.slice(1);
-        section.appendChild(divider);
+//     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+//     const dayTasks = storedTasks[date];
 
 
-        const periodTasks = dayTasks[period];
-        if (periodTasks && periodTasks.length > 0) {
-          periodTasks.forEach(({ task, color }) => {
-            const eventDiv = document.createElement("div");
-            eventDiv.className = "event";
-
-            const content = document.createElement("div");
-            content.className = "event-content";
-
-            const title = document.createElement("span");
-            title.className = "event-title";
-
-            const hasText = task && task.trim() !== "";
-            const hasColor = color && color.trim() !== "";
-
-            if (hasText && hasColor) {
-              content.style.borderLeft = `5px solid ${color}`;
-              title.textContent = task;
-            } else if (!hasText && hasColor) {
-              content.style.borderLeft = `5px solid ${color}`;
-              title.textContent = "No Title";
-            } else {
-              // No text and no color
-              content.style.borderLeft = "none";
-              title.textContent = "No Task";
-            }
-
-            content.appendChild(title);
-            eventDiv.appendChild(content);
-            section.appendChild(eventDiv);
-          });
-        }
-        else {
-          const noTask = document.createElement("p");
-          noTask.className = "no-tasks-text";
-          noTask.textContent = "No tasks for this period.";
-          section.appendChild(noTask);
-        }
-
-        popupTasks.appendChild(section);
-      });
-    }
-
-    document.getElementById("calendar-pop-up").style.display = "block";
-    document.getElementById("backdrop").style.display = "block";
-  }
+//     const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+//     console.log(weekday);
+//     const rest = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+//     console.log(rest);
+//     document.getElementById("popup-date").innerHTML = `
+//   <div class="weekday">${weekday}</div>
+//   <div class="month-year">${rest}</div>
+// `;
 
 
 
+//     const popupTasks = document.getElementById("popup-tasks");
+//     popupTasks.innerHTML = "";
+
+//     if (!dayTasks) {
+//       const noTask = document.createElement("p");
+//       noTask.textContent = "No tasks for this day.";
+//       popupTasks.appendChild(noTask);
+//     } else {
+//       const periods = ["morning", "afternoon", "evening"];
+
+//       periods.forEach(period => {
+//         const section = document.createElement("div");
+//         section.classList.add("period-section");
+
+//         // const heading = document.createElement("h3");
+//         // heading.textContent = period.charAt(0).toUpperCase() + period.slice(1);
+//         // section.appendChild(heading);
+
+//         // const dashedLine = document.createElement("hr");
+//         // dashedLine.classList.add("dashed-line");
+//         // section.appendChild(dashedLine);
+
+//         const divider = document.createElement("div");
+//         divider.className = "section-divider";
+//         divider.textContent = period.charAt(0).toUpperCase() + period.slice(1);
+//         section.appendChild(divider);
+
+
+//         const periodTasks = dayTasks[period];
+//         if (periodTasks && periodTasks.length > 0) {
+//           periodTasks.forEach(({ task, color }) => {
+//             const eventDiv = document.createElement("div");
+//             eventDiv.className = "event";
+
+//             const content = document.createElement("div");
+//             content.className = "event-content";
+
+//             const title = document.createElement("span");
+//             title.className = "event-title";
+
+//             const hasText = task && task.trim() !== "";
+//             const hasColor = color && color.trim() !== "";
+
+//             if (hasText && hasColor) {
+//               content.style.borderLeft = `5px solid ${color}`;
+//               title.textContent = task;
+//             } else if (!hasText && hasColor) {
+//               content.style.borderLeft = `5px solid ${color}`;
+//               title.textContent = "No Title";
+//             } else {
+//               // No text and no color
+//               content.style.borderLeft = "none";
+//               title.textContent = "No Task";
+//             }
+
+//             content.appendChild(title);
+//             eventDiv.appendChild(content);
+//             section.appendChild(eventDiv);
+//           });
+//         }
+//         else {
+//           const noTask = document.createElement("p");
+//           noTask.className = "no-tasks-text";
+//           noTask.textContent = "No tasks for this period.";
+//           section.appendChild(noTask);
+//         }
+
+//         popupTasks.appendChild(section);
+//       });
+//     }
+
+//     document.getElementById("calendar-pop-up").style.display = "block";
+//     document.getElementById("backdrop").style.display = "block";
+//   }
 
 
   // === CLOSE FUNCITONALITY FOR POP UP
-  document.getElementById("closePopupBtn").addEventListener("click", () => {
-    document.getElementById("calendar-pop-up").style.display = "none";
-    document.getElementById("backdrop").style.display = "none";
-  });
-
-  document.getElementById("backdrop").addEventListener("click", () => {
-    document.getElementById("calendar-pop-up").style.display = "none";
-    document.getElementById("backdrop").style.display = "none";
-  });
 
 
   // === SET MAX HEIGHT for each task container after DOM elements are in place
@@ -344,6 +332,11 @@ function updateCalendarWithTasks(month, year) {
         }
       });
     }
+
+    cell.addEventListener("click", () => {
+      const fullDate = cell.getAttribute("data-full-date");
+      showDayTasks(fullDate);
+    });
   }
 }
 
@@ -383,6 +376,17 @@ nextMonthBtnVertView.addEventListener("click", () => {
   updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
 });
 
+
+
+  // document.getElementById("closePopupBtn").addEventListener("click", () => {
+  //   document.getElementById("calendar-pop-up").style.display = "none";
+  //   document.getElementById("backdrop").style.display = "none";
+  // });
+
+  // document.getElementById("backdrop").addEventListener("click", () => {
+  //   document.getElementById("calendar-pop-up").style.display = "none";
+  //   document.getElementById("backdrop").style.display = "none";
+  // });
 
 
 // === INITIAL SETUP ===

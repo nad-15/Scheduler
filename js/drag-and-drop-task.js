@@ -103,7 +103,7 @@ function adjustCalendarHeight() {
   function showDayTasks(e) {
   // const target = e.target.closest('[data-full-date]');
   // if (!target) return;
-
+    console.log("call to showDayTask succesful from grid");
   // const date = target.dataset.fullDate;
   const date = e;
   if (!date) return;
