@@ -61,18 +61,18 @@ calendarPopup.addEventListener('touchend', (e) => {
 function goToNextDay() {
   const dateObj = safeDateFromPopUpDate(popUpDate);
   dateObj.setDate(dateObj.getDate() + 1);
-  popUpDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+  const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
   console.log("POPUPDATE IS:", popUpDate);
-  showDayTasks(popUpDate);
+  showDayTasks(fixedDate);
 }
 
 function goToPreviousDay() {
   const dateObj = safeDateFromPopUpDate(popUpDate);
   dateObj.setDate(dateObj.getDate() - 1);
-  popUpDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+  const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
   console.log("POPUPDATE IS:", popUpDate);
 
-  showDayTasks(popUpDate);
+  showDayTasks(fixedDate);
 }
 
 function safeDateFromPopUpDate(str) {

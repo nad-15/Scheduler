@@ -106,6 +106,7 @@ function adjustCalendarHeight() {
     // console.log("call to showDayTask succesful from grid");
   // const date = target.dataset.fullDate;
   const date = e;
+  popUpDate = date;
   // console.log("POPUPDATE IS:", date);
   if (!date) return;
 
