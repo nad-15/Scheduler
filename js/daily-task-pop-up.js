@@ -131,6 +131,7 @@ document.getElementById("popup-date").innerHTML = `
   if (!dayTasks) {
     const noTask = document.createElement("p");
     noTask.textContent = "No tasks for this day.";
+    // noTask.className = "no-tasks-text"; 
     popupTasks.appendChild(noTask);
   } else {
     const periods = ["morning", "afternoon", "evening"];
