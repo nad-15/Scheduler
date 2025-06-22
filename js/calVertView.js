@@ -7,21 +7,22 @@ const calIconVertView = document.getElementById("icon-month-label-vert-view");
 const prevMonthBtnVertView = document.getElementById("prev-month-vert-view");
 const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 
+
+
+// === TIME VARIABLES ===
 let currentMonthContainer = null;
 let nextMonthContainer = null;
 let prevMonthContainer = null;
 
+let prevMonthVertView = null;
+let prevYearVertView = null;
 
-// === TIME VARIABLES ===
 let todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
 let currentMonthVertView = todayVertView.getMonth();
 let currentYearVertView = todayVertView.getFullYear();
 
 let popUpDate = `${todayVertView.getFullYear()}-${todayVertView.getMonth()}-${todayVertView.getDate()}`;
   console.log("POPUPDATE IS:", popUpDate);
-
-
-
 
 let touchStartX = 0;
 let touchEndX = 0;
@@ -76,10 +77,6 @@ function adjustCalendarHeight() {
 // Call initially and on resize
 adjustCalendarHeight();
 window.addEventListener('resize', adjustCalendarHeight);
-
-
-
-
 
 
 
