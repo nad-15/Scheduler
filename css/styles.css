@@ -2115,6 +2115,36 @@ h2 {
     z-index: 2000;
 }
 
+/* MAPLE FALLING BG */
+.leaf-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.falling-leaf {
+  position: absolute;
+  top: -40px;
+  color: #c62828; /* deep red maple */
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+
+
+
+/* MAPLE FALLING BG END */
+
+
 .popup-header {
     position: sticky;
     top: 0;

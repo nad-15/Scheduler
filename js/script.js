@@ -243,8 +243,49 @@ addTaskBtn.addEventListener('click', () => {
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
     getWeather();
-
+    createFallingLeaf();
 });
+
+
+function createFallingLeaf() {
+  const leafContainer = document.getElementById("leafContainer");
+//   const leaf = document.createElement("span");
+
+//   leaf.className = "falling-leaf material-symbols-outlined";
+//   leaf.textContent = "eco"; // You can also use 🍁 emoji or change this icon
+
+  const leaf = document.createElement("div");
+
+  leaf.className = "falling-leaf";
+  leaf.textContent = "🍁";
+//   leaf.textContent = "❄";
+  // Random horizontal position
+  leaf.style.left = Math.random() * 100 + "vw";
+
+  // Random size (between 16px and 40px)
+  const size = 16 + Math.random() * 24;
+  leaf.style.fontSize = size + "px";
+
+  // Random animation duration and delay
+  const duration = 5 + Math.random() * 5;
+  const delay = Math.random() * 3;
+
+  leaf.style.animation = `fall ${duration}s linear ${delay}s forwards`;
+
+  leafContainer.appendChild(leaf);
+
+  // Remove leaf after animation
+  setTimeout(() => leaf.remove(), (duration + delay) * 1000);
+}
+
+
+// Generate leaves every 0.5–1.5 seconds randomly
+setInterval(() => {
+    if (document.getElementById("calendar-pop-up").style.display === "block") {
+        createFallingLeaf();
+    }
+}, 800);
+
 
 
 // The 8px offset from the right
