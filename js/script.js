@@ -1711,8 +1711,8 @@ function showCalHorView() {
     updateVertViewCalendarFromMonthYear(currentMonthVertView, currentYearVertView);
     requestAnimationFrame(() => {
         currentMonthContainer.scrollIntoView({
-            block: "center",
-            behavior: "instant"
+            block: "start",
+            behavior: "smooth"
         });
 
         // Delay listener until after scroll finishes
