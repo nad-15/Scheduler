@@ -249,34 +249,42 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function createFallingLeaf() {
   const leafContainer = document.getElementById("leafContainer");
-//   const leaf = document.createElement("span");
 
-//   leaf.className = "falling-leaf material-symbols-outlined";
-//   leaf.textContent = "eco"; // You can also use 🍁 emoji or change this icon
+  // Create multiple flakes at once for denser snowfall
+  const flakesCount = Math.floor(Math.random() * 2) + 2; // 2 to 3 snowflakes per call
 
-  const leaf = document.createElement("div");
+  for (let i = 0; i < flakesCount; i++) {
+    const leaf = document.createElement("div");
+    leaf.className = "falling-leaf";
 
-  leaf.className = "falling-leaf";
-  leaf.textContent = "🍁";
-//   leaf.textContent = "❄";
-  // Random horizontal position
-  leaf.style.left = Math.random() * 100 + "vw";
+    // ❄ Random snowflake shape
+    const snowShapes = ["❄️", "❅", "❆", "✼", "✻"];
+    leaf.textContent = snowShapes[Math.floor(Math.random() * snowShapes.length)];
 
-  // Random size (between 16px and 40px)
-  const size = 16 + Math.random() * 24;
-  leaf.style.fontSize = size + "px";
+    // 🎯 Random horizontal position
+    leaf.style.left = Math.random() * 100 + "vw";
 
-  // Random animation duration and delay
-  const duration = 5 + Math.random() * 5;
-  const delay = Math.random() * 3;
+    // 📏 Random size (16–40px)
+    const size = 16 + Math.random() * 24;
+    leaf.style.fontSize = `${size}px`;
 
-  leaf.style.animation = `fall ${duration}s linear ${delay}s forwards`;
+    // ⏳ Slower fall
+    const duration = 8 + Math.random() * 7; // 8 to 15 seconds
+    const delay = Math.random() * 2;
+    leaf.style.animationDuration = `${duration}s`;
+    leaf.style.animationDelay = `${delay}s`;
 
-  leafContainer.appendChild(leaf);
+    // 🎨 Random icy blue color
+    const blues = ["#cceeff", "#bbddff", "#aaddff", "#99ccff", "#b3e0f2"];
+    leaf.style.color = blues[Math.floor(Math.random() * blues.length)];
 
-  // Remove leaf after animation
-  setTimeout(() => leaf.remove(), (duration + delay) * 1000);
+    leafContainer.appendChild(leaf);
+
+    // 🧹 Cleanup
+    setTimeout(() => leaf.remove(), (duration + delay) * 1000);
+  }
 }
+
 
 
 // Generate leaves every 0.5–1.5 seconds randomly
@@ -284,7 +292,7 @@ setInterval(() => {
     if (document.getElementById("calendar-pop-up").style.display === "block") {
         createFallingLeaf();
     }
-}, 800);
+}, 500);
 
 
 
@@ -1542,7 +1550,7 @@ const colorIndicatorTemplate = clonedSlidingInputView.querySelector(`.flower`);
 //change id of submittask to submittemplate 
 const inputTemplate = clonedSlidingInputView.querySelector(`#taskTitle`);
 inputTemplate.id = `templateTitle`;
-inputTemplate.placeholder = `Add New Template`;
+inputTemplate.placeholder = `Add new template.`;
 
 //get new id for submit button
 const addTemplateButton = clonedSlidingInputView.querySelector('#submitTask');
