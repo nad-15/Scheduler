@@ -277,7 +277,8 @@ function createFallingLeaf() {
         leaf.style.animationDelay = `${delay}s`;
 
         // 🎨 Random icy blue color
-        const blues = ["#cceeff", "#bbddff", "#aaddff", "#99ccff", "#b3e0f2"];
+        const blues = ["#cceeff", "#bbddff", "#aaddff", "#b3e0f2"];
+
         leaf.style.color = blues[Math.floor(Math.random() * blues.length)];
 
         leafContainer.appendChild(leaf);
@@ -298,7 +299,7 @@ setInterval(() => {
     if (document.getElementById("calendar-pop-up").style.display === "block") {
         createFallingLeaf();
     }
-}, 800);
+}, 1000);
 
 
 

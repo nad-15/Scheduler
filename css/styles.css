@@ -2142,7 +2142,9 @@ h2 {
   position: absolute;
   top: -40px;
   animation: fall linear forwards;
-  opacity: 0.9;
+  opacity: 0.5;
+    /* filter: blur(1.5px);  */
+
   pointer-events: none;
 }
 
