@@ -2089,6 +2089,7 @@ h2 {
 
 
 #calendar-pop-up {
+    /* box-sizing: border-box; */
     display: none;
     position: fixed;
     top: 50%;
@@ -2103,6 +2104,7 @@ h2 {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
     padding: 20px;
     padding-top: 0px;
+    /* padding-bottom: 7rem; */
     z-index: 2000;
 }
 
@@ -2152,12 +2154,13 @@ h2 {
 
 .popup-content-scroll {
     overflow-y: auto;
-    height: 100%;
+    height: 87%;
     width: 100%;
     padding-top: 0;
     display: flex;
     flex-direction: column;
     scrollbar-width: none;
+    /* padding-bottom: 7rem; */
 }
 
 .popup-tasks {
@@ -2166,6 +2169,7 @@ h2 {
     flex-direction: column;
     margin: 2px;
     flex-grow: 1;
+
 }
 
 .period-section {
