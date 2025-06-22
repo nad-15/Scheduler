@@ -216,32 +216,37 @@ addTaskBtn.addEventListener('click', () => {
         );
 
         if (taskDivToUse) {
-            taskDivToUse.textContent = taskInput.value;
+            taskDivToUse.textContent = "";
             taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
 
             if (emptyIndex !== -1) {
                 storedData[date][taskKey][emptyIndex] = {
-                    task: taskInput.value,
+                    task: taskDivToUse.textContent,
                     color: taskDivToUse.style.backgroundColor
                 };
             } else {
                 storedData[date][taskKey].push({
-                    task: taskInput.value,
+                    task: taskDivToUse.textContent,
                     color: taskDivToUse.style.backgroundColor
                 });
             }
-        } else {
-            taskDivToUse = document.createElement('div');
-            taskDivToUse.textContent = taskInput.value;
-            taskDivToUse.classList.add(`${taskType}Sub`);
-            taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
-            parent.appendChild(taskDivToUse);
 
-            storedData[date][taskKey].push({
-                task: taskInput.value,
-                color: taskDivToUse.style.backgroundColor
-            });
+            taskDivToUse.style.borderLeft = `4px solid ${chosenColor}`;
+            taskDivToUse.style.backgroundColor = fadeColor(chosenColor);
         }
+        taskDivToUse = document.createElement('div');
+        // taskDivToUse.textContent = taskInput.value;
+        taskDivToUse.textContent = "";
+        taskDivToUse.classList.add(`${taskType}Sub`);
+        taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
+        parent.appendChild(taskDivToUse);
+
+        storedData[date][taskKey].push({
+            // task: taskInput.value,
+            task: taskDivToUse.textContent,
+            color: taskDivToUse.style.backgroundColor
+        });
+
 
         taskDivToUse.style.borderLeft = `4px solid ${chosenColor}`;
         taskDivToUse.style.backgroundColor = fadeColor(chosenColor);
@@ -1706,15 +1711,15 @@ function showCalHorView() {
     updateVertViewCalendarFromMonthYear(currentMonthVertView, currentYearVertView);
     requestAnimationFrame(() => {
         currentMonthContainer.scrollIntoView({
-          block: "center",
-          behavior: "instant"
+            block: "center",
+            behavior: "instant"
         });
-      
+
         // Delay listener until after scroll finishes
         requestAnimationFrame(() => {
-          yearContainer.addEventListener('scroll', handleYearContainerScroll);
+            yearContainer.addEventListener('scroll', handleYearContainerScroll);
         });
-      });
+    });
 }
 
 function showCalVertView(month, year) {
