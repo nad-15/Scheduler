@@ -943,7 +943,7 @@ yearContainer.addEventListener('click', (event) => {
             }
         }
 
-        
+
         updateUICounters(); // Update the UI counters
     }
 
@@ -1356,7 +1356,7 @@ function clearSelection() {
     // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-
+    taskInput.value="";
     console.log(`selection cleared`);
 }
 
