@@ -26,17 +26,13 @@ const showVertViewBtn = document.getElementById('calendar-icon-vertview');
 const showHorViewBtn = document.getElementById('calendar-icon-horview');
 
 showVertViewBtn.addEventListener('click', () => {
-    document.getElementById("calendar-pop-up").style.display = "none";
-    document.getElementById("backdrop").style.display = "none";
-    clearFallingLeaves();
+    hidePopup();
     showCalVertView(currentMonthValue, currentYearValue);
 });
 
 
 showHorViewBtn.addEventListener('click', () => {
-    document.getElementById("calendar-pop-up").style.display = "none";
-    document.getElementById("backdrop").style.display = "none";
-    clearFallingLeaves();
+    hidePopup();
     showCalHorView(currentMonthValue, currentYearValue);
 });
 

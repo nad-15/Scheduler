@@ -108,6 +108,7 @@ function createCalendarGrid() {
   }
  
 
+  
   // === SET MAX HEIGHT for each task container after DOM elements are in place
   const allDayCells = daysGridVertView.querySelectorAll(".day-vert-view");
   allDayCells.forEach(cell => {

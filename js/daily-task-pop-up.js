@@ -192,8 +192,9 @@ function showDayTasks(d) {
     });
   }
 
-  document.getElementById("calendar-pop-up").style.display = "block";
-  document.getElementById("backdrop").style.display = "block";
+  // document.getElementById("calendar-pop-up").style.display = "block";
+  // document.getElementById("backdrop").style.display = "block";
+  showPopup();
 }
 
 
@@ -201,13 +202,23 @@ function showDayTasks(d) {
 
 // === CLOSE FUNCITONALITY FOR POP UP
 document.getElementById("closePopupBtn").addEventListener("click", () => {
-  document.getElementById("calendar-pop-up").style.display = "none";
-  document.getElementById("backdrop").style.display = "none";
-  clearFallingLeaves();
+  hidePopup();
 });
 
 document.getElementById("backdrop").addEventListener("click", () => {
-  document.getElementById("calendar-pop-up").style.display = "none";
-  document.getElementById("backdrop").style.display = "none";
-  clearFallingLeaves();
+  hidePopup();
 });
+function showPopup() {
+  const popup = document.getElementById("calendar-pop-up");
+  const backdrop = document.getElementById("backdrop");
+  backdrop.style.display = "block";
+  popup.style.display = "block"
+}
+
+function hidePopup() {
+  const popup = document.getElementById("calendar-pop-up");
+  const backdrop = document.getElementById("backdrop");
+  backdrop.style.display = "none";
+  popup.style.display = "none";
+  clearFallingLeaves();
+}
