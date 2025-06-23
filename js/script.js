@@ -260,7 +260,7 @@ function createFallingLeaf() {
         leaf.className = "falling-leaf";
 
         // ❄ Random snowflake shape
-        const snowShapes = ["❄️", "❅", "❆", "✼", "✻"];
+        const snowShapes = [ "❅", "❆", "✼", "✻"];
         leaf.textContent = snowShapes[Math.floor(Math.random() * snowShapes.length)];
 
         // 🎯 Random horizontal position
