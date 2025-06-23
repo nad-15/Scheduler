@@ -171,6 +171,7 @@ function showDayTasks(d) {
           } else {
             // No text and no color
             content.style.borderLeft = "none";
+            content.classList.add("no-tasks-for-this-period");
             // title.textContent = "No Task";
             title.textContent = "No tasks for this period.";
           }

@@ -2273,10 +2273,15 @@ h2 {
     margin-left: 20px;
     margin-bottom: 10px;
     /* border-radius: 4px; */
+    /* border: 2px solid black; */
 }
 
 .event-title {
     color: black;
+}
+
+.event-content.no-tasks-for-this-period{
+    padding-left: 0px;
 }
 
 .no-tasks-text {
