@@ -256,7 +256,7 @@ function createFallingLeaf() {
         leaf.className = "falling-leaf";
 
         // ❄ Random snowflake shape
-        const snowShapes = [ "❅", "❆", "✼", "✻"];
+        const snowShapes = ["❅", "❆", "✼", "✻"];
         leaf.textContent = snowShapes[Math.floor(Math.random() * snowShapes.length)];
 
         // 🎯 Random horizontal position
@@ -530,13 +530,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     const monthNameContainer = document.createElement('div');
 
 
-    monthNameContainer.addEventListener('click', () => {
-        currentMonthValue = monthName;
-        currentYearValue = yearDate;
-        currentMonthVertView = monthName;
-        currentYearVertView = yearDate;
-        showCalVertView(monthName, yearDate);
-    });
+
 
 
     monthNameContainer.classList.add('month-name-container');
@@ -551,11 +545,19 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     let monthLetterContainer = document.createElement('div');
     monthLetterContainer.classList.add('month-letter-container'); // Add a class for styling
 
+
+    monthLetterContainer.addEventListener('click', () => {
+        swapToGridView(monthName, yearDate);
+    });
+
+
     letters.forEach(letter => {
         let letterDiv = document.createElement('div');
         letterDiv.textContent = letter;
         monthLetterContainer.appendChild(letterDiv); // Append each letter to the wrapper
     });
+
+
 
     // Append the wrapper to the main container
     monthNameContainer.appendChild(monthLetterContainer);
@@ -581,6 +583,10 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         yearLetterContainer.appendChild(letterDiv);
     });
 
+    yearLetterContainer.addEventListener('click', () => {
+        swapToGridView(monthName, yearDate);
+    });
+
     // yearLetterContainer.textContent = yearDate;
     monthNameContainer.appendChild(yearLetterContainer);
 
@@ -590,47 +596,64 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
     // Lock Button
-    let lockButton = document.createElement("div");
-    lockButton.classList.add("lock-button"); // Assign class for styling
+    let toGridCalBtn = document.createElement("div");
+    toGridCalBtn.classList.add("grid-cal-btn"); // Assign class for styling
     const icon = document.createElement("span");
     icon.classList.add("material-icons");
     // icon.textContent = "lock_open";
     icon.textContent = "calendar_month";
 
 
-    lockButton.appendChild(icon);
-    monthNameContainer.prepend(lockButton);
+    toGridCalBtn.appendChild(icon);
+    monthNameContainer.prepend(toGridCalBtn);
+
+
+    toGridCalBtn.addEventListener('click', () => {
+        swapToGridView(monthName, yearDate);
+    });
+
+
+
+    function swapToGridView(monthName, yearDate) {
+        currentMonthValue = monthName;
+        currentYearValue = yearDate;
+        currentMonthVertView = monthName;
+        currentYearVertView = yearDate;
+        showCalVertView(monthName, yearDate);
+    }
 
     // Check if lock state exists in localStorage for this month container
     // Check if lock state exists in localStorage for this month container
-    let isLocked = localStorage.getItem(`lockState-${FormatMonthName}`) === 'true' ? true : false; // Default to false if not found
+    // let isLocked = localStorage.getItem(`lockState-${FormatMonthName}`) === 'true' ? true : false; // Default to false if not found
 
 
     // Apply saved lock state when the page loads
-    if (isLocked) {
-        // console.log(`${FormatMonthName} is locked`);
-        monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
-        // icon.textContent = "lock_open"; // Change icon to locked
-        icon.textContent = "calendar_month";
-    }
+    // if (isLocked) {
+    //     // console.log(`${FormatMonthName} is locked`);
+    //     monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
+    //     // icon.textContent = "lock_open"; // Change icon to locked
+    //     icon.textContent = "calendar_month";
+    // }
 
     // Lock/Unlock functionality
-    lockButton.addEventListener("click", () => {
-        isLocked = !isLocked; // Toggle the lock state
+    // toGridCalBtn.addEventListener("click", () => {
+    //     isLocked = !isLocked; // Toggle the lock state
 
-        if (isLocked) {
-            // console.log(`${FormatMonthName} is locked`);
-            monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
-            icon.textContent = "calendar_month"; // Change icon to locked
-        } else {
-            // console.log(`${FormatMonthName} is unlocked`);
-            monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
-            icon.textContent = "calendar_month"; // Change icon back to unlocked
-        }
+    //     if (isLocked) {
+    //         // console.log(`${FormatMonthName} is locked`);
+    //         monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
+    //         icon.textContent = "calendar_month"; // Change icon to locked
+    //     } else {
+    //         // console.log(`${FormatMonthName} is unlocked`);
+    //         monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
+    //         icon.textContent = "calendar_month"; // Change icon back to unlocked
+    //     }
 
-        // Save the lock state to localStorage
-        localStorage.setItem(`lockState-${FormatMonthName}`, isLocked.toString());
-    });
+    //     // Save the lock state to localStorage
+    //     localStorage.setItem(`lockState-${FormatMonthName}`, isLocked.toString());
+    // });
+
+
 
 
     for (i = 1; i <= lastDateOfMonth; i++) {

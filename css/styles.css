@@ -1145,6 +1145,7 @@ h2 {
     -ms-user-select: none;
     /* For IE/Edge */
     /* flex: 1;         */
+    /* background-color: red; */
 }
 
 .lock-button {
@@ -1165,6 +1166,7 @@ h2 {
 
 .month-letter-container {
     /* border: 2px solid black; */
+    /* background-color: red; */
 }
 
 .month-container {
@@ -1175,6 +1177,14 @@ h2 {
     flex-grow: 1;
     /* flex: 8; */
 }
+
+.year-letter-container:active,
+.month-letter-container:active,
+.grid-cal-btn:active {
+  /* color: snow; */
+  transform: scale(0.9);
+}
+
 
 
 .day-container {
@@ -1881,6 +1891,7 @@ h2 {
     padding: 1rem 1rem;
     /* border-radius: 10px; */
     /* margin-bottom: 0.5rem; */
+
 }
 
 .material-symbols-outlined.header-icon-vert-view {
@@ -1892,7 +1903,11 @@ h2 {
     font-size: 1.2rem;
     font-weight: 600;
     color: #333;
+}
 
+.month-label-vert-view:active,
+#icon-month-label-vert-view:active{
+    transform: scale(0.9);
 }
 
 .navigation-vertview-container {
@@ -2304,6 +2319,7 @@ h2 {
     padding: 5px 10px;
     margin-left: 20px;
     margin-bottom: 10px;
+    padding-left: 0px;
 
 }
 

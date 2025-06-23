@@ -184,6 +184,7 @@ function showDayTasks(d) {
       else {
         const noTask = document.createElement("p");
         noTask.className = "no-tasks-text";
+        // content.classList.add("no-tasks-for-this-period");
         noTask.textContent = "No tasks for this period.";
         section.appendChild(noTask);
       }
