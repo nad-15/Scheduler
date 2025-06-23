@@ -241,7 +241,7 @@ addTaskBtn.addEventListener('click', () => {
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
     getWeather();
-    createFallingLeaf();
+    // createFallingLeaf();
 });
 
 
@@ -291,11 +291,11 @@ function clearFallingLeaves() {
 }
 
 // Generate leaves every 0.5–1.5 seconds randomly
-setInterval(() => {
-    if (document.getElementById("calendar-pop-up").style.display === "block") {
-        createFallingLeaf();
-    }
-}, 1000);
+// setInterval(() => {
+//     if (document.getElementById("calendar-pop-up").style.display === "block") {
+//         createFallingLeaf();
+//     }
+// }, 1000);
 
 
 
