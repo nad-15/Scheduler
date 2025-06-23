@@ -2691,7 +2691,7 @@ h2 {
 .days-grid-vert-view>div {
     border-top: 1px solid var(--calendar-border);
     border-left: 1px solid var(--calendar-border);
-    padding-top: 0.6rem;
+    padding-top: 0.5rem;
 
 }
 
@@ -2709,7 +2709,7 @@ h2 {
     justify-content: flex-start;
     padding: 1px;
     text-align: center;
-    font-size: 1rem;
+    font-size: 0.87rem;
     /* font-weight: bold; */
     height: 100%;
     position: relative;
@@ -2722,7 +2722,7 @@ h2 {
 /* Task container scrollable area */
 .task-container-vert-view {
     /* background: red; */
-    margin-top: 4px;
+    margin-top: 0.4rem;
     overflow-y: auto;
     flex-grow: 1;
     display: flex;
