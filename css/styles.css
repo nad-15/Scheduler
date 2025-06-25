@@ -73,6 +73,7 @@ body {
 } */
 
 .bunny-scale-wrapper {
+    display: none;
   position: absolute;
   top: 0;
   right: 0;
@@ -2553,10 +2554,6 @@ h2 {
 
 }
 
-.material-icons.close-button-menu-icon{
-    color: transparent;
-}
-
 .material-symbols-outlined.header-icon-vert-view {
     font-size: 1.2rem;
 }
@@ -2887,15 +2884,47 @@ h2 {
     color: black;
 }
 
+.edit-close-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-#closePopupBtn {
-    border: transparent;
-
-    background-color: transparent;
-    /* background-color: red; */
-    height: 100%;
-    aspect-ratio: 1/1;
 }
+
+.edit-dailytask-popup{
+    display: none;
+    height: fit-content;
+    width: fit-content;
+    background-color: transparent;
+    border: none;
+}
+
+.close-popup {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: 2px solid white;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.coffee-video {
+
+  width: 90px;              /* Larger than button to simulate zoom-in crop */
+  height: 90px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+
+.material-icons.close-button-menu-icon{
+    /* color: transparent; */
+}
+
 
 .popup-content-scroll {
     overflow-y: auto;

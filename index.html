@@ -454,15 +454,30 @@
 
     <div id="calendar-pop-up">
 
- 
+
 
         <div class="leaf-container" id="leafContainer"></div>
 
+
+
         <div class="popup-header">
             <span class="popup-date" id="popup-date">May 21, 2025</span>
-            <button class="close-popup" id="closePopupBtn">
-                <span class="material-icons close-button-menu-icon">close</span>
-            </button>
+            <div class="edit-close-container">
+                <button class="edit-dailytask-popup" id="edit-btn-dailytask">
+                    <span class="material-symbols-outlined">
+                        note_alt
+                    </span>
+                    <button class="close-popup" id="closePopupBtn">
+                        <!-- <span class="material-icons close-button-menu-icon">close</span> -->
+                        <div class="gif-cropper">
+                            <video autoplay loop muted playsinline class="coffee-video">
+                                <source src="images/coffee.webm" type="video/webm" />
+                            </video>
+                        </div>
+                    </button>
+                </button>
+            </div>
+
         </div>
 
         <div class="popup-content-scroll">
@@ -491,7 +506,7 @@
             </button>
         </div>
 
-               <div class="bunny-scale-wrapper">
+        <div class="bunny-scale-wrapper">
             <div class="bunny-main-container">
                 <div class="bunny-container">
                     <div class="text"></div>
