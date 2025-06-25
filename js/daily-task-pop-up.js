@@ -223,3 +223,15 @@ function hidePopup() {
   popup.style.display = "none";
   clearFallingLeaves();
 }
+
+
+
+
+// ==============EDIT BUTTON
+
+const editBtn = document.getElementById(edit-btn-dailytask);
+
+editBtn.addEventListener('click', ()=>{
+
+});
+  

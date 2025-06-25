@@ -25,6 +25,14 @@ const addTaskBtn = document.getElementById(`addTask`);
 const showVertViewBtn = document.getElementById('calendar-icon-vertview');
 const showHorViewBtn = document.getElementById('calendar-icon-horview');
 
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadTemplate();
+    getWeather();
+    // createFallingLeaf();
+});
+
+
 showVertViewBtn.addEventListener('click', () => {
     hidePopup();
     showCalVertView(currentMonthValue, currentYearValue);
@@ -211,37 +219,6 @@ addTaskBtn.addEventListener('click', () => {
 
     localStorage.setItem("tasks", JSON.stringify(storedData));
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-window.addEventListener('DOMContentLoaded', () => {
-    loadTemplate();
-    getWeather();
-    // createFallingLeaf();
 });
 
 
