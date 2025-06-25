@@ -229,7 +229,8 @@ function hidePopup() {
 
 // ==============EDIT BUTTON
 
-const editBtn = document.getElementById(edit-btn-dailytask);
+const editBtn = document.getElementById("edit-btn-dailytask");
+
 
 editBtn.addEventListener('click', ()=>{
 
