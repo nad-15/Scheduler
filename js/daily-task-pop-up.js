@@ -213,7 +213,7 @@ function showPopup() {
   const popup = document.getElementById("calendar-pop-up");
   const backdrop = document.getElementById("backdrop");
   backdrop.style.display = "block";
-  popup.style.display = "block"
+  popup.style.display = "flex";
 }
 
 function hidePopup() {
