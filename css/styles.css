@@ -74,11 +74,12 @@ body {
 
 .bunny-scale-wrapper {
     display: none;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(39%, 110%) scale(0.08); /* adjust as needed */
-  transform-origin: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(39%, 110%) scale(0.08);
+    /* adjust as needed */
+    transform-origin: center;
 }
 
 
@@ -2785,14 +2786,17 @@ h2 {
 
 
 #calendar-pop-up {
-    /* box-sizing: border-box; */
+    /* box-sizing: border-box;  */
     display: none;
+    flex-direction: column;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 70%;
     /* overflow-y: auto; */
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
     background-color: white;
     color: black;
@@ -2800,9 +2804,12 @@ h2 {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
     padding: 20px;
     padding-top: 0px;
+    padding-bottom: 0px;
     /* padding-bottom: 7rem; */
     z-index: 2000;
 }
+
+
 
 /* .hidden {
   opacity: 0;
@@ -2851,8 +2858,8 @@ h2 {
 
 
 .popup-header {
-    position: sticky;
-    top: 0;
+    /* position: sticky; */
+    /* top: 0; */
     z-index: 1;
     background-color: transparent;
     display: flex;
@@ -2884,14 +2891,14 @@ h2 {
     color: black;
 }
 
-.edit-close-container{
+.edit-close-container {
     display: flex;
     justify-content: center;
     align-items: center;
 
 }
 
-.edit-dailytask-popup{
+.edit-dailytask-popup {
     display: none;
     height: fit-content;
     width: fit-content;
@@ -2900,40 +2907,42 @@ h2 {
 }
 
 .close-popup {
-  width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  background: none;
-  border: 2px solid white;
-  border-radius: 50%;
-  overflow: hidden;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: 2px solid white;
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 .coffee-video {
 
-  width: 90px;              /* Larger than button to simulate zoom-in crop */
-  height: 90px;
-  object-fit: cover;
-  flex-shrink: 0;
+    width: 90px;
+    /* Larger than button to simulate zoom-in crop */
+    height: 90px;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 
-.material-icons.close-button-menu-icon{
+.material-icons.close-button-menu-icon {
     /* color: transparent; */
 }
 
 
 .popup-content-scroll {
     overflow-y: auto;
-    height: 86%;
+    /* height: 86%; */
     width: 100%;
     padding-top: 0;
     display: flex;
     flex-direction: column;
     scrollbar-width: none;
+    flex-grow: 1;
     /* padding-bottom: 7rem; */
     /* background-color: blue; */
 
@@ -3017,17 +3026,19 @@ h2 {
 
 .pop-up-calview-navi {
     box-sizing: border-box;
-    position: absolute;
+    /* position: absolute;
     bottom: 0;
-    left: 0;
+    left: 0; */
     width: 100%;
     /* height: 8%; */
     /* padding: 12px 16px; */
-    background: #f9f9f9;
+    /* background: #f9f9f9; */
     border-top: 1px solid #ccc;
     display: flex;
     z-index: 10;
     /* background-color: red; */
+    margin-left: -20px;
+    margin-right: -20px;
 }
 
 .calendar-icon-button {
