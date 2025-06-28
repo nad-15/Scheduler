@@ -36,7 +36,6 @@ window.addEventListener('DOMContentLoaded', () => {
 showVertViewBtn.addEventListener('click', () => {
     hidePopup();
     showCalVertView(currentMonthValue, currentYearValue);
-
 });
 
 

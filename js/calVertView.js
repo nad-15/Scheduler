@@ -585,6 +585,7 @@ function saveTaskOrderToLocalStorage(popUpDate) {
     const period = section.querySelector(".section-divider")?.textContent.toLowerCase();
     const events = Array.from(section.querySelectorAll(".event"));
 
+    
     updatedPeriods[period] = events.map(event => {
       let task = event.querySelector(".event-title")?.textContent.trim();
       const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;

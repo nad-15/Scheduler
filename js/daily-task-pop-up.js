@@ -27,14 +27,14 @@ yearContainer.addEventListener('click', (e) => {
 
 
 
-  const todayDateObjScroll = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
-  const nowTodayElementScroll = new Date(todayDateObjScroll);
+const todayDateObjScroll = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
+const nowTodayElementScroll = new Date(todayDateObjScroll);
 
-  const yearTodayElementScroll = nowTodayElementScroll.getFullYear();
-  const monthTodayElementScroll = nowTodayElementScroll.getMonth();
-  const dayTodayElementScroll = nowTodayElementScroll.getDate();
+const yearTodayElementScroll = nowTodayElementScroll.getFullYear();
+const monthTodayElementScroll = nowTodayElementScroll.getMonth();
+const dayTodayElementScroll = nowTodayElementScroll.getDate();
 
-  const todayDateScroll = `${yearTodayElementScroll}-${monthTodayElementScroll}-${dayTodayElementScroll}`;
+const todayDateScroll = `${yearTodayElementScroll}-${monthTodayElementScroll}-${dayTodayElementScroll}`;
 
 todayScroll(todayDateScroll);
 
@@ -51,7 +51,7 @@ function todayScroll(todayDate) {
       behavior: "smooth",
       block: "center"
     });
-todayElement.click();
+    todayElement.click();
   }
 }
 
@@ -224,25 +224,28 @@ function showDayTasks(d) {
 // === CLOSE FUNCITONALITY FOR POP UP
 document.getElementById("closePopupBtn").addEventListener("click", () => {
   hidePopup();
-const yearContainer = document.getElementById('year-container');
 
-if (getComputedStyle(yearContainer).display === "flex") {
-  // It's flex, run your function
-  showHorViewBtn.click();
-}
+  const main = document.getElementById('main-container');
+
+  if (getComputedStyle(main).display === "block") {
+    // It's flex, run your function
+    showHorViewBtn.click();
+  }
 });
 
 document.getElementById("backdrop").addEventListener("click", () => {
   hidePopup();
 
-const yearContainer = document.getElementById('year-container');
+  const main = document.getElementById('main-container');
 
-if (getComputedStyle(yearContainer).display === "flex") {
-  // It's flex, run your function
-  showHorViewBtn.click();
-}
-  
+  if (getComputedStyle(main).display === "block") {
+    // It's flex, run your function
+    showHorViewBtn.click();
+  }
+
 });
+
+
 function showPopup() {
   document.body.style.overflow = 'hidden';
   const popup = document.getElementById("calendar-pop-up");
@@ -265,9 +268,9 @@ function hidePopup() {
   const icon = toggleBtn.querySelector('.material-symbols-outlined');
   const label = toggleBtn.querySelector('.calendar-icon-label');
   icon.textContent = 'note_alt';
-  icon.style.color = ''; 
+  icon.style.color = '';
   label.textContent = 'Rearrange';
-  label.style.color = ''; 
+  label.style.color = '';
 }
 
 
