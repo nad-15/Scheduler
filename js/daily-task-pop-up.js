@@ -249,7 +249,7 @@ document.getElementById("backdrop").addEventListener("click", () => {
 
 
 function showPopup() {
-  document.body.style.overflow = 'hidden';
+
   const popup = document.getElementById("calendar-pop-up");
   const backdrop = document.getElementById("backdrop");
   backdrop.style.display = "block";
@@ -257,7 +257,7 @@ function showPopup() {
 }
 
 function hidePopup() {
-  document.body.style.overflow = '';
+
   const popup = document.getElementById("calendar-pop-up");
   const backdrop = document.getElementById("backdrop");
   backdrop.style.display = "none";

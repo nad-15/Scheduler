@@ -475,6 +475,7 @@ function handleTouchEndPopUp() {
 }
 function addDragListeners() {
   applyBordersToEventContent();
+  document.body.style.overflow = 'hidden';
   swipeEnabledPopUp = false;
   const goTodayBtn = document.getElementById('go-to-today');
   goTodayBtn.disabled = true;
@@ -494,6 +495,7 @@ function addDragListeners() {
 
 function removeDragListeners() {
   removeExtraBordersFromEventContent();
+  document.body.style.overflow = '';
   swipeEnabledPopUp = true;
   const goTodayBtn = document.getElementById('go-to-today');
   goTodayBtn.disabled = false;
