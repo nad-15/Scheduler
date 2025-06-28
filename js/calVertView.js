@@ -292,7 +292,7 @@ let isTouch = false;
 
 const MAX_DRAG_DISTANCE = 30;
 
-function startDragging(x, y, target) {
+function startDraggingPopUp(x, y, target) {
   draggedItem = target;
 
   const rect = target.getBoundingClientRect();
@@ -324,7 +324,7 @@ for (let prop of [
 }
 
 
-function moveGhostThrottled(y) {
+function moveGhostThrottledPopUp(y) {
   if (animationFrameId) return;
   animationFrameId = requestAnimationFrame(() => {
     moveGhost(y);
@@ -370,7 +370,7 @@ function moveGhost(y) {
 }
 
 
-function endDragging() {
+function endDraggingPopUp() {
   if (dragTimeout) {
     clearTimeout(dragTimeout);
     dragTimeout = null;
@@ -392,7 +392,7 @@ function endDragging() {
   }
 }
 
-function handlePointerDown(e) {
+function handlePointerDownPopUp(e) {
   if (isTouch) return;
 
   const target = e.target.closest('.event');
@@ -407,7 +407,7 @@ function handlePointerDown(e) {
   }, 100);
 }
 
-function handlePointerMove(e) {
+function handlePointerMovePopUp(e) {
   const distance = Math.abs(e.clientY - startY);
 
   if (dragTimeout && distance > MAX_DRAG_DISTANCE) {
@@ -418,17 +418,17 @@ function handlePointerMove(e) {
   }
 
   if (!draggedItem && canStartDrag && dragTarget) {
-    startDragging(e.clientX, e.clientY, dragTarget);
+    startDraggingPopUp(e.clientX, e.clientY, dragTarget);
   }
 
-  if (draggedItem) moveGhostThrottled(e.clientY);
+  if (draggedItem) moveGhostThrottledPopUp(e.clientY);
 }
 
-function handlePointerUp() {
-  endDragging();
+function handlePointerUpPopUp() {
+  endDraggingPopUp();
 }
 
-function handleTouchStart(e) {
+function handleTouchStartPopUp(e) {
   isTouch = true;
   setTimeout(() => isTouch = false, 1000);
 
@@ -445,7 +445,7 @@ function handleTouchStart(e) {
   }, 300);
 }
 
-function handleTouchMove(e) {
+function handleTouchMovePopUp(e) {
   const touch = e.touches[0];
   const distance = Math.abs(touch.clientY - startY);
 
@@ -457,44 +457,44 @@ function handleTouchMove(e) {
   }
 
   if (!draggedItem && canStartDrag && dragTarget) {
-    startDragging(touch.clientX, touch.clientY, dragTarget);
+    startDraggingPopUp(touch.clientX, touch.clientY, dragTarget);
   }
 
   if (draggedItem) {
-    moveGhostThrottled(touch.clientY);
+    moveGhostThrottledPopUp(touch.clientY);
     e.preventDefault(); // prevent scroll
   }
 }
 
-function handleTouchEnd() {
-  endDragging();
+function handleTouchEndPopUp() {
+  endDraggingPopUp();
 }
 function addDragListeners() {
 applyBordersToEventContent();
 
 
-  document.addEventListener('pointerdown', handlePointerDown);
-  document.addEventListener('pointermove', handlePointerMove);
-  document.addEventListener('pointerup', handlePointerUp);
-  document.addEventListener('pointercancel', endDragging);
+  document.addEventListener('pointerdown', handlePointerDownPopUp);
+  document.addEventListener('pointermove', handlePointerMovePopUp);
+  document.addEventListener('pointerup', handlePointerUpPopUp);
+  document.addEventListener('pointercancel', endDraggingPopUp);
 
-  document.addEventListener('touchstart', handleTouchStart, { passive: false });
-  document.addEventListener('touchmove', handleTouchMove, { passive: false });
-  document.addEventListener('touchend', handleTouchEnd);
-  document.addEventListener('touchcancel', endDragging);
+  document.addEventListener('touchstart', handleTouchStartPopUp, { passive: false });
+  document.addEventListener('touchmove', handleTouchMovePopUp, { passive: false });
+  document.addEventListener('touchend', handleTouchEndPopUp);
+  document.addEventListener('touchcancel', endDraggingPopUp);
 }
 
 function removeDragListeners() {
     removeExtraBordersFromEventContent();
-  document.removeEventListener('pointerdown', handlePointerDown);
-  document.removeEventListener('pointermove', handlePointerMove);
-  document.removeEventListener('pointerup', handlePointerUp);
-  document.removeEventListener('pointercancel', endDragging);
+  document.removeEventListener('pointerdown', handlePointerDownPopUp);
+  document.removeEventListener('pointermove', handlePointerMovePopUp);
+  document.removeEventListener('pointerup', handlePointerUpPopUp);
+  document.removeEventListener('pointercancel', endDraggingPopUp);
 
-  document.removeEventListener('touchstart', handleTouchStart, { passive: false });
-  document.removeEventListener('touchmove', handleTouchMove, { passive: false });
-  document.removeEventListener('touchend', handleTouchEnd);
-  document.removeEventListener('touchcancel', endDragging);
+  document.removeEventListener('touchstart', handleTouchStartPopUp, { passive: false });
+  document.removeEventListener('touchmove', handleTouchMovePopUp, { passive: false });
+  document.removeEventListener('touchend', handleTouchEndPopUp);
+  document.removeEventListener('touchcancel', endDraggingPopUp);
 }
 
 
@@ -538,11 +538,13 @@ toggleBtn.addEventListener('click', () => {
     icon.textContent = 'save_as';   // change icon to "save_as"
     label.textContent = 'Save';     // change text to "Save"
     addDragListeners();
+
+
   } else {
     icon.textContent = 'note_alt';  // revert back to edit icon
-    label.textContent = 'Edit';     // revert back to edit label
+    label.textContent = 'Swap Tasks';     // revert back to edit label
     removeDragListeners();
-    endDragging();
+    endDraggingPopUp();
 
     if (popUpDate) {
       saveTaskOrderToLocalStorage(popUpDate);
@@ -565,13 +567,18 @@ function saveTaskOrderToLocalStorage(popUpDate) {
     const events = Array.from(section.querySelectorAll(".event"));
 
     updatedPeriods[period] = events.map(event => {
-      const task = event.querySelector(".event-title")?.textContent.trim();
+      let task = event.querySelector(".event-title")?.textContent.trim();
       const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
+
+      // Handle fake task label like "No Title"
+      if (task === "No Title" || task === "No tasks for this period.") {
+        task = "";
+      }
+
       return { task, color: rgbToHex(color) };
     });
   });
 
-  // Merge updated periods into existing day data
   storedTasks[popUpDate] = {
     ...currentData,
     ...updatedPeriods

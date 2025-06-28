@@ -169,12 +169,14 @@ function showDayTasks(d) {
             content.style.borderLeft = `5px solid ${color}`;
             title.textContent = "No Title";
           } else {
-            // No text and no color
-            content.style.borderLeft = "none";
-            content.classList.add("no-tasks-for-this-period");
-            // title.textContent = "No Task";
-            title.textContent = "No tasks for this period.";
+            // Don't create an event, create a <p> instead
+            const noTask = document.createElement("p");
+            noTask.className = "no-tasks-text";
+            noTask.textContent = "No tasks for this period.";
+            section.appendChild(noTask);
+            return; // skip appending the .event
           }
+
 
           content.appendChild(title);
           eventDiv.appendChild(content);
@@ -229,7 +231,7 @@ function hidePopup() {
   const icon = toggleBtn.querySelector('.material-symbols-outlined');
   const label = toggleBtn.querySelector('.calendar-icon-label');
   icon.textContent = 'note_alt';
-  label.textContent = 'Edit';
+  label.textContent = 'Swap Tasks';
 }
 
 
