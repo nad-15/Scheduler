@@ -213,8 +213,6 @@ function showDayTasks(d) {
     });
   }
 
-  // document.getElementById("calendar-pop-up").style.display = "block";
-  // document.getElementById("backdrop").style.display = "block";
   showPopup();
 }
 
@@ -230,6 +228,8 @@ document.getElementById("closePopupBtn").addEventListener("click", () => {
   if (getComputedStyle(main).display === "block") {
     // It's flex, run your function
     showHorViewBtn.click();
+  } else {
+    showVertViewBtn.click();
   }
 });
 
@@ -241,6 +241,8 @@ document.getElementById("backdrop").addEventListener("click", () => {
   if (getComputedStyle(main).display === "block") {
     // It's flex, run your function
     showHorViewBtn.click();
+  } else {
+    showVertViewBtn.click();
   }
 
 });
