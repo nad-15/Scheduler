@@ -276,3 +276,298 @@ nextMonthBtnVertView.addEventListener("click", () => {
 // === INITIAL SETUP ===
 // createCalendarGrid();
 // updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+
+
+
+
+let draggedItem = null;
+let ghost = null;
+let offsetYforEditPopUp = 0;
+let dragTimeout = null;
+let startY = 0;
+let animationFrameId = null;
+let canStartDrag = false;
+let dragTarget = null;
+let isTouch = false;
+
+const MAX_DRAG_DISTANCE = 30;
+
+function startDragging(x, y, target) {
+  draggedItem = target;
+
+  const rect = target.getBoundingClientRect();
+  offsetYforEditPopUp = y - rect.top;
+
+  const content = target.querySelector('.event-content');
+  if (!content) return;
+
+  ghost = content.cloneNode(true);
+  ghost.classList.add('ghost');
+
+  const computed = getComputedStyle(content);
+for (let prop of [
+  'width', 'height', 'padding', 'margin',
+  'font', 'fontSize', 'fontWeight',
+  'border', 'borderLeft', 'borderRadius', 'boxSizing'
+]) {
+  ghost.style[prop] = computed[prop];
+}
+
+
+  ghost.style.position = 'absolute';
+  ghost.style.left = `${rect.left}px`;
+  ghost.style.top = `${rect.top}px`;
+  ghost.style.pointerEvents = 'none';
+
+  document.body.appendChild(ghost);
+  target.classList.add('dragging');
+}
+
+
+function moveGhostThrottled(y) {
+  if (animationFrameId) return;
+  animationFrameId = requestAnimationFrame(() => {
+    moveGhost(y);
+    animationFrameId = null;
+  });
+}
+
+function moveGhost(y) {
+  if (!ghost) return;
+  ghost.style.top = `${y - offsetYforEditPopUp}px`;
+
+  const midX = window.innerWidth / 2;
+  const target = document.elementFromPoint(midX, y);
+
+  const dropTarget = target?.closest('.event');
+  const sectionTarget = target?.closest('.period-section');
+
+  if (dropTarget && dropTarget !== draggedItem) {
+    const rect = dropTarget.getBoundingClientRect();
+    const insertBefore = y < rect.top + rect.height / 2;
+    const parent = dropTarget.parentElement;
+    parent.insertBefore(draggedItem, insertBefore ? dropTarget : dropTarget.nextSibling);
+  } else if (sectionTarget && !sectionTarget.contains(draggedItem)) {
+    sectionTarget.appendChild(draggedItem);
+  }
+
+  cleanUpNoTasksText();
+}
+ function cleanUpNoTasksText() {
+  document.querySelectorAll('.period-section').forEach(section => {
+    const events = Array.from(section.children).filter(child => child.classList.contains('event'));
+    const existingNoTask = section.querySelector('.no-tasks-text');
+
+    if (events.length === 0 && !existingNoTask) {
+      const noTask = document.createElement("p");
+      noTask.className = "no-tasks-text";
+      noTask.textContent = "No tasks for this period.";
+      section.appendChild(noTask);
+    } else if (events.length > 0 && existingNoTask) {
+      existingNoTask.remove();
+    }
+  });
+}
+
+
+function endDragging() {
+  if (dragTimeout) {
+    clearTimeout(dragTimeout);
+    dragTimeout = null;
+  }
+
+  canStartDrag = false;
+  dragTarget = null;
+
+  if (draggedItem) {
+    draggedItem.classList.remove('dragging');
+    draggedItem = null;
+  }
+
+  if (ghost) {
+    try {
+      ghost.remove();
+    } catch {}
+    ghost = null;
+  }
+}
+
+function handlePointerDown(e) {
+  if (isTouch) return;
+
+  const target = e.target.closest('.event');
+  if (!target) return;
+
+  startY = e.clientY;
+  dragTarget = target;
+  canStartDrag = false;
+
+  dragTimeout = setTimeout(() => {
+    canStartDrag = true;
+  }, 100);
+}
+
+function handlePointerMove(e) {
+  const distance = Math.abs(e.clientY - startY);
+
+  if (dragTimeout && distance > MAX_DRAG_DISTANCE) {
+    clearTimeout(dragTimeout);
+    dragTimeout = null;
+    dragTarget = null;
+    canStartDrag = false;
+  }
+
+  if (!draggedItem && canStartDrag && dragTarget) {
+    startDragging(e.clientX, e.clientY, dragTarget);
+  }
+
+  if (draggedItem) moveGhostThrottled(e.clientY);
+}
+
+function handlePointerUp() {
+  endDragging();
+}
+
+function handleTouchStart(e) {
+  isTouch = true;
+  setTimeout(() => isTouch = false, 1000);
+
+  const touch = e.touches[0];
+  const target = e.target.closest('.event');
+  if (!target) return;
+
+  startY = touch.clientY;
+  dragTarget = target;
+  canStartDrag = false;
+
+  dragTimeout = setTimeout(() => {
+    canStartDrag = true;
+  }, 300);
+}
+
+function handleTouchMove(e) {
+  const touch = e.touches[0];
+  const distance = Math.abs(touch.clientY - startY);
+
+  if (dragTimeout && distance > MAX_DRAG_DISTANCE) {
+    clearTimeout(dragTimeout);
+    dragTimeout = null;
+    dragTarget = null;
+    canStartDrag = false;
+  }
+
+  if (!draggedItem && canStartDrag && dragTarget) {
+    startDragging(touch.clientX, touch.clientY, dragTarget);
+  }
+
+  if (draggedItem) {
+    moveGhostThrottled(touch.clientY);
+    e.preventDefault(); // prevent scroll
+  }
+}
+
+function handleTouchEnd() {
+  endDragging();
+}
+function addDragListeners() {
+applyBordersToEventContent();
+
+
+  document.addEventListener('pointerdown', handlePointerDown);
+  document.addEventListener('pointermove', handlePointerMove);
+  document.addEventListener('pointerup', handlePointerUp);
+  document.addEventListener('pointercancel', endDragging);
+
+  document.addEventListener('touchstart', handleTouchStart, { passive: false });
+  document.addEventListener('touchmove', handleTouchMove, { passive: false });
+  document.addEventListener('touchend', handleTouchEnd);
+  document.addEventListener('touchcancel', endDragging);
+}
+
+function removeDragListeners() {
+    removeExtraBordersFromEventContent();
+  document.removeEventListener('pointerdown', handlePointerDown);
+  document.removeEventListener('pointermove', handlePointerMove);
+  document.removeEventListener('pointerup', handlePointerUp);
+  document.removeEventListener('pointercancel', endDragging);
+
+  document.removeEventListener('touchstart', handleTouchStart, { passive: false });
+  document.removeEventListener('touchmove', handleTouchMove, { passive: false });
+  document.removeEventListener('touchend', handleTouchEnd);
+  document.removeEventListener('touchcancel', endDragging);
+}
+
+
+function applyBordersToEventContent() {
+  document.querySelectorAll('.event-content').forEach(content => {
+    const borderLeftColor = getComputedStyle(content).borderLeftColor;
+
+    content.style.border = `1px solid ${borderLeftColor}`;
+    content.style.borderLeftWidth = '8px'; // keep the left border thick
+  });
+}
+
+function removeExtraBordersFromEventContent() {
+  document.querySelectorAll('.event-content').forEach(content => {
+    const borderLeftColor = getComputedStyle(content).borderLeftColor;
+
+    content.style.border = 'none';
+    content.style.borderLeft = `3px solid ${borderLeftColor}`; // restore only the left border
+  });
+}
+
+
+
+const toggleBtn = document.getElementById('toggle-edit');
+let isEditing = false;
+
+toggleBtn.addEventListener('click', () => {
+  isEditing = !isEditing;
+  toggleBtn.querySelector('.material-icons').textContent = isEditing ? 'done' : 'edit';
+
+  if (isEditing) {
+    addDragListeners();
+  } else {
+    removeDragListeners();
+    endDragging(); // just in case mid-drag
+
+    if (popUpDate) {
+      saveTaskOrderToLocalStorage(popUpDate);
+    }
+  }
+});
+
+
+
+function saveTaskOrderToLocalStorage(popUpDate) {
+  const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+  const currentData = storedTasks[popUpDate] || {};
+
+  const updatedPeriods = {};
+  const container = document.getElementById("popup-tasks");
+
+  container.querySelectorAll(".period-section").forEach(section => {
+    const period = section.querySelector(".section-divider")?.textContent.toLowerCase();
+    const events = Array.from(section.querySelectorAll(".event"));
+
+    updatedPeriods[period] = events.map(event => {
+      const task = event.querySelector(".event-title")?.textContent.trim();
+      const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
+      return { task, color: rgbToHex(color) };
+    });
+  });
+
+  // Merge updated periods into existing day data
+  storedTasks[popUpDate] = {
+    ...currentData,
+    ...updatedPeriods
+  };
+
+  localStorage.setItem("tasks", JSON.stringify(storedTasks));
+}
+
+function rgbToHex(rgb) {
+  const result = rgb.match(/\d+/g).map(n => (+n).toString(16).padStart(2, "0"));
+  return `#${result.join("")}`;
+}
+
