@@ -26,18 +26,19 @@ yearContainer.addEventListener('click', (e) => {
 });
 
 
-todayScroll();
 
-function todayScroll() {
+  const todayDateObjScroll = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
+  const nowTodayElementScroll = new Date(todayDateObjScroll);
 
-  const todayDateObj = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
-  const nowTodayElement = new Date(todayDateObj);
+  const yearTodayElementScroll = nowTodayElementScroll.getFullYear();
+  const monthTodayElementScroll = nowTodayElementScroll.getMonth();
+  const dayTodayElementScroll = nowTodayElementScroll.getDate();
 
-  const yearTodayElement = nowTodayElement.getFullYear();
-  const monthTodayElement = nowTodayElement.getMonth();
-  const dayTodayElement = nowTodayElement.getDate();
+  const todayDateScroll = `${yearTodayElementScroll}-${monthTodayElementScroll}-${dayTodayElementScroll}`;
 
-  const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
+todayScroll(todayDateScroll);
+
+function todayScroll(todayDate) {
 
   // console.log('Built todayDate:', todayDate);
 
@@ -50,7 +51,24 @@ function todayScroll() {
       behavior: "smooth",
       block: "center"
     });
-    todayElement.click();
+todayElement.click();
+  }
+}
+
+
+function currentDayScroll(todayDate) {
+
+  // console.log('Built todayDate:', todayDate);
+
+  const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
+  // console.log('Found todayElement:', todayElement);
+
+  if (todayElement) {
+    // console.log("ENTERED todayElement");
+    todayElement.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
   }
 }
 
@@ -206,10 +224,24 @@ function showDayTasks(d) {
 // === CLOSE FUNCITONALITY FOR POP UP
 document.getElementById("closePopupBtn").addEventListener("click", () => {
   hidePopup();
+const yearContainer = document.getElementById('year-container');
+
+if (getComputedStyle(yearContainer).display === "flex") {
+  // It's flex, run your function
+  showHorViewBtn.click();
+}
 });
 
 document.getElementById("backdrop").addEventListener("click", () => {
   hidePopup();
+
+const yearContainer = document.getElementById('year-container');
+
+if (getComputedStyle(yearContainer).display === "flex") {
+  // It's flex, run your function
+  showHorViewBtn.click();
+}
+  
 });
 function showPopup() {
   const popup = document.getElementById("calendar-pop-up");
@@ -231,7 +263,7 @@ function hidePopup() {
   const icon = toggleBtn.querySelector('.material-symbols-outlined');
   const label = toggleBtn.querySelector('.calendar-icon-label');
   icon.textContent = 'note_alt';
-  label.textContent = 'Swap Tasks';
+  label.textContent = 'Rearrange';
 }
 
 

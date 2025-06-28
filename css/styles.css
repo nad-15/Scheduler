@@ -2486,6 +2486,7 @@ h2 {
 
 .ghost {
     opacity: 0.8;
+    background-color: #fff;
     pointer-events: none;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);

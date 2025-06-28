@@ -542,7 +542,7 @@ toggleBtn.addEventListener('click', () => {
 
   } else {
     icon.textContent = 'note_alt';  // revert back to edit icon
-    label.textContent = 'Swap Tasks';     // revert back to edit label
+    label.textContent = 'Rearrange';     // revert back to edit label
     removeDragListeners();
     endDraggingPopUp();
 

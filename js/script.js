@@ -36,6 +36,7 @@ window.addEventListener('DOMContentLoaded', () => {
 showVertViewBtn.addEventListener('click', () => {
     hidePopup();
     showCalVertView(currentMonthValue, currentYearValue);
+
 });
 
 
@@ -467,31 +468,6 @@ function handleYearContainerScroll() {
     }
 }
 
-
-// todayScroll();
-// function todayScroll() {
-//     const nowTodayElement = new Date();
-
-//     const yearTodayElement = nowTodayElement.getFullYear();
-//     const monthTodayElement = nowTodayElement.getMonth();
-//     const dayTodayElement = nowTodayElement.getDate();
-
-//     const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
-
-//     console.log('Built todayDate:', todayDate);
-
-//     const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
-//     console.log('Found todayElement:', todayElement);
-
-//     if (todayElement) {
-//       console.log("ENTERED todayElement");
-//       todayElement.scrollIntoView({
-//         behavior: "smooth",
-//         block: "center"
-//       });
-//     // showDayTasks(todayElement);
-//     }
-//   }
 
 
 
@@ -1765,16 +1741,20 @@ function showCalHorView(m, y) {
         yearContainer.removeChild(yearContainer.firstChild);
     }
     updateVertViewCalendarFromMonthYear(m, y);
+
     requestAnimationFrame(() => {
         currentMonthContainer.scrollIntoView({
             block: "start",
-            behavior: "smooth"
+            // behavior: "smooth"
+                        behavior: "auto"
         });
 
         // Delay listener until after scroll finishes
         requestAnimationFrame(() => {
             yearContainer.addEventListener('scroll', handleYearContainerScroll);
         });
+
+        currentDayScroll(popUpDate);
     });
 }
 
