@@ -940,6 +940,23 @@ h2 {
     /* Change cursor to indicate disabled state */
 }
 
+#go-to-today.disabled-btn,
+#go-to-today:disabled {
+  background-color: transparent; /* if button has no visible bg */
+  border: none;
+  cursor: not-allowed;
+}
+
+/* Disable pointer events for children */
+#go-to-today.disabled-btn *,
+#go-to-today:disabled * {
+  pointer-events: none;
+  opacity: 0.5;
+  color: rgb(37, 37, 37) !important; /* override material icon color */
+}
+
+
+
 .selected-task {
     box-sizing: border-box;
     display: flex;

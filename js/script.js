@@ -53,6 +53,7 @@ calendarPopup.addEventListener('touchstart', (e) => {
 });
 
 calendarPopup.addEventListener('touchend', (e) => {
+    if(!swipeEnabledPopUp) return;
     touchEndX = e.changedTouches[0].screenX;
     const diffX = touchEndX - touchStartX;
 

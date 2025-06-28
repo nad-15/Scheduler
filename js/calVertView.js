@@ -8,6 +8,8 @@ const prevMonthBtnVertView = document.getElementById("prev-month-vert-view");
 const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 
 
+let swipeEnabledPopUp = true;
+
 
 // === TIME VARIABLES ===
 let currentMonthContainer = null;
@@ -24,7 +26,7 @@ let currentYearValue = currentYearVertView;
 
 
 let popUpDate = `${todayVertView.getFullYear()}-${todayVertView.getMonth()}-${todayVertView.getDate()}`;
-  console.log("POPUPDATE IS:", popUpDate);
+console.log("POPUPDATE IS:", popUpDate);
 
 let touchStartX = 0;
 let touchEndX = 0;
@@ -106,9 +108,9 @@ function createCalendarGrid() {
     dayCell.appendChild(taskContainer);
     daysGridVertView.appendChild(dayCell);
   }
- 
 
-  
+
+
   // === SET MAX HEIGHT for each task container after DOM elements are in place
   const allDayCells = daysGridVertView.querySelectorAll(".day-vert-view");
   allDayCells.forEach(cell => {
@@ -262,15 +264,15 @@ nextMonthBtnVertView.addEventListener("click", () => {
 
 
 
-  // document.getElementById("closePopupBtn").addEventListener("click", () => {
-  //   document.getElementById("calendar-pop-up").style.display = "none";
-  //   document.getElementById("backdrop").style.display = "none";
-  // });
+// document.getElementById("closePopupBtn").addEventListener("click", () => {
+//   document.getElementById("calendar-pop-up").style.display = "none";
+//   document.getElementById("backdrop").style.display = "none";
+// });
 
-  // document.getElementById("backdrop").addEventListener("click", () => {
-  //   document.getElementById("calendar-pop-up").style.display = "none";
-  //   document.getElementById("backdrop").style.display = "none";
-  // });
+// document.getElementById("backdrop").addEventListener("click", () => {
+//   document.getElementById("calendar-pop-up").style.display = "none";
+//   document.getElementById("backdrop").style.display = "none";
+// });
 
 
 // === INITIAL SETUP ===
@@ -305,13 +307,13 @@ function startDraggingPopUp(x, y, target) {
   ghost.classList.add('ghost');
 
   const computed = getComputedStyle(content);
-for (let prop of [
-  'width', 'height', 'padding', 'margin',
-  'font', 'fontSize', 'fontWeight',
-  'border', 'borderLeft', 'borderRadius', 'boxSizing'
-]) {
-  ghost.style[prop] = computed[prop];
-}
+  for (let prop of [
+    'width', 'height', 'padding', 'margin',
+    'font', 'fontSize', 'fontWeight',
+    'border', 'borderLeft', 'borderRadius', 'boxSizing'
+  ]) {
+    ghost.style[prop] = computed[prop];
+  }
 
 
   ghost.style.position = 'absolute';
@@ -353,7 +355,7 @@ function moveGhost(y) {
 
   cleanUpNoTasksText();
 }
- function cleanUpNoTasksText() {
+function cleanUpNoTasksText() {
   document.querySelectorAll('.period-section').forEach(section => {
     const events = Array.from(section.children).filter(child => child.classList.contains('event'));
     const existingNoTask = section.querySelector('.no-tasks-text');
@@ -387,7 +389,7 @@ function endDraggingPopUp() {
   if (ghost) {
     try {
       ghost.remove();
-    } catch {}
+    } catch { }
     ghost = null;
   }
 }
@@ -418,7 +420,9 @@ function handlePointerMovePopUp(e) {
   }
 
   if (!draggedItem && canStartDrag && dragTarget) {
+    requestAnimationFrame(()=> {
     startDraggingPopUp(e.clientX, e.clientY, dragTarget);
+    });
   }
 
   if (draggedItem) moveGhostThrottledPopUp(e.clientY);
@@ -470,7 +474,11 @@ function handleTouchEndPopUp() {
   endDraggingPopUp();
 }
 function addDragListeners() {
-applyBordersToEventContent();
+  applyBordersToEventContent();
+  swipeEnabledPopUp = false;
+  const goTodayBtn = document.getElementById('go-to-today');
+  goTodayBtn.disabled = true;
+  goTodayBtn.classList.add(`disabled-btn`);
 
 
   document.addEventListener('pointerdown', handlePointerDownPopUp);
@@ -485,7 +493,13 @@ applyBordersToEventContent();
 }
 
 function removeDragListeners() {
-    removeExtraBordersFromEventContent();
+  removeExtraBordersFromEventContent();
+  swipeEnabledPopUp = true;
+  const goTodayBtn = document.getElementById('go-to-today');
+  goTodayBtn.disabled = false;
+  goTodayBtn.classList.remove(`disabled-btn`);
+
+
   document.removeEventListener('pointerdown', handlePointerDownPopUp);
   document.removeEventListener('pointermove', handlePointerMovePopUp);
   document.removeEventListener('pointerup', handlePointerUpPopUp);
@@ -534,15 +548,20 @@ toggleBtn.addEventListener('click', () => {
   const icon = toggleBtn.querySelector('.material-symbols-outlined');
   const label = toggleBtn.querySelector('.calendar-icon-label');
 
+
   if (isEditing) {
-    icon.textContent = 'save_as';   // change icon to "save_as"
-    label.textContent = 'Save';     // change text to "Save"
+    icon.textContent = 'save_as'; 
+    icon.style.color = 'red';     // change icon to "save_as"
+    label.textContent = 'Save';
+    label.style.color = 'red';     // change text to "Save"
     addDragListeners();
 
 
   } else {
-    icon.textContent = 'note_alt';  // revert back to edit icon
-    label.textContent = 'Rearrange';     // revert back to edit label
+    icon.textContent = 'note_alt'; 
+    icon.style.color = '';   // revert back to edit icon
+    label.textContent = 'Rearrange'; 
+    label.style.color = '';   // revert back to edit label
     removeDragListeners();
     endDraggingPopUp();
 
