@@ -420,8 +420,8 @@ function handlePointerMovePopUp(e) {
   }
 
   if (!draggedItem && canStartDrag && dragTarget) {
-    requestAnimationFrame(() => {
-      startDraggingPopUp(e.clientX, e.clientY, dragTarget);
+    requestAnimationFrame(()=> {
+    startDraggingPopUp(e.clientX, e.clientY, dragTarget);
     });
   }
 
@@ -475,7 +475,6 @@ function handleTouchEndPopUp() {
 }
 function addDragListeners() {
   applyBordersToEventContent();
-  // document.body.style.overflow = 'hidden';
   swipeEnabledPopUp = false;
   const goTodayBtn = document.getElementById('go-to-today');
   goTodayBtn.disabled = true;
@@ -495,7 +494,6 @@ function addDragListeners() {
 
 function removeDragListeners() {
   removeExtraBordersFromEventContent();
-  // document.body.style.overflow = '';
   swipeEnabledPopUp = true;
   const goTodayBtn = document.getElementById('go-to-today');
   goTodayBtn.disabled = false;
@@ -552,7 +550,7 @@ toggleBtn.addEventListener('click', () => {
 
 
   if (isEditing) {
-    icon.textContent = 'save_as';
+    icon.textContent = 'save_as'; 
     icon.style.color = 'red';     // change icon to "save_as"
     label.textContent = 'Save';
     label.style.color = 'red';     // change text to "Save"
@@ -560,9 +558,9 @@ toggleBtn.addEventListener('click', () => {
 
 
   } else {
-    icon.textContent = 'note_alt';
+    icon.textContent = 'note_alt'; 
     icon.style.color = '';   // revert back to edit icon
-    label.textContent = 'Rearrange';
+    label.textContent = 'Rearrange'; 
     label.style.color = '';   // revert back to edit label
     removeDragListeners();
     endDraggingPopUp();
@@ -587,19 +585,17 @@ function saveTaskOrderToLocalStorage(popUpDate) {
     const period = section.querySelector(".section-divider")?.textContent.toLowerCase();
     const events = Array.from(section.querySelectorAll(".event"));
 
+    updatedPeriods[period] = events.map(event => {
+      let task = event.querySelector(".event-title")?.textContent.trim();
+      const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
 
-    if (events.length > 0) {
-      updatedPeriods[period] = events.map(event => {
-        let task = event.querySelector(".event-title")?.textContent.trim();
-        const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
+      // Handle fake task label like "No Title"
+      if (task === "No Title" || task === "No tasks for this period.") {
+        task = "";
+      }
 
-        if (task === "No Title" || task === "No tasks for this period.") {
-          task = "";
-        }
-
-        return { task, color: rgbToHex(color) };
-      });
-    }
+      return { task, color: rgbToHex(color) };
+    });
   });
 
   storedTasks[popUpDate] = {
