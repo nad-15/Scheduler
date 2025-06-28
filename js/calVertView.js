@@ -517,25 +517,39 @@ function removeExtraBordersFromEventContent() {
 }
 
 
+document.getElementById('go-to-today').addEventListener('click', () => {
+  const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+  const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+  showDayTasks(todayKey);
+});
+
+
 
 const toggleBtn = document.getElementById('toggle-edit');
 let isEditing = false;
 
 toggleBtn.addEventListener('click', () => {
   isEditing = !isEditing;
-  toggleBtn.querySelector('.material-icons').textContent = isEditing ? 'done' : 'edit';
+
+  const icon = toggleBtn.querySelector('.material-symbols-outlined');
+  const label = toggleBtn.querySelector('.calendar-icon-label');
 
   if (isEditing) {
+    icon.textContent = 'save_as';   // change icon to "save_as"
+    label.textContent = 'Save';     // change text to "Save"
     addDragListeners();
   } else {
+    icon.textContent = 'note_alt';  // revert back to edit icon
+    label.textContent = 'Edit';     // revert back to edit label
     removeDragListeners();
-    endDragging(); // just in case mid-drag
+    endDragging();
 
     if (popUpDate) {
       saveTaskOrderToLocalStorage(popUpDate);
     }
   }
 });
+
 
 
 
@@ -570,4 +584,6 @@ function rgbToHex(rgb) {
   const result = rgb.match(/\d+/g).map(n => (+n).toString(16).padStart(2, "0"));
   return `#${result.join("")}`;
 }
+
+
 

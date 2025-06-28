@@ -482,28 +482,44 @@
         </div>
 
         <!-- navigation button at calendar pop up -->
-        <div class="pop-up-calview-navi">
-            <button class="calendar-icon-button" title="Month View">
-                <div class="calendar-icon-wrapper">
-                    <span class="material-symbols-outlined" id="calendar-icon-vertview">
-                        calendar_month
-                    </span>
-                    <span class="calendar-icon-label">Month View</span>
-                </div>
-            </button>
-            <button class="calendar-icon-button" title="List View">
-                <div class="calendar-icon-wrapper">
-                    <span class="material-symbols-outlined" id="calendar-icon-horview">
-                        event_note
-                    </span>
-                    <span class="calendar-icon-label">List View</span>
-                </div>
-            </button>
-        </div>
+<div class="pop-up-calview-navi">
+  <!-- Month View -->
+  <button class="calendar-icon-button" title="Month View">
+    <div class="calendar-icon-wrapper">
+      <span class="material-symbols-outlined" id="calendar-icon-vertview">calendar_month</span>
+      <span class="calendar-icon-label">Month View</span>
+    </div>
+  </button>
+
+  <!-- List View -->
+  <button class="calendar-icon-button" title="List View">
+    <div class="calendar-icon-wrapper">
+      <span class="material-symbols-outlined" id="calendar-icon-horview">event_note</span>
+      <span class="calendar-icon-label">List View</span>
+    </div>
+  </button>
+
+  <!-- Today Button -->
+<button class="calendar-icon-button" title="Today" id="go-to-today">
+  <div class="calendar-icon-wrapper">
+    <span class="material-symbols-outlined" id="calendar-icon-today">today</span>
+    <span class="calendar-icon-label">Today</span>
+  </div>
+</button>
+
+  <!-- Edit Button -->
+  <button class="calendar-icon-button" title="Edit Tasks" id="toggle-edit">
+    <div class="calendar-icon-wrapper">
+      <span class="material-symbols-outlined" id="calendar-icon-edit">note_alt</span>
+      <span class="calendar-icon-label">Swap Tasks</span>
+    </div>
+  </button>
+</div>
+
         
-    <button id="toggle-edit" class="floating-edit-btn">
+    <!-- <button id="toggle-edit" class="floating-edit-btn">
       <span class="material-icons">edit</span>
-    </button>
+    </button> -->
 
 
     </div>

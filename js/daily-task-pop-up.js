@@ -222,17 +222,23 @@ function hidePopup() {
   backdrop.style.display = "none";
   popup.style.display = "none";
   clearFallingLeaves();
+  removeDragListeners();
+
+  isEditing = false;
+
+  const icon = toggleBtn.querySelector('.material-symbols-outlined');
+  const label = toggleBtn.querySelector('.calendar-icon-label');
+  icon.textContent = 'note_alt';
+  label.textContent = 'Edit';
 }
 
 
 
 
-// ==============EDIT BUTTON
+// ==============EDIT BUTTON remove this its above
 
 const editBtn = document.getElementById("edit-btn-dailytask");
 
-
-editBtn.addEventListener('click', ()=>{
+editBtn.addEventListener('click', () => {
 
 });
-  
