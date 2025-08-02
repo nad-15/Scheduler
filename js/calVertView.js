@@ -295,6 +295,11 @@ let isTouch = false;
 const MAX_DRAG_DISTANCE = 30;
 
 function startDraggingPopUp(x, y, target) {
+
+  if (ghost && ghost.parentNode) {
+    console.log("GHOST REMOVE");
+    ghost.remove();
+  }
   draggedItem = target;
 
   const rect = target.getBoundingClientRect();
@@ -373,6 +378,14 @@ function cleanUpNoTasksText() {
 
 
 function endDraggingPopUp() {
+  // Remove ALL ghost elements from DOM
+  document.querySelectorAll(".ghost").forEach(el => {
+    // console.log("Removing lingering ghost:", el);
+    el.remove();
+  });
+
+  ghost = null;
+
   if (dragTimeout) {
     clearTimeout(dragTimeout);
     dragTimeout = null;
@@ -385,14 +398,8 @@ function endDraggingPopUp() {
     draggedItem.classList.remove('dragging');
     draggedItem = null;
   }
-
-  if (ghost) {
-    try {
-      ghost.remove();
-    } catch { }
-    ghost = null;
-  }
 }
+
 
 function handlePointerDownPopUp(e) {
   if (isTouch) return;
@@ -420,8 +427,8 @@ function handlePointerMovePopUp(e) {
   }
 
   if (!draggedItem && canStartDrag && dragTarget) {
-    requestAnimationFrame(()=> {
-    startDraggingPopUp(e.clientX, e.clientY, dragTarget);
+    requestAnimationFrame(() => {
+      startDraggingPopUp(e.clientX, e.clientY, dragTarget);
     });
   }
 
@@ -458,6 +465,9 @@ function handleTouchMovePopUp(e) {
     dragTimeout = null;
     dragTarget = null;
     canStartDrag = false;
+
+
+
   }
 
   if (!draggedItem && canStartDrag && dragTarget) {
@@ -477,6 +487,10 @@ function addDragListeners() {
   applyBordersToEventContent();
   swipeEnabledPopUp = false;
   const goTodayBtn = document.getElementById('go-to-today');
+  const copyBtn = document.getElementById("copy-tasks-btn");
+
+  copyBtn.disabled = true;
+  copyBtn.classList.add('disabled-btn');
   goTodayBtn.disabled = true;
   goTodayBtn.classList.add(`disabled-btn`);
 
@@ -496,6 +510,10 @@ function removeDragListeners() {
   removeExtraBordersFromEventContent();
   swipeEnabledPopUp = true;
   const goTodayBtn = document.getElementById('go-to-today');
+  const copyBtn = document.getElementById("copy-tasks-btn");
+
+  copyBtn.disabled = false;
+  copyBtn.classList.remove('disabled-btn');
   goTodayBtn.disabled = false;
   goTodayBtn.classList.remove(`disabled-btn`);
 
@@ -526,7 +544,7 @@ function removeExtraBordersFromEventContent() {
     const borderLeftColor = getComputedStyle(content).borderLeftColor;
 
     content.style.border = 'none';
-    content.style.borderLeft = `3px solid ${borderLeftColor}`; // restore only the left border
+    content.style.borderLeft = `5px solid ${borderLeftColor}`; // restore only the left border
   });
 }
 
@@ -550,7 +568,7 @@ toggleBtn.addEventListener('click', () => {
 
 
   if (isEditing) {
-    icon.textContent = 'save_as'; 
+    icon.textContent = 'save_as';
     icon.style.color = 'red';     // change icon to "save_as"
     label.textContent = 'Save';
     label.style.color = 'red';     // change text to "Save"
@@ -558,12 +576,13 @@ toggleBtn.addEventListener('click', () => {
 
 
   } else {
-    icon.textContent = 'note_alt'; 
+    icon.textContent = 'note_alt';
     icon.style.color = '';   // revert back to edit icon
-    label.textContent = 'Rearrange'; 
+    label.textContent = 'Rearrange';
     label.style.color = '';   // revert back to edit label
-    removeDragListeners();
     endDraggingPopUp();
+
+    removeDragListeners();
 
     if (popUpDate) {
       saveTaskOrderToLocalStorage(popUpDate);
@@ -575,6 +594,8 @@ toggleBtn.addEventListener('click', () => {
 
 
 function saveTaskOrderToLocalStorage(popUpDate) {
+
+
   const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
   const currentData = storedTasks[popUpDate] || {};
 
