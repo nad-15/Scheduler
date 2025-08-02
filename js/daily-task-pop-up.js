@@ -3,6 +3,62 @@
 adjustCalendarHeight();
 window.addEventListener('resize', adjustCalendarHeight);
 
+
+const calendarPopup = document.getElementById('calendar-pop-up');
+
+calendarPopup.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+});
+
+calendarPopup.addEventListener('touchend', (e) => {
+  const touchEndX = e.changedTouches[0].screenX;
+  const touchEndY = e.changedTouches[0].screenY;
+
+  const dx = touchEndX - touchStartX;
+  const dy = touchEndY - touchStartY;
+
+  const minSwipeDistance = 50;
+  if (Math.abs(dx) < minSwipeDistance) return; // too short
+
+  const slope = Math.abs(dy / dx);
+  const maxAllowedSlope = Math.tan(30 * Math.PI / 180); // ~0.7
+
+  if (slope > maxAllowedSlope) return; // too vertical
+
+  if (dx < 0) {
+    // Swipe left → next day
+    goToNextDay();
+  } else {
+    // Swipe right → previous day
+    goToPreviousDay();
+
+  }
+
+});
+
+function goToNextDay() {
+  const dateObj = safeDateFromPopUpDate(popUpDate);
+  dateObj.setDate(dateObj.getDate() + 1);
+  const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+  //   console.log("POPUPDATE IS:", popUpDate);
+  showDayTasks(fixedDate);
+}
+
+function goToPreviousDay() {
+  const dateObj = safeDateFromPopUpDate(popUpDate);
+  dateObj.setDate(dateObj.getDate() - 1);
+  const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+  //   console.log("POPUPDATE IS:", popUpDate);
+  showDayTasks(fixedDate);
+}
+
+function safeDateFromPopUpDate(str) {
+  const [year, month, day] = str.split('-').map(Number);
+  return new Date(year, month, day);
+}
+
+
 yearContainer.addEventListener('click', (e) => {
   const dateEl = e.target.closest('.date');
   const dayEl = e.target.closest('.day');

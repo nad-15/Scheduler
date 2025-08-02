@@ -45,47 +45,6 @@ showHorViewBtn.addEventListener('click', () => {
 });
 
 
-const calendarPopup = document.getElementById('calendar-pop-up');
-
-calendarPopup.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-});
-
-calendarPopup.addEventListener('touchend', (e) => {
-    if(!swipeEnabledPopUp) return;
-    touchEndX = e.changedTouches[0].screenX;
-    const diffX = touchEndX - touchStartX;
-
-    if (Math.abs(diffX) > 50) {
-        if (diffX < 0) {
-            goToNextDay(); // swipe left → next
-        } else {
-            goToPreviousDay(); // swipe right → previous
-        }
-    }
-});
-
-function goToNextDay() {
-    const dateObj = safeDateFromPopUpDate(popUpDate);
-    dateObj.setDate(dateObj.getDate() + 1);
-    const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
-    //   console.log("POPUPDATE IS:", popUpDate);
-    showDayTasks(fixedDate);
-}
-
-function goToPreviousDay() {
-    const dateObj = safeDateFromPopUpDate(popUpDate);
-    dateObj.setDate(dateObj.getDate() - 1);
-    const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
-    //   console.log("POPUPDATE IS:", popUpDate);
-    showDayTasks(fixedDate);
-}
-
-function safeDateFromPopUpDate(str) {
-    const [year, month, day] = str.split('-').map(Number);
-    return new Date(year, month, day);
-}
-
 // console.log("Success");
 migrateTaskDataToArrayFormat();
 function migrateTaskDataToArrayFormat() {

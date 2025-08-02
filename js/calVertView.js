@@ -28,41 +28,53 @@ let currentYearValue = currentYearVertView;
 let popUpDate = `${todayVertView.getFullYear()}-${todayVertView.getMonth()}-${todayVertView.getDate()}`;
 console.log("POPUPDATE IS:", popUpDate);
 
+
 let touchStartX = 0;
-let touchEndX = 0;
+let touchStartY = 0;
 
 calendarContainerVertView.addEventListener("touchstart", (e) => {
   touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
 });
 
 calendarContainerVertView.addEventListener("touchend", (e) => {
-  touchEndX = e.changedTouches[0].screenX;
-  handleMobileSwipe();
+  const touchEndX = e.changedTouches[0].screenX;
+  const touchEndY = e.changedTouches[0].screenY;
+  handleMobileSwipe(touchStartX, touchEndX, touchStartY, touchEndY);
 });
 
-function handleMobileSwipe() {
-  const swipeDistance = touchEndX - touchStartX;
+function handleMobileSwipe(startX, endX, startY, endY) {
+  const dx = endX - startX;
+  const dy = endY - startY;
 
-  if (Math.abs(swipeDistance) > 50) { // threshold for detecting swipe
-    if (swipeDistance < 0) {
-      // Swipe left → next month
-      currentMonthVertView++;
-      if (currentMonthVertView > 11) {
-        currentMonthVertView = 0;
-        currentYearVertView++;
-      }
-    } else {
-      // Swipe right → previous month
-      currentMonthVertView--;
-      if (currentMonthVertView < 0) {
-        currentMonthVertView = 11;
-        currentYearVertView--;
-      }
+  const minSwipeDistance = 50;
+  if (Math.abs(dx) < minSwipeDistance) return; // too short
+
+  const slope = Math.abs(dy / dx);
+  const maxAllowedSlope = Math.tan(30 * Math.PI / 180); // ~0.7
+
+  if (slope > maxAllowedSlope) return; // too vertical
+
+  if (dx < 0) {
+    // Swipe left → next month
+    currentMonthVertView++;
+    if (currentMonthVertView > 11) {
+      currentMonthVertView = 0;
+      currentYearVertView++;
     }
-
-    updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+  } else {
+    // Swipe right → previous month
+    currentMonthVertView--;
+    if (currentMonthVertView < 0) {
+      currentMonthVertView = 11;
+      currentYearVertView--;
+    }
   }
+
+  updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
 }
+
+
 
 
 // === RESIZE THE CALENDAR VIEW MINUS THE ADDRESS BAR ===
