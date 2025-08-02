@@ -85,16 +85,16 @@ themeList.addEventListener('click', (event) => {
 });
 
 // Select the 'Size' menu toggle
-const size = document.querySelector('.size');
+// const size = document.querySelector('.size');
 
-// Select the size submenu
-const sizeSubmenu = document.querySelector('.size-submenu');
+// // Select the size submenu
+// const sizeSubmenu = document.querySelector('.size-submenu');
 
-// Add a click event to toggle the visibility of the size submenu
-size.addEventListener('click', () => {
-  // Toggle the class to show or hide the submenu
-  sizeSubmenu.classList.toggle('show');
-});
+// // Add a click event to toggle the visibility of the size submenu
+// size.addEventListener('click', () => {
+//   // Toggle the class to show or hide the submenu
+//   sizeSubmenu.classList.toggle('show');
+// });
 
 
 // Select all size list items

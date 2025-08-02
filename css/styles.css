@@ -2377,6 +2377,11 @@ h2 {
     font-size: 14px;
     /* 1.2rem */
     color: #333;
+
+      user-select: none;   /* Prevents text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none;    /* For Firefox */
+  -ms-user-select: none;     /* For older IE */
 }
 
 .dashed-line {
@@ -2418,12 +2423,22 @@ h2 {
     margin-bottom: 5px;
     margin-top: 5px;
 
+      user-select: none;   /* Prevents text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none;    /* For Firefox */
+  -ms-user-select: none;     /* For older IE */
+
     /* border: 2px solid red; */
 
 }
 
 .event-title {
     color: black;
+
+      user-select: none;   /* Prevents text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none;    /* For Firefox */
+  -ms-user-select: none;     /* For older IE */
 }
 
 .event-content.no-tasks-for-this-period {
