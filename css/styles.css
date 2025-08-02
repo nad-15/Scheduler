@@ -940,6 +940,21 @@ h2 {
     /* Change cursor to indicate disabled state */
 }
 
+#copy-tasks-btn.disabled-btn,
+#copy-tasks-btn:disabled {
+  background-color: transparent;
+  border: none;
+  cursor: not-allowed;
+}
+
+/* Disable pointer events for children */
+#copy-tasks-btn.disabled-btn *,
+#copy-tasks-btn:disabled * {
+  pointer-events: none;
+  opacity: 0.5;
+  color: rgb(37, 37, 37) !important;
+}
+
 #go-to-today.disabled-btn,
 #go-to-today:disabled {
   background-color: transparent; /* if button has no visible bg */
