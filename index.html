@@ -459,19 +459,19 @@
         <div class="popup-header">
             <span class="popup-date" id="popup-date">May 21, 2025</span>
             <div class="edit-close-container">
-                <button class="edit-dailytask-popup" id="edit-btn-dailytask">
+                <!-- <button class="edit-dailytask-popup" id="edit-btn-dailytask">
                     <span class="material-symbols-outlined">
                         note_alt
-                    </span>
-                    <button class="close-popup" id="closePopupBtn">
-                        <!-- <span class="material-icons close-button-menu-icon">close</span> -->
-                        <div class="gif-cropper">
-                            <video autoplay loop muted playsinline class="coffee-video">
-                                <source src="images/coffee.webm" type="video/webm" />
-                            </video>
-                        </div>
-                    </button>
+                    </span> -->
+                <button class="close-popup" id="closePopupBtn">
+                    <!-- <span class="material-icons close-button-menu-icon">close</span> -->
+                    <div class="gif-cropper">
+                        <video autoplay loop muted playsinline class="coffee-video">
+                            <source src="images/coffee.webm" type="video/webm" />
+                        </video>
+                    </div>
                 </button>
+                <!-- </button> -->
             </div>
         </div>
 
@@ -482,42 +482,51 @@
         </div>
 
         <!-- navigation button at calendar pop up -->
-<div class="pop-up-calview-navi">
-  <!-- Month View -->
-  <button class="calendar-icon-button" title="Month View">
-    <div class="calendar-icon-wrapper">
-      <span class="material-symbols-outlined" id="calendar-icon-vertview">calendar_month</span>
-      <span class="calendar-icon-label">Month View</span>
-    </div>
-  </button>
+        <div class="pop-up-calview-navi">
+            <!-- Month View -->
+            <button class="calendar-icon-button" title="Month View">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined" id="calendar-icon-vertview">calendar_month</span>
+                    <span class="calendar-icon-label">Month View</span>
+                </div>
+            </button>
 
-  <!-- List View -->
-  <button class="calendar-icon-button" title="List View">
-    <div class="calendar-icon-wrapper">
-      <span class="material-symbols-outlined" id="calendar-icon-horview">event_note</span>
-      <span class="calendar-icon-label">List View</span>
-    </div>
-  </button>
+            <!-- List View -->
+            <button class="calendar-icon-button" title="List View">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined" id="calendar-icon-horview">event_note</span>
+                    <span class="calendar-icon-label">List View</span>
+                </div>
+            </button>
 
-  <!-- Today Button -->
-<button class="calendar-icon-button" title="Today" id="go-to-today">
-  <div class="calendar-icon-wrapper">
-    <span class="material-symbols-outlined" id="calendar-icon-today">today</span>
-    <span class="calendar-icon-label">Today</span>
-  </div>
-</button>
+            <!-- Today Button -->
+            <button class="calendar-icon-button" title="Today" id="go-to-today">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined" id="calendar-icon-today">today</span>
+                    <span class="calendar-icon-label">Today</span>
+                </div>
+            </button>
 
-  <!-- Edit Button -->
-  <button class="calendar-icon-button" title="Edit Tasks" id="toggle-edit">
-    <div class="calendar-icon-wrapper">
-      <span class="material-symbols-outlined" id="calendar-icon-edit">note_alt</span>
-      <span class="calendar-icon-label">Rearrange</span>
-    </div>
-  </button>
-</div>
+            <!-- Copy Button -->
+            <button class="calendar-icon-button" title="Copy Tasks" id="copy-tasks-btn">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined">content_copy</span>
+                    <span class="calendar-icon-label">Copy</span>
+                </div>
+            </button>
 
-        
-    <!-- <button id="toggle-edit" class="floating-edit-btn">
+
+            <!-- Edit Button -->
+            <button class="calendar-icon-button" title="Edit Tasks" id="toggle-edit">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined" id="calendar-icon-edit">note_alt</span>
+                    <span class="calendar-icon-label">Rearrange</span>
+                </div>
+            </button>
+        </div>
+
+
+        <!-- <button id="toggle-edit" class="floating-edit-btn">
       <span class="material-icons">edit</span>
     </button> -->
 
@@ -526,6 +535,24 @@
 
     <div id="backdrop" class="backdrop"></div>
 
+
+    <div id="toast" style="
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #323232;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+">
+        Toast message
+    </div>
 
 
 

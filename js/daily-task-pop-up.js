@@ -280,8 +280,68 @@ function hidePopup() {
 
 // ==============EDIT BUTTON remove this its above
 
-const editBtn = document.getElementById("edit-btn-dailytask");
+// const editBtn = document.getElementById("edit-btn-dailytask");
 
-editBtn.addEventListener('click', () => {
+// editBtn.addEventListener('click', () => {
 
+// });
+
+
+document.getElementById("copy-tasks-btn").addEventListener("click", () => {
+  copyTasksForDate(popUpDate);
 });
+
+
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.style.opacity = 1;
+
+  setTimeout(() => {
+    toast.style.opacity = 0;
+  }, 2000); // Toast stays visible for 2 seconds
+}
+
+
+function copyTasksForDate(dateKey) {
+  const allTasks = JSON.parse(localStorage.getItem("tasks"));
+  const data = allTasks?.[dateKey];
+
+  if (!data) {
+    showToast("No tasks found for this date.");
+    console.log("Missing dateKey in tasks:", dateKey);
+    return;
+  }
+
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const dateObj = new Date(year, month, day);
+  const dayName = dateObj.toLocaleDateString("en-US", { weekday: "long" });
+
+  let output = `${dayName}\n`;
+  const periods = ['morning', 'afternoon', 'evening'];
+  let taskFound = false;
+
+  periods.forEach(period => {
+    const tasks = data[period];
+    if (Array.isArray(tasks)) {
+      tasks.forEach(taskObj => {
+        const name = taskObj.task?.trim();
+        if (name && name.toLowerCase() !== "invalid date") {
+          output += `- ${name}\n`;
+          taskFound = true;
+        }
+      });
+    }
+  });
+
+  if (!taskFound) {
+    showToast("No valid tasks to copy.");
+    return;
+  }
+
+  navigator.clipboard.writeText(output)
+    .then(() => showToast("Tasks copied!"))
+    .catch(err => showToast("Failed to copy!"));
+}
+
