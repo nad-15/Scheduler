@@ -660,7 +660,20 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             taskData.morning.forEach(({ task, color }) => {
                 const taskDiv = document.createElement('div');
                 taskDiv.classList.add('morningTaskSub');
-                taskDiv.textContent = task;
+
+                // taskDiv.textContent = task;
+
+                //webkit
+                if (task.trim()) {
+                    const span = document.createElement('span');
+                    span.className = 'clamp-text';
+                    span.textContent = task;
+                    taskDiv.innerHTML = ''; // clear existing content
+                    taskDiv.appendChild(span);
+                } else {
+                    taskDiv.textContent = ''; // or some fallback if empty
+                }
+
                 // taskDiv.style.backgroundColor = color;
                 // morningTaskDiv.appendChild(taskDiv);
                 if (color) {
@@ -686,7 +699,21 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             taskData.afternoon.forEach(({ task, color }) => {
                 const taskDiv = document.createElement('div');
                 taskDiv.classList.add('afternoonTaskSub');
-                taskDiv.textContent = task;
+
+                // taskDiv.textContent = task;
+
+                //webkit
+                if (task.trim()) {
+                    const span = document.createElement('span');
+                    span.className = 'clamp-text';
+                    span.textContent = task;
+                    taskDiv.innerHTML = ''; // clear existing content
+                    taskDiv.appendChild(span);
+                } else {
+                    taskDiv.textContent = ''; // or some fallback if empty
+                }
+
+
                 // taskDiv.style.backgroundColor = color;
                 // afternoonTaskDiv.appendChild(taskDiv);
                 if (color) {
@@ -712,7 +739,20 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             taskData.evening.forEach(({ task, color }) => {
                 const taskDiv = document.createElement('div');
                 taskDiv.classList.add('eveningTaskSub');
-                taskDiv.textContent = task;
+
+                // taskDiv.textContent = task;
+
+                //webkit
+                if (task.trim()) {
+                    const span = document.createElement('span');
+                    span.className = 'clamp-text';
+                    span.textContent = task;
+                    taskDiv.innerHTML = ''; // clear existing content
+                    taskDiv.appendChild(span);
+                } else {
+                    taskDiv.textContent = ''; // or some fallback if empty
+                }
+
                 // taskDiv.style.backgroundColor = color;
                 // eveningTaskDiv.appendChild(taskDiv);
                 if (color) {
@@ -1070,7 +1110,16 @@ function submitTask() {
 
             // Use existing text if none is typed in
             if (taskTitle !== '') {
-                div.textContent = taskTitle;
+                // div.textContent = taskTitle;
+        
+                //webkit
+                const span = document.createElement('span');
+                span.className = 'clamp-text';
+                span.textContent = taskTitle;
+
+                div.innerHTML = '';       // Clear any existing content
+                div.appendChild(span);    // Add styled span
+
             } else {
                 taskTitle = div.textContent;
             }
@@ -1707,7 +1756,7 @@ function showCalHorView(m, y) {
         currentMonthContainer.scrollIntoView({
             block: "start",
             // behavior: "smooth"
-                        behavior: "auto"
+            behavior: "auto"
         });
 
         // Delay listener until after scroll finishes
