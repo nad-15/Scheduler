@@ -942,34 +942,32 @@ h2 {
 
 #copy-tasks-btn.disabled-btn,
 #copy-tasks-btn:disabled {
-    background-color: transparent;
-    border: none;
-    cursor: not-allowed;
+  background-color: transparent;
+  border: none;
+  cursor: not-allowed;
 }
 
 /* Disable pointer events for children */
 #copy-tasks-btn.disabled-btn *,
 #copy-tasks-btn:disabled * {
-    pointer-events: none;
-    opacity: 0.5;
-    color: rgb(37, 37, 37) !important;
+  pointer-events: none;
+  opacity: 0.5;
+  color: rgb(37, 37, 37) !important;
 }
 
 #go-to-today.disabled-btn,
 #go-to-today:disabled {
-    background-color: transparent;
-    /* if button has no visible bg */
-    border: none;
-    cursor: not-allowed;
+  background-color: transparent; /* if button has no visible bg */
+  border: none;
+  cursor: not-allowed;
 }
 
 /* Disable pointer events for children */
 #go-to-today.disabled-btn *,
 #go-to-today:disabled * {
-    pointer-events: none;
-    opacity: 0.5;
-    color: rgb(37, 37, 37) !important;
-    /* override material icon color */
+  pointer-events: none;
+  opacity: 0.5;
+  color: rgb(37, 37, 37) !important; /* override material icon color */
 }
 
 
@@ -1376,13 +1374,6 @@ h2 {
 .afternoonTaskSub,
 .eveningTaskSub {
     display: flex;
-
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    box-orient: vertical;
-    
     padding: 3px;
     /* border: .5px solid #ccc; */
     /* border: .5px solid gray; */
@@ -1412,6 +1403,7 @@ h2 {
 
     border-left: 4px solid transparent;
     background-color: transparent;
+
 
 
     /* align-content: center; */
@@ -2401,14 +2393,10 @@ h2 {
     /* 1.2rem */
     color: #333;
 
-    user-select: none;
-    /* Prevents text selection */
-    -webkit-user-select: none;
-    /* For Safari */
-    -moz-user-select: none;
-    /* For Firefox */
-    -ms-user-select: none;
-    /* For older IE */
+      user-select: none;   /* Prevents text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none;    /* For Firefox */
+  -ms-user-select: none;     /* For older IE */
 }
 
 .dashed-line {
@@ -2450,14 +2438,10 @@ h2 {
     margin-bottom: 5px;
     margin-top: 5px;
 
-    user-select: none;
-    /* Prevents text selection */
-    -webkit-user-select: none;
-    /* For Safari */
-    -moz-user-select: none;
-    /* For Firefox */
-    -ms-user-select: none;
-    /* For older IE */
+      user-select: none;   /* Prevents text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none;    /* For Firefox */
+  -ms-user-select: none;     /* For older IE */
 
     /* border: 2px solid red; */
 
@@ -2466,14 +2450,10 @@ h2 {
 .event-title {
     color: black;
 
-    user-select: none;
-    /* Prevents text selection */
-    -webkit-user-select: none;
-    /* For Safari */
-    -moz-user-select: none;
-    /* For Firefox */
-    -ms-user-select: none;
-    /* For older IE */
+      user-select: none;   /* Prevents text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none;    /* For Firefox */
+  -ms-user-select: none;     /* For older IE */
 }
 
 .event-content.no-tasks-for-this-period {
