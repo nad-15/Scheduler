@@ -12,8 +12,8 @@ calendarPopup.addEventListener('touchstart', (e) => {
 });
 
 calendarPopup.addEventListener('touchend', (e) => {
-
   if(!swipeEnabledPopUp) return;
+  
   const touchEndX = e.changedTouches[0].screenX;
   const touchEndY = e.changedTouches[0].screenY;
 
