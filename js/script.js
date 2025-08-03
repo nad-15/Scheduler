@@ -1111,7 +1111,7 @@ function submitTask() {
             // Use existing text if none is typed in
             if (taskTitle !== '') {
                 // div.textContent = taskTitle;
-        
+
                 //webkit
                 const span = document.createElement('span');
                 span.className = 'clamp-text';
@@ -1244,7 +1244,15 @@ function submitTemplate(item) {
         const storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
         selectedDivs.forEach(div => {
-            div.textContent = taskText;
+            // div.textContent = taskText;
+
+            //webkit
+            const span = document.createElement('span');
+            span.className = 'clamp-text';
+            span.textContent = taskText;
+            div.innerHTML = '';       // Clear any existing content
+            div.appendChild(span);    // Add styled span
+
             // div.style.backgroundColor = taskColor;
             div.style.borderLeft = `4px solid ${taskColor}`;
             div.style.backgroundColor = fadeColor(taskColor);
