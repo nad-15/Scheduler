@@ -397,7 +397,8 @@ function copyTasksForDate(dateKey) {
   }
 
   navigator.clipboard.writeText(output)
-    .then(() => showToast("Tasks copied!"))
+    // .then(() => showToast("Tasks copied!"))
+    .then()
     .catch(err => showToast("Failed to copy!"));
 }
 
