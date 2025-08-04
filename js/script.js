@@ -32,6 +32,26 @@ window.addEventListener('DOMContentLoaded', () => {
     // createFallingLeaf();
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+const toggleBtn = document.getElementById('toggleClampBtn');
+const toggleIcon = document.getElementById('toggleIcon');
+
+let expanded = false;
+
+toggleBtn.addEventListener('click', () => {
+    expanded = !expanded;
+
+    document.querySelectorAll('.clamp-text').forEach(span => {
+        span.classList.toggle('expanded', expanded);
+    });
+
+    // Toggle icon
+    toggleIcon.textContent = expanded ? 'compress' : 'expand';
+});
+
+});
+
+
 
 showVertViewBtn.addEventListener('click', () => {
     hidePopup();

@@ -431,6 +431,31 @@ h2 {
 }
 
 
+.clamp-toggle-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 81px;
+    left: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+
+    color: white;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#toggleIcon{
+    font-size: 18px;
+    font-weight: normal;
+}
+
 /* =================== */
 /* ✨ MENU BUTTON ✨ */
 .menu-button {
@@ -1392,6 +1417,15 @@ h2 {
 
 }
 
+.clamp-text.expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: unset;
+    overflow: visible;
+    text-overflow: unset;
+}
+
 
 .morningTaskSub,
 .afternoonTaskSub,
@@ -1411,7 +1445,8 @@ h2 {
     text-overflow: ellipsis; */
     margin: 1px;
     border-radius: 3px;
-    height: 18px;
+    height: autor;
+    min-height: 18px;
 
     overflow: auto;
     word-wrap: break-word;
