@@ -1200,8 +1200,11 @@ h2 {
     justify-content: center;
     height: 100%;
     width: 30px;
+    flex-shrink: 0;
     user-select: none;
     overflow: auto;
+
+
 
     gap: 50px;
 
@@ -1310,7 +1313,8 @@ h2 {
 
 .date,
 .day {
-    flex: 1;
+    /* flex: 1; */
+    flex: 1 0 0%;
     display: flex;
     /* border: .5px solid #ccc; */
     border: .5px solid black;
