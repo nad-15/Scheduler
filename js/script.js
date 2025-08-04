@@ -32,22 +32,23 @@ window.addEventListener('DOMContentLoaded', () => {
     // createFallingLeaf();
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-const toggleBtn = document.getElementById('toggleClampBtn');
-const toggleIcon = document.getElementById('toggleIcon');
-
 let expanded = false;
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('toggleClampBtn');
+    const toggleIcon = document.getElementById('toggleIcon');
 
-toggleBtn.addEventListener('click', () => {
-    expanded = !expanded;
 
-    document.querySelectorAll('.clamp-text').forEach(span => {
-        span.classList.toggle('expanded', expanded);
+
+    toggleBtn.addEventListener('click', () => {
+        expanded = !expanded;
+
+        document.querySelectorAll('.clamp-text').forEach(span => {
+            span.classList.toggle('expanded', expanded);
+        });
+
+        // Toggle icon
+        toggleIcon.textContent = expanded ? 'compress' : 'expand';
     });
-
-    // Toggle icon
-    toggleIcon.textContent = expanded ? 'compress' : 'expand';
-});
 
 });
 
@@ -687,6 +688,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 if (task.trim()) {
                     const span = document.createElement('span');
                     span.className = 'clamp-text';
+
+                    if (expanded) {
+                        span.classList.add('expanded');
+                    }
+
                     span.textContent = task;
                     taskDiv.innerHTML = ''; // clear existing content
                     taskDiv.appendChild(span);
@@ -726,6 +732,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 if (task.trim()) {
                     const span = document.createElement('span');
                     span.className = 'clamp-text';
+
+                    if (expanded) {
+                        span.classList.add('expanded');
+                    }
+
                     span.textContent = task;
                     taskDiv.innerHTML = ''; // clear existing content
                     taskDiv.appendChild(span);
@@ -766,6 +777,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 if (task.trim()) {
                     const span = document.createElement('span');
                     span.className = 'clamp-text';
+
+                    if (expanded) {
+                        span.classList.add('expanded');
+                    }
+
                     span.textContent = task;
                     taskDiv.innerHTML = ''; // clear existing content
                     taskDiv.appendChild(span);
@@ -1135,6 +1151,11 @@ function submitTask() {
                 //webkit
                 const span = document.createElement('span');
                 span.className = 'clamp-text';
+
+                if (expanded) {
+                    span.classList.add('expanded');
+                }
+
                 span.textContent = taskTitle;
 
                 div.innerHTML = '';       // Clear any existing content
@@ -1269,6 +1290,11 @@ function submitTemplate(item) {
             //webkit
             const span = document.createElement('span');
             span.className = 'clamp-text';
+
+            if (expanded) {
+                span.classList.add('expanded');
+            }
+            
             span.textContent = taskText;
             div.innerHTML = '';       // Clear any existing content
             div.appendChild(span);    // Add styled span
