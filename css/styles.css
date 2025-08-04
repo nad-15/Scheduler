@@ -431,8 +431,8 @@ h2 {
 }
 
 
-
-/* MENU SLIDER Start */
+/* =================== */
+/* ✨ MENU BUTTON ✨ */
 .menu-button {
     display: flex;
     justify-content: center;
@@ -453,167 +453,161 @@ h2 {
     background-color: rgba(204, 204, 204, 0.8);
     background-color: rgb(0, 0, 0, 0.2);
 }
+.menu-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
 
-
+/* =================== */
+/* 🧊 SLIDER PANEL 🧊 */
 .menu-slider {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    /* border: 2px solid red; */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 60vw;
-    height: 100vh;
-    max-height: 100vh;
-    background: white;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-    z-index: 4001;
-    padding: 30px 20px;
-    /* margin-bottom: 50vh; */
-    /* Start hidden */
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 60vw;
+  max-width: 340px;
+  height: 100vh;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease, opacity 0.3s ease;
+  z-index: 4001;
+  color: white;
 }
-
-.theme {
-    display: flex;
-    width: 100%;
-    /* background-color: green; */
-
-}
-
-.size {
-    display: flex;
-    width: 100%;
-}
-
-.about {
-    display: flex;
-    width: 100%;
-}
-
-
 
 .menu-slider.open {
-    /* Slide in */
-    transform: translateX(0);
+  transform: translateX(0);
 }
 
+/* =================== */
+/* 🎯 HEADINGS & TEXT */
 .menu-slider h2 {
-    /* border: 2px solid red; */
-    text-align: left;
-    font-size: 2rem;
-    margin-bottom: 20px;
-    color: #333;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffdd57;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.menu-slider ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .menu-slider li {
-    /* border: 2px solid green; */
-    font-size: 1.2rem;
-    color: #555;
-    margin: 15px 0;
-    cursor: pointer;
-    transition: color 0.3s ease;
-    user-select: none;
-    flex-grow: 1;
-    flex-shrink: 0;
-}
-
-.theme-list {
-    /* border: 2px solid red; */
-    /* list-style: none; */
-    margin: 0;
-    max-height: 200px;
-    /* display: flex; */
-    display: none;
-
-
-
-    overflow: auto;
-}
-
-.theme-list.show {
-    display: block;
+  font-size: 1.1rem;
+  padding: 0.6rem 0;
+  color: #eee;
+  transition: color 0.3s, transform 0.2s;
+  cursor: pointer;
 }
 
 .menu-slider li:hover {
-    color: #000;
+  color: #ffffff;
+  transform: translateX(4px);
 }
 
-
-/* Initially hide the submenu */
+/* =================== */
+/* 🔽 SUBMENU */
+.theme-list,
 .size-submenu {
-    display: none;
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  display: none;
+  max-height: 160px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #999 transparent;
 }
 
-/* When 'show' class is added, the submenu is displayed */
+.theme-list.show,
 .size-submenu.show {
-    display: block;
+  display: block;
 }
 
-/* Define height classes */
-.day-container.small {
-    height: 25px;
+.theme-list::-webkit-scrollbar {
+  width: 6px;
+}
+.theme-list::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 10px;
 }
 
-.day-container.medium {
-    height: 28px;
-}
-
-.day-container.large {
-    height: 31px;
-}
-
-.day-container.extra-large {
-    height: 35px;
-}
-
-.day-container.extra-small {
-    height: 20px;
-}
-
-
-
-
+/* =================== */
+/* 🌚 OVERLAY */
 .overlay-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease-in-out;
-    z-index: 4000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 4000;
 }
 
 .overlay-menu.show {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
+/* =================== */
+/* ❌ CLOSE BUTTON */
 .close-button-menu {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: #333;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    cursor: pointer;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
 }
 
+.close-button-menu:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
 
+/* =================== */
+/* 🧠 ICONS */
 .material-icons.menu-icon {
-    font-size: 20px;
-
+  font-size: 22px;
 }
 
+/* =================== */
+/* ✅ "KalKulator" BUTTON */
+.menu-slider .btn {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.7rem 1.2rem;
+  background: linear-gradient(90deg, #00ffb8, #35fcd0);
+  border-radius: 10px;
+  color: #111;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 255, 200, 0.3);
+}
 
-/* MENU SLIDER Start */
-
+.menu-slider .btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 25px rgba(0, 255, 200, 0.5);
+}
+/* =================== */
 
 
 
