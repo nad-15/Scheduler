@@ -37,7 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('toggleClampBtn');
     const toggleIcon = document.getElementById('toggleIcon');
 
+    expanded = localStorage.getItem('clampExpanded') === 'true';
 
+    document.querySelectorAll('.clamp-text').forEach(span => {
+        span.classList.toggle('expanded', expanded);
+    });
+
+    toggleIcon.textContent = expanded ? 'compress' : 'expand';
 
     toggleBtn.addEventListener('click', () => {
         expanded = !expanded;
@@ -48,6 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Toggle icon
         toggleIcon.textContent = expanded ? 'compress' : 'expand';
+
+        localStorage.setItem('clampExpanded', expanded ? 'true' : 'false');
+
     });
 
 });
@@ -1294,7 +1303,7 @@ function submitTemplate(item) {
             if (expanded) {
                 span.classList.add('expanded');
             }
-            
+
             span.textContent = taskText;
             div.innerHTML = '';       // Clear any existing content
             div.appendChild(span);    // Add styled span
