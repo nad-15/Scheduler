@@ -1425,7 +1425,9 @@ h2 {
     -moz-user-select: none;
     -ms-user-select: none;
 
-    padding: 0;
+    /* padding: 0; */
+    padding: 0 3px;
+
     margin: 0;
     border: none;
     background: transparent;
@@ -1441,7 +1443,7 @@ h2 {
     -webkit-box-orient: unset;
     overflow: visible;
     text-overflow: unset;
-    padding: 3px;
+    padding: 2px;
 }
 
 
