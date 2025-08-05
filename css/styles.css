@@ -1353,6 +1353,15 @@ h2 {
 
 }
 
+.date:active,
+.day:active {
+    background-color: #e6f3ff;
+    transform: scale(0.90);
+    transition: transform 0.1s ease;
+    border: .5px solid #e6f3ff ;
+}
+
+
 .date {
     font-size: 18px;
     font-weight: bold;
@@ -2166,6 +2175,12 @@ h2 {
     justify-content: flex-start;
     overflow: hidden;
 }
+
+.days-grid-vert-view > div:active {
+    background-color: #e6f3ff;
+    border: 2px solid #3399ff;
+}
+
 
 /* Single Line Divider for Date Grid */
 .days-grid-vert-view>div {
