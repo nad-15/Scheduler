@@ -88,7 +88,7 @@ yearContainer.addEventListener('click', (e) => {
       if (lastClickedEl === clickedEl) {
         showDayTasks(fullDate);
       }
-    }, 50);
+    }, 60);
   }
 });
 

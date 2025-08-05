@@ -247,7 +247,7 @@ function updateCalendarWithTasks(month, year) {
         const fullDate = cell.getAttribute("data-full-date");
         showDayTasks(fullDate); // Only show if this is still the last clicked
       }
-    }, 50);
+    }, 60);
   });
   }
 }

@@ -211,7 +211,7 @@ templateTaskBtn.addEventListener('click', () => {
 hideAllButtons.addEventListener('click', () => {
     const extrasToolbar = document.querySelector(".extras-toolbar");
 
-    extrasToolbar.style.display = extrasToolbar.style.display  === 'none' ? 'flex' : 'none';
+    extrasToolbar.style.display = extrasToolbar.style.display === 'none' ? 'flex' : 'none';
     todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
     hideWidgetBtn.style.display = hideWidgetBtn.style.display === 'none' ? 'flex' : 'none';
     taskToolbar.style.display = taskToolbar.style.display === 'none' ? 'flex' : 'none';
@@ -525,8 +525,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         // Make Sunday and Saturday different colors and bigger
 
         if (dayName === 'Sun' || dayName === 'Sat') {
-            dayDiv.style.fontSize = "12px";
-            dayDiv.style.fontWeight = "bold";
+
+            dayDiv.classList.add("weekends");
+
+            // dayDiv.style.fontSize = "12px";
+            // dayDiv.style.fontWeight = "bold";
             dayDiv.style.borderColor = ""; // Make the font larger
 
             if (dayName === 'Sun') {
@@ -790,30 +793,30 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 // fullScreenButton.addEventListener(`click`, enterFullScreen);
 fullScreenButton.addEventListener('click', () => {
-  if (!document.fullscreenElement) {
-    enterFullScreen();
-  } else {
-    exitFullScreen();
-  }
+    if (!document.fullscreenElement) {
+        enterFullScreen();
+    } else {
+        exitFullScreen();
+    }
 });
 // exitFullscreenBtn.addEventListener("click", exitFullscreen);
 
 
 function enterFullScreen() {
-  const docElement = document.documentElement;
-  if (docElement.requestFullscreen) {
-    docElement.requestFullscreen();
-  } else if (docElement.webkitRequestFullscreen) {
-    docElement.webkitRequestFullscreen(); // Safari
-  } else if (docElement.msRequestFullscreen) {
-    docElement.msRequestFullscreen(); // IE/Edge
-  }
+    const docElement = document.documentElement;
+    if (docElement.requestFullscreen) {
+        docElement.requestFullscreen();
+    } else if (docElement.webkitRequestFullscreen) {
+        docElement.webkitRequestFullscreen(); // Safari
+    } else if (docElement.msRequestFullscreen) {
+        docElement.msRequestFullscreen(); // IE/Edge
+    }
 }
 // Exit fullscreen function
 function exitFullScreen() {
-  if (document.exitFullscreen) {
-    document.exitFullscreen();
-  }
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
 }
 
 

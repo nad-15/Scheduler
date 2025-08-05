@@ -499,7 +499,7 @@ h2 {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
-#toggleIcon{
+#toggleIcon {
     font-size: 18px;
     font-weight: normal;
 }
@@ -528,160 +528,163 @@ h2 {
     background-color: rgba(204, 204, 204, 0.8);
     background-color: rgb(0, 0, 0, 0.2);
 }
+
 .menu-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
 }
 
 /* =================== */
 /* 🧊 SLIDER PANEL 🧊 */
 .menu-slider {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 60vw;
-  max-width: 340px;
-  height: 100vh;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
-  transform: translateX(-100%);
-  transition: transform 0.4s ease, opacity 0.3s ease;
-  z-index: 4001;
-  color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 60vw;
+    max-width: 340px;
+    height: 100vh;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease, opacity 0.3s ease;
+    z-index: 4001;
+    color: white;
 }
 
 .menu-slider.open {
-  transform: translateX(0);
+    transform: translateX(0);
 }
 
 /* =================== */
 /* 🎯 HEADINGS & TEXT */
 .menu-slider h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #ffdd57;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffdd57;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .menu-slider ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .menu-slider li {
-  font-size: 1.1rem;
-  padding: 0.6rem 0;
-  color: #eee;
-  transition: color 0.3s, transform 0.2s;
-  cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.6rem 0;
+    color: #eee;
+    transition: color 0.3s, transform 0.2s;
+    cursor: pointer;
 }
 
 .menu-slider li:hover {
-  color: #ffffff;
-  transform: translateX(4px);
+    color: #ffffff;
+    transform: translateX(4px);
 }
 
 /* =================== */
 /* 🔽 SUBMENU */
 .theme-list,
 .size-submenu {
-  margin-top: 0.5rem;
-  padding-left: 1rem;
-  display: none;
-  max-height: 160px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #999 transparent;
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    display: none;
+    max-height: 160px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #999 transparent;
 }
 
 .theme-list.show,
 .size-submenu.show {
-  display: block;
+    display: block;
 }
 
 .theme-list::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
+
 .theme-list::-webkit-scrollbar-thumb {
-  background: #999;
-  border-radius: 10px;
+    background: #999;
+    border-radius: 10px;
 }
 
 /* =================== */
 /* 🌚 OVERLAY */
 .overlay-menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease;
-  z-index: 4000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 4000;
 }
 
 .overlay-menu.show {
-  opacity: 1;
-  visibility: visible;
+    opacity: 1;
+    visibility: visible;
 }
 
 /* =================== */
 /* ❌ CLOSE BUTTON */
 .close-button-menu {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  font-size: 2rem;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
 }
 
 .close-button-menu:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: rotate(90deg);
+    background: rgba(255, 255, 255, 0.25);
+    transform: rotate(90deg);
 }
 
 /* =================== */
 /* 🧠 ICONS */
 .material-icons.menu-icon {
-  font-size: 22px;
+    font-size: 22px;
 }
 
 /* =================== */
 /* ✅ "KalKulator" BUTTON */
 .menu-slider .btn {
-  display: inline-block;
-  margin-top: 2rem;
-  padding: 0.7rem 1.2rem;
-  background: linear-gradient(90deg, #00ffb8, #35fcd0);
-  border-radius: 10px;
-  color: #111;
-  font-weight: 600;
-  text-decoration: none;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 255, 200, 0.3);
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.7rem 1.2rem;
+    background: linear-gradient(90deg, #00ffb8, #35fcd0);
+    border-radius: 10px;
+    color: #111;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 255, 200, 0.3);
 }
 
 .menu-slider .btn:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 25px rgba(0, 255, 200, 0.5);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 25px rgba(0, 255, 200, 0.5);
 }
+
 /* =================== */
 
 
@@ -1335,7 +1338,7 @@ h2 {
     /* background-color: aqua; */
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    /* font-size: 12px; */
     /* font-weight: bold; */
     white-space: nowrap;
     overflow: hidden;
@@ -1350,13 +1353,24 @@ h2 {
     /* For IE/Edge */
     min-width: fit-content;
 
+    transition: font-size 100ms ease, background-color 100ms ease;
+
 
 }
 
+
+.weekends {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+
 .date:active,
-.day:active {
+.day:active,
+.weekends:active {
     background-color: #ADD8E6;
-    border: .5px solid #ADD8E6 ;
+    border: .5px solid #ADD8E6;
+    font-size: 105%;
 }
 
 
@@ -2174,9 +2188,10 @@ h2 {
     overflow: hidden;
 }
 
-.days-grid-vert-view > div:active {
+.days-grid-vert-view>div:active {
     background-color: #e6f3ff;
     border: 2px solid #3399ff;
+    font-size: 110%;
 }
 
 
