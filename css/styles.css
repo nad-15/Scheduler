@@ -1428,6 +1428,7 @@ h2 {
     -webkit-box-orient: unset;
     overflow: visible;
     text-overflow: unset;
+    padding: 3px;
 }
 
 
@@ -1435,7 +1436,7 @@ h2 {
 .afternoonTaskSub,
 .eveningTaskSub {
     display: flex;
-    padding: 3px;
+    padding: 0px;
     /* border: .5px solid #ccc; */
     /* border: .5px solid gray; */
     font-weight: bold;
@@ -1449,8 +1450,9 @@ h2 {
     text-overflow: ellipsis; */
     margin: 1px;
     border-radius: 3px;
-    height: autor;
-    min-height: 18px;
+    height: auto;
+    min-height: 24px;
+    /* max-height: 18px; */
 
     overflow: auto;
     word-wrap: break-word;
