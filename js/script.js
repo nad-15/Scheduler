@@ -383,6 +383,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 
     monthLetterContainer.addEventListener('click', () => {
+        popUpDate = null;
         swapToGridView(monthName, yearDate);
     });
 
@@ -420,6 +421,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     });
 
     yearLetterContainer.addEventListener('click', () => {
+        popUpDate = null;
         swapToGridView(monthName, yearDate);
     });
 
@@ -445,6 +447,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 
     toGridCalBtn.addEventListener('click', () => {
+        popUpDate = null;
         swapToGridView(monthName, yearDate);
     });
 
@@ -1704,7 +1707,7 @@ function showCalHorView(m, y) {
 }
 
 function showCalVertView(month, year) {
-    console.log("Vert View Showing");
+    // console.log("Vert View Showing");
 
     // Make sure both elements exist
     const main = document.getElementById('main-container');
@@ -1720,7 +1723,7 @@ function showCalVertView(month, year) {
     vert.style.display = 'flex'; // Assuming your flex styles are defined in CSS
 
     const todayElement = document.querySelector(`.grid-cell[data-full-date="${popUpDate}"]`);
-    if(todayElement) todayElement.classList.add('is-active');
+    if (todayElement) todayElement.classList.add('is-active');
 }
 
 
