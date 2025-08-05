@@ -1355,10 +1355,8 @@ h2 {
 
 .date:active,
 .day:active {
-    background-color: #e6f3ff;
-    transform: scale(0.90);
-    transition: transform 0.1s ease;
-    border: .5px solid #e6f3ff ;
+    background-color: #ADD8E6;
+    border: .5px solid #ADD8E6 ;
 }
 
 
