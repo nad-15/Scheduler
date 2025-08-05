@@ -131,7 +131,7 @@ function currentDayScroll(todayDate) {
   // console.log('Found todayElement:', todayElement);
 
   if (todayElement) {
-    // console.log("ENTERED todayElement");
+    // console.log("ENTERED todayElement", todayElement);
     todayElement.scrollIntoView({
       behavior: "smooth",
       block: "center"

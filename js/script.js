@@ -1661,6 +1661,7 @@ function fadeColor(color, alpha = 0.6) {
 }
 
 monthLabelVertView.addEventListener('click', () => {
+    popUpDate = null;
     showCalHorView(currentMonthVertView, currentYearVertView);
 });
 calIconVertView.addEventListener('click', () => {
@@ -1698,7 +1699,6 @@ function showCalHorView(m, y) {
         requestAnimationFrame(() => {
             yearContainer.addEventListener('scroll', handleYearContainerScroll);
         });
-
         currentDayScroll(popUpDate);
     });
 }
