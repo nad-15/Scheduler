@@ -431,13 +431,61 @@ h2 {
 }
 
 
+.extras-toolbar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    gap: 5px;
+
+    /* border: 2px solid red; */
+}
+
+
+.screen-size-change {
+    /* display: none; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* position: fixed;
+    top: 43px;
+    left: 8px; */
+    background-color: rgba(204, 204, 204, 0.8);
+    background-color: rgb(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    /* font-size: 180px; */
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 1s ease, background-color 0.3s ease;
+}
+
+.material-icons.screen-size {
+    font-size: 18px;
+}
+
+.exit-flscreen-button {
+    display: none;
+}
+
+.fullscreen-btn {
+    display: flex;
+}
+
+
+
 .clamp-toggle-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: fixed;
+    /* position: fixed;
     top: 78px;
-    left: 8px;
+    left: 8px; */
     border-radius: 50%;
     cursor: pointer;
 
@@ -456,15 +504,17 @@ h2 {
     font-weight: normal;
 }
 
+
+
 /* =================== */
 /* ✨ MENU BUTTON ✨ */
 .menu-button {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: fixed;
+    /* position: fixed;
     top: 8px;
-    left: 8px;
+    left: 8px; */
     border-radius: 50%;
     cursor: pointer;
 
@@ -637,43 +687,6 @@ h2 {
 
 
 
-
-
-.screen-size-change {
-
-    /* display: none; */
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 43px;
-    left: 8px;
-    background-color: rgba(204, 204, 204, 0.8);
-    background-color: rgb(0, 0, 0, 0.2);
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
-    color: white;
-    border: none;
-    border-radius: 50%;
-    /* font-size: 180px; */
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    z-index: 1000;
-    transition: transform 1s ease, background-color 0.3s ease;
-}
-
-.material-icons.screen-size {
-    font-size: 18px;
-}
-
-
-
-.exit-flscreen-button {
-    display: none;
-}
-
-.fullscreen-btn {
-    display: flex;
-}
 
 .floating-add-btn,
 .clear-button {

@@ -1,6 +1,5 @@
 const jumPingText = document.querySelector(".jumping-text");
 const taskInput = document.getElementById('taskTitle');
-// const exitFullscreenBtn = document.getElementById(`exit-flscreen-button`);
 const clearButton = document.getElementById('clear-button');
 const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
@@ -297,29 +296,18 @@ templateTaskBtn.addEventListener('click', () => {
 
 // submitTaskBtn.disabled = true;
 // console.log(submitTaskBtn.disabled);
-let isHidden = false;
 
 hideAllButtons.addEventListener('click', () => {
-    // Toggle visibility of various UI parts
+    const extrasToolbar = document.querySelector(".extras-toolbar");
+
+    extrasToolbar.style.display = extrasToolbar.style.display  === 'none' ? 'flex' : 'none';
     todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
     hideWidgetBtn.style.display = hideWidgetBtn.style.display === 'none' ? 'flex' : 'none';
-    menuButton.style.display = menuButton.style.display === 'none' ? 'flex' : 'none';
     taskToolbar.style.display = taskToolbar.style.display === 'none' ? 'flex' : 'none';
     slidingInputView.style.display = slidingInputView.style.display !== 'none' ? 'none' : 'flex';
 
-    const isFullScreen = !!document.fullscreenElement;
-
-    // ⬇️ Only 1 fullscreen button now, just show/hide it
-    if (!isHidden) {
-        fullScreenButton.style.display = 'none';
-        isHidden = true;
-    } else {
-        fullScreenButton.style.display = 'flex';
-        isHidden = false;
-    }
-
-    // ✅ Make sure icon matches fullscreen mode
-    fullscreenIcon.textContent = isFullScreen ? 'fullscreen_exit' : 'fullscreen';
+    // const isFullScreen = !!document.fullscreenElement;
+    // fullscreenIcon.textContent = isFullScreen ? 'fullscreen_exit' : 'fullscreen';
 });
 
 
