@@ -143,6 +143,12 @@ function createCalendarGrid() {
 }
 
 function updateCalendarWithTasks(month, year) {
+
+
+  document.querySelectorAll(".grid-cell").forEach(cell => {
+    cell.classList.remove("is-active");
+  });
+
   const tasks = loadTasksFromLocalStorage();
   const firstDayOfMonth = new Date(year, month, 1).getDay();
   const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
