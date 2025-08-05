@@ -1,6 +1,6 @@
 const jumPingText = document.querySelector(".jumping-text");
 const taskInput = document.getElementById('taskTitle');
-const exitFullscreenBtn = document.getElementById(`exit-flscreen-button`);
+// const exitFullscreenBtn = document.getElementById(`exit-flscreen-button`);
 const clearButton = document.getElementById('clear-button');
 const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
@@ -297,42 +297,35 @@ templateTaskBtn.addEventListener('click', () => {
 
 // submitTaskBtn.disabled = true;
 // console.log(submitTaskBtn.disabled);
-
 let isHidden = false;
-hideAllButtons.addEventListener(`click`, () => {
 
+hideAllButtons.addEventListener('click', () => {
+    // Toggle visibility of various UI parts
     todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
     hideWidgetBtn.style.display = hideWidgetBtn.style.display === 'none' ? 'flex' : 'none';
     menuButton.style.display = menuButton.style.display === 'none' ? 'flex' : 'none';
-    // clearButton.style.display = clearButton.style.display === 'none' ? 'flex' : 'none';
     taskToolbar.style.display = taskToolbar.style.display === 'none' ? 'flex' : 'none';
-    // floatingAddBtn.style.display = floatingAddBtn.style.display === 'none' ? '' : 'none';
     slidingInputView.style.display = slidingInputView.style.display !== 'none' ? 'none' : 'flex';
 
     const isFullScreen = !!document.fullscreenElement;
 
+    // ⬇️ Only 1 fullscreen button now, just show/hide it
     if (!isHidden) {
-        // console.log(isFullScreen);
-        if (isFullScreen) {
-
-            exitFullscreenBtn.style.display = `none`;
-        } else {
-            fullScreenButton.style.display = `none`;
-        }
+        fullScreenButton.style.display = 'none';
         isHidden = true;
     } else {
-        if (isFullScreen) {
-            exitFullscreenBtn.style.display = `flex`;
-        } else {
-            fullScreenButton.style.display = `flex`;
-        }
+        fullScreenButton.style.display = 'flex';
         isHidden = false;
     }
 
+    // ✅ Make sure icon matches fullscreen mode
+    fullscreenIcon.textContent = isFullScreen ? 'fullscreen_exit' : 'fullscreen';
 });
+
 
 const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
+const fullscreenIcon = document.getElementById('fullscreen-icon');
 
 
 
@@ -896,64 +889,41 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 
 
-fullScreenButton.addEventListener(`click`, enterFullScreen);
-exitFullscreenBtn.addEventListener("click", exitFullscreen);
+// fullScreenButton.addEventListener(`click`, enterFullScreen);
+fullScreenButton.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    enterFullScreen();
+  } else {
+    exitFullScreen();
+  }
+});
+// exitFullscreenBtn.addEventListener("click", exitFullscreen);
 
 
 function enterFullScreen() {
-    const docElement = document.documentElement;
-    if (docElement.requestFullscreen) {
-        docElement.requestFullscreen();
-
-    } else if (docElement.webkitRequestFullscreen) {
-        docElement.webkitRequestFullscreen(); // Safari
-    } else if (docElement.msRequestFullscreen) {
-        docElement.msRequestFullscreen(); // IE/Edge
-    }
-    fullScreenButton.style.display = 'none';
-    exitFullscreenBtn.style.display = `flex`;
-
-    // slidingInputView.classList.toggle("show");
-    // Reset button position and rotation
-    // floatingAddBtn.style.transform = 'rotate(0)';
-    // Reset button color to green
-    // floatingAddBtn.style.backgroundColor = '#4CAF50'; 
-    // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)';
-
-    // floatingAddBtn.style.bottom = `${20}px`;
-    // clearButton.style.bottom = `${80}px`;
-    // isPopupOpen = true;
+  const docElement = document.documentElement;
+  if (docElement.requestFullscreen) {
+    docElement.requestFullscreen();
+  } else if (docElement.webkitRequestFullscreen) {
+    docElement.webkitRequestFullscreen(); // Safari
+  } else if (docElement.msRequestFullscreen) {
+    docElement.msRequestFullscreen(); // IE/Edge
+  }
 }
 // Exit fullscreen function
-function exitFullscreen() {
-    // if (document.fullscreenElement) { // Check if fullscreen is active
-    //     document.exitFullscreen()
-    //         .then(() => console.log("Exited fullscreen"))
-    //         .catch(err => console.error("Error exiting fullscreen:", err));
-    // } else {
-    //     console.log("Fullscreen mode is not active");
-    // }
-
+function exitFullScreen() {
+  if (document.exitFullscreen) {
     document.exitFullscreen();
-    exitFullscreenBtn.style.display = `none`;
-    fullScreenButton.style.display = 'flex';
+  }
 }
 
 
 
 document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-        if (!isHidden) {
-            exitFullscreenBtn.style.display = `none`;
-            fullScreenButton.style.display = 'flex';
-        }
-    } else {
-        if (!isHidden) {
-            exitFullscreenBtn.style.display = `flex`;
-            fullScreenButton.style.display = 'none';
-        }
-    }
+    const isFullScreen = !!document.fullscreenElement;
+    fullscreenIcon.textContent = isFullScreen ? 'fullscreen_exit' : 'fullscreen';
 });
+
 
 let selectedDivs = [];
 let chosenColor = '#6a5044';
