@@ -144,7 +144,6 @@ function createCalendarGrid() {
 
 function updateCalendarWithTasks(month, year) {
 
-
   document.querySelectorAll(".grid-cell").forEach(cell => {
     cell.classList.remove("is-active");
   });
@@ -252,7 +251,7 @@ function updateCalendarWithTasks(month, year) {
         cell.classList.remove("is-active");
       });
 
-      // cell.classList.add("is-active");
+      cell.classList.add("is-active");
 
 
       clearTimeout(popupTimeout); // Cancel previous popup trigger
