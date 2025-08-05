@@ -168,6 +168,8 @@ function updateCalendarWithTasks(month, year) {
 
     let currentDay, dateKey;
 
+    cell.classList.add("grid-cell");
+
     // === PREVIOUS MONTH ===
     if (i < firstDayOfMonth) {
       currentDay = totalDaysLastMonth - firstDayOfMonth + 1 + i;
@@ -233,22 +235,30 @@ function updateCalendarWithTasks(month, year) {
         }
       });
     }
-//here
+    //here
     // cell.addEventListener("click", () => {
     //   const fullDate = cell.getAttribute("data-full-date");
     //   showDayTasks(fullDate);
     // });
     cell.addEventListener('click', () => {
-    clearTimeout(popupTimeout); // Cancel previous popup trigger
-    lastClickedCell = cell;
 
-    popupTimeout = setTimeout(() => {
-      if (lastClickedCell === cell) {
-        const fullDate = cell.getAttribute("data-full-date");
-        showDayTasks(fullDate); // Only show if this is still the last clicked
-      }
-    }, 60);
-  });
+      document.querySelectorAll(".grid-cell").forEach(cell => {
+        cell.classList.remove("is-active");
+      });
+
+      // cell.classList.add("is-active");
+
+
+      clearTimeout(popupTimeout); // Cancel previous popup trigger
+      lastClickedCell = cell;
+
+      popupTimeout = setTimeout(() => {
+        if (lastClickedCell === cell) {
+          const fullDate = cell.getAttribute("data-full-date");
+          showDayTasks(fullDate); // Only show if this is still the last clicked
+        }
+      }, 60);
+    });
   }
 }
 

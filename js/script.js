@@ -1718,6 +1718,9 @@ function showCalVertView(month, year) {
     updateCalendarWithTasks(month, year);
     main.style.display = 'none';
     vert.style.display = 'flex'; // Assuming your flex styles are defined in CSS
+
+    const todayElement = document.querySelector(`.grid-cell[data-full-date="${popUpDate}"]`);
+    if(todayElement) todayElement.classList.add('is-active');
 }
 
 

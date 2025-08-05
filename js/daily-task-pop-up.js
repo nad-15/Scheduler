@@ -136,6 +136,8 @@ function currentDayScroll(todayDate) {
       behavior: "smooth",
       block: "center"
     });
+  } else {
+    return;
   }
 
   setTimeout(() => {
