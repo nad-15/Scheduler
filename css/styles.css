@@ -1373,6 +1373,16 @@ h2 {
     font-size: 105%;
 }
 
+.date.is-active,
+.day.is-active,
+.weekends.is-active {
+    background-color: #ADD8E6;
+    border: 0.5px solid #ADD8E6;
+    font-size: 105%;
+    transition: all 0.2s ease;
+}
+
+
 
 .date {
     font-size: 18px;

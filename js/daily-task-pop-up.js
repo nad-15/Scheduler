@@ -137,6 +137,15 @@ function currentDayScroll(todayDate) {
       block: "center"
     });
   }
+
+  setTimeout(() => {
+      todayElement.classList.add('is-active');
+
+      setTimeout(() => {
+        todayElement.classList.remove('is-active');
+      }, 300); // how long the effect lasts
+    }, 350); // delay should roughly match scroll duration
+  
 }
 
 
