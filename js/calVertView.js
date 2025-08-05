@@ -10,6 +10,9 @@ const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 
 let swipeEnabledPopUp = true;
 
+let popupTimeout;
+let lastClickedCell = null;
+
 
 // === TIME VARIABLES ===
 let currentMonthContainer = null;
@@ -230,11 +233,22 @@ function updateCalendarWithTasks(month, year) {
         }
       });
     }
+//here
+    // cell.addEventListener("click", () => {
+    //   const fullDate = cell.getAttribute("data-full-date");
+    //   showDayTasks(fullDate);
+    // });
+    cell.addEventListener('click', () => {
+    clearTimeout(popupTimeout); // Cancel previous popup trigger
+    lastClickedCell = cell;
 
-    cell.addEventListener("click", () => {
-      const fullDate = cell.getAttribute("data-full-date");
-      showDayTasks(fullDate);
-    });
+    popupTimeout = setTimeout(() => {
+      if (lastClickedCell === cell) {
+        const fullDate = cell.getAttribute("data-full-date");
+        showDayTasks(fullDate); // Only show if this is still the last clicked
+      }
+    }, 50);
+  });
   }
 }
 
