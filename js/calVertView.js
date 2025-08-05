@@ -7,7 +7,7 @@ const calIconVertView = document.getElementById("icon-month-label-vert-view");
 const prevMonthBtnVertView = document.getElementById("prev-month-vert-view");
 const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 
-
+const yearContainer = document.getElementById('year-container');
 let swipeEnabledPopUp = true;
 
 let popupTimeout;

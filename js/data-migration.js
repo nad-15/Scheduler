@@ -1,5 +1,8 @@
 
+// console.log("Success");
+
 // migrateTaskDataToArrayFormat();
+
 // function migrateTaskDataToArrayFormat() {
 //     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
 //     const migratedData = {};
@@ -27,10 +30,6 @@
 //             }
 //         });
 //     }
-
 //     localStorage.setItem("tasks", JSON.stringify(migratedData));
-//     console.log("✅ Task data migrated to array-of-objects format.");
+//     // console.log("✅ Task data migrated to array-of-objects format.");
 // }
-
-
-//revert here again

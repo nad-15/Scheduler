@@ -12,8 +12,8 @@ calendarPopup.addEventListener('touchstart', (e) => {
 });
 
 calendarPopup.addEventListener('touchend', (e) => {
-  if(!swipeEnabledPopUp) return;
-  
+  if (!swipeEnabledPopUp) return;
+
   const touchEndX = e.changedTouches[0].screenX;
   const touchEndY = e.changedTouches[0].screenY;
 
@@ -66,20 +66,29 @@ yearContainer.addEventListener('click', (e) => {
   const dayEl = e.target.closest('.day');
 
   let fullDate = null;
+  let clickedEl = null;
 
   if (dateEl) {
     fullDate = dateEl.dataset.fullDate;
+    clickedEl = dateEl;
   } else if (dayEl) {
     // Find sibling .date (assumes .day and .date share a common parent)
     const siblingDateEl = dayEl.parentElement.querySelector('.date');
     if (siblingDateEl) {
       fullDate = siblingDateEl.dataset.fullDate;
+      clickedEl = dayEl;
     }
   }
 
   if (fullDate) {
-    // console.log("DATE IS CLICKED:", fullDate);
-    showDayTasks(fullDate);
+    clearTimeout(popupTimeout);
+    lastClickedEl = clickedEl;
+
+    popupTimeout = setTimeout(() => {
+      if (lastClickedEl === clickedEl) {
+        showDayTasks(fullDate);
+      }
+    }, 50);
   }
 });
 
@@ -320,7 +329,6 @@ function hidePopup() {
   const backdrop = document.getElementById("backdrop");
   backdrop.style.display = "none";
   popup.style.display = "none";
-  clearFallingLeaves();
   removeDragListeners();
 
   isEditing = false;
