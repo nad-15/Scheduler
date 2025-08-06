@@ -1759,6 +1759,7 @@ h2 {
   display: flex;
   flex-direction: row; /* horizontal layout */
   background: white;
+  background: #f0f0f0;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -1789,12 +1790,12 @@ h2 {
   content: '';
   position: absolute;
   top: 50%;
-  left: -12px; /* Position it on the left edge of the dropdown */
+  left: -11px; /* Position it on the left edge of the dropdown */
   transform: translateY(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: transparent white transparent transparent;
-    background-color: #0078FF; /* temp debug */
+  border-color: transparent #f0f0f0 transparent transparent;
+    /* background-color: #0078FF; */
 }
 
 

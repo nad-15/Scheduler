@@ -25,15 +25,106 @@ const paletteBtn = document.getElementById("showRecentColors");
 const dropdown = document.getElementById("color-mode-dropdown");
 
 paletteBtn.addEventListener("click", () => {
-  dropdown.classList.toggle("hidden");
+    dropdown.classList.toggle("hidden");
 });
+
 
 // Close dropdown when clicking outside
 document.addEventListener("click", (e) => {
-  if (!paletteBtn.closest(".palette-wrapper").contains(e.target)) {
-    dropdown.classList.add("hidden");
-  }
+    const isClickInsideDropdown = dropdown.contains(e.target);
+
+    if (!paletteBtn.closest(".palette-wrapper").contains(e.target) || isClickInsideDropdown) {
+        dropdown.classList.add("hidden");
+    }
 });
+
+
+document.querySelector('.dropdown-option[data-mode="all"]').addEventListener('click', () => {
+    const originalHTML = document.getElementById("colorPicker").dataset.originalHtml;
+    document.getElementById("colorPicker").innerHTML = originalHTML;
+    const firstButton = document.querySelector('#colorPicker .color-option');
+    if (firstButton) {
+        chosenColor = firstButton.getAttribute('data-color');
+
+        // Highlight the selected button
+        document.querySelectorAll('.color-option').forEach(btn =>
+            btn.classList.remove('selected-color')
+        );
+        firstButton.classList.add('selected-color');
+
+        // Update flower color
+        flower.style.color = chosenColor;
+    }
+});
+
+
+document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener('click', () => {
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+
+    const dates = Object.keys(tasks).sort((a, b) => new Date(b) - new Date(a)); // sort latest to earliest
+    const recentColors = new Set();
+
+    for (const date of dates) {
+        const dayData = tasks[date];
+        for (const period in dayData) {
+            dayData[period].forEach(entry => {
+                if (entry.color) {
+                    let hex = entry.color;
+
+                    // Convert RGB to HEX if needed
+                    if (hex.startsWith("rgb")) {
+                        const rgb = hex.match(/\d+/g);
+                        hex = "#" + rgb.map(x => (+x).toString(16).padStart(2, '0')).join("");
+                    }
+
+                    recentColors.add(hex.toLowerCase());
+
+                    if (recentColors.size >= 13) return; // Stop after 10 unique colors
+                }
+            });
+        }
+    }
+
+    // Render recent colors in the color picker
+    const colorPicker = document.getElementById("colorPicker");
+    colorPicker.innerHTML = ""; // Clear previous
+
+    recentColors.forEach(color => {
+        const container = document.createElement("div");
+        container.className = "color-option-container";
+
+        const btn = document.createElement("button");
+        btn.className = "color-option";
+        btn.dataset.color = color;
+        btn.style.backgroundColor = color;
+
+        container.appendChild(btn);
+        colorPicker.appendChild(container);
+    });
+
+    const firstButton = document.querySelector('#colorPicker .color-option');
+    if (firstButton) {
+        chosenColor = firstButton.getAttribute('data-color');
+
+        // Highlight the selected button
+        document.querySelectorAll('.color-option').forEach(btn =>
+            btn.classList.remove('selected-color')
+        );
+        firstButton.classList.add('selected-color');
+
+        // Update flower color
+        flower.style.color = chosenColor;
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const picker = document.getElementById("colorPicker");
+    picker.dataset.originalHtml = picker.innerHTML;
+});
+
+
+
 
 let selectedDivs = [];
 let hasSuggestionContent = false;
@@ -869,19 +960,50 @@ let chosenColor = '#6a5044';
 let currentTask = '';
 
 
-//add click listener to colors for task
-document.querySelectorAll('.color-option').forEach(button => {
-    button.addEventListener('click', () => {
-        // Get the selected color
-        chosenColor = button.getAttribute('data-color');
-        // Highlight the selected button
-        document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected-color'));
-        button.classList.add('selected-color');
-        flower.style.color = chosenColor;
+// //add click listener to colors for task
+// document.querySelectorAll('.color-option').forEach(button => {
+//     button.addEventListener('click', () => {
+//         // Get the selected color
+//         chosenColor = button.getAttribute('data-color');
+//         // Highlight the selected button
+//         document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected-color'));
+//         button.classList.add('selected-color');
+//         flower.style.color = chosenColor;
 
 
-    });
+//     });
+// });
+document.getElementById('colorPicker').addEventListener('click', (e) => {
+    const button = e.target.closest('.color-option');
+    if (!button) return; // Clicked outside a button
+
+    // Get the selected color
+    chosenColor = button.getAttribute('data-color');
+
+    // Highlight the selected button
+    document.querySelectorAll('.color-option').forEach(btn =>
+        btn.classList.remove('selected-color')
+    );
+    button.classList.add('selected-color');
+
+    // Update flower color
+    flower.style.color = chosenColor;
 });
+
+
+const firstButton = document.querySelector('#colorPicker .color-option');
+if (firstButton) {
+    chosenColor = firstButton.getAttribute('data-color');
+
+    // Highlight the selected button
+    document.querySelectorAll('.color-option').forEach(btn =>
+        btn.classList.remove('selected-color')
+    );
+    firstButton.classList.add('selected-color');
+
+    // Update flower color
+    flower.style.color = chosenColor;
+}
 
 //add click listeners to task(morning, afternoon, evening) divs
 yearContainer.addEventListener('click', (event) => {
