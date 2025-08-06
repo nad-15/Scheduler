@@ -779,7 +779,7 @@ h2 {
 } */
 .suggestion-text {
     display: flex;
-    /* display: none; */
+    display: none;
     flex-direction: row;
     gap: 6px;
     height: 18px;
@@ -844,7 +844,7 @@ h2 {
 
     box-sizing: border-box;
     display: flex;
-    display: none;
+    /* display: none; */
     justify-content: center;
     align-items: center;
     font-family: monospace;
