@@ -1764,7 +1764,8 @@ h2 {
   display: flex;
   flex-direction: row; /* horizontal layout */
   background: white;
-  background: #cce6ff;
+  background: rgba(204, 230, 255, 0.95) /* 70% opaque */
+;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -1799,7 +1800,8 @@ h2 {
   transform: translateY(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: transparent #cce6ff transparent transparent;
+  border-color: transparent rgba(204, 230, 255, 0.95) /* 70% opaque */
+ transparent transparent;
     /* background-color: #0078FF; */
 }
 
