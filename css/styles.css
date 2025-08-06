@@ -1725,6 +1725,7 @@ h2 {
     /* border: 1px solid red; */
     display: flex;
     align-items: center;
+    gap: 5px
 }
 
 #showRecentColors{
@@ -1752,7 +1753,7 @@ h2 {
 .color-mode-dropdown {
   position: absolute;
   top: 50%;
-  left: calc(100% + 4px); /* small gap from the button */
+  left: calc(100% + 10px); /* small gap from the button */
   left: 100%; /* right side */
   transform: translateY(-50%);
   display: flex;
@@ -1788,11 +1789,12 @@ h2 {
   content: '';
   position: absolute;
   top: 50%;
-  left: -6px; /* Position it on the left edge of the dropdown */
+  left: -12px; /* Position it on the left edge of the dropdown */
   transform: translateY(-50%);
   border-width: 6px;
   border-style: solid;
   border-color: transparent white transparent transparent;
+    background-color: #0078FF; /* temp debug */
 }
 
 
