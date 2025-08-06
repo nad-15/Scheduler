@@ -809,7 +809,7 @@ h2 {
 }
 
 .paste-button.blank-suggestion {
-    width: 50px;
+    width: 40px;
     font-weight: bold;
     background-color: #dddddd;
 }
@@ -835,6 +835,11 @@ h2 {
     flex-shrink: 0;
     font-weight: bold;
 
+}
+
+#eraser-icon{
+    font-size: 15px;
+    font-weight: bold;
 }
 
 

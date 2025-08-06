@@ -955,11 +955,7 @@ function addToSuggestionText(text) {
 
 function updateSuggestionFromSelected() {
     const suggestionContainer = document.querySelector('.suggestion-text');
-
-    // Keep the .blank-suggestion button
-    const blankBtn = suggestionContainer.querySelector('.blank-suggestion');
     suggestionContainer.innerHTML = '';
-    if (blankBtn) suggestionContainer.appendChild(blankBtn);
 
     const added = new Set();
 
@@ -975,13 +971,7 @@ function updateSuggestionFromSelected() {
             button.addEventListener('click', () => {
                 taskInput.value = lastText;
             });
-
-            // ⏹️ Insert directly after .blank-suggestion
-            if (blankBtn && blankBtn.nextSibling) {
-                suggestionContainer.insertBefore(button, blankBtn.nextSibling);
-            } else {
                 suggestionContainer.appendChild(button);
-            }
         }
     }
 
