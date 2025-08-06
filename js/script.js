@@ -1449,7 +1449,7 @@ function clearSelection() {
     // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-    taskInput.value = "";
+    // taskInput.value = "";
     console.log(`selection cleared`);
 }
 
