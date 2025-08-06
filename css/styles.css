@@ -10,6 +10,10 @@
 
 }
 
+/* * {
+    border: 1px solid lime;
+} */
+
 /* Blue Tint	#f5faff */
 
 /* * {
@@ -727,6 +731,7 @@ h2 {
     width: 100%;
     height: 130px;
     max-height: 130px;
+    /* min-height: 130px; */
     background-color: rgba(255, 255, 255, 0.9);
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);
     overflow: hidden;
@@ -747,21 +752,99 @@ h2 {
     /* border: 2px solid blue; */
     box-sizing: border-box;
     width: 100%;
+    height: 100%;
     margin: 0px;
-    padding: 10px 10px;
+    padding: 5px 10px;
+    /* padding-bottom: 0px; */
     display: flex;
     flex-direction: column;
     background-color: transparent;
+    justify-content: space-around;
+    /* gap: 5px; */
     /* box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);  */
 }
+
+
+/* .suggestion-text {
+
+
+    display: flex;
+
+    flex: 1 1 auto; 
+    align-items: center;
+    height: auto;
+    border: 1px solid red;
+
+    overflow: hidden;
+} */
+.suggestion-text {
+    display: flex;
+    /* display: none; */
+    flex-direction: row;
+    gap: 6px;
+    height: 18px;
+    align-items: center;
+    padding: 0 4px;
+    background-color: #f8f8f8;
+    /* border: 1px solid #ccc; */
+    border-radius: 4px;
+
+    overflow-x: auto;
+    /* Allow horizontal scrolling */
+    overflow-y: hidden;
+    /* Prevent vertical scroll */
+    white-space: nowrap;
+    /* Prevent line wrapping */
+    scroll-behavior: smooth;
+    /* Optional: smooth scrolling */
+    scrollbar-width: none;
+
+}
+
+/* Paste buttons styled to fit in 18px tall row */
+.paste-button {
+    font-size: 12px;
+    padding: 1px 8px;
+    /* Small vertical padding to stay within 18px */
+    background-color: #dff0ff;
+    color: #333;
+    border-radius: 999px;
+    /* Oval shape */
+    white-space: nowrap;
+    line-height: 1;
+    /* Prevent text from expanding height */
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    height: 18px;
+    /* Keeps it safely inside the 18px container */
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+    max-width: 200px;
+    flex-shrink: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+}
+
+.paste-button:hover {
+    background-color: #cce6ff;
+}
+
+
 
 
 
 
 /* //original task tempalte */
 .jumping-text-container {
+
     box-sizing: border-box;
     display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     font-family: monospace;
@@ -770,6 +853,7 @@ h2 {
     height: .5px;
     border: .5px solid red;
     align-self: center;
+    /* margin-top: 5px; */
     /* border:2px solid red; */
 }
 
@@ -828,7 +912,7 @@ h2 {
     /* margin-bottom: 10px; */
     justify-content: center;
     align-items: center;
-    margin-top: 5px;
+    /* margin-top: 5px; */
     gap: 5px;
 }
 
@@ -1140,10 +1224,13 @@ h2 {
     overflow: auto;
     scrollbar-width: none;
     gap: 10px;
-    padding: 10px;
+    padding: 5px;
+    /* padding-bottom: 0px; */
     /* border: 2px solid red; */
     border-radius: 60px;
-    margin-bottom: 5px;
+    /* margin-bottom: 5px; */
+    /* margin-top: 5px;
+    margin-bottom: 5px; */
 }
 
 /* .color-option {
@@ -1360,8 +1447,8 @@ h2 {
 
 
 .weekends {
-  font-size: 12px;
-  font-weight: bold;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 
@@ -2197,7 +2284,7 @@ h2 {
     justify-content: flex-start;
     overflow: hidden;
 
-        user-select: none;
+    user-select: none;
     /* Prevents text selection */
     -webkit-user-select: none;
     /* For Safari */
