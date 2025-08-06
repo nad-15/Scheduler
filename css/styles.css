@@ -731,12 +731,13 @@ h2 {
     /* min-height: 130px; */
     background-color: rgba(255, 255, 255, 0.9);
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
+    /* overflow: hidden; */
     z-index: 999;
     transform: translateY(100%);
     /* Start hidden */
     transition: transform 0.3s ease-in-out;
     /* Smooth transition */
+
 
 }
 
@@ -1797,6 +1798,44 @@ h2 {
   border-color: transparent #f0f0f0 transparent transparent;
     /* background-color: #0078FF; */
 }
+
+.dropdown-option-wrapper {
+  position: relative;
+}
+
+.shade-submenu {
+  position: absolute;
+  bottom: 100%; /* Appear above the "Shades" button */
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1001;
+  padding: 4px;
+  gap: 4px;
+}
+
+.shade-submenu.hidden {
+  display: none;
+}
+
+.shade-color-btn {
+  padding: 6px 10px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+}
+
+.shade-color-btn:hover {
+  background-color: #f0f0f0;
+}
+
 
 
 
@@ -2933,7 +2972,7 @@ h2 {
 
 
 /* Define the shake animation */
-@keyframes shake {
+/* @keyframes shake {
     0% {
         transform: translateX(0);
     }
@@ -2950,6 +2989,26 @@ h2 {
         transform: translateX(-5px);
     }
 
+    100% {
+        transform: translateX(0);
+    }
+} */
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+    20% {
+        transform: translateX(-1px);
+    }
+    40% {
+        transform: translateX(1px);
+    }
+    60% {
+        transform: translateX(-1px);
+    }
+    80% {
+        transform: translateX(1px);
+    }
     100% {
         transform: translateX(0);
     }

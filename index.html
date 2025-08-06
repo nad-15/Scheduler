@@ -142,18 +142,39 @@
                     <div class="color-button-options">
                         <div class="palette-wrapper">
                             <button id="showRecentColors" class="palette-button" title="Show Recently Used Colors">
-                                <span class="material-symbols-outlined" id="recentcolors-icon">
-                                    palette
-                                </span>
+                                <span class="material-symbols-outlined" id="recentcolors-icon">palette</span>
                             </button>
 
                             <!-- Dropdown menu -->
                             <div id="color-mode-dropdown" class="color-mode-dropdown hidden">
                                 <button data-mode="all" class="dropdown-option">All</button>
                                 <button data-mode="recent" class="dropdown-option">Favorites</button>
-                                <button data-mode="shades" class="dropdown-option">Shades</button>
+
+                                <!-- Wrap "Shades" with submenu -->
+                                <div class="dropdown-option-wrapper shades-wrapper">
+                                    <button data-mode="shades" class="dropdown-option">Shades</button>
+
+                                    <!-- Submenu for Shades -->
+                                    <div id="shadeSubmenu" class="shade-submenu hidden">
+                                        <button class="shade-color-btn" data-color="red">Red</button>
+                                        <button class="shade-color-btn" data-color="orange">Orange</button>
+                                        <button class="shade-color-btn" data-color="yellow">Yellow</button>
+                                        <button class="shade-color-btn" data-color="green">Green</button>
+                                        <button class="shade-color-btn" data-color="blue">Blue</button>
+                                        <button class="shade-color-btn" data-color="purple">Purple</button>
+                                        <button class="shade-color-btn" data-color="pink">Pink</button>
+                                        <button class="shade-color-btn" data-color="teal">Teal</button>
+                                        <button class="shade-color-btn" data-color="peach">Peach</button>
+                                        <button class="shade-color-btn" data-color="coral">Coral</button>
+                                        <button class="shade-color-btn" data-color="lavender">Lavender</button>
+                                        <button class="shade-color-btn" data-color="grey">Grey</button>
+                                        <button class="shade-color-btn" data-color="brown">Brown</button>
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
 
                         <!-- Color Picker  -->
                         <div class="color-picker" id="colorPicker">

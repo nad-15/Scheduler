@@ -20,6 +20,7 @@ const taskToolbar = document.querySelector(`.task-toolbar-container`);
 const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
+const allColorsIcon = document.getElementById("recentcolors-icon");
 
 const paletteBtn = document.getElementById("showRecentColors");
 const dropdown = document.getElementById("color-mode-dropdown");
@@ -41,6 +42,8 @@ document.addEventListener("click", (e) => {
 
 
 document.querySelector('.dropdown-option[data-mode="all"]').addEventListener('click', () => {
+
+    allColorsIcon.textContent="palette";
     const originalHTML = document.getElementById("colorPicker").dataset.originalHtml;
     document.getElementById("colorPicker").innerHTML = originalHTML;
 
@@ -62,6 +65,7 @@ document.querySelector('.dropdown-option[data-mode="all"]').addEventListener('cl
 
 
 document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener('click', () => {
+        allColorsIcon.textContent="star";
     const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
     const colorFrequency = {};
 
@@ -135,6 +139,134 @@ document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener(
     }
 });
 
+const shadesBtn = document.querySelector('[data-mode="shades"]');
+const shadeSubmenu = document.getElementById('shadeSubmenu');
+
+// Toggle the submenu when "Shades" is clicked
+shadesBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent global dropdown closing
+    shadeSubmenu.classList.toggle('hidden');
+});
+// Listener: When user clicks a shade color button (e.g. Red, Blue, etc.)
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".shade-color-btn");
+    if (!btn) return;
+
+    const baseColor = btn.dataset.color;
+    if (!baseColor) return;
+
+    generateShadesFor(baseColor);
+});
+
+// Generate 13 shades for a named base color (like "red", "blue", etc.)
+function generateShadesFor(colorName) {
+
+        allColorsIcon.textContent="opacity";
+    const baseColors = {
+        red: "#e53935",
+        orange: "#fb8c00",
+        yellow: "#fdd835",
+        green: "#43a047",
+        blue: "#1e88e5",
+        purple: "#8e24aa",
+        pink: "#d81b60",
+        teal: "#009688",
+        peach: "#ffb88c",
+        coral: "#ff6f61",
+        lavender: "#b39ddb",
+        brown: "#6d4c41",
+        grey: "#998c80"
+    };
+
+    const baseHex = baseColors[colorName];
+    if (!baseHex) return;
+
+    const shades = generateShadesForPicker(baseHex, 13);
+    renderColorOptions(shades);
+}
+
+// Generate lighter/darker shades from a base hex color
+function generateShadesForPicker(hex, count) {
+    const shades = [];
+    const [r, g, b] = colorPickerHexToRgb(hex);
+
+    for (let i = 0; i < count; i++) {
+        const factor = 1 - (i - count / 2) * 0.08; // range from darker to lighter
+        const shade = colorPickerRgbToHex(
+            Math.min(255, Math.max(0, r * factor)),
+            Math.min(255, Math.max(0, g * factor)),
+            Math.min(255, Math.max(0, b * factor))
+        );
+        shades.push(shade);
+    }
+
+    return shades.reverse();
+}
+
+// Convert HEX to RGB
+function colorPickerHexToRgb(hex) {
+    const cleanHex = hex.replace("#", "");
+    return [
+        parseInt(cleanHex.substring(0, 2), 16),
+        parseInt(cleanHex.substring(2, 4), 16),
+        parseInt(cleanHex.substring(4, 6), 16)
+    ];
+}
+
+// Convert RGB to HEX
+function colorPickerRgbToHex(r, g, b) {
+    return "#" + [r, g, b].map(x =>
+        Math.round(x).toString(16).padStart(2, '0')
+    ).join("");
+}
+
+// Render color buttons into #colorPicker
+function renderColorOptions(colors) {
+    const colorPicker = document.getElementById("colorPicker");
+    colorPicker.innerHTML = "";
+
+    colors.forEach(color => {
+        const container = document.createElement("div");
+        container.className = "color-option-container";
+
+        const btn = document.createElement("button");
+        btn.className = "color-option";
+        btn.dataset.color = color;
+        btn.style.backgroundColor = color;
+
+        container.appendChild(btn);
+        colorPicker.appendChild(container);
+    });
+
+    // Auto-select the first button
+    const first = colorPicker.querySelector(".color-option");
+    if (first) {
+        chosenColor = first.dataset.color;
+
+        document.querySelectorAll('.color-option').forEach(btn =>
+            btn.classList.remove('selected-color')
+        );
+        first.classList.add('selected-color');
+
+        flower.style.color = chosenColor;
+    }
+}
+
+// Hide submenu when clicking outside
+document.addEventListener('click', (e) => {
+    const isInside = document.querySelector('.shades-wrapper')?.contains(e.target);
+    if (!isInside) {
+        const shadeSubmenu = document.querySelector('#shade-submenu');
+        if (shadeSubmenu) shadeSubmenu.classList.add('hidden');
+    }
+});
+
+
+// Hide submenu when clicking outside
+document.addEventListener('click', (e) => {
+    const isInside = document.querySelector('.shades-wrapper')?.contains(e.target);
+    if (!isInside) shadeSubmenu.classList.add('hidden');
+});
 
 
 
@@ -1023,6 +1155,8 @@ if (firstButton) {
 
     flower.style.color = chosenColor;
 }
+
+
 //add click listeners to task(morning, afternoon, evening) divs
 yearContainer.addEventListener('click', (event) => {
     const subTaskElement = event.target.closest('.morningTaskSub, .afternoonTaskSub, .eveningTaskSub');
