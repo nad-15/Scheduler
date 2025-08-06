@@ -23,6 +23,7 @@ const addTaskBtn = document.getElementById(`addTask`);
 
 const paletteBtn = document.getElementById("showRecentColors");
 const dropdown = document.getElementById("color-mode-dropdown");
+const colorPicker = document.getElementById("colorPicker");
 
 paletteBtn.addEventListener("click", () => {
     dropdown.classList.toggle("hidden");
@@ -42,17 +43,19 @@ document.addEventListener("click", (e) => {
 document.querySelector('.dropdown-option[data-mode="all"]').addEventListener('click', () => {
     const originalHTML = document.getElementById("colorPicker").dataset.originalHtml;
     document.getElementById("colorPicker").innerHTML = originalHTML;
-    const firstButton = document.querySelector('#colorPicker .color-option');
+
+
+
+    // ✅ NOW select the first new button (within colorPicker)
+    const firstButton = colorPicker.querySelector('.color-option');
     if (firstButton) {
         chosenColor = firstButton.getAttribute('data-color');
 
-        // Highlight the selected button
-        document.querySelectorAll('.color-option').forEach(btn =>
+        colorPicker.querySelectorAll('.color-option').forEach(btn =>
             btn.classList.remove('selected-color')
         );
         firstButton.classList.add('selected-color');
 
-        // Update flower color
         flower.style.color = chosenColor;
     }
 });
@@ -62,11 +65,22 @@ document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener(
     const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
     const colorFrequency = {};
 
-    // 1. Traverse all tasks and count color usage
-    for (const date in tasks) {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    const dates = Object.keys(tasks)
+        .filter(date => new Date(date) >= oneYearAgo)
+        .sort((a, b) => new Date(b) - new Date(a)); // Sort: newest to oldest
+
+    let colorChecks = 0;
+    const maxChecks = 1000;
+
+    for (const date of dates) {
         const dayData = tasks[date];
         for (const period in dayData) {
-            dayData[period].forEach(entry => {
+            for (const entry of dayData[period]) {
+                if (colorChecks >= maxChecks) break;
+
                 let color = entry.color;
                 if (color) {
                     // Convert RGB to HEX if necessary
@@ -74,20 +88,22 @@ document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener(
                         const rgb = color.match(/\d+/g);
                         color = "#" + rgb.map(x => (+x).toString(16).padStart(2, '0')).join("");
                     }
+
                     color = color.toLowerCase();
                     colorFrequency[color] = (colorFrequency[color] || 0) + 1;
+                    colorChecks++;
                 }
-            });
+            }
+            if (colorChecks >= maxChecks) break;
         }
+        if (colorChecks >= maxChecks) break;
     }
 
-    // 2. Sort by frequency and take top 13
     const topColors = Object.entries(colorFrequency)
-        .sort((a, b) => b[1] - a[1]) // Sort by count descending
+        .sort((a, b) => b[1] - a[1])
         .slice(0, 13)
         .map(([color]) => color);
 
-    // 3. Render these colors
     const colorPicker = document.getElementById("colorPicker");
     colorPicker.innerHTML = "";
 
@@ -104,12 +120,13 @@ document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener(
         colorPicker.appendChild(container);
     });
 
-    // 4. Select the first color by default
-    const firstButton = document.querySelector('#colorPicker .color-option');
+
+    // ✅ NOW select the first new button (within colorPicker)
+    const firstButton = colorPicker.querySelector('.color-option');
     if (firstButton) {
         chosenColor = firstButton.getAttribute('data-color');
 
-        document.querySelectorAll('.color-option').forEach(btn =>
+        colorPicker.querySelectorAll('.color-option').forEach(btn =>
             btn.classList.remove('selected-color')
         );
         firstButton.classList.add('selected-color');
@@ -117,6 +134,7 @@ document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener(
         flower.style.color = chosenColor;
     }
 });
+
 
 
 
@@ -993,20 +1011,18 @@ document.getElementById('colorPicker').addEventListener('click', (e) => {
 });
 
 
-const firstButton = document.querySelector('#colorPicker .color-option');
+// ✅ NOW select the first new button (within colorPicker)
+const firstButton = colorPicker.querySelector('.color-option');
 if (firstButton) {
     chosenColor = firstButton.getAttribute('data-color');
 
-    // Highlight the selected button
-    document.querySelectorAll('.color-option').forEach(btn =>
+    colorPicker.querySelectorAll('.color-option').forEach(btn =>
         btn.classList.remove('selected-color')
     );
     firstButton.classList.add('selected-color');
 
-    // Update flower color
     flower.style.color = chosenColor;
 }
-
 //add click listeners to task(morning, afternoon, evening) divs
 yearContainer.addEventListener('click', (event) => {
     const subTaskElement = event.target.closest('.morningTaskSub, .afternoonTaskSub, .eveningTaskSub');
