@@ -851,6 +851,13 @@ h2 {
     flex-shrink: 0;
     font-weight: bold;
 
+
+    
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
 }
 
 .paste-button:hover {
