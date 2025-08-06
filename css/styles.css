@@ -10,9 +10,7 @@
 
 }
 
-/* * {
-    border: 1px solid lime;
-} */
+
 
 /* Blue Tint	#f5faff */
 
@@ -710,7 +708,6 @@ h2 {
 /* Sliding Input View */
 .sliding-input-view {
     /* border: 2px solid red; */
-
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -764,31 +761,30 @@ h2 {
     /* box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);  */
 }
 
-
-/* .suggestion-text {
-
-
-    display: flex;
-
-    flex: 1 1 auto; 
-    align-items: center;
-    height: auto;
-    border: 1px solid red;
-
-    overflow: hidden;
+/* * {
+    border: 1px solid lime;
 } */
-.suggestion-text {
+
+.jumping-text-box {
     display: flex;
     display: none;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+}
+
+.suggestion-text {
+    /* border: 1px solid red; */
+    display: flex;
+    /* display: none; */
     flex-direction: row;
     gap: 6px;
-    height: 18px;
+    height: 20px;
     align-items: center;
     padding: 0 4px;
-    background-color: #f8f8f8;
+    background-color: transparent;
     /* border: 1px solid #ccc; */
     border-radius: 4px;
-
     overflow-x: auto;
     /* Allow horizontal scrolling */
     overflow-y: hidden;
@@ -801,34 +797,29 @@ h2 {
 
 }
 
-/* Paste buttons styled to fit in 18px tall row */
 .paste-button {
     font-size: 12px;
-    padding: 1px 8px;
-    /* Small vertical padding to stay within 18px */
-    background-color: #dff0ff;
+    padding: 2px 15px; /* Adjust padding here */
+    padding-top: 4px;
+    background-color: #f0f0f0;
     color: #333;
     border-radius: 999px;
-    /* Oval shape */
     white-space: nowrap;
     line-height: 1;
-    /* Prevent text from expanding height */
     cursor: pointer;
     user-select: none;
-    display: flex;
-    align-items: center;
-    height: 18px;
-    /* Keeps it safely inside the 18px container */
+    height: 20px;
+    width: 110px;
     box-sizing: border-box;
-    transition: background-color 0.2s;
-    max-width: 200px;
-    flex-shrink: 0;
-
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    text-align: center;
+    flex-shrink: 0;
+    font-weight: bold;
 
 }
+
+
 
 .paste-button:hover {
     background-color: #cce6ff;
@@ -837,14 +828,13 @@ h2 {
 
 
 
-
-
 /* //original task tempalte */
+
+
 .jumping-text-container {
 
     box-sizing: border-box;
     display: flex;
-    /* display: none; */
     justify-content: center;
     align-items: center;
     font-family: monospace;
