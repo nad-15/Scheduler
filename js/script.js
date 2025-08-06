@@ -22,6 +22,7 @@ const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
 
 let selectedDivs = [];
+let hasSuggestionContent = false;
 
 const blankSuggestion = document.querySelector('.blank-suggestion');
 
@@ -874,9 +875,10 @@ yearContainer.addEventListener('click', (event) => {
 
     if (subTaskElement) {
         handleSubtaskClick(subTaskElement); // Handle child click
-        updateUICounters();
+
         // taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
         updateSuggestionFromSelected();
+        updateUICounters();
 
 
         const lastDiv = selectedDivs[selectedDivs.length - 1];
@@ -898,16 +900,13 @@ yearContainer.addEventListener('click', (event) => {
 
     if (mainTaskElement) {
         handleParentClick(mainTaskElement); // Handle parent click
-
-        updateUICounters();
         updateSuggestionFromSelected();
+        updateUICounters();
         // taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
 
 
         const lastDiv = selectedDivs[selectedDivs.length - 1];
         if (lastDiv) {
-
-
             const computedStyle = getComputedStyle(lastDiv);
             const rgbColor = computedStyle.borderLeftColor;
             const hexColor = rgbToHex(rgbColor);
@@ -918,8 +917,6 @@ yearContainer.addEventListener('click', (event) => {
             }
         }
 
-
-        updateUICounters(); // Update the UI counters
     }
 
 
@@ -958,6 +955,7 @@ function updateSuggestionFromSelected() {
     suggestionContainer.innerHTML = '';
 
     const added = new Set();
+    hasSuggestionContent = false;
 
     // Insert the last selected first
     const lastDiv = selectedDivs[selectedDivs.length - 1];
@@ -971,7 +969,8 @@ function updateSuggestionFromSelected() {
             button.addEventListener('click', () => {
                 taskInput.value = lastText;
             });
-                suggestionContainer.appendChild(button);
+            suggestionContainer.appendChild(button);
+            hasSuggestionContent = true;
         }
     }
 
@@ -988,6 +987,7 @@ function updateSuggestionFromSelected() {
             taskInput.value = text;
         });
         suggestionContainer.appendChild(button);
+        hasSuggestionContent = true;
     }
 }
 
@@ -1096,11 +1096,18 @@ function handleSubtaskGroupToggle(event) {
 const counterObserver = new MutationObserver(() => {
     if (parseInt(selectedTaskCounter.textContent) > 0) {
 
-        const suggestionWrapper = document.querySelector('.suggestion-wrapper');
-        const jumpingTextBox = document.querySelector(".jumping-text-box");
+        if (hasSuggestionContent) {
+            const suggestionWrapper = document.querySelector('.suggestion-wrapper');
+            const jumpingTextBox = document.querySelector(".jumping-text-box");
+            jumpingTextBox.style.display = "none";
+            suggestionWrapper.style.display = "flex";
+        } else {
+            const suggestionWrapper = document.querySelector('.suggestion-wrapper');
+            const jumpingTextBox = document.querySelector(".jumping-text-box");
+            jumpingTextBox.style.display = "flex";
+            suggestionWrapper.style.display = "none";
+        }
 
-        jumpingTextBox.style.display = "none";
-        suggestionWrapper.style.display = "flex";
         submitTaskBtn.classList.remove('disabled-btn'); // Remove disabled styling
         addTaskBtn.classList.remove('disabled-btn'); // Remove 
         selectedTaskCounter.classList.add(`selection-true`);
@@ -1110,10 +1117,11 @@ const counterObserver = new MutationObserver(() => {
 
         const suggestionWrapper = document.querySelector('.suggestion-wrapper');
         const jumpingTextBox = document.querySelector(".jumping-text-box");
-        taskInput.value = "";
-
         jumpingTextBox.style.display = "flex";
         suggestionWrapper.style.display = "none";
+
+
+        // taskInput.value = "";
 
         submitTaskBtn.classList.add('disabled-btn'); // Add 
         addTaskBtn.classList.add('disabled-btn'); // Remove 
