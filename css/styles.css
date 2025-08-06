@@ -1741,6 +1741,10 @@ h2 {
     border-radius: 50%;
 }
 
+#showRecentColors:active{
+    transform: scale(0.90);
+}
+
 #recentcolors-icon{
     color: white;
     font-weight: 300;
