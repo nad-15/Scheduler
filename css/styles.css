@@ -817,6 +817,14 @@ h2 {
     /* border: 2px solid #0078FF; */
 }
 
+.paste-button.blank-suggestion:hover {
+    background-color: #0078FF;
+}
+
+.paste-button:active {
+    transform: scale(0.95);
+}
+
 #eraser-icon{
     font-size: 15px;
     font-weight: bold;
@@ -844,10 +852,6 @@ h2 {
     font-weight: bold;
 
 }
-
-
-
-
 
 .paste-button:hover {
     background-color: #cce6ff;

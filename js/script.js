@@ -864,6 +864,8 @@ document.querySelectorAll('.color-option').forEach(button => {
         document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected-color'));
         button.classList.add('selected-color');
         flower.style.color = chosenColor;
+
+
     });
 });
 
@@ -890,8 +892,25 @@ yearContainer.addEventListener('click', (event) => {
 
             if (hexColor) {
                 const colorBtn = document.querySelector(`button.color-option[data-color="${hexColor}"]`);
-                if (colorBtn) colorBtn.click();
+                if (colorBtn) {
+                    colorBtn.click();
+
+                    const scrollContainer = document.querySelector('.color-picker'); // scrollable container
+
+                    // Center the button horizontally inside the scroll container
+                    const containerRect = scrollContainer.getBoundingClientRect();
+                    const targetRect = colorBtn.getBoundingClientRect();
+
+                    const offset = targetRect.left - containerRect.left;
+                    const centerOffset = offset - (scrollContainer.clientWidth / 2) + (colorBtn.clientWidth / 2);
+
+                    scrollContainer.scrollTo({
+                        left: scrollContainer.scrollLeft + centerOffset,
+                        behavior: 'smooth'
+                    });
+                }
             }
+
         }
 
 
