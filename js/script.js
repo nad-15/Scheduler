@@ -1301,6 +1301,27 @@ function submitTemplate(item) {
     const taskText = item.textContent;
     const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
 
+                if (taskColor) {
+                const colorBtn = document.querySelector(`button.color-option[data-color="${taskColor}"]`);
+                if (colorBtn) {
+                    colorBtn.click();
+
+                    const scrollContainer = document.querySelector('.color-picker'); // scrollable container
+
+                    // Center the button horizontally inside the scroll container
+                    const containerRect = scrollContainer.getBoundingClientRect();
+                    const targetRect = colorBtn.getBoundingClientRect();
+
+                    const offset = targetRect.left - containerRect.left;
+                    const centerOffset = offset - (scrollContainer.clientWidth / 2) + (colorBtn.clientWidth / 2);
+
+                    scrollContainer.scrollTo({
+                        left: scrollContainer.scrollLeft + centerOffset,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+
     if (selectedDivs.length > 0) {
         const storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
@@ -1341,6 +1362,8 @@ function submitTemplate(item) {
         });
 
         [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+//color here
+
     } else {
         triggerShakeEffect();
     }
