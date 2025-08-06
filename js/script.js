@@ -60,36 +60,38 @@ document.querySelector('.dropdown-option[data-mode="all"]').addEventListener('cl
 
 document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener('click', () => {
     const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+    const colorFrequency = {};
 
-    const dates = Object.keys(tasks).sort((a, b) => new Date(b) - new Date(a)); // sort latest to earliest
-    const recentColors = new Set();
-
-    for (const date of dates) {
+    // 1. Traverse all tasks and count color usage
+    for (const date in tasks) {
         const dayData = tasks[date];
         for (const period in dayData) {
             dayData[period].forEach(entry => {
-                if (entry.color) {
-                    let hex = entry.color;
-
-                    // Convert RGB to HEX if needed
-                    if (hex.startsWith("rgb")) {
-                        const rgb = hex.match(/\d+/g);
-                        hex = "#" + rgb.map(x => (+x).toString(16).padStart(2, '0')).join("");
+                let color = entry.color;
+                if (color) {
+                    // Convert RGB to HEX if necessary
+                    if (color.startsWith("rgb")) {
+                        const rgb = color.match(/\d+/g);
+                        color = "#" + rgb.map(x => (+x).toString(16).padStart(2, '0')).join("");
                     }
-
-                    recentColors.add(hex.toLowerCase());
-
-                    if (recentColors.size >= 13) return; // Stop after 10 unique colors
+                    color = color.toLowerCase();
+                    colorFrequency[color] = (colorFrequency[color] || 0) + 1;
                 }
             });
         }
     }
 
-    // Render recent colors in the color picker
-    const colorPicker = document.getElementById("colorPicker");
-    colorPicker.innerHTML = ""; // Clear previous
+    // 2. Sort by frequency and take top 13
+    const topColors = Object.entries(colorFrequency)
+        .sort((a, b) => b[1] - a[1]) // Sort by count descending
+        .slice(0, 13)
+        .map(([color]) => color);
 
-    recentColors.forEach(color => {
+    // 3. Render these colors
+    const colorPicker = document.getElementById("colorPicker");
+    colorPicker.innerHTML = "";
+
+    topColors.forEach(color => {
         const container = document.createElement("div");
         container.className = "color-option-container";
 
@@ -102,20 +104,20 @@ document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener(
         colorPicker.appendChild(container);
     });
 
+    // 4. Select the first color by default
     const firstButton = document.querySelector('#colorPicker .color-option');
     if (firstButton) {
         chosenColor = firstButton.getAttribute('data-color');
 
-        // Highlight the selected button
         document.querySelectorAll('.color-option').forEach(btn =>
             btn.classList.remove('selected-color')
         );
         firstButton.classList.add('selected-color');
 
-        // Update flower color
         flower.style.color = chosenColor;
     }
 });
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
