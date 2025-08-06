@@ -21,6 +21,8 @@ const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
 
+let selectedDivs = [];
+
 const blankSuggestion = document.querySelector('.blank-suggestion');
 
 blankSuggestion.addEventListener('click', () => {
@@ -68,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 showVertViewBtn.addEventListener('click', () => {
+
     hidePopup();
     currentMonthVertView = currentMonthValue;
     currentYearVertView = currentYearValue;
@@ -306,7 +309,17 @@ addDays("initPrev", prevDateMonth, 1, prevDate.getDay(), prevDateLastDate, "", "
 // Handle scroll event
 yearContainer.addEventListener('scroll', handleYearContainerScroll);
 
+
+function cleanupSelectedDivs() {
+    selectedDivs = selectedDivs.filter(el => document.body.contains(el));
+    updateUICounters();
+}
+
+
 function handleYearContainerScroll() {
+
+    cleanupSelectedDivs();
+
     const scrollTop = yearContainer.scrollTop;
     const scrollHeight = yearContainer.scrollHeight;
     const clientHeight = yearContainer.clientHeight;
@@ -836,7 +849,7 @@ document.addEventListener('fullscreenchange', () => {
 });
 
 
-let selectedDivs = [];
+
 let chosenColor = '#6a5044';
 let currentTask = '';
 
@@ -1107,6 +1120,7 @@ const counterObserver = new MutationObserver(() => {
 
         const suggestionWrapper = document.querySelector('.suggestion-wrapper');
         const jumpingTextBox = document.querySelector(".jumping-text-box");
+        taskInput.value = "";
 
         jumpingTextBox.style.display = "flex";
         suggestionWrapper.style.display = "none";
@@ -1779,7 +1793,7 @@ calIconVertView.addEventListener('click', () => {
 
 function showCalHorView(m, y) {
 
-
+    cleanupSelectedDivs();
     // Make sure both elements exist
     const main = document.getElementById('main-container');
     const vert = document.getElementById('calendar-container-vert-view');
@@ -1812,6 +1826,8 @@ function showCalHorView(m, y) {
 }
 
 function showCalVertView(month, year) {
+
+    cleanupSelectedDivs();
     // console.log("Vert View Showing");
 
     // Make sure both elements exist
@@ -1833,6 +1849,7 @@ function showCalVertView(month, year) {
 
 
 function updateVertViewCalendarFromMonthYear(currentMonth, currentYear) {
+    cleanupSelectedDivs();
     console.log("FIND ERROR the current now is:");
     console.log(currentMonth);
     console.log(currentYear);
