@@ -767,24 +767,35 @@ h2 {
 
 .jumping-text-box {
     display: flex;
-    display: none;
+    /* display: none; */
     justify-content: center;
     align-items: center;
     height: 20px;
 }
 
+.suggestion-wrapper {
+    /* display: flex; */
+    display: none;
+    width: 100%;
+    gap: 4px;
+    background-color: transparent;
+
+}
+
 .suggestion-text {
     /* border: 1px solid red; */
     display: flex;
-    /* display: none; */
     flex-direction: row;
     gap: 6px;
     height: 20px;
     align-items: center;
     padding: 0 4px;
+    padding-left: 0px;
     background-color: transparent;
     /* border: 1px solid #ccc; */
     border-radius: 4px;
+        border-top-left-radius: 999px;;
+    border-bottom-left-radius: 999px;
     overflow-x: auto;
     /* Allow horizontal scrolling */
     overflow-y: hidden;
@@ -797,9 +808,16 @@ h2 {
 
 }
 
+.paste-button.blank-suggestion {
+    width: 50px;
+    font-weight: bold;
+    background-color: #dddddd;
+}
+
 .paste-button {
     font-size: 12px;
-    padding: 2px 15px; /* Adjust padding here */
+    padding: 2px 15px;
+    /* Adjust padding here */
     padding-top: 4px;
     background-color: #f0f0f0;
     color: #333;

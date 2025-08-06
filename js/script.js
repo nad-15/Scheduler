@@ -21,6 +21,12 @@ const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
 
+const blankSuggestion = document.querySelector('.blank-suggestion');
+
+blankSuggestion.addEventListener('click', () => {
+    taskInput.value = '';
+});
+
 const showVertViewBtn = document.getElementById('calendar-icon-vertview');
 const showHorViewBtn = document.getElementById('calendar-icon-horview');
 
@@ -856,11 +862,13 @@ yearContainer.addEventListener('click', (event) => {
     if (subTaskElement) {
         handleSubtaskClick(subTaskElement); // Handle child click
         updateUICounters();
-        taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
+        // taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
+        updateSuggestionFromSelected();
 
 
         const lastDiv = selectedDivs[selectedDivs.length - 1];
         if (lastDiv) {
+
             const computedStyle = getComputedStyle(lastDiv);
             const rgbColor = computedStyle.borderLeftColor;
             const hexColor = rgbToHex(rgbColor);
@@ -877,11 +885,16 @@ yearContainer.addEventListener('click', (event) => {
 
     if (mainTaskElement) {
         handleParentClick(mainTaskElement); // Handle parent click
-        taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
+
+        updateUICounters();
+        updateSuggestionFromSelected();
+        // taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
 
 
         const lastDiv = selectedDivs[selectedDivs.length - 1];
         if (lastDiv) {
+
+
             const computedStyle = getComputedStyle(lastDiv);
             const rgbColor = computedStyle.borderLeftColor;
             const hexColor = rgbToHex(rgbColor);
@@ -898,6 +911,85 @@ yearContainer.addEventListener('click', (event) => {
 
 
 });
+
+
+function addToSuggestionText(text) {
+    const suggestionContainer = document.querySelector('.suggestion-text');
+    const existingButtons = Array.from(suggestionContainer.querySelectorAll('.paste-button'));
+
+    // Check if the text already exists
+    const alreadyExists = existingButtons.some(btn => btn.textContent === text);
+    if (alreadyExists) return;
+
+    // Create a new paste button
+    const button = document.createElement('div');
+    button.classList.add('paste-button');
+    button.textContent = text;
+
+    // When clicked, send the text to the taskInput
+    button.addEventListener('click', () => {
+        taskInput.value = text;
+    });
+
+    const blankBtn = suggestionContainer.querySelector('.blank-suggestion');
+    if (blankBtn && blankBtn.nextSibling) {
+        suggestionContainer.insertBefore(button, blankBtn.nextSibling);
+    } else {
+        suggestionContainer.appendChild(button);
+    }
+}
+
+
+function updateSuggestionFromSelected() {
+    const suggestionContainer = document.querySelector('.suggestion-text');
+
+    // Keep the .blank-suggestion button
+    const blankBtn = suggestionContainer.querySelector('.blank-suggestion');
+    suggestionContainer.innerHTML = '';
+    if (blankBtn) suggestionContainer.appendChild(blankBtn);
+
+    const added = new Set();
+
+    // Insert the last selected first
+    const lastDiv = selectedDivs[selectedDivs.length - 1];
+    if (lastDiv) {
+        const lastText = lastDiv.textContent?.trim();
+        if (lastText && !added.has(lastText)) {
+            added.add(lastText);
+            const button = document.createElement('div');
+            button.classList.add('paste-button');
+            button.textContent = lastText;
+            button.addEventListener('click', () => {
+                taskInput.value = lastText;
+            });
+
+            // ⏹️ Insert directly after .blank-suggestion
+            if (blankBtn && blankBtn.nextSibling) {
+                suggestionContainer.insertBefore(button, blankBtn.nextSibling);
+            } else {
+                suggestionContainer.appendChild(button);
+            }
+        }
+    }
+
+    // Add the rest (excluding last)
+    for (let i = 0; i < selectedDivs.length - 1; i++) {
+        const text = selectedDivs[i].textContent?.trim();
+        if (!text || added.has(text)) continue;
+        added.add(text);
+
+        const button = document.createElement('div');
+        button.classList.add('paste-button');
+        button.textContent = text;
+        button.addEventListener('click', () => {
+            taskInput.value = text;
+        });
+        suggestionContainer.appendChild(button);
+    }
+}
+
+
+
 
 
 // Handle selection/deselection for the subtask (child)
@@ -1000,12 +1092,25 @@ function handleSubtaskGroupToggle(event) {
 
 const counterObserver = new MutationObserver(() => {
     if (parseInt(selectedTaskCounter.textContent) > 0) {
+
+        const suggestionWrapper = document.querySelector('.suggestion-wrapper');
+        const jumpingTextBox = document.querySelector(".jumping-text-box");
+
+        jumpingTextBox.style.display = "none";
+        suggestionWrapper.style.display = "flex";
         submitTaskBtn.classList.remove('disabled-btn'); // Remove disabled styling
         addTaskBtn.classList.remove('disabled-btn'); // Remove 
         selectedTaskCounter.classList.add(`selection-true`);
         // submitTaskBtn.disabled = false;
         // selectedTaskCounter.classList.remove('shake-btn'); // Remove shake effect when counter is > 0
     } else {
+
+        const suggestionWrapper = document.querySelector('.suggestion-wrapper');
+        const jumpingTextBox = document.querySelector(".jumping-text-box");
+
+        jumpingTextBox.style.display = "flex";
+        suggestionWrapper.style.display = "none";
+
         submitTaskBtn.classList.add('disabled-btn'); // Add 
         addTaskBtn.classList.add('disabled-btn'); // Remove 
         // disabled styling
