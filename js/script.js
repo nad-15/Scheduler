@@ -21,6 +21,20 @@ const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
 
+const paletteBtn = document.getElementById("showRecentColors");
+const dropdown = document.getElementById("color-mode-dropdown");
+
+paletteBtn.addEventListener("click", () => {
+  dropdown.classList.toggle("hidden");
+});
+
+// Close dropdown when clicking outside
+document.addEventListener("click", (e) => {
+  if (!paletteBtn.closest(".palette-wrapper").contains(e.target)) {
+    dropdown.classList.add("hidden");
+  }
+});
+
 let selectedDivs = [];
 let hasSuggestionContent = false;
 
@@ -1301,26 +1315,26 @@ function submitTemplate(item) {
     const taskText = item.textContent;
     const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
 
-                if (taskColor) {
-                const colorBtn = document.querySelector(`button.color-option[data-color="${taskColor}"]`);
-                if (colorBtn) {
-                    colorBtn.click();
+    if (taskColor) {
+        const colorBtn = document.querySelector(`button.color-option[data-color="${taskColor}"]`);
+        if (colorBtn) {
+            colorBtn.click();
 
-                    const scrollContainer = document.querySelector('.color-picker'); // scrollable container
+            const scrollContainer = document.querySelector('.color-picker'); // scrollable container
 
-                    // Center the button horizontally inside the scroll container
-                    const containerRect = scrollContainer.getBoundingClientRect();
-                    const targetRect = colorBtn.getBoundingClientRect();
+            // Center the button horizontally inside the scroll container
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const targetRect = colorBtn.getBoundingClientRect();
 
-                    const offset = targetRect.left - containerRect.left;
-                    const centerOffset = offset - (scrollContainer.clientWidth / 2) + (colorBtn.clientWidth / 2);
+            const offset = targetRect.left - containerRect.left;
+            const centerOffset = offset - (scrollContainer.clientWidth / 2) + (colorBtn.clientWidth / 2);
 
-                    scrollContainer.scrollTo({
-                        left: scrollContainer.scrollLeft + centerOffset,
-                        behavior: 'smooth'
-                    });
-                }
-            }
+            scrollContainer.scrollTo({
+                left: scrollContainer.scrollLeft + centerOffset,
+                behavior: 'smooth'
+            });
+        }
+    }
 
     if (selectedDivs.length > 0) {
         const storedData = JSON.parse(localStorage.getItem('tasks')) || {};
@@ -1362,7 +1376,7 @@ function submitTemplate(item) {
         });
 
         [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-//color here
+        //color here
 
     } else {
         triggerShakeEffect();
