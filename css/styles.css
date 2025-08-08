@@ -1019,15 +1019,14 @@ h2 {
 
 .input-task-template {
     box-sizing: border-box;
-    padding-top: 7px;
-    border: none;
+    padding-top: 6px;
     /* border: 1px solid #2277b0; */
     /* border-radius:  4px; */
     flex-grow: 1;
     min-width: 0;
     /* Makes the input take more space than the button */
     font-size: 16px;
-    height: 30px;
+    /* height: 30px; */
     /* border-radius: 17px; */
     background-color: transparent;
     vertical-align: middle;
