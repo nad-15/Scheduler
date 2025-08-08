@@ -738,7 +738,7 @@ h2 {
     /* Start hidden */
     transition: transform 0.3s ease-in-out;
     /* Smooth transition */
-    pointer-events: all;
+    z-index: 1998;
 
 
 }
@@ -1063,6 +1063,13 @@ h2 {
     -ms-user-select: none;
 }
 
+.user-select-none {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
 /* Hover effect */
 #submitTask:hover {
     background-color: #005FCC;
@@ -1198,7 +1205,7 @@ h2 {
     flex-shrink: 0;
     flex-grow: 0;
 
-        /* Circular gradient border */
+    /* Circular gradient border */
     /* border: 4px solid transparent;
     background: 
         linear-gradient(#e5e5e5, #e5e5e5) padding-box,
@@ -1718,6 +1725,10 @@ h2 {
     transition: opacity 0.3s ease;
     text-align: center;
     z-index: 9999;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .morningTaskSub:active,
