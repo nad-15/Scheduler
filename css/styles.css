@@ -795,7 +795,8 @@ h2 {
     background-color: transparent;
     /* border: 1px solid #ccc; */
     border-radius: 4px;
-        border-top-left-radius: 999px;;
+    border-top-left-radius: 999px;
+    ;
     border-bottom-left-radius: 999px;
     overflow-x: auto;
     /* Allow horizontal scrolling */
@@ -817,7 +818,7 @@ h2 {
     font-weight: bold;
     background-color: #0078FF;
     color: white;
-    
+
     /* border: 2px solid #0078FF; */
 }
 
@@ -829,7 +830,7 @@ h2 {
     transform: scale(0.95);
 }
 
-#eraser-icon{
+#eraser-icon {
     font-size: 15px;
     font-weight: bold;
 }
@@ -856,7 +857,7 @@ h2 {
     font-weight: bold;
 
 
-    
+
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -1125,10 +1126,54 @@ h2 {
 }
 
 
+.counter-icon-container {
+    display: flex;
+    /* display: none; */
+    justify-content: center;
+    align-items: content;
+    height: 35px;
+    width: 35px;
+    background-color: blue;
+    background-color: transparent;
+    border-radius: 50%;
+}
+
+.icon-with-number-container {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    /* adjust based on icon size */
+    height: 40px;
+    font-size: 32px;
+    /* icon size */
+    text-align: center;
+}
+
+
+#gfont-counter-icon {
+    font-size: 25px;
+    font-weight: normal;
+    line-height: 35px;
+    color: blue;
+}
+
+.calendar-number {
+    position: absolute;
+    top: 49%;
+    left: 55%;
+    transform: translate(-50%, -55%);
+    font-size: 12px;
+    font-weight: bold;
+    color: black;
+    pointer-events: none;
+    /* don't block clicks */
+}
+
 
 .selected-task {
     box-sizing: border-box;
     display: flex;
+    /* display: none; */
     justify-content: center;
     align-items: center;
     height: 35px;
@@ -1722,14 +1767,14 @@ h2 {
 /* border-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); */
 
 
-.color-button-options{
+.color-button-options {
     /* border: 1px solid red; */
     display: flex;
     align-items: center;
     gap: 5px
 }
 
-#showRecentColors{
+#showRecentColors {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1741,112 +1786,119 @@ h2 {
     border-radius: 50%;
 }
 
-#showRecentColors:active{
+#showRecentColors:active {
     transform: scale(0.90);
 }
 
-#recentcolors-icon{
+#recentcolors-icon {
     color: white;
     font-weight: 300;
     font-size: 20px;
 }
+
 .palette-wrapper {
-  position: relative;
-  display: inline-block;
+    position: relative;
+    display: inline-block;
 }
 
 .color-mode-dropdown {
-  position: absolute;
-  top: 50%;
-  left: calc(100% + 10px); /* small gap from the button */
-  left: 100%; /* right side */
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: row; /* horizontal layout */
-  background: white;
-  background: rgba(204, 230, 255, 0.95) /* 70% opaque */
-;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  z-index: 1000;
-  padding: 4px;
-  gap: 4px;
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 10px);
+    /* small gap from the button */
+    left: 100%;
+    /* right side */
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: row;
+    /* horizontal layout */
+    background: white;
+    background: rgba(204, 230, 255, 0.95)
+        /* 70% opaque */
+    ;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 4px;
+    gap: 4px;
 }
 
 .color-mode-dropdown.hidden {
-  display: none;
+    display: none;
 }
 
 .dropdown-option {
-  padding: 6px 10px;
-  background: none;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
+    padding: 6px 10px;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
 }
 
 .dropdown-option:hover {
-  background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
 
-
 .color-mode-dropdown::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -11px; /* Position it on the left edge of the dropdown */
-  transform: translateY(-50%);
-  border-width: 6px;
-  border-style: solid;
-  border-color: transparent rgba(204, 230, 255, 0.95) /* 70% opaque */
- transparent transparent;
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -11px;
+    /* Position it on the left edge of the dropdown */
+    transform: translateY(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent rgba(204, 230, 255, 0.95)
+        /* 70% opaque */
+        transparent transparent;
     /* background-color: #0078FF; */
 }
 
 .dropdown-option-wrapper {
-  position: relative;
+    position: relative;
 }
 
 .shade-submenu {
-  position: absolute;
-  bottom: 100%; /* Appear above the "Shades" button */
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  z-index: 1001;
-  padding: 4px;
-  gap: 4px;
+    position: absolute;
+    bottom: 100%;
+    /* Appear above the "Shades" button */
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    padding: 4px;
+    gap: 4px;
 }
 
 .shade-submenu.hidden {
-  display: none;
+    display: none;
 }
 
 .shade-color-btn {
-  padding: 6px 10px;
-  background: none;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  text-align: left;
+    padding: 6px 10px;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
 }
 
 .shade-color-btn:hover {
-  background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
 
 
 
 
 .color-option {
-        /* border: 5px solid green; */
+    /* border: 5px solid green; */
     box-sizing: border-box;
     display: flex;
     flex-shrink: 0;
@@ -3000,17 +3052,49 @@ h2 {
     }
 } */
 @keyframes shake {
-  0%   { transform: translate(0, 0); }
-  10%  { transform: translate(-1px, 1px); }
-  20%  { transform: translate(1px, -1px); }
-  30%  { transform: translate(-1px, -1px); }
-  40%  { transform: translate(1px, 1px); }
-  50%  { transform: translate(-0.5px, 0.5px); }
-  60%  { transform: translate(0.5px, -0.5px); }
-  70%  { transform: translate(-0.5px, -0.5px); }
-  80%  { transform: translate(0.5px, 0.5px); }
-  90%  { transform: translate(-0.3px, 0.3px); }
-  100% { transform: translate(0, 0); }
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-1px, 1px);
+    }
+
+    20% {
+        transform: translate(1px, -1px);
+    }
+
+    30% {
+        transform: translate(-1px, -1px);
+    }
+
+    40% {
+        transform: translate(1px, 1px);
+    }
+
+    50% {
+        transform: translate(-0.5px, 0.5px);
+    }
+
+    60% {
+        transform: translate(0.5px, -0.5px);
+    }
+
+    70% {
+        transform: translate(-0.5px, -0.5px);
+    }
+
+    80% {
+        transform: translate(0.5px, 0.5px);
+    }
+
+    90% {
+        transform: translate(-0.3px, 0.3px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
 }
 
 
