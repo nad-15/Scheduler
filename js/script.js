@@ -1904,6 +1904,11 @@ if (selectedTask) {
     selectedTask.remove();  // Remove the selected-task button
 }
 
+const cloneColorMenu = clonedSlidingInputView.querySelector(".palette-button");
+if(cloneColorMenu){
+    cloneColorMenu.remove();
+}
+
 
 // Select both arrows
 // const arrows = clonedSlidingInputView.querySelector('.template-task-btn1 ');

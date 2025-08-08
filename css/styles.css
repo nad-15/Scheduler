@@ -738,6 +738,7 @@ h2 {
     /* Start hidden */
     transition: transform 0.3s ease-in-out;
     /* Smooth transition */
+    pointer-events: auto;
 
 
 }
@@ -1029,7 +1030,6 @@ h2 {
     /* height: 30px; */
     /* border-radius: 17px; */
     background-color: transparent;
-    vertical-align: middle;
     border: none;
     font-family: inherit;
     scrollbar-width: none;
@@ -2220,7 +2220,7 @@ h2 {
     transform: translate(-50%, -50%);
     border-radius: 6px;
     width: 80%;
-    height: auto;
+    /* height: auto; */
     z-index: 3001;
 }
 
