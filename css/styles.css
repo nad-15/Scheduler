@@ -1019,18 +1019,20 @@ h2 {
 
 .input-task-template {
     box-sizing: border-box;
-    /* padding: 10px; */
+    padding-top: 7px;
     border: none;
-    border: 1px solid #2277b0;
+    /* border: 1px solid #2277b0; */
     /* border-radius:  4px; */
     flex-grow: 1;
     min-width: 0;
     /* Makes the input take more space than the button */
     font-size: 16px;
     height: 30px;
-    border-radius: 17px;
+    /* border-radius: 17px; */
     background-color: transparent;
+    vertical-align: middle;
     border: none;
+    font-family: inherit;
 }
 
 .input-task-template:focus {
