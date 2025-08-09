@@ -584,7 +584,7 @@ h2 {
     margin-bottom: 1.5rem;
     align-items: center;
     justify-content: center;
-    height: calc(.33 * 100vh);
+    /* height: calc(.33 * 100vh); */
     justify-content: space-around;
     /* gap: 20px; */
 
