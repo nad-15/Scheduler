@@ -595,6 +595,7 @@ h2 {
     font-weight: 700;
     color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+      font-family: 'Kaushan Script', cursive;
 }
 
 #slider-menu-header-logo {
@@ -603,6 +604,8 @@ h2 {
 
 .slider-menu-tagline{
     text-align: center;
+    font-style: italic;
+          font-family: 'Kaushan Script', cursive;
 }
 
 .menuslider-divider {
