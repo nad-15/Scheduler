@@ -576,7 +576,7 @@ function applyBordersToEventContent() {
     const borderLeftColor = getComputedStyle(content).borderLeftColor;
 
     content.style.border = `1px solid ${borderLeftColor}`;
-    content.style.borderLeftWidth = '8px'; // keep the left border thick
+    content.style.borderLeftWidth = '5px'; // keep the left border thick
   });
 }
 
