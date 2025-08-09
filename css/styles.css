@@ -556,23 +556,63 @@ h2 {
     color: white;
 }
 
+/* *{
+    border:1px solid lime;
+} */
 .menu-slider.open {
     transform: translateX(0);
 }
 
+.theme,
+.about,
+.other-webapps {
+    display: inline-flex;
+    align-items: center;
+    /* vertical center */
+    gap: 8px;
+    /* space between icon and text */
+
+}
+
+
+
 /* =================== */
 /* 🎯 HEADINGS & TEXT */
-.menu-slider h2 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #ffdd57;
+.side-menu-header-container {
+    display: flex;
+    flex-direction: column;
     margin-bottom: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    height: calc(.33 * 100vh);
+    justify-content: center;
+    gap: 20px;
+}
+
+.slider-menu-header-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+#slider-menu-header-logo {
+    font-size: 150px;
+}
+
+.slider-menu-tagline{
+    text-align: center;
+}
+
+.menuslider-divider {
+    /* height: 2px; */
+    border: 1px solid white;
+    margin-bottom: 10px;
 }
 
 .menu-slider ul {
     list-style: none;
-    padding: 0;
+    padding: 0px;
     margin: 0;
 }
 
@@ -670,16 +710,13 @@ h2 {
 /* =================== */
 /* ✅ "KalKulator" BUTTON */
 .menu-slider .btn {
+    font-size: 1.1rem;
     display: inline-block;
-    margin-top: 2rem;
-    padding: 0.7rem 1.2rem;
-    background: linear-gradient(90deg, #00ffb8, #35fcd0);
-    border-radius: 10px;
-    color: #111;
-    font-weight: 600;
     text-decoration: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0, 255, 200, 0.3);
+    padding: 0.6rem 0;
+    color: #eee;
+    transition: color 0.3s, transform 0.2s;
+    cursor: pointer;
 }
 
 .menu-slider .btn:hover {
@@ -689,17 +726,11 @@ h2 {
 
 /* =================== */
 
-
-
-
-
 .floating-add-btn,
 .clear-button {
     transition: transform 1s ease, bottom 0.3s ease;
     /* Same transition for the buttons */
 }
-
-
 
 .floating-add-btn:hover {
     transform: scale(1.1);
@@ -2190,7 +2221,7 @@ h2 {
     user-select: none;
     text-align: center;
     padding: 5px;
-    
+
 
     overflow: auto;
     word-wrap: break-word;
