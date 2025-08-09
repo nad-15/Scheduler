@@ -585,8 +585,9 @@ h2 {
     align-items: center;
     justify-content: center;
     height: calc(.33 * 100vh);
-    justify-content: center;
-    gap: 20px;
+    justify-content: space-around;
+    /* gap: 20px; */
+
 }
 
 .slider-menu-header-title {
