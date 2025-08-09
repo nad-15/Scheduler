@@ -2190,10 +2190,12 @@ h2 {
     user-select: none;
     text-align: center;
     padding: 5px;
+    
 
     overflow: auto;
     word-wrap: break-word;
     white-space: normal;
+    word-break: break-word;
 }
 
 .items:active {
