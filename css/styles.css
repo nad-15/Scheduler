@@ -554,6 +554,8 @@ h2 {
     transition: transform 0.4s ease, opacity 0.3s ease;
     z-index: 4001;
     color: white;
+    overflow: scroll;
+    scrollbar-width: none;
 }
 
 /* *{
