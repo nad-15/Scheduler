@@ -336,23 +336,25 @@ let isTouch = false;
 const MAX_DRAG_DISTANCE = 30;
 
 function startDraggingPopUp(x, y, target) {
-
   if (ghost && ghost.parentNode) {
     console.log("GHOST REMOVE");
-    ghost.remove();
+    // ghost.remove();
   }
   draggedItem = target;
 
   const rect = target.getBoundingClientRect();
   offsetYforEditPopUp = y - rect.top;
 
+  // Instead of querying for .event-content and cloning it,
+  // we take the parent node of that content
   const content = target.querySelector('.event-content');
-  if (!content) return;
+  if (!content || !content.parentNode) return;
 
-  ghost = content.cloneNode(true);
+  const parentElem = content.parentNode; // 👈 get parent container
+  ghost = parentElem.cloneNode(true);
   ghost.classList.add('ghost');
 
-  const computed = getComputedStyle(content);
+  const computed = getComputedStyle(parentElem);
   for (let prop of [
     'width', 'height', 'padding', 'margin',
     'font', 'fontSize', 'fontWeight',
@@ -360,7 +362,6 @@ function startDraggingPopUp(x, y, target) {
   ]) {
     ghost.style[prop] = computed[prop];
   }
-
 
   ghost.style.position = 'absolute';
   ghost.style.left = `${rect.left}px`;
@@ -370,6 +371,7 @@ function startDraggingPopUp(x, y, target) {
   document.body.appendChild(ghost);
   target.classList.add('dragging');
 }
+
 
 
 function moveGhostThrottledPopUp(y) {
