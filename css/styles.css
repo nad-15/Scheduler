@@ -554,7 +554,8 @@ h2 {
     transition: transform 0.4s ease, opacity 0.3s ease;
     z-index: 4001;
     color: white;
-    overflow: scroll;
+    overflow: hidden;
+    overflow-y: scroll;
     scrollbar-width: none;
 }
 
@@ -564,6 +565,8 @@ h2 {
 .menu-slider.open {
     transform: translateX(0);
 }
+
+
 
 .theme,
 .about,
@@ -597,17 +600,17 @@ h2 {
     font-weight: 700;
     color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-      font-family: 'Kaushan Script', cursive;
+    font-family: 'Kaushan Script', cursive;
 }
 
 #slider-menu-header-logo {
     font-size: 150px;
 }
 
-.slider-menu-tagline{
+.slider-menu-tagline {
     text-align: center;
     font-style: italic;
-          font-family: 'Kaushan Script', cursive;
+    font-family: 'Kaushan Script', cursive;
 }
 
 .menuslider-divider {
@@ -2681,6 +2684,12 @@ h2 {
     border-image-slice: 1;
 }
 
+/* .event-title[contenteditable="true"] {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 2px 4px;
+} */
 
 
 #calendar-pop-up {
@@ -2944,13 +2953,52 @@ h2 {
 
 
 
+.arrow-up-dayTask,
+.arrow-down-dayTask {
+  background: none;
+  border: none;
+  padding: 4px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #007bff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-dayTask {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #d9534f; /* red */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.event {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    /* border: 2px solid green; */
+}
+
+/* .delete-dayTask,
+.arrow-up-dayTask,
+.arrow-down-dayTask {
+  display: none;
+} */
+
 
 .event-content {
+    display: flex;
     font-size: 12px;
+    width: 100%;
     /* 1rem */
     padding: 5px 10px;
-    margin-left: 20px;
-    margin-right: 20px;
+    /* margin-left: 20px;
+    margin-right: 20px; */
     margin-bottom: 5px;
     margin-top: 5px;
 
@@ -2964,6 +3012,7 @@ h2 {
     /* For older IE */
 
     /* border: 2px solid red; */
+
 
 }
 

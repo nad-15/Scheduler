@@ -141,13 +141,13 @@ function currentDayScroll(todayDate) {
   }
 
   setTimeout(() => {
-      todayElement.classList.add('is-active');
+    todayElement.classList.add('is-active');
 
-      setTimeout(() => {
-        todayElement.classList.remove('is-active');
-      }, 300); // how long the effect lasts
-    }, 350); // delay should roughly match scroll duration
-  
+    setTimeout(() => {
+      todayElement.classList.remove('is-active');
+    }, 300); // how long the effect lasts
+  }, 350); // delay should roughly match scroll duration
+
 }
 
 
@@ -165,33 +165,25 @@ function adjustCalendarHeight() {
 }
 
 
-function showDayTasks(d) {
-  // const target = e.target.closest('[data-full-date]');
-  // if (!target) return;
-  // console.log("call to showDayTask succesful from grid");
-  // const date = target.dataset.fullDate;
-  const date = d;
+function showDayTasks(date, focusInfo) {
   popUpDate = date;
-  // console.log("POPUPDATE IS:", date);
   if (!date) return;
 
   const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
   const dayTasks = storedTasks[date];
 
-  // Split and pad manually
+  // Fix date padding for JS Date
   const [year, month, day] = date.split('-');
   const paddedMonth = String(Number(month) + 1).padStart(2, '0');
   const paddedDay = String(day).padStart(2, '0');
   const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
 
   const dateObj = new Date(fixedDate);
-
   currentMonthValue = dateObj.getMonth();
   currentYearValue = dateObj.getFullYear();
 
   const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
   const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-
   const dayDiff = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24));
 
   let label;
@@ -206,20 +198,18 @@ function showDayTasks(d) {
   }
 
   if (label) {
-    const shortWeekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' }); // "Mon"
-    const shortDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }); // "June 22"
+    const shortWeekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+    const shortDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
     bottomLine = `${shortWeekday}, ${shortDate}`;
   } else {
-    label = dateObj.toLocaleDateString('en-US', { weekday: 'long' }); // "Monday"
+    label = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
     bottomLine = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   }
 
   document.getElementById("popup-date").innerHTML = `
-  <div class="weekday">${label}</div>
-  <div class="month-year">${bottomLine}</div>
-`;
-
-
+    <div class="weekday">${label}</div>
+    <div class="month-year">${bottomLine}</div>
+  `;
 
   const popupTasks = document.getElementById("popup-tasks");
   popupTasks.innerHTML = "";
@@ -227,72 +217,231 @@ function showDayTasks(d) {
   if (!dayTasks) {
     const noTask = document.createElement("p");
     noTask.textContent = "No tasks for this day.";
-    // noTask.className = "no-tasks-text"; 
     popupTasks.appendChild(noTask);
   } else {
     const periods = ["morning", "afternoon", "evening"];
+    let currentlyEditing = null;
 
     periods.forEach(period => {
       const section = document.createElement("div");
       section.classList.add("period-section");
-
 
       const divider = document.createElement("div");
       divider.className = "section-divider";
       divider.textContent = period.charAt(0).toUpperCase() + period.slice(1);
       section.appendChild(divider);
 
-
       const periodTasks = dayTasks[period];
       if (periodTasks && periodTasks.length > 0) {
-        periodTasks.forEach(({ task, color }) => {
+        periodTasks.forEach(({ task, color }, index) => {
           const eventDiv = document.createElement("div");
           eventDiv.className = "event";
 
+          // Delete button on left
+          const deleteBtn = document.createElement("button");
+          deleteBtn.classList.add("delete-dayTask");
+          deleteBtn.title = "Delete task";
+          deleteBtn.style.cursor = "pointer";
+          deleteBtn.innerHTML = `<span class="material-symbols-outlined">delete_forever</span>`;
+
+          // event-content with task title and colored left border
           const content = document.createElement("div");
           content.className = "event-content";
+          if (color) content.style.borderLeft = `5px solid ${color}`;
 
           const title = document.createElement("span");
           title.className = "event-title";
+          title.textContent = task || "No Title";
 
-          const hasText = task && task.trim() !== "";
-          const hasColor = color && color.trim() !== "";
+          // Arrow buttons on right
+          const arrowUp = document.createElement("button");
+          arrowUp.innerHTML = `<span class="material-symbols-outlined">
+keyboard_arrow_up
+</span>`;
+          arrowUp.title = "Add task above";
+          arrowUp.style.cursor = "pointer";
+          arrowUp.classList.add("arrow-up-dayTask");
 
-          if (hasText && hasColor) {
-            content.style.borderLeft = `5px solid ${color}`;
-            title.textContent = task;
-          } else if (!hasText && hasColor) {
-            content.style.borderLeft = `5px solid ${color}`;
-            title.textContent = "No Title";
-          } else {
-            // Don't create an event, create a <p> instead
-            const noTask = document.createElement("p");
-            noTask.className = "no-tasks-text";
-            noTask.textContent = "No tasks for this period.";
-            section.appendChild(noTask);
-            return; // skip appending the .event
+          const arrowDown = document.createElement("button");
+          arrowDown.innerHTML = `<span class="material-symbols-outlined">
+keyboard_arrow_down
+</span>`;
+          arrowDown.classList.add("arrow-down-dayTask");
+          arrowDown.title = "Add task below";
+          arrowDown.style.cursor = "pointer";
+
+          // Append title inside content
+          content.appendChild(title);
+
+          // Append all inside eventDiv
+          eventDiv.appendChild(deleteBtn);
+          eventDiv.appendChild(content);
+          eventDiv.appendChild(arrowUp);
+          eventDiv.appendChild(arrowDown);
+
+          // DELETE button logic
+          deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+            if (storedTasks[date] && storedTasks[date][period]) {
+              storedTasks[date][period].splice(index, 1);
+              localStorage.setItem("tasks", JSON.stringify(storedTasks));
+              showDayTasks(date);
+            }
+          });
+
+          // Save current task before insertion
+          function saveCurrentTask() {
+            if (title.isContentEditable) {
+              const newText = title.textContent.trim();
+              const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+              if (storedTasks[date] && storedTasks[date][period] && storedTasks[date][period][index]) {
+                storedTasks[date][period][index].task = newText;
+                localStorage.setItem("tasks", JSON.stringify(storedTasks));
+              }
+            }
           }
 
+          arrowUp.addEventListener("click", (e) => {
+            e.stopPropagation();
+            saveCurrentTask();
 
-          content.appendChild(title);
-          eventDiv.appendChild(content);
+            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+            if (!storedTasks[date]) storedTasks[date] = {};
+            if (!storedTasks[date][period]) storedTasks[date][period] = [];
+
+            storedTasks[date][period].splice(index, 0, { task: "No Title", color: "#007bff" });
+            localStorage.setItem("tasks", JSON.stringify(storedTasks));
+
+            showDayTasks(date, { period, index });
+          });
+
+          arrowDown.addEventListener("click", (e) => {
+            e.stopPropagation();
+            saveCurrentTask();
+
+            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+            if (!storedTasks[date]) storedTasks[date] = {};
+            if (!storedTasks[date][period]) storedTasks[date][period] = [];
+
+            storedTasks[date][period].splice(index + 1, 0, { task: "No Title", color: "#007bff" });
+            localStorage.setItem("tasks", JSON.stringify(storedTasks));
+
+            showDayTasks(date, { period, index: index + 1 });
+          });
+
+          title.addEventListener("click", () => {
+            arrowUp.style.display = "inline-block";
+            arrowDown.style.display = "inline-block";
+            // Save currently editing if different
+            if (currentlyEditing && currentlyEditing !== title) {
+              currentlyEditing.contentEditable = "false";
+              currentlyEditing.style.outline = "none";
+              const oldPeriod = currentlyEditing.dataset.period;
+              const oldIndex = parseInt(currentlyEditing.dataset.index);
+              const oldDate = popUpDate;
+              const oldText = currentlyEditing.textContent.trim();
+              const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+              if (storedTasks[oldDate] && storedTasks[oldDate][oldPeriod] && storedTasks[oldDate][oldPeriod][oldIndex]) {
+                storedTasks[oldDate][oldPeriod][oldIndex].task = oldText;
+                localStorage.setItem("tasks", JSON.stringify(storedTasks));
+              }
+            }
+
+            currentlyEditing = title;
+            title.contentEditable = "true";
+            title.focus();
+            title.style.outline = "2px solid #00aaff";
+
+            const range = document.createRange();
+            range.selectNodeContents(title);
+            range.collapse(false);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          });
+
+          title.addEventListener("blur", () => {
+            title.contentEditable = "false";
+            title.style.outline = "none";
+
+            const newText = title.textContent.trim();
+            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+            if (storedTasks[date] && storedTasks[date][period] && storedTasks[date][period][index]) {
+              storedTasks[date][period][index].task = newText;
+              localStorage.setItem("tasks", JSON.stringify(storedTasks));
+            }
+            currentlyEditing = null;
+          });
+
+          // Store period and index on title for saving on switching edits
+          title.dataset.period = period;
+          title.dataset.index = index;
+
           section.appendChild(eventDiv);
         });
-      }
-      else {
-        const noTask = document.createElement("p");
-        noTask.className = "no-tasks-text";
-        // content.classList.add("no-tasks-for-this-period");
-        noTask.textContent = "No tasks for this period.";
-        section.appendChild(noTask);
-      }
+} else {
+  const noTask = document.createElement("p");
+  noTask.className = "no-tasks-text";
+  noTask.textContent = "No tasks for this period.";
+  noTask.style.cursor = "pointer";
+  noTask.title = "Click to add a new task";
+
+  noTask.addEventListener("click", () => {
+    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+    if (!storedTasks[date]) storedTasks[date] = {};
+    if (!storedTasks[date][period]) storedTasks[date][period] = [];
+
+    storedTasks[date][period].push({ task: "No Title", color: "#007bff" });
+    localStorage.setItem("tasks", JSON.stringify(storedTasks));
+
+    showDayTasks(date, { period, index: storedTasks[date][period].length - 1 });
+  });
+
+  section.appendChild(noTask);
+}
+
 
       popupTasks.appendChild(section);
     });
   }
 
+  // Focus newly created task if requested
+  if (focusInfo) {
+    setTimeout(() => {
+      const sections = document.querySelectorAll(".period-section");
+      let targetSection = null;
+      sections.forEach(section => {
+        const divider = section.querySelector(".section-divider");
+        if (divider && divider.textContent.toLowerCase() === focusInfo.period) {
+          targetSection = section;
+        }
+      });
+
+      if (targetSection) {
+        const titles = targetSection.querySelectorAll(".event-title");
+        if (titles[focusInfo.index]) {
+          const title = titles[focusInfo.index];
+          title.contentEditable = "true";
+          title.focus();
+          title.style.outline = "2px solid #00aaff";
+
+          const range = document.createRange();
+          range.selectNodeContents(title);
+          range.collapse(false);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+    }, 0);
+  }
+
   showPopup();
 }
+
+
+
 
 
 
