@@ -2684,12 +2684,11 @@ h2 {
     border-image-slice: 1;
 }
 
-/* .event-title[contenteditable="true"] {
-  outline: none;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  padding: 2px 4px;
-} */
+.event-title[contenteditable="true"] {
+  outline: none;      /* Removes the default focus outline */
+  border: none;       /* Removes any default border */
+}
+
 
 
 #calendar-pop-up {
@@ -2982,6 +2981,8 @@ h2 {
     align-items: center;
     width: 100%;
     /* border: 2px solid green; */
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
 .delete-dayTask,
