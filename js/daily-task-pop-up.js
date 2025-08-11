@@ -165,12 +165,147 @@ function adjustCalendarHeight() {
 }
 
 
-function showDayTasks(date, focusInfo = null) {
+
+
+function showDayTasks(d) {
+  // const target = e.target.closest('[data-full-date]');
+  // if (!target) return;
+  // console.log("call to showDayTask succesful from grid");
+  // const date = target.dataset.fullDate;
+  const date = d;
   popUpDate = date;
+  // console.log("POPUPDATE IS:", date);
   if (!date) return;
 
   const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
   const dayTasks = storedTasks[date];
+
+  // Split and pad manually
+  const [year, month, day] = date.split('-');
+  const paddedMonth = String(Number(month) + 1).padStart(2, '0');
+  const paddedDay = String(day).padStart(2, '0');
+  const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
+
+  const dateObj = new Date(fixedDate);
+
+  currentMonthValue = dateObj.getMonth();
+  currentYearValue = dateObj.getFullYear();
+
+  const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+  const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+
+  const dayDiff = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24));
+
+  let label;
+  let bottomLine;
+
+  if (dayDiff === 0) {
+    label = "Today";
+  } else if (dayDiff === -1) {
+    label = "Yesterday";
+  } else if (dayDiff === 1) {
+    label = "Tomorrow";
+  }
+
+  if (label) {
+    const shortWeekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' }); // "Mon"
+    const shortDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }); // "June 22"
+    bottomLine = `${shortWeekday}, ${shortDate}`;
+  } else {
+    label = dateObj.toLocaleDateString('en-US', { weekday: 'long' }); // "Monday"
+    bottomLine = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  document.getElementById("popup-date").innerHTML = `
+  <div class="weekday">${label}</div>
+  <div class="month-year">${bottomLine}</div>
+`;
+
+
+
+  const popupTasks = document.getElementById("popup-tasks");
+  popupTasks.innerHTML = "";
+
+  if (!dayTasks) {
+    const noTask = document.createElement("p");
+    noTask.textContent = "No tasks for this day.";
+    // noTask.className = "no-tasks-text"; 
+    popupTasks.appendChild(noTask);
+  } else {
+    const periods = ["morning", "afternoon", "evening"];
+
+    periods.forEach(period => {
+      const section = document.createElement("div");
+      section.classList.add("period-section");
+
+
+      const divider = document.createElement("div");
+      divider.className = "section-divider";
+      divider.textContent = period.charAt(0).toUpperCase() + period.slice(1);
+      section.appendChild(divider);
+
+
+      const periodTasks = dayTasks[period];
+      if (periodTasks && periodTasks.length > 0) {
+        periodTasks.forEach(({ task, color }) => {
+          const eventDiv = document.createElement("div");
+          eventDiv.className = "event";
+
+          const content = document.createElement("div");
+          content.className = "event-content";
+
+          const title = document.createElement("span");
+          title.className = "event-title";
+
+          const hasText = task && task.trim() !== "";
+          const hasColor = color && color.trim() !== "";
+
+          if (hasText && hasColor) {
+            content.style.borderLeft = `5px solid ${color}`;
+            title.textContent = task;
+          } else if (!hasText && hasColor) {
+            content.style.borderLeft = `5px solid ${color}`;
+            title.textContent = "No Title";
+          } else {
+            // Don't create an event, create a <p> instead
+            const noTask = document.createElement("p");
+            noTask.className = "no-tasks-text";
+            noTask.textContent = "No tasks for this period.";
+            section.appendChild(noTask);
+            return; // skip appending the .event
+          }
+
+
+          content.appendChild(title);
+          eventDiv.appendChild(content);
+          section.appendChild(eventDiv);
+        });
+      }
+      else {
+        const noTask = document.createElement("p");
+        noTask.className = "no-tasks-text";
+        // content.classList.add("no-tasks-for-this-period");
+        noTask.textContent = "No tasks for this period.";
+        section.appendChild(noTask);
+      }
+
+      popupTasks.appendChild(section);
+    });
+  }
+
+  showPopup();
+}
+
+
+// Assume dayTasksForEdit is a global or passed in variable representing the day's tasks copy for editing
+function showDayTasksEditable(date, focusInfo = null) {
+  console.log("rerendering");
+  // popUpDate = date;
+  if (!date) return;
+
+  // Use the copied tasks instead of fetching from localStorage
+  const dayTasks = dayTasksForEdit;
+  // console.log(dayTasks);
 
   // Fix date padding for JS Date
   const [year, month, day] = date.split('-');
@@ -279,109 +414,90 @@ keyboard_arrow_down
           eventDiv.appendChild(arrowUp);
           eventDiv.appendChild(arrowDown);
 
-          // DELETE button logic
+          // DELETE button logic updates dayTasksForEdit
           deleteBtn.addEventListener("click", (e) => {
-            if (!isEditing) return;
-            e.stopPropagation(); // stops bubbling
+            e.stopPropagation();
             e.preventDefault();
-            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-            if (storedTasks[date] && storedTasks[date][period]) {
-              storedTasks[date][period].splice(index, 1);
-              localStorage.setItem("tasks", JSON.stringify(storedTasks));
-              showDayTasks(date);
+            if (dayTasksForEdit && dayTasksForEdit[period]) {
+              dayTasksForEdit[period].splice(index, 1);
+              // Rerender with updated data
+              showDayTasksEditable(date);
             }
           });
 
-          // Save current task before insertion
+          // Save current task before insertion (on arrow clicks)
           function saveCurrentTask() {
             if (title.isContentEditable) {
               const newText = title.textContent.trim();
-              const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-              if (storedTasks[date] && storedTasks[date][period] && storedTasks[date][period][index]) {
-                storedTasks[date][period][index].task = newText;
-                localStorage.setItem("tasks", JSON.stringify(storedTasks));
+              if (dayTasksForEdit && dayTasksForEdit[period] && dayTasksForEdit[period][index]) {
+                dayTasksForEdit[period][index].task = newText;
               }
             }
           }
 
           arrowUp.addEventListener("click", (e) => {
-            // if (!isEditing) return;
-            console.log("Arrow Up clicked");
             e.stopPropagation();
             e.preventDefault();
             saveCurrentTask();
 
-            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-            if (!storedTasks[date]) storedTasks[date] = {};
-            if (!storedTasks[date][period]) storedTasks[date][period] = [];
+            if (!dayTasksForEdit[period]) dayTasksForEdit[period] = [];
+            dayTasksForEdit[period].splice(index, 0, { task: "No Title", color: "#007bff" });
 
-            storedTasks[date][period].splice(index, 0, { task: "No Title", color: "#007bff" });
-            localStorage.setItem("tasks", JSON.stringify(storedTasks));
-
-            showDayTasks(date, { period, index });
+            showDayTasksEditable(date, { period, index });
           });
 
           arrowDown.addEventListener("click", (e) => {
-            // if (!isEditing) return;
-            e.stopPropagation(); // stops bubbling
+            e.stopPropagation();
             e.preventDefault();
             saveCurrentTask();
 
-            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-            if (!storedTasks[date]) storedTasks[date] = {};
-            if (!storedTasks[date][period]) storedTasks[date][period] = [];
+            if (!dayTasksForEdit[period]) dayTasksForEdit[period] = [];
+            dayTasksForEdit[period].splice(index + 1, 0, { task: "No Title", color: "#007bff" });
 
-            storedTasks[date][period].splice(index + 1, 0, { task: "No Title", color: "#007bff" });
-            localStorage.setItem("tasks", JSON.stringify(storedTasks));
-
-            showDayTasks(date, { period, index: index + 1 });
+            showDayTasksEditable(date, { period, index: index + 1 });
           });
 
           title.addEventListener("click", () => {
-            // if (!isEditing) return;
-            arrowUp.style.display = "inline-block";
-            arrowDown.style.display = "inline-block";
-            // Save currently editing if different
+            // Remove outline from previously editing title's parent if any
             if (currentlyEditing && currentlyEditing !== title) {
-              currentlyEditing.contentEditable = "false";
-              currentlyEditing.style.outline = "none";
-              const oldPeriod = currentlyEditing.dataset.period;
-              const oldIndex = parseInt(currentlyEditing.dataset.index);
-              const oldDate = popUpDate;
-              const oldText = currentlyEditing.textContent.trim();
-              const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-              if (storedTasks[oldDate] && storedTasks[oldDate][oldPeriod] && storedTasks[oldDate][oldPeriod][oldIndex]) {
-                storedTasks[oldDate][oldPeriod][oldIndex].task = oldText;
-                localStorage.setItem("tasks", JSON.stringify(storedTasks));
+              const prevEventDiv = currentlyEditing.closest('.event');
+              if (prevEventDiv) {
+                prevEventDiv.style.outline = 'none';
               }
+              currentlyEditing.contentEditable = "false";
+            }
+
+            // Add outline to current .event parent
+            const eventDiv = title.closest('.event');
+            if (eventDiv) {
+              eventDiv.style.outline = '2px solid #00aaff';
             }
 
             currentlyEditing = title;
             title.contentEditable = "true";
             title.focus();
-            title.style.outline = "2px solid #00aaff";
 
+            // Select all text inside the title for highlight
             const range = document.createRange();
             range.selectNodeContents(title);
-            range.collapse(false);
             const sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
           });
 
           title.addEventListener("blur", () => {
-            if (!isEditing) return;
             title.contentEditable = "false";
-            title.style.outline = "none";
 
-            const newText = title.textContent.trim();
-            const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-            if (storedTasks[date] && storedTasks[date][period] && storedTasks[date][period][index]) {
-              storedTasks[date][period][index].task = newText;
-              localStorage.setItem("tasks", JSON.stringify(storedTasks));
+            // Remove outline from .event parent
+            const eventDiv = title.closest('.event');
+            if (eventDiv) {
+              eventDiv.style.outline = 'none';
             }
+
             currentlyEditing = null;
           });
+
+
 
           // Store period and index on title for saving on switching edits
           title.dataset.period = period;
@@ -392,72 +508,80 @@ keyboard_arrow_down
       } else {
         const noTask = document.createElement("p");
         noTask.className = "no-tasks-text";
-        noTask.textContent = "No tasks for this period.";
+        noTask.textContent = `Click to add new task for  ${period}`;
+
         noTask.style.cursor = "pointer";
         noTask.title = "Click to add a new task";
 
         noTask.addEventListener("click", () => {
-          if (!isEditing) return;
-          const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-          if (!storedTasks[date]) storedTasks[date] = {};
-          if (!storedTasks[date][period]) storedTasks[date][period] = [];
+          if (!dayTasksForEdit[period]) dayTasksForEdit[period] = [];
 
-          storedTasks[date][period].push({ task: "No Title", color: "#007bff" });
-          localStorage.setItem("tasks", JSON.stringify(storedTasks));
+          dayTasksForEdit[period].push({ task: "No Title", color: "#007bff" });
 
-          showDayTasks(date, { period, index: storedTasks[date][period].length - 1 });
+          showDayTasksEditable(date, { period, index: dayTasksForEdit[period].length - 1 });
         });
 
         section.appendChild(noTask);
       }
 
-
       popupTasks.appendChild(section);
     });
   }
 
-  // Focus newly created task if requested
-  if (focusInfo) {
-    setTimeout(() => {
-      const sections = document.querySelectorAll(".period-section");
-      let targetSection = null;
-      sections.forEach(section => {
-        const divider = section.querySelector(".section-divider");
-        if (divider && divider.textContent.toLowerCase() === focusInfo.period) {
-          targetSection = section;
-        }
-      });
-
-      if (targetSection) {
-        const titles = targetSection.querySelectorAll(".event-title");
-        if (titles[focusInfo.index]) {
-          const title = titles[focusInfo.index];
-          title.contentEditable = "true";
-          title.focus();
-          title.style.outline = "2px solid #00aaff";
-
-          const range = document.createRange();
-          range.selectNodeContents(title);
-          range.collapse(false);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
+// Focus newly created task if requested
+if (focusInfo) {
+  setTimeout(() => {
+    const sections = document.querySelectorAll(".period-section");
+    let targetSection = null;
+    sections.forEach(section => {
+      const divider = section.querySelector(".section-divider");
+      if (divider && divider.textContent.toLowerCase() === focusInfo.period) {
+        targetSection = section;
       }
-    }, 0);
-  }
+    });
 
-  if(isEditing){
-        document.querySelectorAll(".event-content").forEach(el => {
+    if (targetSection) {
+      const titles = targetSection.querySelectorAll(".event-title");
+      if (titles[focusInfo.index]) {
+        const title = titles[focusInfo.index];
+        const eventDiv = title.closest('.event');
+
+        // Remove outline from any previously editing event
+        document.querySelectorAll('.event').forEach(ev => ev.style.outline = 'none');
+
+        // Add outline to newly focused event
+        if (eventDiv) {
+          eventDiv.style.outline = '2px solid #00aaff';
+        }
+
+        title.contentEditable = "true";
+        title.focus();
+
+        // Select all text inside title
+        const range = document.createRange();
+        range.selectNodeContents(title);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  }, 0);
+}
+
+
+
+  // Show editing UI styles
+  if (isEditing) {
+    document.querySelectorAll(".event-content").forEach(el => {
       el.style.marginLeft = "0";
       el.style.marginRight = "0";
     });
 
     document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
-      el.style.display = "inline-flex"; // or "block" depending on layout
+      el.style.display = "inline-flex";
     });
 
-    document.querySelectorAll(".event").forEach(el =>{
+    document.querySelectorAll(".event").forEach(el => {
       el.style.border = "1px solid #ccc";
       el.style.borderRadius = "5px";
     });
@@ -465,9 +589,6 @@ keyboard_arrow_down
 
   showPopup();
 }
-
-
-
 
 
 
@@ -519,11 +640,11 @@ function hidePopup() {
 
   isEditing = false;
 
-  const icon = toggleBtn.querySelector('.material-symbols-outlined');
-  const label = toggleBtn.querySelector('.calendar-icon-label');
-  icon.textContent = 'note_alt';
+  const icon = toggleEditBtn.querySelector('.material-symbols-outlined');
+  const label = toggleEditBtn.querySelector('.calendar-icon-label');
+  icon.textContent = 'edit_note';
   icon.style.color = '';
-  label.textContent = 'Rearrange';
+  label.textContent = 'Edit';
   label.style.color = '';
 }
 

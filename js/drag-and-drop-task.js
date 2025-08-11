@@ -227,6 +227,3 @@
 // });
 
 
-document.addEventListener('click', (event) => {
-  console.log('Clicked element:', event.target);
-});

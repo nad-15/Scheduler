@@ -10,6 +10,8 @@ const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 const yearContainer = document.getElementById('year-container');
 let swipeEnabledPopUp = true;
 
+
+let dayTasksForEdit = null;
 let popupTimeout;
 let lastClickedCell = null;
 
@@ -524,6 +526,8 @@ function handleTouchMovePopUp(e) {
 }
 
 function handleTouchEndPopUp() {
+  saveTaskOrderToTemp();
+  showDayTasksEditable(popUpDate);
   endDraggingPopUp();
 }
 function addDragListeners() {
@@ -617,6 +621,11 @@ toggleEditBtn.addEventListener('click', () => {
     label.style.color = 'red';     // change text to "Save"
     addDragListeners();
 
+        const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+    dayTasksForEdit = storedTasks[popUpDate] ? JSON.parse(JSON.stringify(storedTasks[popUpDate])) : {};
+showDayTasksEditable(popUpDate);
+
+
     document.querySelectorAll(".event-content").forEach(el => {
       el.style.marginLeft = "0";
       el.style.marginRight = "0";
@@ -648,6 +657,8 @@ toggleEditBtn.addEventListener('click', () => {
     if (popUpDate) {
       saveTaskOrderToLocalStorage(popUpDate);
     }
+
+    showDayTasks(popUpDate);
 
     document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
     el.style.display = "none";
@@ -701,6 +712,31 @@ function saveTaskOrderToLocalStorage(popUpDate) {
 
   localStorage.setItem("tasks", JSON.stringify(storedTasks));
 }
+
+
+function saveTaskOrderToTemp() {
+  if (!dayTasksForEdit) return;
+
+  const container = document.getElementById("popup-tasks");
+
+  container.querySelectorAll(".period-section").forEach(section => {
+    const period = section.querySelector(".section-divider")?.textContent.toLowerCase();
+    const events = Array.from(section.querySelectorAll(".event"));
+
+    dayTasksForEdit[period] = events.map(event => {
+      let task = event.querySelector(".event-title")?.textContent.trim();
+      const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
+
+      // Normalize placeholder task names
+      if (task === "No Title" || task === "No tasks for this period.") {
+        task = "";
+      }
+
+      return { task, color: rgbToHex(color) };
+    });
+  });
+}
+
 
 function rgbToHex(rgb) {
   const result = rgb.match(/\d+/g).map(n => (+n).toString(16).padStart(2, "0"));

@@ -2685,8 +2685,11 @@ h2 {
 }
 
 .event-title[contenteditable="true"] {
-  outline: none;      /* Removes the default focus outline */
-  border: none;       /* Removes any default border */
+    outline: none;
+    border: none;
+    text-decoration: none;
+    -webkit-text-decoration-skip: ink;
+    caret-color: auto;
 }
 
 
@@ -2954,27 +2957,29 @@ h2 {
 
 .arrow-up-dayTask,
 .arrow-down-dayTask {
-  background: none;
-  border: none;
-  padding: 4px;
-  font-size: 20px;
-  cursor: pointer;
-  color: black;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    background: none;
+    border: none;
+    padding: 4px;
+    font-size: 20px;
+    cursor: pointer;
+    color: black;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .delete-dayTask {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #d9534f; /* red */
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #d9534f;
+    /* red */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .event {
     display: flex;
     justify-content: center;
@@ -2988,7 +2993,7 @@ h2 {
 .delete-dayTask,
 .arrow-up-dayTask,
 .arrow-down-dayTask {
-  display: none;
+    display: none;
 }
 
 
