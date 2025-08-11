@@ -372,12 +372,51 @@ function showDayTasksEditable(date, focusInfo = null) {
           const eventDiv = document.createElement("div");
           eventDiv.className = "event";
 
-          // Delete button on left
-          const deleteBtn = document.createElement("button");
-          deleteBtn.classList.add("delete-dayTask");
-          deleteBtn.title = "Delete task";
-          deleteBtn.style.cursor = "pointer";
-          deleteBtn.innerHTML = `<span class="material-symbols-outlined">delete_forever</span>`;
+          // Replace this:
+          // const deleteBtn = document.createElement("button");
+          // deleteBtn.classList.add("delete-dayTask");
+          // deleteBtn.title = "Delete task";
+          // deleteBtn.style.cursor = "pointer";
+          // deleteBtn.innerHTML = `<span class="material-symbols-outlined">delete_forever</span>`;
+
+          // WITH THIS:
+          const selectBtn = document.createElement("button");
+          selectBtn.classList.add("select-dayTask");
+          selectBtn.title = "Select task";
+          selectBtn.style.cursor = "pointer";
+
+          const taskId = `${period}-${index}`; // Unique ID for tracking selection
+
+          // Initialize button state based on selectedTasksPopup
+          if (selectedTasksPopup.includes(taskId)) {
+            selectBtn.innerHTML = `<span class="material-symbols-outlined">
+check_box
+</span>`;
+            eventDiv.classList.add("selected-task-popup");
+          } else {
+            selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+            eventDiv.classList.remove("selected-task-popup");
+          }
+
+          // Toggle selection on click
+          selectBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            const idx = selectedTasksPopup.indexOf(taskId);
+            if (idx === -1) {
+              selectedTasksPopup.push(taskId);
+              selectBtn.innerHTML = `<span class="material-symbols-outlined">
+check_box
+</span>`;
+              eventDiv.classList.add("selected-task-popup");
+            } else {
+              selectedTasksPopup.splice(idx, 1);
+              selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+              eventDiv.classList.remove("selected-task-popup");
+            }
+          });
+
 
           // event-content with task title and colored left border
           const content = document.createElement("div");
@@ -409,21 +448,23 @@ keyboard_arrow_down
           content.appendChild(title);
 
           // Append all inside eventDiv
-          eventDiv.appendChild(deleteBtn);
+          // eventDiv.appendChild(deleteBtn);
+          eventDiv.appendChild(selectBtn);
+
           eventDiv.appendChild(content);
           eventDiv.appendChild(arrowUp);
           eventDiv.appendChild(arrowDown);
 
           // DELETE button logic updates dayTasksForEdit
-          deleteBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            if (dayTasksForEdit && dayTasksForEdit[period]) {
-              dayTasksForEdit[period].splice(index, 1);
-              // Rerender with updated data
-              showDayTasksEditable(date);
-            }
-          });
+          // deleteBtn.addEventListener("click", (e) => {
+          //   e.stopPropagation();
+          //   e.preventDefault();
+          //   if (dayTasksForEdit && dayTasksForEdit[period]) {
+          //     dayTasksForEdit[period].splice(index, 1);
+          //     // Rerender with updated data
+          //     showDayTasksEditable(date);
+          //   }
+          // });
 
           // Save current task before insertion (on arrow clicks)
           function saveCurrentTask() {
@@ -528,45 +569,45 @@ keyboard_arrow_down
     });
   }
 
-// Focus newly created task if requested
-if (focusInfo) {
-  setTimeout(() => {
-    const sections = document.querySelectorAll(".period-section");
-    let targetSection = null;
-    sections.forEach(section => {
-      const divider = section.querySelector(".section-divider");
-      if (divider && divider.textContent.toLowerCase() === focusInfo.period) {
-        targetSection = section;
-      }
-    });
-
-    if (targetSection) {
-      const titles = targetSection.querySelectorAll(".event-title");
-      if (titles[focusInfo.index]) {
-        const title = titles[focusInfo.index];
-        const eventDiv = title.closest('.event');
-
-        // Remove outline from any previously editing event
-        document.querySelectorAll('.event').forEach(ev => ev.style.outline = 'none');
-
-        // Add outline to newly focused event
-        if (eventDiv) {
-          eventDiv.style.outline = '2px solid #00aaff';
+  // Focus newly created task if requested
+  if (focusInfo) {
+    setTimeout(() => {
+      const sections = document.querySelectorAll(".period-section");
+      let targetSection = null;
+      sections.forEach(section => {
+        const divider = section.querySelector(".section-divider");
+        if (divider && divider.textContent.toLowerCase() === focusInfo.period) {
+          targetSection = section;
         }
+      });
 
-        title.contentEditable = "true";
-        title.focus();
+      if (targetSection) {
+        const titles = targetSection.querySelectorAll(".event-title");
+        if (titles[focusInfo.index]) {
+          const title = titles[focusInfo.index];
+          const eventDiv = title.closest('.event');
 
-        // Select all text inside title
-        const range = document.createRange();
-        range.selectNodeContents(title);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
+          // Remove outline from any previously editing event
+          document.querySelectorAll('.event').forEach(ev => ev.style.outline = 'none');
+
+          // Add outline to newly focused event
+          if (eventDiv) {
+            eventDiv.style.outline = '2px solid #00aaff';
+          }
+
+          title.contentEditable = "true";
+          title.focus();
+
+          // Select all text inside title
+          const range = document.createRange();
+          range.selectNodeContents(title);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
       }
-    }
-  }, 0);
-}
+    }, 0);
+  }
 
 
 

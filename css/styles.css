@@ -2694,6 +2694,8 @@ h2 {
 
 
 
+
+
 #calendar-pop-up {
     /* box-sizing: border-box; */
     display: none;
@@ -2956,7 +2958,7 @@ h2 {
 
 
 .arrow-up-dayTask,
-.arrow-down-dayTask {
+.arrow-down-dayTask, .select-dayTask {
     background: none;
     border: none;
     padding: 4px;
@@ -2968,17 +2970,12 @@ h2 {
     justify-content: center;
 }
 
-.delete-dayTask {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #d9534f;
-    /* red */
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.selected-task-popup {
+  outline: 2px solid #00aaff;
+  background-color: rgba(0, 170, 255, 0.1);
 }
+
+
 
 .event {
     display: flex;
@@ -2990,7 +2987,7 @@ h2 {
     margin-bottom: 2px;
 }
 
-.delete-dayTask,
+
 .arrow-up-dayTask,
 .arrow-down-dayTask {
     display: none;
@@ -3058,6 +3055,15 @@ h2 {
 
 }
 
+
+.edit-mode.hidden, .normal-mode.hidden {
+    display: none;
+}
+
+
+
+
+
 .pop-up-calview-navi {
     box-sizing: border-box;
     /* position: absolute;
@@ -3074,6 +3080,7 @@ h2 {
     /* background-color: red; */
 
 }
+
 
 .calendar-icon-button {
     flex: 1;

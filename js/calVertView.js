@@ -10,6 +10,8 @@ const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 const yearContainer = document.getElementById('year-container');
 let swipeEnabledPopUp = true;
 
+let selectedTasksPopup = [];
+
 
 let dayTasksForEdit = null;
 let popupTimeout;
@@ -307,7 +309,8 @@ nextMonthBtnVertView.addEventListener("click", () => {
 
 
 
-// document.getElementById("closePopupBtn").addEventListener("click", () => {
+// document.getElementById("
+// ").addEventListener("click", () => {
 //   document.getElementById("calendar-pop-up").style.display = "none";
 //   document.getElementById("backdrop").style.display = "none";
 // });
@@ -608,22 +611,28 @@ const toggleEditBtn = document.getElementById('toggle-edit');
 let isEditing = false;
 
 toggleEditBtn.addEventListener('click', () => {
+
   isEditing = !isEditing;
 
+  const normalButtons = document.querySelectorAll('.normal-mode');
+  const editButtons = document.querySelectorAll('.edit-mode');
   const icon = toggleEditBtn.querySelector('.material-symbols-outlined');
   const label = toggleEditBtn.querySelector('.calendar-icon-label');
 
 
   if (isEditing) {
+    
+  normalButtons.forEach(btn => btn.classList.add('hidden'));
+  editButtons.forEach(btn => btn.classList.remove('hidden'));
     icon.textContent = 'save_as';
     icon.style.color = 'red';     // change icon to "save_as"
     label.textContent = 'Save';
     label.style.color = 'red';     // change text to "Save"
     addDragListeners();
 
-        const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
     dayTasksForEdit = storedTasks[popUpDate] ? JSON.parse(JSON.stringify(storedTasks[popUpDate])) : {};
-showDayTasksEditable(popUpDate);
+    showDayTasksEditable(popUpDate);
 
 
     document.querySelectorAll(".event-content").forEach(el => {
@@ -635,7 +644,7 @@ showDayTasksEditable(popUpDate);
       el.style.display = "inline-flex"; // or "block" depending on layout
     });
 
-    document.querySelectorAll(".event").forEach(el =>{
+    document.querySelectorAll(".event").forEach(el => {
       el.style.border = "1px solid #ccc";
       el.style.borderRadius = "5px";
     });
@@ -644,7 +653,12 @@ showDayTasksEditable(popUpDate);
 
 
   } else {
+
+    
+  normalButtons.forEach(btn => btn.classList.remove('hidden'));
+  editButtons.forEach(btn => btn.classList.add('hidden'));
     // icon.textContent = 'note_alt';
+    dayTasksForEdit = null;
     icon.textContent = 'edit_note';
 
     icon.style.color = '';   // revert back to edit icon
@@ -661,12 +675,12 @@ showDayTasksEditable(popUpDate);
     showDayTasks(popUpDate);
 
     document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
-    el.style.display = "none";
+      el.style.display = "none";
 
-        document.querySelectorAll(".event").forEach(el =>{
-      el.style.border = "none";
+      document.querySelectorAll(".event").forEach(el => {
+        el.style.border = "none";
+      });
     });
-});
 
     document.querySelectorAll(".event-content").forEach(el => {
       el.style.marginLeft = "20px";
@@ -674,10 +688,20 @@ showDayTasksEditable(popUpDate);
     });
 
   }
+
+
 });
 
 
-
+document.getElementById('cancel-btn').addEventListener('click', () => {
+    const normalButtons = document.querySelectorAll('.normal-mode');
+  const editButtons = document.querySelectorAll('.edit-mode');
+  editButtons.forEach(btn => btn.classList.add('hidden'));
+  normalButtons.forEach(btn => btn.classList.remove('hidden'));
+  console.log("cancel button clicked");
+  document.getElementById("closePopupBtn").click();
+  showDayTasks(popUpDate);
+});
 
 function saveTaskOrderToLocalStorage(popUpDate) {
 

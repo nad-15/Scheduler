@@ -688,9 +688,39 @@
         </div>
 
         <!-- navigation button at calendar pop up -->
+
         <div class="pop-up-calview-navi">
+            <!-- Edit Mode -->
+            <button class="calendar-icon-button edit-mode hidden" title="Undo" id="undo-btn">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined">undo</span>
+                    <span class="calendar-icon-label">Undo</span>
+                </div>
+            </button>
+
+            <button class="calendar-icon-button edit-mode hidden" title="Redo" id="redo-btn">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined">redo</span>
+                    <span class="calendar-icon-label">Redo</span>
+                </div>
+            </button>
+
+            <button class="calendar-icon-button edit-mode hidden" title="Delete Selected" id="delete-btn">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined">delete</span>
+                    <span class="calendar-icon-label">Delete</span>
+                </div>
+            </button>
+
+            <button class="calendar-icon-button edit-mode hidden" title="Cancel Edit" id="cancel-btn">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined">close</span>
+                    <span class="calendar-icon-label">Cancel</span>
+                </div>
+            </button>
+                    <!-- Normal Mode -->
             <!-- Month View -->
-            <button class="calendar-icon-button" title="Month View">
+            <button class="calendar-icon-button normal-mode" title="Month View">
                 <div class="calendar-icon-wrapper">
                     <span class="material-symbols-outlined" id="calendar-icon-vertview">calendar_month</span>
                     <span class="calendar-icon-label">Month View</span>
@@ -698,54 +728,38 @@
             </button>
 
             <!-- List View -->
-            <button class="calendar-icon-button" title="List View">
+            <button class="calendar-icon-button normal-mode" title="List View">
                 <div class="calendar-icon-wrapper">
                     <span class="material-symbols-outlined" id="calendar-icon-horview">event_note</span>
                     <span class="calendar-icon-label">List View</span>
                 </div>
             </button>
 
-            <!-- Today Button -->
-            <button class="calendar-icon-button" title="Today" id="go-to-today">
+            <!-- Today -->
+            <button class="calendar-icon-button normal-mode" title="Today" id="go-to-today">
                 <div class="calendar-icon-wrapper">
                     <span class="material-symbols-outlined" id="calendar-icon-today">today</span>
                     <span class="calendar-icon-label">Today</span>
                 </div>
             </button>
 
-            <!-- Copy Button -->
-            <button class="calendar-icon-button" title="Copy Tasks" id="copy-tasks-btn">
+            <!-- Copy -->
+            <button class="calendar-icon-button normal-mode" title="Copy Tasks" id="copy-tasks-btn">
                 <div class="calendar-icon-wrapper">
                     <span class="material-symbols-outlined">content_copy</span>
                     <span class="calendar-icon-label">Copy</span>
                 </div>
             </button>
 
-
-            <!-- Rearrange Button -->
+            <!-- Edit -->
             <button class="calendar-icon-button" title="Edit Tasks" id="toggle-edit">
-                <div class="calendar-icon-wrapper">
-                    <!-- <span class="material-symbols-outlined" id="calendar-icon-edit">note_alt</span> -->
-                     <span class="material-symbols-outlined" id="calendar-icon-superedit">edit_note</span>
-                    <span class="calendar-icon-label">Edit</span>
-                </div>
-            </button>
-
-
-            <!-- Edit button -->
-            <!-- <button class="calendar-icon-button" title="superEdit Tasks" id="toggle-superedit">
                 <div class="calendar-icon-wrapper">
                     <span class="material-symbols-outlined" id="calendar-icon-superedit">edit_note</span>
                     <span class="calendar-icon-label">Edit</span>
                 </div>
-            </button> -->
+            </button>
+
         </div>
-
-
-        <!-- <button id="toggle-edit" class="floating-edit-btn">
-      <span class="material-icons">edit</span>
-    </button> -->
-
 
     </div>
 
