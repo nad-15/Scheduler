@@ -165,7 +165,7 @@ function adjustCalendarHeight() {
 }
 
 
-function showDayTasks(date, focusInfo) {
+function showDayTasks(date, focusInfo = null) {
   popUpDate = date;
   if (!date) return;
 
@@ -281,7 +281,9 @@ keyboard_arrow_down
 
           // DELETE button logic
           deleteBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
+            if (!isEditing) return;
+            e.stopPropagation(); // stops bubbling
+            e.preventDefault();
             const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
             if (storedTasks[date] && storedTasks[date][period]) {
               storedTasks[date][period].splice(index, 1);
@@ -303,7 +305,10 @@ keyboard_arrow_down
           }
 
           arrowUp.addEventListener("click", (e) => {
+            // if (!isEditing) return;
+            console.log("Arrow Up clicked");
             e.stopPropagation();
+            e.preventDefault();
             saveCurrentTask();
 
             const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
@@ -317,7 +322,9 @@ keyboard_arrow_down
           });
 
           arrowDown.addEventListener("click", (e) => {
-            e.stopPropagation();
+            // if (!isEditing) return;
+            e.stopPropagation(); // stops bubbling
+            e.preventDefault();
             saveCurrentTask();
 
             const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
@@ -331,6 +338,7 @@ keyboard_arrow_down
           });
 
           title.addEventListener("click", () => {
+            // if (!isEditing) return;
             arrowUp.style.display = "inline-block";
             arrowDown.style.display = "inline-block";
             // Save currently editing if different
@@ -362,6 +370,7 @@ keyboard_arrow_down
           });
 
           title.addEventListener("blur", () => {
+            if (!isEditing) return;
             title.contentEditable = "false";
             title.style.outline = "none";
 
@@ -380,26 +389,27 @@ keyboard_arrow_down
 
           section.appendChild(eventDiv);
         });
-} else {
-  const noTask = document.createElement("p");
-  noTask.className = "no-tasks-text";
-  noTask.textContent = "No tasks for this period.";
-  noTask.style.cursor = "pointer";
-  noTask.title = "Click to add a new task";
+      } else {
+        const noTask = document.createElement("p");
+        noTask.className = "no-tasks-text";
+        noTask.textContent = "No tasks for this period.";
+        noTask.style.cursor = "pointer";
+        noTask.title = "Click to add a new task";
 
-  noTask.addEventListener("click", () => {
-    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-    if (!storedTasks[date]) storedTasks[date] = {};
-    if (!storedTasks[date][period]) storedTasks[date][period] = [];
+        noTask.addEventListener("click", () => {
+          if (!isEditing) return;
+          const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+          if (!storedTasks[date]) storedTasks[date] = {};
+          if (!storedTasks[date][period]) storedTasks[date][period] = [];
 
-    storedTasks[date][period].push({ task: "No Title", color: "#007bff" });
-    localStorage.setItem("tasks", JSON.stringify(storedTasks));
+          storedTasks[date][period].push({ task: "No Title", color: "#007bff" });
+          localStorage.setItem("tasks", JSON.stringify(storedTasks));
 
-    showDayTasks(date, { period, index: storedTasks[date][period].length - 1 });
-  });
+          showDayTasks(date, { period, index: storedTasks[date][period].length - 1 });
+        });
 
-  section.appendChild(noTask);
-}
+        section.appendChild(noTask);
+      }
 
 
       popupTasks.appendChild(section);
@@ -435,6 +445,22 @@ keyboard_arrow_down
         }
       }
     }, 0);
+  }
+
+  if(isEditing){
+        document.querySelectorAll(".event-content").forEach(el => {
+      el.style.marginLeft = "0";
+      el.style.marginRight = "0";
+    });
+
+    document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+      el.style.display = "inline-flex"; // or "block" depending on layout
+    });
+
+    document.querySelectorAll(".event").forEach(el =>{
+      el.style.border = "1px solid #ccc";
+      el.style.borderRadius = "5px";
+    });
   }
 
   showPopup();

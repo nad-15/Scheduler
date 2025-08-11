@@ -338,7 +338,7 @@ const MAX_DRAG_DISTANCE = 30;
 function startDraggingPopUp(x, y, target) {
   if (ghost && ghost.parentNode) {
     console.log("GHOST REMOVE");
-    // ghost.remove();
+    ghost.remove();
   }
   draggedItem = target;
 
@@ -538,10 +538,10 @@ function addDragListeners() {
   goTodayBtn.classList.add(`disabled-btn`);
 
 
-  document.addEventListener('pointerdown', handlePointerDownPopUp);
-  document.addEventListener('pointermove', handlePointerMovePopUp);
-  document.addEventListener('pointerup', handlePointerUpPopUp);
-  document.addEventListener('pointercancel', endDraggingPopUp);
+  // document.addEventListener('pointerdown', handlePointerDownPopUp);
+  // document.addEventListener('pointermove', handlePointerMovePopUp);
+  // document.addEventListener('pointerup', handlePointerUpPopUp);
+  // document.addEventListener('pointercancel', endDraggingPopUp);
 
   document.addEventListener('touchstart', handleTouchStartPopUp, { passive: false });
   document.addEventListener('touchmove', handleTouchMovePopUp, { passive: false });
@@ -561,10 +561,10 @@ function removeDragListeners() {
   goTodayBtn.classList.remove(`disabled-btn`);
 
 
-  document.removeEventListener('pointerdown', handlePointerDownPopUp);
-  document.removeEventListener('pointermove', handlePointerMovePopUp);
-  document.removeEventListener('pointerup', handlePointerUpPopUp);
-  document.removeEventListener('pointercancel', endDraggingPopUp);
+  // document.removeEventListener('pointerdown', handlePointerDownPopUp);
+  // document.removeEventListener('pointermove', handlePointerMovePopUp);
+  // document.removeEventListener('pointerup', handlePointerUpPopUp);
+  // document.removeEventListener('pointercancel', endDraggingPopUp);
 
   document.removeEventListener('touchstart', handleTouchStartPopUp, { passive: false });
   document.removeEventListener('touchmove', handleTouchMovePopUp, { passive: false });
@@ -577,7 +577,7 @@ function applyBordersToEventContent() {
   document.querySelectorAll('.event-content').forEach(content => {
     const borderLeftColor = getComputedStyle(content).borderLeftColor;
 
-    content.style.border = `1px solid ${borderLeftColor}`;
+    // content.style.border = `1px solid ${borderLeftColor}`;
     content.style.borderLeftWidth = '5px'; // keep the left border thick
   });
 }
@@ -600,14 +600,14 @@ document.getElementById('go-to-today').addEventListener('click', () => {
 
 
 
-const toggleBtn = document.getElementById('toggle-edit');
+const toggleEditBtn = document.getElementById('toggle-edit');
 let isEditing = false;
 
-toggleBtn.addEventListener('click', () => {
+toggleEditBtn.addEventListener('click', () => {
   isEditing = !isEditing;
 
-  const icon = toggleBtn.querySelector('.material-symbols-outlined');
-  const label = toggleBtn.querySelector('.calendar-icon-label');
+  const icon = toggleEditBtn.querySelector('.material-symbols-outlined');
+  const label = toggleEditBtn.querySelector('.calendar-icon-label');
 
 
   if (isEditing) {
@@ -617,11 +617,29 @@ toggleBtn.addEventListener('click', () => {
     label.style.color = 'red';     // change text to "Save"
     addDragListeners();
 
+    document.querySelectorAll(".event-content").forEach(el => {
+      el.style.marginLeft = "0";
+      el.style.marginRight = "0";
+    });
+
+    document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+      el.style.display = "inline-flex"; // or "block" depending on layout
+    });
+
+    document.querySelectorAll(".event").forEach(el =>{
+      el.style.border = "1px solid #ccc";
+      el.style.borderRadius = "5px";
+    });
+
+
+
 
   } else {
-    icon.textContent = 'note_alt';
+    // icon.textContent = 'note_alt';
+    icon.textContent = 'edit_note';
+
     icon.style.color = '';   // revert back to edit icon
-    label.textContent = 'Rearrange';
+    label.textContent = 'Edit';
     label.style.color = '';   // revert back to edit label
     endDraggingPopUp();
 
@@ -630,6 +648,20 @@ toggleBtn.addEventListener('click', () => {
     if (popUpDate) {
       saveTaskOrderToLocalStorage(popUpDate);
     }
+
+    document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+    el.style.display = "none";
+
+        document.querySelectorAll(".event").forEach(el =>{
+      el.style.border = "none";
+    });
+});
+
+    document.querySelectorAll(".event-content").forEach(el => {
+      el.style.marginLeft = "20px";
+      el.style.marginRight = "20px";
+    });
+
   }
 });
 

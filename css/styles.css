@@ -2960,7 +2960,7 @@ h2 {
   padding: 4px;
   font-size: 20px;
   cursor: pointer;
-  color: #007bff;
+  color: black;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2984,11 +2984,11 @@ h2 {
     /* border: 2px solid green; */
 }
 
-/* .delete-dayTask,
+.delete-dayTask,
 .arrow-up-dayTask,
 .arrow-down-dayTask {
   display: none;
-} */
+}
 
 
 .event-content {
@@ -2997,8 +2997,8 @@ h2 {
     width: 100%;
     /* 1rem */
     padding: 5px 10px;
-    /* margin-left: 20px;
-    margin-right: 20px; */
+    margin-left: 20px;
+    margin-right: 20px;
     margin-bottom: 5px;
     margin-top: 5px;
 
@@ -3027,6 +3027,8 @@ h2 {
     /* For Firefox */
     -ms-user-select: none;
     /* For older IE */
+
+    width: 100%;
 }
 
 .event-content.no-tasks-for-this-period {
