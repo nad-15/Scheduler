@@ -566,6 +566,10 @@ function handleTouchStartPopUp(e) {
 
   dragTimeout = setTimeout(() => {
     canStartDrag = true;
+
+        // Save pre-drag state to undo only when drag really starts
+    undoStack.push(saveTaskOrderToTemp());
+    redoStack.length = 0; // Clear redo
   }, 300);
 }
 
@@ -758,7 +762,8 @@ function redo() {
   if (redoStack.length === 0) return;
 
   // Save current state to undo stack before redoing
-  undoStack.push(deepClone(dayTasksForEdit));
+undoStack.push(saveTaskOrderToTemp());
+
 
   // Restore next state
   const nextState = redoStack.pop();
@@ -786,7 +791,8 @@ function undo() {
   if (undoStack.length === 0) return;
 
   // Save current state to redo stack before undoing
-  redoStack.push(deepClone(dayTasksForEdit));
+redoStack.push(saveTaskOrderToTemp());
+
 
   // Restore previous state
   const previousState = undoStack.pop();
@@ -887,23 +893,29 @@ function saveTaskOrderToTemp() {
 
   container.querySelectorAll(".period-section").forEach(section => {
     const period = section.querySelector(".section-divider")?.textContent.toLowerCase();
+
+    // Select only real events, ignore placeholders like <p class="no-tasks-text">
     const events = Array.from(section.querySelectorAll(".event"));
 
-    snapshot[period] = events.map(event => {
-      let task = event.querySelector(".event-title")?.textContent.trim();
-      const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
+    // If no events, save empty array; else map tasks with colors
+    snapshot[period] = events.length === 0
+      ? []
+      : events.map(event => {
+          let task = event.querySelector(".event-title")?.textContent.trim() || "";
+          const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
 
-      // Normalize placeholder task names
-      if (task === "No Title" || task === "No tasks for this period.") {
-        task = "";
-      }
+          // Normalize placeholder task names
+          if (task === "No Title" || task === "No tasks for this period.") {
+            task = "";
+          }
 
-      return { task, color: rgbToHex(color) };
-    });
+          return { task, color: rgbToHex(color) };
+        });
   });
 
   return snapshot;
 }
+
 
 
 

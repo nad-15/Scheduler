@@ -398,6 +398,9 @@ function showDayTasksEditable(date, focusInfo = null) {
         noTask.title = "Click to add a new task";
 
         noTask.addEventListener("click", () => {
+          const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+          undoStack.push(currentState);
+          redoStack.length = 0; // clear redo stack because new action happened
           // const clickToAddNewTaskParagraph = section.querySelector()
           // existingNoTask.remove();
           const newEvent = createEventElement({
@@ -528,6 +531,10 @@ const handlePopupClick = (e) => {
   // Arrow Up button clicked?
   const arrowUp = target.closest(".arrow-up-dayTask");
   if (arrowUp && popupTasks.contains(arrowUp)) {
+
+    const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+    undoStack.push(currentState);
+    redoStack.length = 0;
     e.stopPropagation();
     e.preventDefault();
 
@@ -560,6 +567,10 @@ const handlePopupClick = (e) => {
   // Arrow Down button clicked?
   const arrowDown = target.closest(".arrow-down-dayTask");
   if (arrowDown && popupTasks.contains(arrowDown)) {
+
+    const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+    undoStack.push(currentState);
+    redoStack.length = 0;
 
     e.stopPropagation();
     e.preventDefault();
@@ -743,6 +754,15 @@ function showPopup() {
 }
 
 function hidePopup() {
+  if (isEditing) {
+    const confirmSave = confirm("Do you want to save changes before closing?");
+    if (confirmSave) {
+      document.getElementById("toggle-edit").click(); // trigger save
+    }
+  }
+
+
+
 
   const popup = document.getElementById("calendar-pop-up");
   const backdrop = document.getElementById("backdrop");
