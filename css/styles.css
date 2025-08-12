@@ -2971,7 +2971,7 @@ h2 {
 }
 
 .selected-task-popup {
-  outline: 2px solid #00aaff;
+  /* outline: 2px solid #00aaff; */
   background-color: rgba(0, 170, 255, 0.1);
 }
 

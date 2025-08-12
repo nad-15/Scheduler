@@ -1,3 +1,13 @@
+const popupTasks = document.getElementById("popup-tasks");
+
+const todayDateObjScroll = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
+const nowTodayElementScroll = new Date(todayDateObjScroll);
+
+const yearTodayElementScroll = nowTodayElementScroll.getFullYear();
+const monthTodayElementScroll = nowTodayElementScroll.getMonth();
+const dayTodayElementScroll = nowTodayElementScroll.getDate();
+
+const todayDateScroll = `${yearTodayElementScroll}-${monthTodayElementScroll}-${dayTodayElementScroll}`;
 
 // Call initially and on resize
 adjustCalendarHeight();
@@ -93,18 +103,7 @@ yearContainer.addEventListener('click', (e) => {
 });
 
 
-
-const todayDateObjScroll = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
-const nowTodayElementScroll = new Date(todayDateObjScroll);
-
-const yearTodayElementScroll = nowTodayElementScroll.getFullYear();
-const monthTodayElementScroll = nowTodayElementScroll.getMonth();
-const dayTodayElementScroll = nowTodayElementScroll.getDate();
-
-const todayDateScroll = `${yearTodayElementScroll}-${monthTodayElementScroll}-${dayTodayElementScroll}`;
-
 todayScroll(todayDateScroll);
-
 function todayScroll(todayDate) {
 
   // console.log('Built todayDate:', todayDate);
@@ -301,200 +300,11 @@ function showDayTasks(d) {
 function showDayTasksEditable(date, focusInfo = null) {
   console.log("rerendering");
 
-  console.log("Clicked element:", event.currentTarget); // The element that the listener is attached to
-  console.log("Clicked element (actual target):", event.target); // The actual element clicked (might be child)
+  // console.log("Clicked element:", event.currentTarget); // The element that the listener is attached to
+  // console.log("Clicked element (actual target):", event.target); // The actual element clicked (might be child)
 
-
-  // popUpDate = date;
   if (!date) return;
-
-  // Use the copied tasks instead of fetching from localStorage
   const dayTasks = dayTasksForEdit;
-  // console.log(dayTasks);
-
-  // // Fix date padding for JS Date
-  // const [year, month, day] = date.split('-');
-  // const paddedMonth = String(Number(month) + 1).padStart(2, '0');
-  // const paddedDay = String(day).padStart(2, '0');
-  // const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
-
-  // const dateObj = new Date(fixedDate);
-  // currentMonthValue = dateObj.getMonth();
-  // currentYearValue = dateObj.getFullYear();
-
-  // const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
-  // const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-  // const dayDiff = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24));
-
-  // let label;
-  // let bottomLine;
-
-  // if (dayDiff === 0) {
-  //   label = "Today";
-  // } else if (dayDiff === -1) {
-  //   label = "Yesterday";
-  // } else if (dayDiff === 1) {
-  //   label = "Tomorrow";
-  // }
-
-  // if (label) {
-  //   const shortWeekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-  //   const shortDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-  //   bottomLine = `${shortWeekday}, ${shortDate}`;
-  // } else {
-  //   label = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-  //   bottomLine = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-  // }
-
-  // document.getElementById("popup-date").innerHTML = `
-  //   <div class="weekday">${label}</div>
-  //   <div class="month-year">${bottomLine}</div>
-  // `;
-
-  const popupTasks = document.getElementById("popup-tasks");
-
-  // Delegate clicks inside popupTasks
-  popupTasks.addEventListener("click", (e) => {
-    const target = e.target;
-
-    // Select button clicked?
-    const selectBtn = target.closest(".select-dayTask");
-    if (selectBtn && popupTasks.contains(selectBtn)) {
-
-      // Toggle selection on click
-
-      e.stopPropagation();
-      e.preventDefault();
-      const eventDiv = e.target.closest(".event");
-
-      if (selectBtn.innerHTML.includes("check_box_outline_blank")) {
-        selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box</span>`;
-        eventDiv.classList.add("selected-task-popup");
-      } else {
-        selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
-        eventDiv.classList.remove("selected-task-popup");
-      }
-
-
-
-
-    }
-
-    // Arrow Up button clicked?
-    const arrowUp = target.closest(".arrow-up-dayTask");
-    if (arrowUp && popupTasks.contains(arrowUp)) {
-      e.stopPropagation();
-      e.preventDefault();
-
-      console.log("trieggerred CREATEEVENTELEMENT");
-
-      const currentEvent = e.target.closest(".event");
-      const period = currentEvent.querySelector(".event-title").dataset.period;
-
-      // Create a new event element (new task)
-      const newEvent = createEventElement({
-        task: "No Title",
-        color: "#007bff",
-        period: period,
-        index: null, // index can be updated later if needed
-        isSelected: false,
-      });
-
-
-      // Insert new event before the current event
-      currentEvent.parentNode.insertBefore(newEvent, currentEvent);
-      renderAppropriateStyle();
-
-    }
-
-    // Arrow Down button clicked?
-    const arrowDown = target.closest(".arrow-down-dayTask");
-    if (arrowDown && popupTasks.contains(arrowDown)) {
-
-      e.stopPropagation();
-      e.preventDefault();
-
-      const currentEvent = e.target.closest(".event");
-      const period = currentEvent.querySelector(".event-title").dataset.period;
-
-      const newEvent = createEventElement({
-        task: "No Title",
-        color: "#007bff",
-        period: period,
-        index: null,
-        isSelected: false,
-      });
-
-
-
-      // Insert new event after the current event
-      if (currentEvent.nextSibling) {
-        currentEvent.parentNode.insertBefore(newEvent, currentEvent.nextSibling);
-      } else {
-        currentEvent.parentNode.appendChild(newEvent);
-      }
-      renderAppropriateStyle();
-
-
-    }
-
-    function createEventElement({ task = "No Title", color = "#007bff", period, index, isSelected = false }) {
-      const eventDiv = document.createElement("div");
-      eventDiv.className = "event";
-
-      // Select button
-      const selectBtn = document.createElement("button");
-      selectBtn.classList.add("select-dayTask");
-      selectBtn.title = "Select task";
-      selectBtn.style.cursor = "pointer";
-      selectBtn.innerHTML = isSelected
-        ? `<span class="material-symbols-outlined">check_box</span>`
-        : `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
-      if (isSelected) eventDiv.classList.add("selected-task-popup");
-
-      // Task content with colored left border
-      const content = document.createElement("div");
-      content.className = "event-content";
-      if (color) content.style.borderLeft = `5px solid ${color}`;
-
-      const title = document.createElement("span");
-      title.className = "event-title";
-      title.textContent = task;
-
-      content.appendChild(title);
-
-      // Arrow Up button
-      const arrowUp = document.createElement("button");
-      arrowUp.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_up</span>`;
-      arrowUp.title = "Add task above";
-      arrowUp.style.cursor = "pointer";
-      arrowUp.classList.add("arrow-up-dayTask");
-
-      // Arrow Down button
-      const arrowDown = document.createElement("button");
-      arrowDown.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_down</span>`;
-      arrowDown.title = "Add task below";
-      arrowDown.style.cursor = "pointer";
-      arrowDown.classList.add("arrow-down-dayTask");
-
-      // Append buttons and content to eventDiv
-      eventDiv.appendChild(selectBtn);
-      eventDiv.appendChild(content);
-      eventDiv.appendChild(arrowUp);
-      eventDiv.appendChild(arrowDown);
-
-      // Store period and index for reference (optional)
-      title.dataset.period = period;
-      title.dataset.index = index;
-
-      return eventDiv;
-    }
-
-
-
-
-  });
-
   popupTasks.innerHTML = "";
 
   if (!dayTasks) {
@@ -503,7 +313,6 @@ function showDayTasksEditable(date, focusInfo = null) {
     // popupTasks.appendChild(noTask);
   } else {
     const periods = ["morning", "afternoon", "evening"];
-    let currentlyEditing = null;
 
     periods.forEach(period => {
       const section = document.createElement("div");
@@ -569,72 +378,14 @@ function showDayTasksEditable(date, focusInfo = null) {
           eventDiv.appendChild(arrowUp);
           eventDiv.appendChild(arrowDown);
 
-          // DELETE button logic updates dayTasksForEdit
-          // deleteBtn.addEventListener("click", (e) => {
-          //   e.stopPropagation();
-          //   e.preventDefault();
-          //   if (dayTasksForEdit && dayTasksForEdit[period]) {
-          //     dayTasksForEdit[period].splice(index, 1);
-          //     // Rerender with updated data
-          //     showDayTasksEditable(date);
-          //   }
-          // });
-
-          // Save current task before insertion (on arrow clicks)
-          function saveCurrentTask() {
-            if (title.isContentEditable) {
-              const newText = title.textContent.trim();
-              if (dayTasksForEdit && dayTasksForEdit[period] && dayTasksForEdit[period][index]) {
-                dayTasksForEdit[period][index].task = newText;
-              }
-            }
-          }
-
-          title.addEventListener("click", () => {
-            // Remove outline from previously editing title's parent if any
-            if (currentlyEditing && currentlyEditing !== title) {
-              const prevEventDiv = currentlyEditing.closest('.event');
-              if (prevEventDiv) {
-                prevEventDiv.style.outline = 'none';
-              }
-              currentlyEditing.contentEditable = "false";
-            }
-
-            // Add outline to current .event parent
-            const eventDiv = title.closest('.event');
-            if (eventDiv) {
-              eventDiv.style.outline = '2px solid #00aaff';
-            }
-
-            currentlyEditing = title;
-            title.contentEditable = "true";
-            title.focus();
-
-            // Select all text inside the title for highlight
-            const range = document.createRange();
-            range.selectNodeContents(title);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-          });
-
           title.addEventListener("blur", () => {
             title.contentEditable = "false";
-
             // Remove outline from .event parent
             const eventDiv = title.closest('.event');
             if (eventDiv) {
               eventDiv.style.outline = 'none';
             }
-
-            currentlyEditing = null;
           });
-
-
-
-          // Store period and index on title for saving on switching edits
-          title.dataset.period = period;
-          title.dataset.index = index;
 
           section.appendChild(eventDiv);
         });
@@ -646,13 +397,39 @@ function showDayTasksEditable(date, focusInfo = null) {
         noTask.style.cursor = "pointer";
         noTask.title = "Click to add a new task";
 
-        noTask.addEventListener("click", () => {
-          if (!dayTasksForEdit[period]) dayTasksForEdit[period] = [];
-
-          dayTasksForEdit[period].push({ task: "No Title", color: "#007bff" });
-
-          showDayTasksEditable(date, { period, index: dayTasksForEdit[period].length - 1 });
+      noTask.addEventListener("click", () => {
+        // const clickToAddNewTaskParagraph = section.querySelector()
+        // existingNoTask.remove();
+        const newEvent = createEventElement({
+          task: "No Title",
+          color: "#007bff",
+          period: period,
+          index: null,
+          isSelected: false,
         });
+
+        section.appendChild(newEvent);
+        renderAppropriateStyle();
+        blurCurrentlyEditing();
+        autoFocusEventTitle(newEvent);
+
+        // Optionally, focus and highlight the new event's title:
+        const newTitle = newEvent.querySelector(".event-title");
+        if (newTitle) {
+          newTitle.contentEditable = "true";
+          newEvent.style.outline = "2px solid #00aaff";
+          newTitle.focus();
+
+          const range = document.createRange();
+          range.selectNodeContents(newTitle);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+
+        noTask.remove();
+      });
+
 
         section.appendChild(noTask);
       }
@@ -660,84 +437,266 @@ function showDayTasksEditable(date, focusInfo = null) {
       popupTasks.appendChild(section);
     });
   }
-
-  // Focus newly created task if requested
-  if (focusInfo) {
-    setTimeout(() => {
-      const sections = document.querySelectorAll(".period-section");
-      let targetSection = null;
-      sections.forEach(section => {
-        const divider = section.querySelector(".section-divider");
-        if (divider && divider.textContent.toLowerCase() === focusInfo.period) {
-          targetSection = section;
-        }
-      });
-
-      if (targetSection) {
-        const titles = targetSection.querySelectorAll(".event-title");
-        if (titles[focusInfo.index]) {
-          const title = titles[focusInfo.index];
-          const eventDiv = title.closest('.event');
-
-          // Remove outline from any previously editing event
-          document.querySelectorAll('.event').forEach(ev => ev.style.outline = 'none');
-
-          // Add outline to newly focused event
-          if (eventDiv) {
-            eventDiv.style.outline = '2px solid #00aaff';
-          }
-
-          title.contentEditable = "true";
-          title.focus();
-
-          // Select all text inside title
-          const range = document.createRange();
-          range.selectNodeContents(title);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-      }
-    }, 0);
-  }
-
-
-
-  // Show editing UI styles
-  function renderAppropriateStyle() {
-    if (isEditing) {
-      document.querySelectorAll(".event-content").forEach(el => {
-        el.style.marginLeft = "0";
-        el.style.marginRight = "0";
-      });
-
-      document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
-        el.style.display = "inline-flex";
-      });
-
-      document.querySelectorAll(".event").forEach(el => {
-        el.style.border = "1px solid #ccc";
-        el.style.borderRadius = "5px";
-      });
-    }
-  }
-
-
   showPopup();
 }
 
-function updateSelectedTasksFromDOM() {
-  selectedTasksPopup = [];
-  document.querySelectorAll(".select-dayTask").forEach(btn => {
-    if (btn.querySelector(".material-symbols-outlined").textContent === "check_box") {
-      const eventDiv = btn.closest(".event");
-      const period = eventDiv.dataset.period;
-      const taskText = eventDiv.querySelector(".event-title")?.textContent.trim();
-      selectedTasksPopup.push({ period, taskText });
-    }
-  });
+
+function blurCurrentlyEditing() {
+  const editingTitle = popupTasks.querySelector(".event-title[contenteditable='true']");
+  if (editingTitle) {
+    editingTitle.contentEditable = "false";
+    const eventDiv = editingTitle.closest(".event");
+    if (eventDiv) eventDiv.style.outline = "none";
+    editingTitle.blur();
+  }
 }
 
+function autoFocusEventTitle(eventDiv) {
+  const title = eventDiv.querySelector(".event-title");
+  if (!title) return;
+
+  title.contentEditable = "true";
+  eventDiv.style.outline = "2px solid #00aaff";
+  title.focus();
+
+  const range = document.createRange();
+  range.selectNodeContents(title);
+
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+
+// Delegate clicks inside popupTasks
+const handlePopupClick = (e) => {
+
+  if(!isEditing) return;
+  const target = e.target;
+
+  // Title clicked?
+  const title = target.closest(".event-title");
+  if (title && popupTasks.contains(title)) {
+
+    e.stopPropagation();
+    e.preventDefault();
+    // Make editable
+    title.contentEditable = "true";
+
+    // Add outline to parent .event
+    const eventDiv = title.closest(".event");
+    if (eventDiv) {
+      eventDiv.style.outline = "2px solid #00aaff";
+    }
+
+    // Focus and highlight all text
+    title.focus();
+    const range = document.createRange();
+    range.selectNodeContents(title);
+
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    return;
+  }
+
+
+
+  // Select button clicked?
+  const selectBtn = target.closest(".select-dayTask");
+  if (selectBtn && popupTasks.contains(selectBtn)) {
+
+    // Toggle selection on click
+
+    e.stopPropagation();
+    e.preventDefault();
+    const eventDiv = e.target.closest(".event");
+
+    if (selectBtn.innerHTML.includes("check_box_outline_blank")) {
+      selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box</span>`;
+      eventDiv.classList.add("selected-task-popup");
+    } else {
+      selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+      eventDiv.classList.remove("selected-task-popup");
+    }
+
+
+    return;
+
+  }
+
+  // Arrow Up button clicked?
+  const arrowUp = target.closest(".arrow-up-dayTask");
+  if (arrowUp && popupTasks.contains(arrowUp)) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    console.log("trieggerred CREATEEVENTELEMENT");
+
+    const currentEvent = e.target.closest(".event");
+    const period = currentEvent.querySelector(".event-title").dataset.period;
+
+    // Create a new event element (new task)
+    const newEvent = createEventElement({
+      task: "No Title",
+      color: "#007bff",
+      period: period,
+      index: null, // index can be updated later if needed
+      isSelected: false,
+    });
+
+
+    // Insert new event before the current event
+    currentEvent.parentNode.insertBefore(newEvent, currentEvent);
+    console.log("inserting");
+    renderAppropriateStyle();
+    blurCurrentlyEditing();
+    autoFocusEventTitle(newEvent);
+
+    return;
+
+  }
+
+  // Arrow Down button clicked?
+  const arrowDown = target.closest(".arrow-down-dayTask");
+  if (arrowDown && popupTasks.contains(arrowDown)) {
+
+    e.stopPropagation();
+    e.preventDefault();
+
+    const currentEvent = e.target.closest(".event");
+    const period = currentEvent.querySelector(".event-title").dataset.period;
+
+    const newEvent = createEventElement({
+      task: "No Title",
+      color: "#007bff",
+      period: period,
+      index: null,
+      isSelected: false,
+    });
+
+    // Insert new event after the current event
+    if (currentEvent.nextSibling) {
+      currentEvent.parentNode.insertBefore(newEvent, currentEvent.nextSibling);
+    } else {
+      currentEvent.parentNode.appendChild(newEvent);
+    }
+    renderAppropriateStyle();
+    blurCurrentlyEditing();
+    autoFocusEventTitle(newEvent);
+
+    return;
+  }
+
+
+
+}
+
+  function createEventElement({ task = "No Title", color = "#007bff", period, index, isSelected = false }) {
+    const eventDiv = document.createElement("div");
+    eventDiv.className = "event";
+
+    // Select button
+    const selectBtn = document.createElement("button");
+    selectBtn.classList.add("select-dayTask");
+    selectBtn.title = "Select task";
+    selectBtn.style.cursor = "pointer";
+    selectBtn.innerHTML = isSelected
+      ? `<span class="material-symbols-outlined">check_box</span>`
+      : `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+    if (isSelected) eventDiv.classList.add("selected-task-popup");
+
+    // Task content with colored left border
+    const content = document.createElement("div");
+    content.className = "event-content";
+    if (color) content.style.borderLeft = `5px solid ${color}`;
+
+    const title = document.createElement("span");
+    title.className = "event-title";
+    title.textContent = task;
+
+    content.appendChild(title);
+
+
+    title.addEventListener("blur", function onBlur() {
+      console.log("blurred");
+      title.contentEditable = "false";
+      eventDiv.style.outline = "none";
+      // title.removeEventListener("blur", onBlur);
+    });
+
+
+    // Arrow Up button
+    const arrowUp = document.createElement("button");
+    arrowUp.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_up</span>`;
+    arrowUp.title = "Add task above";
+    arrowUp.style.cursor = "pointer";
+    arrowUp.classList.add("arrow-up-dayTask");
+
+    // Arrow Down button
+    const arrowDown = document.createElement("button");
+    arrowDown.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_down</span>`;
+    arrowDown.title = "Add task below";
+    arrowDown.style.cursor = "pointer";
+    arrowDown.classList.add("arrow-down-dayTask");
+
+    // Append buttons and content to eventDiv
+    eventDiv.appendChild(selectBtn);
+    eventDiv.appendChild(content);
+    eventDiv.appendChild(arrowUp);
+    eventDiv.appendChild(arrowDown);
+
+    // Store period and index for reference (optional)
+    title.dataset.period = period;
+    title.dataset.index = index;
+
+    return eventDiv;
+  }
+
+popupTasks.addEventListener("click", handlePopupClick);
+
+function renderAppropriateStyle() {
+  if (isEditing) {
+    document.querySelectorAll(".event-content").forEach(el => {
+      el.style.marginLeft = "0";
+      el.style.marginRight = "0";
+    });
+
+    document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+      el.style.display = "inline-flex";
+    });
+
+    document.querySelectorAll(".event").forEach(el => {
+      el.style.border = "1px solid #ccc";
+      el.style.borderRadius = "5px";
+    });
+  }
+}
+
+
+document.getElementById("delete-btn-popup").addEventListener("click", () => {
+  // Select all .event elements that are selected (have class .selected-task-popup)
+  const selectedEvents = document.querySelectorAll("#popup-tasks .event.selected-task-popup");
+
+  if (selectedEvents.length === 0) {
+    alert("No tasks selected to delete.");
+    return;
+  }
+
+  selectedEvents.forEach(eventDiv => {
+    // Remove from DOM
+    eventDiv.remove();
+
+    // TODO: Also remove from your data model (like dayTasksForEdit) here if applicable
+    // For example, find the period and index from eventDiv and update your data accordingly
+  });
+
+  // Optionally, re-render or update your UI after deletion
+  // For example, if you keep dayTasksForEdit updated, call your showDayTasksEditable() here
+
+  cleanUpNoTasksText();
+
+});
 
 
 // === CLOSE FUNCITONALITY FOR POP UP

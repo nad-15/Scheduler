@@ -408,15 +408,73 @@ function moveGhost(y) {
 
   cleanUpNoTasksText();
 }
+// function cleanUpNoTasksText() {
+//   document.querySelectorAll('.period-section').forEach(section => {
+//     const events = Array.from(section.children).filter(child => child.classList.contains('event'));
+//     const existingNoTask = section.querySelector('.no-tasks-text');
+
+//     if (events.length === 0 && !existingNoTask) {
+//       const noTask = document.createElement("p");
+//       noTask.className = "no-tasks-text";
+//       noTask.textContent = "No tasks for this period.";
+//       section.appendChild(noTask);
+//     } else if (events.length > 0 && existingNoTask) {
+//       existingNoTask.remove();
+//     }
+//   });
+// }
+
 function cleanUpNoTasksText() {
   document.querySelectorAll('.period-section').forEach(section => {
     const events = Array.from(section.children).filter(child => child.classList.contains('event'));
     const existingNoTask = section.querySelector('.no-tasks-text');
+    // existingNoTask.remove();
+
 
     if (events.length === 0 && !existingNoTask) {
+      const period = section.querySelector('.section-divider').textContent.toLowerCase();
+
       const noTask = document.createElement("p");
       noTask.className = "no-tasks-text";
-      noTask.textContent = "No tasks for this period.";
+      noTask.textContent = `Click to add new task for ${period}`;
+      noTask.style.cursor = "pointer";
+      noTask.title = "Click to add a new task";
+
+
+      noTask.addEventListener("click", () => {
+        // const clickToAddNewTaskParagraph = section.querySelector()
+        // existingNoTask.remove();
+        const newEvent = createEventElement({
+          task: "No Title",
+          color: "#007bff",
+          period: period,
+          index: null,
+          isSelected: false,
+        });
+
+        section.appendChild(newEvent);
+        renderAppropriateStyle();
+        blurCurrentlyEditing();
+        autoFocusEventTitle(newEvent);
+
+        // Optionally, focus and highlight the new event's title:
+        const newTitle = newEvent.querySelector(".event-title");
+        if (newTitle) {
+          newTitle.contentEditable = "true";
+          newEvent.style.outline = "2px solid #00aaff";
+          newTitle.focus();
+
+          const range = document.createRange();
+          range.selectNodeContents(newTitle);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+
+        noTask.remove();
+      });
+
+
       section.appendChild(noTask);
     } else if (events.length > 0 && existingNoTask) {
       existingNoTask.remove();
@@ -526,7 +584,7 @@ function handleTouchMovePopUp(e) {
 }
 
 function handleTouchEndPopUp() {
-  saveTaskOrderToTemp();
+  // saveTaskOrderToTemp();
   // showDayTasksEditable(popUpDate);
   endDraggingPopUp();
 }
@@ -550,11 +608,11 @@ function addDragListeners() {
   // document.addEventListener('pointercancel', endDraggingPopUp);
 
 
-// Add listeners to popupTasks element instead of document
-popupTasks.addEventListener('touchstart', handleTouchStartPopUp, { passive: false });
-popupTasks.addEventListener('touchmove', handleTouchMovePopUp, { passive: false });
-popupTasks.addEventListener('touchend', handleTouchEndPopUp);
-popupTasks.addEventListener('touchcancel', endDraggingPopUp);
+  // Add listeners to popupTasks element instead of document
+  popupTasks.addEventListener('touchstart', handleTouchStartPopUp, { passive: false });
+  popupTasks.addEventListener('touchmove', handleTouchMovePopUp, { passive: false });
+  popupTasks.addEventListener('touchend', handleTouchEndPopUp);
+  popupTasks.addEventListener('touchcancel', endDraggingPopUp);
 }
 
 function removeDragListeners() {
@@ -568,7 +626,7 @@ function removeDragListeners() {
   goTodayBtn.disabled = false;
   goTodayBtn.classList.remove(`disabled-btn`);
 
-    const popupTasks = document.getElementById("popup-tasks");
+  const popupTasks = document.getElementById("popup-tasks");
 
 
   // document.removeEventListener('pointerdown', handlePointerDownPopUp);
@@ -576,11 +634,11 @@ function removeDragListeners() {
   // document.removeEventListener('pointerup', handlePointerUpPopUp);
   // document.removeEventListener('pointercancel', endDraggingPopUp);
 
-// Later, to remove them:
-popupTasks.removeEventListener('touchstart', handleTouchStartPopUp, { passive: false });
-popupTasks.removeEventListener('touchmove', handleTouchMovePopUp, { passive: false });
-popupTasks.removeEventListener('touchend', handleTouchEndPopUp);
-popupTasks.removeEventListener('touchcancel', endDraggingPopUp);
+  // Later, to remove them:
+  popupTasks.removeEventListener('touchstart', handleTouchStartPopUp, { passive: false });
+  popupTasks.removeEventListener('touchmove', handleTouchMovePopUp, { passive: false });
+  popupTasks.removeEventListener('touchend', handleTouchEndPopUp);
+  popupTasks.removeEventListener('touchcancel', endDraggingPopUp);
 }
 
 
@@ -625,9 +683,8 @@ toggleEditBtn.addEventListener('click', () => {
 
 
   if (isEditing) {
-    
-  normalButtons.forEach(btn => btn.classList.add('hidden'));
-  editButtons.forEach(btn => btn.classList.remove('hidden'));
+    normalButtons.forEach(btn => btn.classList.add('hidden'));
+    editButtons.forEach(btn => btn.classList.remove('hidden'));
     icon.textContent = 'save_as';
     icon.style.color = 'red';     // change icon to "save_as"
     label.textContent = 'Save';
@@ -653,14 +710,10 @@ toggleEditBtn.addEventListener('click', () => {
       el.style.borderRadius = "5px";
     });
 
-
-
-
   } else {
 
-    
-  normalButtons.forEach(btn => btn.classList.remove('hidden'));
-  editButtons.forEach(btn => btn.classList.add('hidden'));
+    normalButtons.forEach(btn => btn.classList.remove('hidden'));
+    editButtons.forEach(btn => btn.classList.add('hidden'));
     // icon.textContent = 'note_alt';
     dayTasksForEdit = null;
     icon.textContent = 'edit_note';
@@ -692,13 +745,11 @@ toggleEditBtn.addEventListener('click', () => {
     });
 
   }
-
-
 });
 
 
-document.getElementById('cancel-btn').addEventListener('click', () => {
-    const normalButtons = document.querySelectorAll('.normal-mode');
+document.getElementById('cancel-btn-popup').addEventListener('click', () => {
+  const normalButtons = document.querySelectorAll('.normal-mode');
   const editButtons = document.querySelectorAll('.edit-mode');
   editButtons.forEach(btn => btn.classList.add('hidden'));
   normalButtons.forEach(btn => btn.classList.remove('hidden'));
