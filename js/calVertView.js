@@ -15,7 +15,7 @@ let swipeEnabledPopUp = true;
 const undoStack = [];
 const redoStack = [];
 
-
+let chosenColor = '#6a5044';
 
 let dayTasksForEdit = null;
 let popupTimeout;
@@ -694,6 +694,7 @@ toggleEditBtn.addEventListener('click', () => {
 
 
   if (isEditing) {
+    moveColorOptionsToPopup();
     normalButtons.forEach(btn => btn.classList.add('hidden'));
     editButtons.forEach(btn => btn.classList.remove('hidden'));
     icon.textContent = 'save_as';
@@ -722,7 +723,7 @@ toggleEditBtn.addEventListener('click', () => {
     });
 
   } else {
-
+    restoreColorOptions();
     normalButtons.forEach(btn => btn.classList.remove('hidden'));
     editButtons.forEach(btn => btn.classList.add('hidden'));
     // icon.textContent = 'note_alt';

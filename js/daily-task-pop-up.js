@@ -408,7 +408,7 @@ function showDayTasksEditable(date, focusInfo = null) {
           // existingNoTask.remove();
           const newEvent = createEventElement({
             task: "No Title",
-            color: "#007bff",
+            color: chosenColor,
             period: period,
             index: null,
             isSelected: false,
@@ -481,53 +481,53 @@ const handlePopupClick = (e) => {
   const target = e.target;
 
   // Title clicked?
-const title = target.closest(".event-title");
-if (title && popupTasks.contains(title)) {
-  e.stopPropagation();
-  e.preventDefault();
+  const title = target.closest(".event-title");
+  if (title && popupTasks.contains(title)) {
+    e.stopPropagation();
+    e.preventDefault();
 
-  const eventDiv = title.closest(".event");
+    const eventDiv = title.closest(".event");
 
-  // First click → make editable + select all
-  if (title.contentEditable !== "true") {
-    title.contentEditable = "true";
-    if (eventDiv) {
-      eventDiv.style.outline = "1px solid #00aaff";
-    }
-    title.focus();
-
-    // Select all text
-    const range = document.createRange();
-    range.selectNodeContents(title);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-
-  } else {
-    // Already editable → place caret at click position
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-
-    const range = document.createRange();
-
-    if (document.caretRangeFromPoint) {
-      const caretRange = document.caretRangeFromPoint(e.clientX, e.clientY);
-      if (caretRange) {
-        range.setStart(caretRange.startContainer, caretRange.startOffset);
+    // First click → make editable + select all
+    if (title.contentEditable !== "true") {
+      title.contentEditable = "true";
+      if (eventDiv) {
+        eventDiv.style.outline = "1px solid #00aaff";
       }
-    } else if (document.caretPositionFromPoint) {
-      const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
-      if (pos) {
-        range.setStart(pos.offsetNode, pos.offset);
+      title.focus();
+
+      // Select all text
+      const range = document.createRange();
+      range.selectNodeContents(title);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+
+    } else {
+      // Already editable → place caret at click position
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+
+      const range = document.createRange();
+
+      if (document.caretRangeFromPoint) {
+        const caretRange = document.caretRangeFromPoint(e.clientX, e.clientY);
+        if (caretRange) {
+          range.setStart(caretRange.startContainer, caretRange.startOffset);
+        }
+      } else if (document.caretPositionFromPoint) {
+        const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+        if (pos) {
+          range.setStart(pos.offsetNode, pos.offset);
+        }
       }
+
+      range.collapse(true);
+      sel.addRange(range);
     }
 
-    range.collapse(true);
-    sel.addRange(range);
+    return;
   }
-
-  return;
-}
 
 
 
@@ -574,7 +574,7 @@ if (title && popupTasks.contains(title)) {
     // Create a new event element (new task)
     const newEvent = createEventElement({
       task: "No Title",
-      color: "#007bff",
+      color: chosenColor,
       period: period,
       index: null, // index can be updated later if needed
       isSelected: false,
@@ -608,7 +608,7 @@ if (title && popupTasks.contains(title)) {
 
     const newEvent = createEventElement({
       task: "No Title",
-      color: "#007bff",
+      color: chosenColor,
       period: period,
       index: null,
       isSelected: false,
@@ -791,10 +791,12 @@ function hidePopup() {
   if (isEditing) {
     const normalButtons = document.querySelectorAll('.normal-mode');
     const editButtons = document.querySelectorAll('.edit-mode');
-    
+
     normalButtons.forEach(btn => btn.classList.remove('hidden'));
     editButtons.forEach(btn => btn.classList.add('hidden'));
   }
+
+  restoreColorOptions();
 
   undoStack.length = 0;
   redoStack.length = 0;
@@ -887,5 +889,48 @@ function copyTasksForDate(dateKey) {
     // .then(() => showToast("Tasks copied!"))
     .then()
     .catch(err => showToast("Failed to copy!"));
+}
+
+
+let originalColorOptionsParent = null;
+let originalColorOptionsNextSibling = null;
+
+function moveColorOptionsToPopup() {
+  const colorOptions = document.querySelector(".color-button-options");
+  if (!colorOptions) return;
+
+  if (!originalColorOptionsParent) {
+    originalColorOptionsParent = colorOptions.parentElement;
+    originalColorOptionsNextSibling = colorOptions.nextElementSibling;
+  }
+
+  const popup = document.getElementById("calendar-pop-up");
+  const nav = popup.querySelector(".pop-up-calview-navi");
+
+  if (nav) {
+    nav.parentElement.insertBefore(colorOptions, nav);
+    colorOptions.style.transform = "scale(0.80)";
+    colorOptions.style.width = "100%";
+
+    // colorOptions.style.margin = "0 10px";
+  }
+
+
+}
+
+function restoreColorOptions() {
+  const colorOptions = document.querySelector(".color-button-options");
+  if (!colorOptions || !originalColorOptionsParent) return;
+
+  if (originalColorOptionsNextSibling) {
+    originalColorOptionsParent.insertBefore(colorOptions, originalColorOptionsNextSibling);
+  } else {
+    originalColorOptionsParent.appendChild(colorOptions);
+  }
+
+  // Reset styles you changed when moving it
+  colorOptions.style.transform = "";
+  colorOptions.style.width = "";
+  colorOptions.style.margin = "";
 }
 

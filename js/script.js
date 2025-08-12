@@ -43,7 +43,7 @@ document.addEventListener("click", (e) => {
 
 document.querySelector('.dropdown-option[data-mode="all"]').addEventListener('click', () => {
 
-    allColorsIcon.textContent="palette";
+    allColorsIcon.textContent = "palette";
     const originalHTML = document.getElementById("colorPicker").dataset.originalHtml;
     document.getElementById("colorPicker").innerHTML = originalHTML;
 
@@ -65,7 +65,7 @@ document.querySelector('.dropdown-option[data-mode="all"]').addEventListener('cl
 
 
 document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener('click', () => {
-        allColorsIcon.textContent="star";
+    allColorsIcon.textContent = "star";
     const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
     const colorFrequency = {};
 
@@ -161,7 +161,7 @@ document.addEventListener("click", (e) => {
 // Generate 13 shades for a named base color (like "red", "blue", etc.)
 function generateShadesFor(colorName) {
 
-        allColorsIcon.textContent="opacity";
+    allColorsIcon.textContent = "opacity";
     const baseColors = {
         red: "#e53935",
         orange: "#fb8c00",
@@ -1108,7 +1108,7 @@ document.addEventListener('fullscreenchange', () => {
 
 
 
-let chosenColor = '#6a5044';
+
 let currentTask = '';
 
 
@@ -1140,7 +1140,29 @@ document.getElementById('colorPicker').addEventListener('click', (e) => {
 
     // Update flower color
     flower.style.color = chosenColor;
+
+    // Additional: if editing mode, update selected tasks border color
+    if (isEditing) {
+        // Save undo state just once after updating all selected tasks
+
+        const selectedTasks = document.querySelectorAll('.selected-task-popup');
+
+        if (!selectedTasks) return;
+        const currentState = saveTaskOrderToTemp();
+        undoStack.push(currentState);
+        redoStack.length = 0; // clear redo stack because new action happened
+        selectedTasks.forEach(eventDiv => {
+            const content = eventDiv.querySelector('.event-content');
+            if (content) {
+                content.style.borderLeft = `5px solid ${chosenColor}`;
+            }
+        });
+
+
+
+    }
 });
+
 
 
 // ✅ NOW select the first new button (within colorPicker)
@@ -1905,7 +1927,7 @@ if (selectedTask) {
 }
 
 const cloneColorMenu = clonedSlidingInputView.querySelector(".palette-button");
-if(cloneColorMenu){
+if (cloneColorMenu) {
     cloneColorMenu.remove();
 }
 
