@@ -3057,6 +3057,7 @@ h2 {
     /* For older IE */
 
     width: 100%;
+    word-break: break-word;
 }
 
 .event-content.no-tasks-for-this-period {
