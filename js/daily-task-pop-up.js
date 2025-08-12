@@ -909,7 +909,11 @@ function moveColorOptionsToPopup() {
 
   if (nav) {
     nav.parentElement.insertBefore(colorOptions, nav);
-    colorOptions.style.transform = "scale(0.80)";
+
+    const colorPickerContainer = colorOptions.querySelector(".color-picker");
+    colorPickerContainer.style.borderRadius = "0";
+
+    colorOptions.style.transform = "scale(0.87)";
     colorOptions.style.width = "100%";
 
     // colorOptions.style.margin = "0 10px";
@@ -929,8 +933,11 @@ function restoreColorOptions() {
   }
 
   // Reset styles you changed when moving it
+
+  const colorPickerContainer = colorOptions.querySelector(".color-picker");
+  colorPickerContainer.style.borderRadius = "";
   colorOptions.style.transform = "";
   colorOptions.style.width = "";
-  colorOptions.style.margin = "";
+
 }
 
