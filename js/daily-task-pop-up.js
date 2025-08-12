@@ -345,7 +345,7 @@ function showDayTasksEditable(date, focusInfo = null) {
           selectBtn.title = "Select task";
           selectBtn.style.cursor = "pointer";
 
-          selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+          selectBtn.innerHTML = `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
 
 
           // event-content with task title and colored left border
@@ -359,13 +359,13 @@ function showDayTasksEditable(date, focusInfo = null) {
 
           // Arrow buttons on right
           const arrowUp = document.createElement("button");
-          arrowUp.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_up</span>`;
+          arrowUp.innerHTML = `<span class="material-symbols-outlined">first_page</span>`;
           arrowUp.title = "Add task above";
           arrowUp.style.cursor = "pointer";
           arrowUp.classList.add("arrow-up-dayTask");
 
           const arrowDown = document.createElement("button");
-          arrowDown.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_down</span>`;
+          arrowDown.innerHTML = `<span class="material-symbols-outlined">first_page</span>`;
           arrowDown.classList.add("arrow-down-dayTask");
           arrowDown.title = "Add task below";
           arrowDown.style.cursor = "pointer";
@@ -519,15 +519,16 @@ const handlePopupClick = (e) => {
     const eventDiv = e.target.closest(".event");
 
     if (selectBtn.innerHTML.includes("check_box_outline_blank")) {
-      selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box</span>`;
+      selectBtn.innerHTML = `<span class="material-symbols-outlined " id="check_box">check_box</span>`;
       eventDiv.classList.add("selected-task-popup");
     } else {
-      selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+      selectBtn.innerHTML = `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
       eventDiv.classList.remove("selected-task-popup");
     }
 
 
     return;
+
 
   }
 
@@ -616,8 +617,8 @@ function createEventElement({ task = "No Title", color = "#007bff", period, inde
   selectBtn.title = "Select task";
   selectBtn.style.cursor = "pointer";
   selectBtn.innerHTML = isSelected
-    ? `<span class="material-symbols-outlined">check_box</span>`
-    : `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+    ? `<span class="material-symbols-outlined " id="check_box">check_box</span>`
+    : `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
   if (isSelected) eventDiv.classList.add("selected-task-popup");
 
   // Task content with colored left border
@@ -642,14 +643,14 @@ function createEventElement({ task = "No Title", color = "#007bff", period, inde
 
   // Arrow Up button
   const arrowUp = document.createElement("button");
-  arrowUp.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_up</span>`;
+  arrowUp.innerHTML = `<span class="material-symbols-outlined">first_page</span>`;
   arrowUp.title = "Add task above";
   arrowUp.style.cursor = "pointer";
   arrowUp.classList.add("arrow-up-dayTask");
 
   // Arrow Down button
   const arrowDown = document.createElement("button");
-  arrowDown.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_down</span>`;
+  arrowDown.innerHTML = `<span class="material-symbols-outlined">first_page</span>`;
   arrowDown.title = "Add task below";
   arrowDown.style.cursor = "pointer";
   arrowDown.classList.add("arrow-down-dayTask");

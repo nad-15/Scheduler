@@ -1353,6 +1353,10 @@ h2 {
     font-size: 20px;
 }
 
+#check_box {
+    font-size: 18px ;
+}
+
 
 
 
@@ -2955,6 +2959,20 @@ h2 {
     margin: 0 0px;
 }
 
+
+
+
+
+
+.arrow-up-dayTask {
+
+  transform: rotate(90deg); /* left → up */
+}
+
+.arrow-down-dayTask {
+
+  transform: rotate(-90deg); /* left → down */
+}
 
 
 .arrow-up-dayTask,
