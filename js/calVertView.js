@@ -847,6 +847,7 @@ document.getElementById('cancel-btn-popup').addEventListener('click', () => {
   editButtons.forEach(btn => btn.classList.add('hidden'));
   normalButtons.forEach(btn => btn.classList.remove('hidden'));
   console.log("cancel button clicked");
+  isEditing = false;
   document.getElementById("closePopupBtn").click();
   showDayTasks(popUpDate);
 });
