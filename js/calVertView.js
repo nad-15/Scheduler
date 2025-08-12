@@ -10,7 +10,11 @@ const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 const yearContainer = document.getElementById('year-container');
 let swipeEnabledPopUp = true;
 
-let selectedTasksPopup = [];
+// let selectedTasksPopup = [];
+
+const undoStack = [];
+const redoStack = [];
+
 
 
 let dayTasksForEdit = null;
@@ -426,9 +430,11 @@ function moveGhost(y) {
 
 function cleanUpNoTasksText() {
   document.querySelectorAll('.period-section').forEach(section => {
+
+
     const events = Array.from(section.children).filter(child => child.classList.contains('event'));
     const existingNoTask = section.querySelector('.no-tasks-text');
-    // existingNoTask.remove();
+
 
 
     if (events.length === 0 && !existingNoTask) {
@@ -442,8 +448,9 @@ function cleanUpNoTasksText() {
 
 
       noTask.addEventListener("click", () => {
-        // const clickToAddNewTaskParagraph = section.querySelector()
-        // existingNoTask.remove();
+    const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+    undoStack.push(currentState);
+    redoStack.length = 0; // clear redo stack because new action happened
         const newEvent = createEventElement({
           task: "No Title",
           color: "#007bff",
@@ -747,6 +754,85 @@ toggleEditBtn.addEventListener('click', () => {
   }
 });
 
+function redo() {
+  if (redoStack.length === 0) return;
+
+  // Save current state to undo stack before redoing
+  undoStack.push(deepClone(dayTasksForEdit));
+
+  // Restore next state
+  const nextState = redoStack.pop();
+
+  dayTasksForEdit = deepClone(nextState);
+
+  showDayTasksEditable(popUpDate);  // re-render your UI with restored state
+
+  document.querySelectorAll(".event-content").forEach(el => {
+    el.style.marginLeft = "0";
+    el.style.marginRight = "0";
+  });
+
+  document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+    el.style.display = "inline-flex"; // or "block" depending on layout
+  });
+
+  document.querySelectorAll(".event").forEach(el => {
+    el.style.border = "1px solid #ccc";
+    el.style.borderRadius = "5px";
+  });
+}
+
+function undo() {
+  if (undoStack.length === 0) return;
+
+  // Save current state to redo stack before undoing
+  redoStack.push(deepClone(dayTasksForEdit));
+
+  // Restore previous state
+  const previousState = undoStack.pop();
+
+  dayTasksForEdit = deepClone(previousState);
+  showDayTasksEditable(popUpDate);  // re-render your UI with restored state
+
+  document.querySelectorAll(".event-content").forEach(el => {
+    el.style.marginLeft = "0";
+    el.style.marginRight = "0";
+  });
+
+  document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+    el.style.display = "inline-flex"; // or "block" depending on layout
+  });
+
+  document.querySelectorAll(".event").forEach(el => {
+    el.style.border = "1px solid #ccc";
+    el.style.borderRadius = "5px";
+  });
+}
+
+function saveState() {
+  undoStack.push(deepClone(dayTasksForEdit));
+  // Clear redo stack on new action
+  redoStack.length = 0;
+}
+
+
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+
+
+document.getElementById('undo-btn-popup').addEventListener('click', () => {
+  undo();
+});
+
+document.getElementById('redo-btn-popup').addEventListener('click', () => {
+  redo();
+});
+
+
+
+
 
 document.getElementById('cancel-btn-popup').addEventListener('click', () => {
   const normalButtons = document.querySelectorAll('.normal-mode');
@@ -794,15 +880,16 @@ function saveTaskOrderToLocalStorage(popUpDate) {
 
 
 function saveTaskOrderToTemp() {
-  if (!dayTasksForEdit) return;
+  if (!dayTasksForEdit) return null;
 
   const container = document.getElementById("popup-tasks");
+  const snapshot = {};
 
   container.querySelectorAll(".period-section").forEach(section => {
     const period = section.querySelector(".section-divider")?.textContent.toLowerCase();
     const events = Array.from(section.querySelectorAll(".event"));
 
-    dayTasksForEdit[period] = events.map(event => {
+    snapshot[period] = events.map(event => {
       let task = event.querySelector(".event-title")?.textContent.trim();
       const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
 
@@ -814,13 +901,17 @@ function saveTaskOrderToTemp() {
       return { task, color: rgbToHex(color) };
     });
   });
+
+  return snapshot;
 }
+
 
 
 function rgbToHex(rgb) {
   const result = rgb.match(/\d+/g).map(n => (+n).toString(16).padStart(2, "0"));
   return `#${result.join("")}`;
 }
+
 
 
 

@@ -397,38 +397,38 @@ function showDayTasksEditable(date, focusInfo = null) {
         noTask.style.cursor = "pointer";
         noTask.title = "Click to add a new task";
 
-      noTask.addEventListener("click", () => {
-        // const clickToAddNewTaskParagraph = section.querySelector()
-        // existingNoTask.remove();
-        const newEvent = createEventElement({
-          task: "No Title",
-          color: "#007bff",
-          period: period,
-          index: null,
-          isSelected: false,
+        noTask.addEventListener("click", () => {
+          // const clickToAddNewTaskParagraph = section.querySelector()
+          // existingNoTask.remove();
+          const newEvent = createEventElement({
+            task: "No Title",
+            color: "#007bff",
+            period: period,
+            index: null,
+            isSelected: false,
+          });
+
+          section.appendChild(newEvent);
+          renderAppropriateStyle();
+          blurCurrentlyEditing();
+          autoFocusEventTitle(newEvent);
+
+          // Optionally, focus and highlight the new event's title:
+          const newTitle = newEvent.querySelector(".event-title");
+          if (newTitle) {
+            newTitle.contentEditable = "true";
+            newEvent.style.outline = "2px solid #00aaff";
+            newTitle.focus();
+
+            const range = document.createRange();
+            range.selectNodeContents(newTitle);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+
+          noTask.remove();
         });
-
-        section.appendChild(newEvent);
-        renderAppropriateStyle();
-        blurCurrentlyEditing();
-        autoFocusEventTitle(newEvent);
-
-        // Optionally, focus and highlight the new event's title:
-        const newTitle = newEvent.querySelector(".event-title");
-        if (newTitle) {
-          newTitle.contentEditable = "true";
-          newEvent.style.outline = "2px solid #00aaff";
-          newTitle.focus();
-
-          const range = document.createRange();
-          range.selectNodeContents(newTitle);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-
-        noTask.remove();
-      });
 
 
         section.appendChild(noTask);
@@ -471,7 +471,7 @@ function autoFocusEventTitle(eventDiv) {
 // Delegate clicks inside popupTasks
 const handlePopupClick = (e) => {
 
-  if(!isEditing) return;
+  if (!isEditing) return;
   const target = e.target;
 
   // Title clicked?
@@ -592,66 +592,66 @@ const handlePopupClick = (e) => {
 
 }
 
-  function createEventElement({ task = "No Title", color = "#007bff", period, index, isSelected = false }) {
-    const eventDiv = document.createElement("div");
-    eventDiv.className = "event";
+function createEventElement({ task = "No Title", color = "#007bff", period, index, isSelected = false }) {
+  const eventDiv = document.createElement("div");
+  eventDiv.className = "event";
 
-    // Select button
-    const selectBtn = document.createElement("button");
-    selectBtn.classList.add("select-dayTask");
-    selectBtn.title = "Select task";
-    selectBtn.style.cursor = "pointer";
-    selectBtn.innerHTML = isSelected
-      ? `<span class="material-symbols-outlined">check_box</span>`
-      : `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
-    if (isSelected) eventDiv.classList.add("selected-task-popup");
+  // Select button
+  const selectBtn = document.createElement("button");
+  selectBtn.classList.add("select-dayTask");
+  selectBtn.title = "Select task";
+  selectBtn.style.cursor = "pointer";
+  selectBtn.innerHTML = isSelected
+    ? `<span class="material-symbols-outlined">check_box</span>`
+    : `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+  if (isSelected) eventDiv.classList.add("selected-task-popup");
 
-    // Task content with colored left border
-    const content = document.createElement("div");
-    content.className = "event-content";
-    if (color) content.style.borderLeft = `5px solid ${color}`;
+  // Task content with colored left border
+  const content = document.createElement("div");
+  content.className = "event-content";
+  if (color) content.style.borderLeft = `5px solid ${color}`;
 
-    const title = document.createElement("span");
-    title.className = "event-title";
-    title.textContent = task;
+  const title = document.createElement("span");
+  title.className = "event-title";
+  title.textContent = task;
 
-    content.appendChild(title);
-
-
-    title.addEventListener("blur", function onBlur() {
-      console.log("blurred");
-      title.contentEditable = "false";
-      eventDiv.style.outline = "none";
-      // title.removeEventListener("blur", onBlur);
-    });
+  content.appendChild(title);
 
 
-    // Arrow Up button
-    const arrowUp = document.createElement("button");
-    arrowUp.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_up</span>`;
-    arrowUp.title = "Add task above";
-    arrowUp.style.cursor = "pointer";
-    arrowUp.classList.add("arrow-up-dayTask");
+  title.addEventListener("blur", function onBlur() {
+    console.log("blurred");
+    title.contentEditable = "false";
+    eventDiv.style.outline = "none";
+    // title.removeEventListener("blur", onBlur);
+  });
 
-    // Arrow Down button
-    const arrowDown = document.createElement("button");
-    arrowDown.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_down</span>`;
-    arrowDown.title = "Add task below";
-    arrowDown.style.cursor = "pointer";
-    arrowDown.classList.add("arrow-down-dayTask");
 
-    // Append buttons and content to eventDiv
-    eventDiv.appendChild(selectBtn);
-    eventDiv.appendChild(content);
-    eventDiv.appendChild(arrowUp);
-    eventDiv.appendChild(arrowDown);
+  // Arrow Up button
+  const arrowUp = document.createElement("button");
+  arrowUp.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_up</span>`;
+  arrowUp.title = "Add task above";
+  arrowUp.style.cursor = "pointer";
+  arrowUp.classList.add("arrow-up-dayTask");
 
-    // Store period and index for reference (optional)
-    title.dataset.period = period;
-    title.dataset.index = index;
+  // Arrow Down button
+  const arrowDown = document.createElement("button");
+  arrowDown.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_down</span>`;
+  arrowDown.title = "Add task below";
+  arrowDown.style.cursor = "pointer";
+  arrowDown.classList.add("arrow-down-dayTask");
 
-    return eventDiv;
-  }
+  // Append buttons and content to eventDiv
+  eventDiv.appendChild(selectBtn);
+  eventDiv.appendChild(content);
+  eventDiv.appendChild(arrowUp);
+  eventDiv.appendChild(arrowDown);
+
+  // Store period and index for reference (optional)
+  title.dataset.period = period;
+  title.dataset.index = index;
+
+  return eventDiv;
+}
 
 popupTasks.addEventListener("click", handlePopupClick);
 
@@ -675,6 +675,12 @@ function renderAppropriateStyle() {
 
 
 document.getElementById("delete-btn-popup").addEventListener("click", () => {
+
+  const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+
+  undoStack.push(currentState);
+  redoStack.length = 0; // clear redo stack because new action happened
+
   // Select all .event elements that are selected (have class .selected-task-popup)
   const selectedEvents = document.querySelectorAll("#popup-tasks .event.selected-task-popup");
 
