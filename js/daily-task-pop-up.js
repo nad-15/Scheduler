@@ -167,6 +167,9 @@ function adjustCalendarHeight() {
 
 
 function showDayTasks(d) {
+
+  undoStack.length = 0;
+  redoStack.length = 0;
   // const target = e.target.closest('[data-full-date]');
   // if (!target) return;
   // console.log("call to showDayTask succesful from grid");
@@ -420,7 +423,7 @@ function showDayTasksEditable(date, focusInfo = null) {
           const newTitle = newEvent.querySelector(".event-title");
           if (newTitle) {
             newTitle.contentEditable = "true";
-            newEvent.style.outline = "2px solid #00aaff";
+            newEvent.style.outline = "1px solid #00aaff";
             newTitle.focus();
 
             const range = document.createRange();
@@ -459,7 +462,7 @@ function autoFocusEventTitle(eventDiv) {
   if (!title) return;
 
   title.contentEditable = "true";
-  eventDiv.style.outline = "2px solid #00aaff";
+  eventDiv.style.outline = "1px solid #00aaff";
   title.focus();
 
   const range = document.createRange();
@@ -489,7 +492,7 @@ const handlePopupClick = (e) => {
     // Add outline to parent .event
     const eventDiv = title.closest(".event");
     if (eventDiv) {
-      eventDiv.style.outline = "2px solid #00aaff";
+      eventDiv.style.outline = "1px solid #00aaff";
     }
 
     // Focus and highlight all text
@@ -754,12 +757,14 @@ function showPopup() {
 }
 
 function hidePopup() {
-  if (isEditing) {
-    const confirmSave = confirm("Do you want to save changes before closing?");
-    if (confirmSave) {
-      document.getElementById("toggle-edit").click(); // trigger save
+  if (isEditing && undoStack.length > 0) {
+    if (confirm("Do you want to save changes?")) {
+      document.getElementById("toggle-edit").click();
     }
   }
+
+  undoStack.length = 0;
+  redoStack.length = 0;
 
 
 
