@@ -764,6 +764,14 @@ function hidePopup() {
     }
   }
 
+  if (isEditing) {
+    const normalButtons = document.querySelectorAll('.normal-mode');
+    const editButtons = document.querySelectorAll('.edit-mode');
+    
+    normalButtons.forEach(btn => btn.classList.remove('hidden'));
+    editButtons.forEach(btn => btn.classList.add('hidden'));
+  }
+
   undoStack.length = 0;
   redoStack.length = 0;
 
