@@ -481,30 +481,54 @@ const handlePopupClick = (e) => {
   const target = e.target;
 
   // Title clicked?
-  const title = target.closest(".event-title");
-  if (title && popupTasks.contains(title)) {
+const title = target.closest(".event-title");
+if (title && popupTasks.contains(title)) {
+  e.stopPropagation();
+  e.preventDefault();
 
-    e.stopPropagation();
-    e.preventDefault();
-    // Make editable
+  const eventDiv = title.closest(".event");
+
+  // First click → make editable + select all
+  if (title.contentEditable !== "true") {
     title.contentEditable = "true";
-
-    // Add outline to parent .event
-    const eventDiv = title.closest(".event");
     if (eventDiv) {
       eventDiv.style.outline = "1px solid #00aaff";
     }
-
-    // Focus and highlight all text
     title.focus();
+
+    // Select all text
     const range = document.createRange();
     range.selectNodeContents(title);
-
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
-    return;
+
+  } else {
+    // Already editable → place caret at click position
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+
+    const range = document.createRange();
+
+    if (document.caretRangeFromPoint) {
+      const caretRange = document.caretRangeFromPoint(e.clientX, e.clientY);
+      if (caretRange) {
+        range.setStart(caretRange.startContainer, caretRange.startOffset);
+      }
+    } else if (document.caretPositionFromPoint) {
+      const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+      if (pos) {
+        range.setStart(pos.offsetNode, pos.offset);
+      }
+    }
+
+    range.collapse(true);
+    sel.addRange(range);
   }
+
+  return;
+}
+
 
 
 
