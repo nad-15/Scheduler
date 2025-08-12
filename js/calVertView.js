@@ -453,7 +453,7 @@ function cleanUpNoTasksText() {
     redoStack.length = 0; // clear redo stack because new action happened
         const newEvent = createEventElement({
           task: "No Title",
-          color: "#007bff",
+          color: chosenColor,
           period: period,
           index: null,
           isSelected: false,
