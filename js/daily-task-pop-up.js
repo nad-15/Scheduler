@@ -300,6 +300,11 @@ function showDayTasks(d) {
 // Assume dayTasksForEdit is a global or passed in variable representing the day's tasks copy for editing
 function showDayTasksEditable(date, focusInfo = null) {
   console.log("rerendering");
+
+  console.log("Clicked element:", event.currentTarget); // The element that the listener is attached to
+  console.log("Clicked element (actual target):", event.target); // The actual element clicked (might be child)
+
+
   // popUpDate = date;
   if (!date) return;
 
@@ -307,52 +312,195 @@ function showDayTasksEditable(date, focusInfo = null) {
   const dayTasks = dayTasksForEdit;
   // console.log(dayTasks);
 
-  // Fix date padding for JS Date
-  const [year, month, day] = date.split('-');
-  const paddedMonth = String(Number(month) + 1).padStart(2, '0');
-  const paddedDay = String(day).padStart(2, '0');
-  const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
+  // // Fix date padding for JS Date
+  // const [year, month, day] = date.split('-');
+  // const paddedMonth = String(Number(month) + 1).padStart(2, '0');
+  // const paddedDay = String(day).padStart(2, '0');
+  // const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
 
-  const dateObj = new Date(fixedDate);
-  currentMonthValue = dateObj.getMonth();
-  currentYearValue = dateObj.getFullYear();
+  // const dateObj = new Date(fixedDate);
+  // currentMonthValue = dateObj.getMonth();
+  // currentYearValue = dateObj.getFullYear();
 
-  const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
-  const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-  const dayDiff = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24));
+  // const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+  // const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  // const dayDiff = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24));
 
-  let label;
-  let bottomLine;
+  // let label;
+  // let bottomLine;
 
-  if (dayDiff === 0) {
-    label = "Today";
-  } else if (dayDiff === -1) {
-    label = "Yesterday";
-  } else if (dayDiff === 1) {
-    label = "Tomorrow";
-  }
+  // if (dayDiff === 0) {
+  //   label = "Today";
+  // } else if (dayDiff === -1) {
+  //   label = "Yesterday";
+  // } else if (dayDiff === 1) {
+  //   label = "Tomorrow";
+  // }
 
-  if (label) {
-    const shortWeekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-    const shortDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-    bottomLine = `${shortWeekday}, ${shortDate}`;
-  } else {
-    label = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-    bottomLine = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-  }
+  // if (label) {
+  //   const shortWeekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+  //   const shortDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  //   bottomLine = `${shortWeekday}, ${shortDate}`;
+  // } else {
+  //   label = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+  //   bottomLine = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  // }
 
-  document.getElementById("popup-date").innerHTML = `
-    <div class="weekday">${label}</div>
-    <div class="month-year">${bottomLine}</div>
-  `;
+  // document.getElementById("popup-date").innerHTML = `
+  //   <div class="weekday">${label}</div>
+  //   <div class="month-year">${bottomLine}</div>
+  // `;
 
   const popupTasks = document.getElementById("popup-tasks");
+
+  // Delegate clicks inside popupTasks
+  popupTasks.addEventListener("click", (e) => {
+    const target = e.target;
+
+    // Select button clicked?
+    const selectBtn = target.closest(".select-dayTask");
+    if (selectBtn && popupTasks.contains(selectBtn)) {
+
+      // Toggle selection on click
+
+      e.stopPropagation();
+      e.preventDefault();
+      const eventDiv = e.target.closest(".event");
+
+      if (selectBtn.innerHTML.includes("check_box_outline_blank")) {
+        selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box</span>`;
+        eventDiv.classList.add("selected-task-popup");
+      } else {
+        selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+        eventDiv.classList.remove("selected-task-popup");
+      }
+
+
+
+
+    }
+
+    // Arrow Up button clicked?
+    const arrowUp = target.closest(".arrow-up-dayTask");
+    if (arrowUp && popupTasks.contains(arrowUp)) {
+      e.stopPropagation();
+      e.preventDefault();
+
+      console.log("trieggerred CREATEEVENTELEMENT");
+
+      const currentEvent = e.target.closest(".event");
+      const period = currentEvent.querySelector(".event-title").dataset.period;
+
+      // Create a new event element (new task)
+      const newEvent = createEventElement({
+        task: "No Title",
+        color: "#007bff",
+        period: period,
+        index: null, // index can be updated later if needed
+        isSelected: false,
+      });
+
+
+      // Insert new event before the current event
+      currentEvent.parentNode.insertBefore(newEvent, currentEvent);
+      renderAppropriateStyle();
+
+    }
+
+    // Arrow Down button clicked?
+    const arrowDown = target.closest(".arrow-down-dayTask");
+    if (arrowDown && popupTasks.contains(arrowDown)) {
+
+      e.stopPropagation();
+      e.preventDefault();
+
+      const currentEvent = e.target.closest(".event");
+      const period = currentEvent.querySelector(".event-title").dataset.period;
+
+      const newEvent = createEventElement({
+        task: "No Title",
+        color: "#007bff",
+        period: period,
+        index: null,
+        isSelected: false,
+      });
+
+
+
+      // Insert new event after the current event
+      if (currentEvent.nextSibling) {
+        currentEvent.parentNode.insertBefore(newEvent, currentEvent.nextSibling);
+      } else {
+        currentEvent.parentNode.appendChild(newEvent);
+      }
+      renderAppropriateStyle();
+
+
+    }
+
+    function createEventElement({ task = "No Title", color = "#007bff", period, index, isSelected = false }) {
+      const eventDiv = document.createElement("div");
+      eventDiv.className = "event";
+
+      // Select button
+      const selectBtn = document.createElement("button");
+      selectBtn.classList.add("select-dayTask");
+      selectBtn.title = "Select task";
+      selectBtn.style.cursor = "pointer";
+      selectBtn.innerHTML = isSelected
+        ? `<span class="material-symbols-outlined">check_box</span>`
+        : `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
+      if (isSelected) eventDiv.classList.add("selected-task-popup");
+
+      // Task content with colored left border
+      const content = document.createElement("div");
+      content.className = "event-content";
+      if (color) content.style.borderLeft = `5px solid ${color}`;
+
+      const title = document.createElement("span");
+      title.className = "event-title";
+      title.textContent = task;
+
+      content.appendChild(title);
+
+      // Arrow Up button
+      const arrowUp = document.createElement("button");
+      arrowUp.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_up</span>`;
+      arrowUp.title = "Add task above";
+      arrowUp.style.cursor = "pointer";
+      arrowUp.classList.add("arrow-up-dayTask");
+
+      // Arrow Down button
+      const arrowDown = document.createElement("button");
+      arrowDown.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_down</span>`;
+      arrowDown.title = "Add task below";
+      arrowDown.style.cursor = "pointer";
+      arrowDown.classList.add("arrow-down-dayTask");
+
+      // Append buttons and content to eventDiv
+      eventDiv.appendChild(selectBtn);
+      eventDiv.appendChild(content);
+      eventDiv.appendChild(arrowUp);
+      eventDiv.appendChild(arrowDown);
+
+      // Store period and index for reference (optional)
+      title.dataset.period = period;
+      title.dataset.index = index;
+
+      return eventDiv;
+    }
+
+
+
+
+  });
+
   popupTasks.innerHTML = "";
 
   if (!dayTasks) {
-    const noTask = document.createElement("p");
-    noTask.textContent = "No tasks for this day.";
-    popupTasks.appendChild(noTask);
+    // const noTask = document.createElement("p");
+    // noTask.textContent = "No tasks for this day.";
+    // popupTasks.appendChild(noTask);
   } else {
     const periods = ["morning", "afternoon", "evening"];
     let currentlyEditing = null;
@@ -385,37 +533,7 @@ function showDayTasksEditable(date, focusInfo = null) {
           selectBtn.title = "Select task";
           selectBtn.style.cursor = "pointer";
 
-          const taskId = `${period}-${index}`; // Unique ID for tracking selection
-
-          // Initialize button state based on selectedTasksPopup
-          if (selectedTasksPopup.includes(taskId)) {
-            selectBtn.innerHTML = `<span class="material-symbols-outlined">
-check_box
-</span>`;
-            eventDiv.classList.add("selected-task-popup");
-          } else {
-            selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
-            eventDiv.classList.remove("selected-task-popup");
-          }
-
-          // Toggle selection on click
-          selectBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-
-            const idx = selectedTasksPopup.indexOf(taskId);
-            if (idx === -1) {
-              selectedTasksPopup.push(taskId);
-              selectBtn.innerHTML = `<span class="material-symbols-outlined">
-check_box
-</span>`;
-              eventDiv.classList.add("selected-task-popup");
-            } else {
-              selectedTasksPopup.splice(idx, 1);
-              selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
-              eventDiv.classList.remove("selected-task-popup");
-            }
-          });
+          selectBtn.innerHTML = `<span class="material-symbols-outlined">check_box_outline_blank</span>`;
 
 
           // event-content with task title and colored left border
@@ -429,17 +547,13 @@ check_box
 
           // Arrow buttons on right
           const arrowUp = document.createElement("button");
-          arrowUp.innerHTML = `<span class="material-symbols-outlined">
-keyboard_arrow_up
-</span>`;
+          arrowUp.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_up</span>`;
           arrowUp.title = "Add task above";
           arrowUp.style.cursor = "pointer";
           arrowUp.classList.add("arrow-up-dayTask");
 
           const arrowDown = document.createElement("button");
-          arrowDown.innerHTML = `<span class="material-symbols-outlined">
-keyboard_arrow_down
-</span>`;
+          arrowDown.innerHTML = `<span class="material-symbols-outlined">keyboard_arrow_down</span>`;
           arrowDown.classList.add("arrow-down-dayTask");
           arrowDown.title = "Add task below";
           arrowDown.style.cursor = "pointer";
@@ -475,28 +589,6 @@ keyboard_arrow_down
               }
             }
           }
-
-          arrowUp.addEventListener("click", (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            saveCurrentTask();
-
-            if (!dayTasksForEdit[period]) dayTasksForEdit[period] = [];
-            dayTasksForEdit[period].splice(index, 0, { task: "No Title", color: "#007bff" });
-
-            showDayTasksEditable(date, { period, index });
-          });
-
-          arrowDown.addEventListener("click", (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            saveCurrentTask();
-
-            if (!dayTasksForEdit[period]) dayTasksForEdit[period] = [];
-            dayTasksForEdit[period].splice(index + 1, 0, { task: "No Title", color: "#007bff" });
-
-            showDayTasksEditable(date, { period, index: index + 1 });
-          });
 
           title.addEventListener("click", () => {
             // Remove outline from previously editing title's parent if any
@@ -612,25 +704,39 @@ keyboard_arrow_down
 
 
   // Show editing UI styles
-  if (isEditing) {
-    document.querySelectorAll(".event-content").forEach(el => {
-      el.style.marginLeft = "0";
-      el.style.marginRight = "0";
-    });
+  function renderAppropriateStyle() {
+    if (isEditing) {
+      document.querySelectorAll(".event-content").forEach(el => {
+        el.style.marginLeft = "0";
+        el.style.marginRight = "0";
+      });
 
-    document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
-      el.style.display = "inline-flex";
-    });
+      document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+        el.style.display = "inline-flex";
+      });
 
-    document.querySelectorAll(".event").forEach(el => {
-      el.style.border = "1px solid #ccc";
-      el.style.borderRadius = "5px";
-    });
+      document.querySelectorAll(".event").forEach(el => {
+        el.style.border = "1px solid #ccc";
+        el.style.borderRadius = "5px";
+      });
+    }
   }
+
 
   showPopup();
 }
 
+function updateSelectedTasksFromDOM() {
+  selectedTasksPopup = [];
+  document.querySelectorAll(".select-dayTask").forEach(btn => {
+    if (btn.querySelector(".material-symbols-outlined").textContent === "check_box") {
+      const eventDiv = btn.closest(".event");
+      const period = eventDiv.dataset.period;
+      const taskText = eventDiv.querySelector(".event-title")?.textContent.trim();
+      selectedTasksPopup.push({ period, taskText });
+    }
+  });
+}
 
 
 

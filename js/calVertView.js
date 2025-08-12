@@ -449,43 +449,43 @@ function endDraggingPopUp() {
 }
 
 
-function handlePointerDownPopUp(e) {
-  if (isTouch) return;
+// function handlePointerDownPopUp(e) {
+//   if (isTouch) return;
 
-  const target = e.target.closest('.event');
-  if (!target) return;
+//   const target = e.target.closest('.event');
+//   if (!target) return;
 
-  startY = e.clientY;
-  dragTarget = target;
-  canStartDrag = false;
+//   startY = e.clientY;
+//   dragTarget = target;
+//   canStartDrag = false;
 
-  dragTimeout = setTimeout(() => {
-    canStartDrag = true;
-  }, 100);
-}
+//   dragTimeout = setTimeout(() => {
+//     canStartDrag = true;
+//   }, 100);
+// }
 
-function handlePointerMovePopUp(e) {
-  const distance = Math.abs(e.clientY - startY);
+// function handlePointerMovePopUp(e) {
+//   const distance = Math.abs(e.clientY - startY);
 
-  if (dragTimeout && distance > MAX_DRAG_DISTANCE) {
-    clearTimeout(dragTimeout);
-    dragTimeout = null;
-    dragTarget = null;
-    canStartDrag = false;
-  }
+//   if (dragTimeout && distance > MAX_DRAG_DISTANCE) {
+//     clearTimeout(dragTimeout);
+//     dragTimeout = null;
+//     dragTarget = null;
+//     canStartDrag = false;
+//   }
 
-  if (!draggedItem && canStartDrag && dragTarget) {
-    requestAnimationFrame(() => {
-      startDraggingPopUp(e.clientX, e.clientY, dragTarget);
-    });
-  }
+//   if (!draggedItem && canStartDrag && dragTarget) {
+//     requestAnimationFrame(() => {
+//       startDraggingPopUp(e.clientX, e.clientY, dragTarget);
+//     });
+//   }
 
-  if (draggedItem) moveGhostThrottledPopUp(e.clientY);
-}
+//   if (draggedItem) moveGhostThrottledPopUp(e.clientY);
+// }
 
-function handlePointerUpPopUp() {
-  endDraggingPopUp();
-}
+// function handlePointerUpPopUp() {
+//   endDraggingPopUp();
+// }
 
 function handleTouchStartPopUp(e) {
   isTouch = true;
@@ -513,9 +513,6 @@ function handleTouchMovePopUp(e) {
     dragTimeout = null;
     dragTarget = null;
     canStartDrag = false;
-
-
-
   }
 
   if (!draggedItem && canStartDrag && dragTarget) {
@@ -530,7 +527,7 @@ function handleTouchMovePopUp(e) {
 
 function handleTouchEndPopUp() {
   saveTaskOrderToTemp();
-  showDayTasksEditable(popUpDate);
+  // showDayTasksEditable(popUpDate);
   endDraggingPopUp();
 }
 function addDragListeners() {
@@ -544,16 +541,20 @@ function addDragListeners() {
   goTodayBtn.disabled = true;
   goTodayBtn.classList.add(`disabled-btn`);
 
+  const popupTasks = document.getElementById("popup-tasks");
+
 
   // document.addEventListener('pointerdown', handlePointerDownPopUp);
   // document.addEventListener('pointermove', handlePointerMovePopUp);
   // document.addEventListener('pointerup', handlePointerUpPopUp);
   // document.addEventListener('pointercancel', endDraggingPopUp);
 
-  document.addEventListener('touchstart', handleTouchStartPopUp, { passive: false });
-  document.addEventListener('touchmove', handleTouchMovePopUp, { passive: false });
-  document.addEventListener('touchend', handleTouchEndPopUp);
-  document.addEventListener('touchcancel', endDraggingPopUp);
+
+// Add listeners to popupTasks element instead of document
+popupTasks.addEventListener('touchstart', handleTouchStartPopUp, { passive: false });
+popupTasks.addEventListener('touchmove', handleTouchMovePopUp, { passive: false });
+popupTasks.addEventListener('touchend', handleTouchEndPopUp);
+popupTasks.addEventListener('touchcancel', endDraggingPopUp);
 }
 
 function removeDragListeners() {
@@ -567,16 +568,19 @@ function removeDragListeners() {
   goTodayBtn.disabled = false;
   goTodayBtn.classList.remove(`disabled-btn`);
 
+    const popupTasks = document.getElementById("popup-tasks");
+
 
   // document.removeEventListener('pointerdown', handlePointerDownPopUp);
   // document.removeEventListener('pointermove', handlePointerMovePopUp);
   // document.removeEventListener('pointerup', handlePointerUpPopUp);
   // document.removeEventListener('pointercancel', endDraggingPopUp);
 
-  document.removeEventListener('touchstart', handleTouchStartPopUp, { passive: false });
-  document.removeEventListener('touchmove', handleTouchMovePopUp, { passive: false });
-  document.removeEventListener('touchend', handleTouchEndPopUp);
-  document.removeEventListener('touchcancel', endDraggingPopUp);
+// Later, to remove them:
+popupTasks.removeEventListener('touchstart', handleTouchStartPopUp, { passive: false });
+popupTasks.removeEventListener('touchmove', handleTouchMovePopUp, { passive: false });
+popupTasks.removeEventListener('touchend', handleTouchEndPopUp);
+popupTasks.removeEventListener('touchcancel', endDraggingPopUp);
 }
 
 

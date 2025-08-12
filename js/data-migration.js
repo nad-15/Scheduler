@@ -1,5 +1,22 @@
+function clearLockStates() {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith("lockState-")) {
+      localStorage.removeItem(key);
+      // Because removing shifts indexes, restart loop
+      i = -1;
+    }
+  }
+}
 
+
+clearLockStates();
 // console.log("Success");
+
+
+
+//log on mobile the keys
+//add backup downloadable and uploadable the localstorage keys
 
 // migrateTaskDataToArrayFormat();
 
