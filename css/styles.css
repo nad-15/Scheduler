@@ -1353,10 +1353,6 @@ h2 {
     font-size: 20px;
 }
 
-#check_box {
-    font-size: 18px ;
-}
-
 
 
 
@@ -2962,6 +2958,17 @@ h2 {
 
 
 
+#arrows-popup{
+    font-size: larger;
+    font-weight: 100;
+    color: grey;
+}
+
+
+#check_box {
+    font-size: 18px ;
+        color: grey;
+}
 
 
 .arrow-up-dayTask {

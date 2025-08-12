@@ -359,13 +359,13 @@ function showDayTasksEditable(date, focusInfo = null) {
 
           // Arrow buttons on right
           const arrowUp = document.createElement("button");
-          arrowUp.innerHTML = `<span class="material-symbols-outlined">first_page</span>`;
+          arrowUp.innerHTML = `<span class="material-symbols-outlined" id="arrows-popup">first_page</span>`;
           arrowUp.title = "Add task above";
           arrowUp.style.cursor = "pointer";
           arrowUp.classList.add("arrow-up-dayTask");
 
           const arrowDown = document.createElement("button");
-          arrowDown.innerHTML = `<span class="material-symbols-outlined">first_page</span>`;
+          arrowDown.innerHTML = `<span class="material-symbols-outlined"id="arrows-popup">first_page</span>`;
           arrowDown.classList.add("arrow-down-dayTask");
           arrowDown.title = "Add task below";
           arrowDown.style.cursor = "pointer";
@@ -667,14 +667,14 @@ function createEventElement({ task = "No Title", color = "#007bff", period, inde
 
   // Arrow Up button
   const arrowUp = document.createElement("button");
-  arrowUp.innerHTML = `<span class="material-symbols-outlined">first_page</span>`;
+  arrowUp.innerHTML = `<span class="material-symbols-outlined"id="arrows-popup">first_page</span>`;
   arrowUp.title = "Add task above";
   arrowUp.style.cursor = "pointer";
   arrowUp.classList.add("arrow-up-dayTask");
 
   // Arrow Down button
   const arrowDown = document.createElement("button");
-  arrowDown.innerHTML = `<span class="material-symbols-outlined">first_page</span>`;
+  arrowDown.innerHTML = `<span class="material-symbols-outlined"id="arrows-popup">first_page</span>`;
   arrowDown.title = "Add task below";
   arrowDown.style.cursor = "pointer";
   arrowDown.classList.add("arrow-down-dayTask");
