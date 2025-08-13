@@ -2959,8 +2959,9 @@ h2 {
 
 
 #arrows-popup{
-    font-size: larger;
-    font-weight: 100;
+    font-size: 20px;
+    font-variation-settings: 'wght' 200;
+    font-weight: 200;
     color: grey;
 }
 
