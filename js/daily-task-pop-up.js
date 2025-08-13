@@ -349,14 +349,7 @@ function showDayTasksEditable(date, focusInfo = null) {
           const eventDiv = document.createElement("div");
           eventDiv.className = "event";
 
-          // Replace this:
-          // const deleteBtn = document.createElement("button");
-          // deleteBtn.classList.add("delete-dayTask");
-          // deleteBtn.title = "Delete task";
-          // deleteBtn.style.cursor = "pointer";
-          // deleteBtn.innerHTML = `<span class="material-symbols-outlined">delete_forever</span>`;
-
-          // WITH THIS:
+          //Select button checkbox
           const selectBtn = document.createElement("button");
           selectBtn.classList.add("select-dayTask");
           selectBtn.title = "Select task";
@@ -404,6 +397,7 @@ function showDayTasksEditable(date, focusInfo = null) {
             const eventDiv = title.closest('.event');
             if (eventDiv) {
               eventDiv.style.outline = 'none';
+              eventDiv.style.border = "1px solid #ccc";
             }
           });
 
@@ -440,7 +434,7 @@ function showDayTasksEditable(date, focusInfo = null) {
           const newTitle = newEvent.querySelector(".event-title");
           if (newTitle) {
             newTitle.contentEditable = "true";
-            newEvent.stylel.borderColor = "#00aaff";
+            newEvent.stylel.border = "2px solid #00aaff";
             newTitle.focus();
 
             const range = document.createRange();
@@ -469,7 +463,10 @@ function blurCurrentlyEditing() {
   if (editingTitle) {
     editingTitle.contentEditable = "false";
     const eventDiv = editingTitle.closest(".event");
-    if (eventDiv) eventDiv.style.outline = "none";
+    if (eventDiv){
+      eventDiv.style.outline = 'none';
+       eventDiv.style.border = "1px solid #ccc";
+    }
     editingTitle.blur();
   }
 }
@@ -479,7 +476,7 @@ function autoFocusEventTitle(eventDiv) {
   if (!title) return;
 
   title.contentEditable = "true";
-  eventDiv.style.borderColor = "#00aaff";
+  eventDiv.style.border = "2px solid #00aaff";
   title.focus();
 
   const range = document.createRange();
@@ -509,7 +506,7 @@ const handlePopupClick = (e) => {
     if (title.contentEditable !== "true") {
       title.contentEditable = "true";
       if (eventDiv) {
-        eventDiv.style.borderColor = "#00aaff";
+        eventDiv.style.border = "2px solid #00aaff";
       }
       title.focus();
 
@@ -677,7 +674,8 @@ function createEventElement({ task = "No Title", color = "#007bff", period, inde
   title.addEventListener("blur", function onBlur() {
     console.log("blurred");
     title.contentEditable = "false";
-    eventDiv.style.outline = "none";
+     eventDiv.style.border = "1px solid #ccc";
+    eventDiv.style.border = "1px solid #ccc";
     // title.removeEventListener("blur", onBlur);
   });
 

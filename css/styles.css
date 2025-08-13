@@ -2908,6 +2908,7 @@ h2 {
     flex-direction: column;
     margin: 2px;
     flex-grow: 1;
+    /* background-color: black; */
 
 }
 
@@ -3002,17 +3003,26 @@ h2 {
 }
 
 
-
 .event {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    /* border: 2px solid green; */
     margin-top: 3px;
     margin-bottom: 3px;
-    
+    position: relative;
+
+    /* cuts at top-left and bottom-right */
+    clip-path: polygon(
+        8px 0,                       /* a bit right from top-left */
+        100% 0,                       /* top-right */
+        100% calc(100% - 8px),        /* a bit above bottom-right */
+        calc(100% - 8px) 100%,        /* a bit left from bottom-right */
+        0 100%,                       /* bottom-left */
+        0 8px                         /* a bit down from top-left */
+    );
 }
+
 
 
 .arrow-up-dayTask,

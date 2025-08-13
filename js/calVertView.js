@@ -16,7 +16,7 @@ const undoStack = [];
 const redoStack = [];
 
 let chosenColor = '#6a5044';
-let lineDivider = null;  
+let lineDivider = null;
 
 
 let dayTasksForEdit = null;
@@ -359,7 +359,7 @@ function startDraggingPopUp(x, y, target) {
   const content = target.querySelector('.event-content');
   if (!content || !content.parentNode) return;
 
-  const parentElem = content.parentNode; 
+  const parentElem = content.parentNode;
   ghost = parentElem.cloneNode(true);
   ghost.classList.add('ghost');
 
@@ -374,7 +374,7 @@ function startDraggingPopUp(x, y, target) {
 
   ghost.style.position = 'fixed';
   ghost.style.left = `${rect.left}px`;
-  ghost.style.top = `${y-offsetYforEditPopUp}px`;
+  ghost.style.top = `${y - offsetYforEditPopUp}px`;
   ghost.style.pointerEvents = 'none';
 
   document.body.appendChild(ghost);
@@ -448,9 +448,9 @@ function cleanUpNoTasksText() {
 
 
       noTask.addEventListener("click", () => {
-    const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
-    undoStack.push(currentState);
-    redoStack.length = 0; // clear redo stack because new action happened
+        const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+        undoStack.push(currentState);
+        redoStack.length = 0; // clear redo stack because new action happened
         const newEvent = createEventElement({
           task: "No Title",
           color: chosenColor,
@@ -468,7 +468,9 @@ function cleanUpNoTasksText() {
         const newTitle = newEvent.querySelector(".event-title");
         if (newTitle) {
           newTitle.contentEditable = "true";
-          newEvent.style.borderColor = "#00aaff";
+          newEvent.style.outline = "none";
+          newEvent.style.border = "1px solid #ccc";
+
           newTitle.focus();
 
           const range = document.createRange();
@@ -567,7 +569,7 @@ function handleTouchStartPopUp(e) {
   dragTimeout = setTimeout(() => {
     canStartDrag = true;
 
-        // Save pre-drag state to undo only when drag really starts
+    // Save pre-drag state to undo only when drag really starts
     undoStack.push(saveTaskOrderToTemp());
     redoStack.length = 0; // Clear redo
 
@@ -765,7 +767,7 @@ function redo() {
   if (redoStack.length === 0) return;
 
   // Save current state to undo stack before redoing
-undoStack.push(saveTaskOrderToTemp());
+  undoStack.push(saveTaskOrderToTemp());
 
 
   // Restore next state
@@ -794,7 +796,7 @@ function undo() {
   if (undoStack.length === 0) return;
 
   // Save current state to redo stack before undoing
-redoStack.push(saveTaskOrderToTemp());
+  redoStack.push(saveTaskOrderToTemp());
 
 
   // Restore previous state
@@ -917,16 +919,16 @@ function saveTaskOrderToTemp() {
     snapshot[period] = events.length === 0
       ? []
       : events.map(event => {
-          let task = event.querySelector(".event-title")?.textContent.trim() || "";
-          const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
+        let task = event.querySelector(".event-title")?.textContent.trim() || "";
+        const color = getComputedStyle(event.querySelector(".event-content")).borderLeftColor;
 
-          // Normalize placeholder task names
-          if (task === "No Title" || task === "No tasks for this period.") {
-            task = "";
-          }
+        // Normalize placeholder task names
+        if (task === "No Title" || task === "No tasks for this period.") {
+          task = "";
+        }
 
-          return { task, color: rgbToHex(color) };
-        });
+        return { task, color: rgbToHex(color) };
+      });
   });
 
   return snapshot;
