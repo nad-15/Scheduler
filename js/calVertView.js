@@ -786,7 +786,7 @@ undoStack.push(saveTaskOrderToTemp());
 
   document.querySelectorAll(".event").forEach(el => {
     el.style.border = "1px solid #ccc";
-    el.style.borderRadius = "5px";
+    el.style.borderRadius = "2px";
   });
 }
 
@@ -814,7 +814,7 @@ redoStack.push(saveTaskOrderToTemp());
 
   document.querySelectorAll(".event").forEach(el => {
     el.style.border = "1px solid #ccc";
-    el.style.borderRadius = "5px";
+    el.style.borderRadius = "2px";
   });
 }
 
