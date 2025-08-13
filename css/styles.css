@@ -3009,8 +3009,9 @@ h2 {
     align-items: center;
     width: 100%;
     /* border: 2px solid green; */
-    margin-top: 2px;
-    margin-bottom: 2px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    
 }
 
 
@@ -3022,7 +3023,7 @@ h2 {
 
 .event-content {
     display: flex;
-    font-size: 12px;
+    /* font-size: 12px; */
     width: 100%;
     /* 1rem */
     padding: 5px 10px;

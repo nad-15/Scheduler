@@ -440,7 +440,7 @@ function showDayTasksEditable(date, focusInfo = null) {
           const newTitle = newEvent.querySelector(".event-title");
           if (newTitle) {
             newTitle.contentEditable = "true";
-            newEvent.style.outline = "1px solid #00aaff";
+            newEvent.stylel.borderColor = "#00aaff";
             newTitle.focus();
 
             const range = document.createRange();
@@ -479,7 +479,7 @@ function autoFocusEventTitle(eventDiv) {
   if (!title) return;
 
   title.contentEditable = "true";
-  eventDiv.style.outline = "1px solid #00aaff";
+  eventDiv.style.borderColor = "#00aaff";
   title.focus();
 
   const range = document.createRange();
@@ -509,7 +509,7 @@ const handlePopupClick = (e) => {
     if (title.contentEditable !== "true") {
       title.contentEditable = "true";
       if (eventDiv) {
-        eventDiv.style.outline = "1px solid #00aaff";
+        eventDiv.style.borderColor = "#00aaff";
       }
       title.focus();
 
