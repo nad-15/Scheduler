@@ -895,6 +895,7 @@ function copyTasksForDate(dateKey) {
 let originalColorOptionsParent = null;
 let originalColorOptionsNextSibling = null;
 
+
 function moveColorOptionsToPopup() {
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions) return;
@@ -911,20 +912,33 @@ function moveColorOptionsToPopup() {
     nav.parentElement.insertBefore(colorOptions, nav);
 
     const colorPickerContainer = colorOptions.querySelector(".color-picker");
-    colorPickerContainer.style.borderRadius = "0";
-
+    colorPickerContainer.style.borderRadius = "10px";
     colorOptions.style.transform = "scale(0.87)";
     colorOptions.style.width = "100%";
 
-    // colorOptions.style.margin = "0 10px";
+    if (!lineDivider) {
+      lineDivider = document.createElement("div");
+      lineDivider.style.height = "0.5px";
+      lineDivider.style.backgroundColor = "#ccc";
+      lineDivider.style.width = "100%";
+      lineDivider.style.marginTop = "10px";
+    }
+
+    // Insert divider before colorOptions if it's not already there
+    if (!lineDivider.parentElement) {
+      nav.parentElement.insertBefore(lineDivider, colorOptions);
+    }
   }
-
-
 }
 
 function restoreColorOptions() {
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions || !originalColorOptionsParent) return;
+
+  // Remove divider if present
+  if (lineDivider && lineDivider.parentElement) {
+    lineDivider.parentElement.removeChild(lineDivider);
+  }
 
   if (originalColorOptionsNextSibling) {
     originalColorOptionsParent.insertBefore(colorOptions, originalColorOptionsNextSibling);
@@ -932,12 +946,11 @@ function restoreColorOptions() {
     originalColorOptionsParent.appendChild(colorOptions);
   }
 
-  // Reset styles you changed when moving it
-
+  // Reset styles
   const colorPickerContainer = colorOptions.querySelector(".color-picker");
   colorPickerContainer.style.borderRadius = "";
   colorOptions.style.transform = "";
   colorOptions.style.width = "";
-
 }
+
 

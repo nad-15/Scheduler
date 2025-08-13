@@ -1147,7 +1147,7 @@ document.getElementById('colorPicker').addEventListener('click', (e) => {
 
         const selectedTasks = document.querySelectorAll('.selected-task-popup');
 
-        if (!selectedTasks) return;
+        if (selectedTasks.length === 0) return;
         const currentState = saveTaskOrderToTemp();
         undoStack.push(currentState);
         redoStack.length = 0; // clear redo stack because new action happened
@@ -1157,9 +1157,6 @@ document.getElementById('colorPicker').addEventListener('click', (e) => {
                 content.style.borderLeft = `5px solid ${chosenColor}`;
             }
         });
-
-
-
     }
 });
 

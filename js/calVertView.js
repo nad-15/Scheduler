@@ -16,6 +16,8 @@ const undoStack = [];
 const redoStack = [];
 
 let chosenColor = '#6a5044';
+let lineDivider = null;  
+
 
 let dayTasksForEdit = null;
 let popupTimeout;
