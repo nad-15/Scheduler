@@ -228,12 +228,29 @@ function showDayTasks(d) {
   const popupTasks = document.getElementById("popup-tasks");
   popupTasks.innerHTML = "";
 
-  if (!dayTasks) {
-    const noTask = document.createElement("p");
-    noTask.textContent = "No tasks for this day.";
-    // noTask.className = "no-tasks-text"; 
-    popupTasks.appendChild(noTask);
-  } else {
+if (
+  !dayTasks || 
+  (
+    (!dayTasks.morning || dayTasks.morning.length === 0) &&
+    (!dayTasks.afternoon || dayTasks.afternoon.length === 0) &&
+    (!dayTasks.evening || dayTasks.evening.length === 0)
+  )
+) {
+  const noTask = document.createElement("p");
+  noTask.textContent = "No tasks for this day.";
+  popupTasks.appendChild(noTask);
+
+  // Also remove this date from localStorage to save space
+  const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+  if (storedTasks[date]) {
+    delete storedTasks[date];
+    localStorage.setItem("tasks", JSON.stringify(storedTasks));
+  }
+}
+
+
+
+else {
     const periods = ["morning", "afternoon", "evening"];
 
     periods.forEach(period => {

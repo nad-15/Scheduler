@@ -855,8 +855,6 @@ document.getElementById('cancel-btn-popup').addEventListener('click', () => {
 });
 
 function saveTaskOrderToLocalStorage(popUpDate) {
-
-
   const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
   const currentData = storedTasks[popUpDate] || {};
 
@@ -880,13 +878,27 @@ function saveTaskOrderToLocalStorage(popUpDate) {
     });
   });
 
-  storedTasks[popUpDate] = {
-    ...currentData,
-    ...updatedPeriods
-  };
+  // Check if all periods are empty or contain only empty tasks (task and color both empty)
+  const allEmpty = Object.values(updatedPeriods).every(periodTasks =>
+    periodTasks.length === 0 || periodTasks.every(t => t.task === "" && (!t.color || t.color === "" || t.color === "#00000000"))
+  );
 
-  localStorage.setItem("tasks", JSON.stringify(storedTasks));
+  if (allEmpty) {
+    // Remove the day entry from storedTasks
+    if (storedTasks[popUpDate]) {
+      delete storedTasks[popUpDate];
+      localStorage.setItem("tasks", JSON.stringify(storedTasks));
+    }
+  } else {
+    // Save updated data
+    storedTasks[popUpDate] = {
+      ...currentData,
+      ...updatedPeriods
+    };
+    localStorage.setItem("tasks", JSON.stringify(storedTasks));
+  }
 }
+
 
 
 function saveTaskOrderToTemp() {
