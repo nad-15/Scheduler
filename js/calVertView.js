@@ -356,12 +356,10 @@ function startDraggingPopUp(x, y, target) {
   const rect = target.getBoundingClientRect();
   offsetYforEditPopUp = y - rect.top;
 
-  // Instead of querying for .event-content and cloning it,
-  // we take the parent node of that content
   const content = target.querySelector('.event-content');
   if (!content || !content.parentNode) return;
 
-  const parentElem = content.parentNode; // 👈 get parent container
+  const parentElem = content.parentNode; 
   ghost = parentElem.cloneNode(true);
   ghost.classList.add('ghost');
 
@@ -374,9 +372,9 @@ function startDraggingPopUp(x, y, target) {
     ghost.style[prop] = computed[prop];
   }
 
-  ghost.style.position = 'absolute';
+  ghost.style.position = 'fixed';
   ghost.style.left = `${rect.left}px`;
-  ghost.style.top = `${rect.top}px`;
+  ghost.style.top = `${y-offsetYforEditPopUp}px`;
   ghost.style.pointerEvents = 'none';
 
   document.body.appendChild(ghost);
@@ -572,6 +570,8 @@ function handleTouchStartPopUp(e) {
         // Save pre-drag state to undo only when drag really starts
     undoStack.push(saveTaskOrderToTemp());
     redoStack.length = 0; // Clear redo
+
+    startDraggingPopUp(touch.clientX, touch.clientY, dragTarget);
   }, 300);
 }
 
@@ -586,9 +586,9 @@ function handleTouchMovePopUp(e) {
     canStartDrag = false;
   }
 
-  if (!draggedItem && canStartDrag && dragTarget) {
-    startDraggingPopUp(touch.clientX, touch.clientY, dragTarget);
-  }
+  // if (!draggedItem && canStartDrag && dragTarget) {
+  //   startDraggingPopUp(touch.clientX, touch.clientY, dragTarget);
+  // }
 
   if (draggedItem) {
     moveGhostThrottledPopUp(touch.clientY);
@@ -721,7 +721,7 @@ toggleEditBtn.addEventListener('click', () => {
 
     document.querySelectorAll(".event").forEach(el => {
       el.style.border = "1px solid #ccc";
-      el.style.borderRadius = "5px";
+      el.style.borderRadius = "2x";
     });
 
   } else {

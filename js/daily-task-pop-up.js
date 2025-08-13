@@ -933,12 +933,13 @@ function moveColorOptionsToPopup() {
     colorOptions.style.transform = "scale(0.87)";
     colorOptions.style.width = "100%";
 
+
     if (!lineDivider) {
       lineDivider = document.createElement("div");
-      lineDivider.style.height = "0.5px";
+      lineDivider.style.height = "1px";
       lineDivider.style.backgroundColor = "#ccc";
       lineDivider.style.width = "100%";
-      lineDivider.style.marginTop = "10px";
+      lineDivider.style.marginTop = "5px";
     }
 
     // Insert divider before colorOptions if it's not already there
