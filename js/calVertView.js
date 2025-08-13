@@ -367,7 +367,7 @@ function startDraggingPopUp(x, y, target) {
   for (let prop of [
     'width', 'height', 'padding', 'margin',
     'font', 'fontSize', 'fontWeight',
-    'border', 'borderLeft', 'borderRadius', 'boxSizing'
+    'border', 'borderLeft', 'borderRadius', 'boxSizing', 'backgroundColor'
   ]) {
     ghost.style[prop] = computed[prop];
   }
@@ -717,6 +717,11 @@ toggleEditBtn.addEventListener('click', () => {
       el.style.marginRight = "0";
     });
 
+    //   document.querySelectorAll(".event").forEach(el => {
+    //     el.style.backgroundColor = "rgba(0, 170, 255, 0.1)";
+    // });
+
+
     document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
       el.style.display = "inline-flex"; // or "block" depending on layout
     });
@@ -752,6 +757,7 @@ toggleEditBtn.addEventListener('click', () => {
 
       document.querySelectorAll(".event").forEach(el => {
         el.style.border = "none";
+        // el.style.backgroundColor = "";
       });
     });
 

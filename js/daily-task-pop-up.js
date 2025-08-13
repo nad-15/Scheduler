@@ -228,29 +228,29 @@ function showDayTasks(d) {
   const popupTasks = document.getElementById("popup-tasks");
   popupTasks.innerHTML = "";
 
-if (
-  !dayTasks || 
-  (
-    (!dayTasks.morning || dayTasks.morning.length === 0) &&
-    (!dayTasks.afternoon || dayTasks.afternoon.length === 0) &&
-    (!dayTasks.evening || dayTasks.evening.length === 0)
-  )
-) {
-  const noTask = document.createElement("p");
-  noTask.textContent = "No tasks for this day.";
-  popupTasks.appendChild(noTask);
+  if (
+    !dayTasks ||
+    (
+      (!dayTasks.morning || dayTasks.morning.length === 0) &&
+      (!dayTasks.afternoon || dayTasks.afternoon.length === 0) &&
+      (!dayTasks.evening || dayTasks.evening.length === 0)
+    )
+  ) {
+    const noTask = document.createElement("p");
+    noTask.textContent = "No tasks for this day.";
+    popupTasks.appendChild(noTask);
 
-  // Also remove this date from localStorage to save space
-  const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
-  if (storedTasks[date]) {
-    delete storedTasks[date];
-    localStorage.setItem("tasks", JSON.stringify(storedTasks));
+    // Also remove this date from localStorage to save space
+    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
+    if (storedTasks[date]) {
+      delete storedTasks[date];
+      localStorage.setItem("tasks", JSON.stringify(storedTasks));
+    }
   }
-}
 
 
 
-else {
+  else {
     const periods = ["morning", "afternoon", "evening"];
 
     periods.forEach(period => {
@@ -463,9 +463,9 @@ function blurCurrentlyEditing() {
   if (editingTitle) {
     editingTitle.contentEditable = "false";
     const eventDiv = editingTitle.closest(".event");
-    if (eventDiv){
+    if (eventDiv) {
       eventDiv.style.outline = 'none';
-       eventDiv.style.border = "1px solid #ccc";
+      eventDiv.style.border = "1px solid #ccc";
     }
     editingTitle.blur();
   }
@@ -548,27 +548,42 @@ const handlePopupClick = (e) => {
 
   // Select button clicked?
   const selectBtn = target.closest(".select-dayTask");
-  if (selectBtn && popupTasks.contains(selectBtn)) {
+if (selectBtn && popupTasks.contains(selectBtn)) {
+  e.stopPropagation();
+  e.preventDefault();
+  const selectAllBtn = document.querySelector(".select-all-container");
+  const eventDiv = e.target.closest(".event");
 
-    // Toggle selection on click
-
-    e.stopPropagation();
-    e.preventDefault();
-    const eventDiv = e.target.closest(".event");
-
-    if (selectBtn.innerHTML.includes("check_box_outline_blank")) {
-      selectBtn.innerHTML = `<span class="material-symbols-outlined " id="check_box">check_box</span>`;
-      eventDiv.classList.add("selected-task-popup");
-    } else {
-      selectBtn.innerHTML = `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
-      eventDiv.classList.remove("selected-task-popup");
-    }
-
-
-    return;
-
-
+  // Toggle individual
+  if (selectBtn.innerHTML.includes("check_box_outline_blank")) {
+    selectBtn.innerHTML = `<span class="material-symbols-outlined" id="check_box">check_box</span>`;
+    eventDiv.classList.add("selected-task-popup");
+  } else {
+    selectBtn.innerHTML = `<span class="material-symbols-outlined" id="check_box">check_box_outline_blank</span>`;
+    eventDiv.classList.remove("selected-task-popup");
   }
+
+  // Sync Select All button state
+  const allEventDivs = popupTasks.querySelectorAll(".event");
+  const allSelected = Array.from(allEventDivs).every(div =>
+    div.classList.contains("selected-task-popup")
+  );
+
+
+
+  
+  
+
+
+
+  if (allSelected) {
+    selectAllBtn.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Unselect All</span>`;
+  } else {
+    selectAllBtn.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
+  }
+
+  return;
+}
 
   // Arrow Up button clicked?
   const arrowUp = target.closest(".arrow-up-dayTask");
@@ -674,7 +689,7 @@ function createEventElement({ task = "No Title", color = "#007bff", period, inde
   title.addEventListener("blur", function onBlur() {
     console.log("blurred");
     title.contentEditable = "false";
-     eventDiv.style.border = "1px solid #ccc";
+    eventDiv.style.border = "1px solid #ccc";
     eventDiv.style.border = "1px solid #ccc";
     // title.removeEventListener("blur", onBlur);
   });
@@ -910,7 +925,6 @@ function copyTasksForDate(dateKey) {
 let originalColorOptionsParent = null;
 let originalColorOptionsNextSibling = null;
 
-
 function moveColorOptionsToPopup() {
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions) return;
@@ -922,30 +936,59 @@ function moveColorOptionsToPopup() {
 
   const popup = document.getElementById("calendar-pop-up");
   const nav = popup.querySelector(".pop-up-calview-navi");
+  nav.style.border = "0";
 
   if (nav) {
-    nav.parentElement.insertBefore(colorOptions, nav);
+    // Create extras container if not present
+    let extras = document.getElementById("edit-extras-container");
+    if (!extras) {
+      extras = document.createElement("div");
+      extras.id = "edit-extras-container";
 
-    const colorPickerContainer = colorOptions.querySelector(".color-picker");
-    colorPickerContainer.style.borderRadius = "10px";
-    colorOptions.style.transform = "scale(0.87)";
-    colorOptions.style.width = "100%";
+      const selectAllContainer = document.createElement("div");
+      selectAllContainer.className = "select-all-container";
+      selectAllContainer.innerHTML = `
+        <span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span>
+        <span class="select-all-text">Select All</span>
+      `;
 
+      extras.appendChild(selectAllContainer);
 
-    if (!lineDivider) {
-      lineDivider = document.createElement("div");
-      lineDivider.style.height = "1px";
-      lineDivider.style.backgroundColor = "#ccc";
-      lineDivider.style.width = "100%";
-      lineDivider.style.marginTop = "5px";
+      // Directly use selectAllContainer — no need to query again
+selectAllContainer.addEventListener("click", () => {
+  const allButtons = popupTasks.querySelectorAll(".select-dayTask");
+  const isSelecting = selectAllContainer.innerHTML.includes("check_box_outline_blank");
+
+  // Toggle select-all icon
+  selectAllContainer.innerHTML = isSelecting
+    ? `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Unselect All</span>`
+    : `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
+
+  // Apply change to each task
+  allButtons.forEach(btn => {
+    const eventDiv = btn.closest(".event");
+
+    btn.innerHTML = isSelecting
+      ? `<span class="material-symbols-outlined " id="check_box">check_box</span>`
+      :  `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
+
+    eventDiv.classList.toggle("selected-task-popup", isSelecting);
+  });
+});
+
     }
 
-    // Insert divider before colorOptions if it's not already there
-    if (!lineDivider.parentElement) {
-      nav.parentElement.insertBefore(lineDivider, colorOptions);
-    }
+    // Move colorOptions into extras
+    extras.appendChild(colorOptions);
+
+    // Apply popup styling
+    colorOptions.classList.add("in-popup");
+
+    // Insert extras before nav
+    nav.parentElement.insertBefore(extras, nav);
   }
 }
+
 
 function restoreColorOptions() {
   const colorOptions = document.querySelector(".color-button-options");
@@ -956,17 +999,24 @@ function restoreColorOptions() {
     lineDivider.parentElement.removeChild(lineDivider);
   }
 
+  // Restore colorOptions to original location
   if (originalColorOptionsNextSibling) {
     originalColorOptionsParent.insertBefore(colorOptions, originalColorOptionsNextSibling);
   } else {
     originalColorOptionsParent.appendChild(colorOptions);
   }
 
+  // Remove extras container
+  let extras = document.getElementById("edit-extras-container");
+  if (extras && extras.parentElement) {
+    extras.parentElement.removeChild(extras);
+  }
+
   // Reset styles
   const colorPickerContainer = colorOptions.querySelector(".color-picker");
   colorPickerContainer.style.borderRadius = "";
-  colorOptions.style.transform = "";
-  colorOptions.style.width = "";
+  colorOptions.classList.remove("in-popup");
 }
+
 
 

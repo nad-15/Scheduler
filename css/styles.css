@@ -3002,6 +3002,49 @@ h2 {
   background-color: rgba(0, 170, 255, 0.1);
 }
 
+/* Color options container adjustments when inside popup */
+.color-button-options.in-popup {
+  transform: scale(0.87);
+  width: 100%;
+}
+
+/* The inner color picker */
+.color-button-options.in-popup .color-picker {
+  border-radius: 10px;
+}
+
+
+/* Extras container */
+#edit-extras-container {
+    box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin-bottom: 5px;
+  /* background-color: red; */
+  width: 100%;
+  flex-direction: column;
+  border-top: 2px solid #ccc;
+  border-radius: 10px;
+  padding-top: 5px;
+}
+
+.select-all-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    /* border: 2px solid red; */
+}
+
+#icon-checkbox{
+    font-size: 15px;
+}
+
+
+
 
 .event {
     display: flex;
