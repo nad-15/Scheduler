@@ -2820,6 +2820,7 @@ h2 {
 
 }
 
+
 #popup-date {
     /* background-color: red; */
     font-size: 15px;
@@ -2827,7 +2828,30 @@ h2 {
     font-weight: bold;
     display: inline-block;
     color: black;
+    /* border: 2px solid green; */
 }
+
+
+.select-all-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 10px;
+    font-weight: normal;
+    /* border: 2px solid red; */
+    /* margin-right: auto; */
+    padding: 0;
+    margin: 0;
+    margin-top: 5px;
+}
+
+#icon-checkbox {
+    font-size: 16px;
+    color: grey;
+
+}
+
 
 
 #popup-date .weekday {
@@ -2974,23 +2998,6 @@ h2 {
 #check_box, ic {
     font-size: 18px;
     color: grey;
-}
-
-.select-all-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    font-size: 10px;
-    /* font-weight: bold; */
-    /* border: 2px solid red; */
-    margin-right: auto;
-}
-
-#icon-checkbox {
-    font-size: 16px;
-    color: grey;
-
 }
 
 

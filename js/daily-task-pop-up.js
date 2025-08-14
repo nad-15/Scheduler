@@ -323,10 +323,6 @@ function showDayTasksEditable(date, focusInfo = null) {
   // console.log("Clicked element:", event.currentTarget); // The element that the listener is attached to
   // console.log("Clicked element (actual target):", event.target); // The actual element clicked (might be child)
 
-  if (!date) return;
-  const dayTasks = dayTasksForEdit;
-  popupTasks.innerHTML = "";
-
   const selectAllContainer = document.createElement("div");
   selectAllContainer.className = "select-all-container";
   selectAllContainer.innerHTML = `
@@ -334,7 +330,8 @@ function showDayTasksEditable(date, focusInfo = null) {
         <span class="select-all-text">Select All</span>
       `;
 
-  popupTasks.appendChild(selectAllContainer);
+  
+  document.getElementById("popup-date").appendChild(selectAllContainer);
 
   // Directly use selectAllContainer — no need to query again
   selectAllContainer.addEventListener("click", () => {
@@ -359,6 +356,9 @@ function showDayTasksEditable(date, focusInfo = null) {
   });
 
 
+  if (!date) return;
+  const dayTasks = dayTasksForEdit;
+  popupTasks.innerHTML = "";
 
   if (!dayTasks) {
     // const noTask = document.createElement("p");
