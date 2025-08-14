@@ -489,6 +489,7 @@ function showDayTasksEditable(date, focusInfo = null) {
       popupTasks.appendChild(section);
     });
   }
+
   showPopup();
 }
 
@@ -688,12 +689,9 @@ const handlePopupClick = (e) => {
     renderAppropriateStyle();
     blurCurrentlyEditing();
     autoFocusEventTitle(newEvent);
-
+    selectAllBtnUpdate();
     return;
   }
-
-
-
 }
 
 function createEventElement({ task = "No Title", color = "#007bff", period, index, isSelected = false }) {
@@ -806,14 +804,33 @@ document.getElementById("delete-btn-popup").addEventListener("click", () => {
   // For example, if you keep dayTasksForEdit updated, call your showDayTasksEditable() here
 
   cleanUpNoTasksText();
+  selectAllBtnUpdate();
 
-  const remainingButtons = document.querySelectorAll("#popup-tasks .select-dayTask");
-  if (remainingButtons.length === 0) {
-    const selectAllContainer = document.querySelector(".select-all-container");
-    selectAllContainer.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
-  }
 
 });
+
+function selectAllBtnUpdate() {
+  const allButtons = document.querySelectorAll("#popup-tasks .select-dayTask");
+  const selectAllContainer = document.querySelector(".select-all-container");
+
+  if (allButtons.length === 0) {
+    // No tasks remaining → reset Select All
+    selectAllContainer.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
+    return;
+  }
+
+  // Check if all tasks are selected
+  const allSelected = Array.from(allButtons).every(btn => {
+    const eventDiv = btn.closest(".event");
+    return eventDiv.classList.contains("selected-task-popup");
+  });
+
+  // Update Select All to reflect current state
+  selectAllContainer.innerHTML = allSelected
+    ? `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Select All</span>`
+    : `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
+}
+
 
 
 // === CLOSE FUNCITONALITY FOR POP UP

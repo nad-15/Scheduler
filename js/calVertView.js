@@ -791,7 +791,7 @@ function redo() {
   dayTasksForEdit = deepClone(nextState);
 
   showDayTasksEditable(popUpDate);  // re-render your UI with restored state
-
+  selectAllBtnUpdate();
   document.querySelectorAll(".event-content").forEach(el => {
     el.style.marginLeft = "0";
     el.style.marginRight = "0";
@@ -818,8 +818,9 @@ function undo() {
   const previousState = undoStack.pop();
 
   dayTasksForEdit = deepClone(previousState);
+  
   showDayTasksEditable(popUpDate);  // re-render your UI with restored state
-
+  selectAllBtnUpdate();
   document.querySelectorAll(".event-content").forEach(el => {
     el.style.marginLeft = "0";
     el.style.marginRight = "0";
