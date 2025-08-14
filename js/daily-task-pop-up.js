@@ -553,29 +553,27 @@ const handlePopupClick = (e) => {
       sel.addRange(range);
 
     } else {
-      e.stopPropagation();
-      e.preventDefault();
       console.log("Clicked twice");
       // Already editable → place caret at click position
-      // const sel = window.getSelection();
-      // sel.removeAllRanges();
+      const sel = window.getSelection();
+      sel.removeAllRanges();
 
-      // const range = document.createRange();
+      const range = document.createRange();
 
-      // if (document.caretRangeFromPoint) {
-      //   const caretRange = document.caretRangeFromPoint(e.clientX, e.clientY);
-      //   if (caretRange) {
-      //     range.setStart(caretRange.startContainer, caretRange.startOffset);
-      //   }
-      // } else if (document.caretPositionFromPoint) {
-      //   const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
-      //   if (pos) {
-      //     range.setStart(pos.offsetNode, pos.offset);
-      //   }
-      // }
+      if (document.caretRangeFromPoint) {
+        const caretRange = document.caretRangeFromPoint(e.clientX, e.clientY);
+        if (caretRange) {
+          range.setStart(caretRange.startContainer, caretRange.startOffset);
+        }
+      } else if (document.caretPositionFromPoint) {
+        const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+        if (pos) {
+          range.setStart(pos.offsetNode, pos.offset);
+        }
+      }
 
-      // range.collapse(true);
-      // sel.addRange(range);
+      range.collapse(true);
+      sel.addRange(range);
     }
 
     return;
