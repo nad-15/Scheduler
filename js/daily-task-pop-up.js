@@ -319,36 +319,36 @@ function showDayTasks(d) {
 // Assume dayTasksForEdit is a global or passed in variable representing the day's tasks copy for editing
 function showDayTasksEditable(date, focusInfo = null) {
   console.log("rerendering");
-let selectAllContainer = document.querySelector(".select-all-container");
+  let selectAllContainer = document.querySelector(".select-all-container");
 
-if (!selectAllContainer) {
-  selectAllContainer = document.createElement("div");
-  selectAllContainer.className = "select-all-container";
-  selectAllContainer.innerHTML = `
+  if (!selectAllContainer) {
+    selectAllContainer = document.createElement("div");
+    selectAllContainer.className = "select-all-container";
+    selectAllContainer.innerHTML = `
     <span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span>
     <span class="select-all-text">Select All</span>
   `;
-  document.getElementById("popup-date").appendChild(selectAllContainer);
+    document.getElementById("popup-date").appendChild(selectAllContainer);
 
-  selectAllContainer.addEventListener("click", () => {
-    const allButtons = popupTasks.querySelectorAll(".select-dayTask");
-    if (allButtons.length === 0) return;
+    selectAllContainer.addEventListener("click", () => {
+      const allButtons = popupTasks.querySelectorAll(".select-dayTask");
+      if (allButtons.length === 0) return;
 
-    const isSelecting = selectAllContainer.innerHTML.includes("check_box_outline_blank");
+      const isSelecting = selectAllContainer.innerHTML.includes("check_box_outline_blank");
 
-    selectAllContainer.innerHTML = isSelecting
-      ? `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Select All</span>`
-      : `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
+      selectAllContainer.innerHTML = isSelecting
+        ? `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Select All</span>`
+        : `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
 
-    allButtons.forEach(btn => {
-      const eventDiv = btn.closest(".event");
-      btn.innerHTML = isSelecting
-        ? `<span class="material-symbols-outlined " id="check_box">check_box</span>`
-        : `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
-      eventDiv.classList.toggle("selected-task-popup", isSelecting);
+      allButtons.forEach(btn => {
+        const eventDiv = btn.closest(".event");
+        btn.innerHTML = isSelecting
+          ? `<span class="material-symbols-outlined " id="check_box">check_box</span>`
+          : `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
+        eventDiv.classList.toggle("selected-task-popup", isSelecting);
+      });
     });
-  });
-}
+  }
 
 
   if (!date) return;
@@ -553,26 +553,29 @@ const handlePopupClick = (e) => {
       sel.addRange(range);
 
     } else {
+      e.stopPropagation();
+      e.preventDefault();
+      console.log("Clicked twice");
       // Already editable → place caret at click position
-      const sel = window.getSelection();
-      sel.removeAllRanges();
+      // const sel = window.getSelection();
+      // sel.removeAllRanges();
 
-      const range = document.createRange();
+      // const range = document.createRange();
 
-      if (document.caretRangeFromPoint) {
-        const caretRange = document.caretRangeFromPoint(e.clientX, e.clientY);
-        if (caretRange) {
-          range.setStart(caretRange.startContainer, caretRange.startOffset);
-        }
-      } else if (document.caretPositionFromPoint) {
-        const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
-        if (pos) {
-          range.setStart(pos.offsetNode, pos.offset);
-        }
-      }
+      // if (document.caretRangeFromPoint) {
+      //   const caretRange = document.caretRangeFromPoint(e.clientX, e.clientY);
+      //   if (caretRange) {
+      //     range.setStart(caretRange.startContainer, caretRange.startOffset);
+      //   }
+      // } else if (document.caretPositionFromPoint) {
+      //   const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+      //   if (pos) {
+      //     range.setStart(pos.offsetNode, pos.offset);
+      //   }
+      // }
 
-      range.collapse(true);
-      sel.addRange(range);
+      // range.collapse(true);
+      // sel.addRange(range);
     }
 
     return;
