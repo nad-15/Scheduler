@@ -697,7 +697,7 @@ toggleEditBtn.addEventListener('click', () => {
 
   isEditing = !isEditing;
 
-  document.querySelector(".popup-header").classList.add("in-edit-mode");
+  // document.querySelector(".popup-header").classList.add("in-edit-mode");
 
   const normalButtons = document.querySelectorAll('.normal-mode');
   const editButtons = document.querySelectorAll('.edit-mode');

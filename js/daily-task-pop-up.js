@@ -167,7 +167,7 @@ function adjustCalendarHeight() {
 
 
 function showDayTasks(d) {
-
+  document.querySelector(".select-all-container")?.remove();
   undoStack.length = 0;
   redoStack.length = 0;
   // const target = e.target.closest('[data-full-date]');
@@ -328,7 +328,11 @@ function showDayTasksEditable(date, focusInfo = null) {
     <span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span>
     <span class="select-all-text">Select All</span>
   `;
-    document.getElementById("popup-date").appendChild(selectAllContainer);
+    const contentScroll = document.querySelector(".popup-content-scroll");
+    const parent = contentScroll.parentNode;
+
+    parent.insertBefore(selectAllContainer, contentScroll);
+
 
     selectAllContainer.addEventListener("click", () => {
       const allButtons = popupTasks.querySelectorAll(".select-dayTask");
@@ -1018,7 +1022,7 @@ function moveColorOptionsToPopup() {
 
 
 function restoreColorOptions() {
-  document.querySelector(".popup-header").classList.remove("in-edit-mode");
+  // document.querySelector(".popup-header").classList.remove("in-edit-mode");
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions || !originalColorOptionsParent) return;
 
