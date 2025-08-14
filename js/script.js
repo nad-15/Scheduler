@@ -273,6 +273,9 @@ document.addEventListener('click', (e) => {
 document.addEventListener("DOMContentLoaded", () => {
     const picker = document.getElementById("colorPicker");
     picker.dataset.originalHtml = picker.innerHTML;
+
+    document.querySelector('.dropdown-option[data-mode="recent"]').click();
+
 });
 
 
