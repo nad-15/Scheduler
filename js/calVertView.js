@@ -559,6 +559,10 @@ function endDraggingPopUp() {
 // }
 
 function handleTouchStartPopUp(e) {
+
+  e.preventDefault();
+  e.stopPropagation();
+  
   isTouch = true;
   setTimeout(() => isTouch = false, 1000);
 
@@ -599,7 +603,7 @@ function handleTouchMovePopUp(e) {
   if (draggedItem) {
     moveGhostThrottledPopUp(touch.clientY);
 
-    e.preventDefault(); // prevent scroll
+    e.preventDefault();
     e.stopPropagation();
   }
 }
