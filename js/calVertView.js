@@ -560,9 +560,6 @@ function endDraggingPopUp() {
 
 function handleTouchStartPopUp(e) {
 
-  e.preventDefault();
-  e.stopPropagation();
-  
   isTouch = true;
   setTimeout(() => isTouch = false, 1000);
 
