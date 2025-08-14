@@ -379,7 +379,7 @@ function startDraggingPopUp(x, y, target) {
 
   document.body.appendChild(ghost);
   target.classList.add('dragging');
-  document.body.classList.add('dragging');
+  // document.body.classList.add('dragging');
 }
 
 
@@ -516,7 +516,7 @@ function endDraggingPopUp() {
     draggedItem = null;
   }
 
-  document.body.classList.remove('dragging');
+  // document.body.classList.remove('dragging');
 }
 
 

@@ -319,41 +319,36 @@ function showDayTasks(d) {
 // Assume dayTasksForEdit is a global or passed in variable representing the day's tasks copy for editing
 function showDayTasksEditable(date, focusInfo = null) {
   console.log("rerendering");
+let selectAllContainer = document.querySelector(".select-all-container");
 
-  // console.log("Clicked element:", event.currentTarget); // The element that the listener is attached to
-  // console.log("Clicked element (actual target):", event.target); // The actual element clicked (might be child)
-
-  const selectAllContainer = document.createElement("div");
+if (!selectAllContainer) {
+  selectAllContainer = document.createElement("div");
   selectAllContainer.className = "select-all-container";
   selectAllContainer.innerHTML = `
-        <span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span>
-        <span class="select-all-text">Select All</span>
-      `;
-
-
+    <span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span>
+    <span class="select-all-text">Select All</span>
+  `;
   document.getElementById("popup-date").appendChild(selectAllContainer);
 
-  // Directly use selectAllContainer — no need to query again
   selectAllContainer.addEventListener("click", () => {
     const allButtons = popupTasks.querySelectorAll(".select-dayTask");
+    if (allButtons.length === 0) return;
+
     const isSelecting = selectAllContainer.innerHTML.includes("check_box_outline_blank");
 
-    // Toggle select-all icon
     selectAllContainer.innerHTML = isSelecting
       ? `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Select All</span>`
       : `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
 
-    // Apply change to each task
     allButtons.forEach(btn => {
       const eventDiv = btn.closest(".event");
-
       btn.innerHTML = isSelecting
         ? `<span class="material-symbols-outlined " id="check_box">check_box</span>`
         : `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
-
       eventDiv.classList.toggle("selected-task-popup", isSelecting);
     });
   });
+}
 
 
   if (!date) return;
@@ -811,6 +806,12 @@ document.getElementById("delete-btn-popup").addEventListener("click", () => {
 
   cleanUpNoTasksText();
 
+  const remainingButtons = document.querySelectorAll("#popup-tasks .select-dayTask");
+  if (remainingButtons.length === 0) {
+    const selectAllContainer = document.querySelector(".select-all-container");
+    selectAllContainer.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
+  }
+
 });
 
 
@@ -1022,6 +1023,8 @@ function restoreColorOptions() {
   }
 
   // Reset styles
+  const nav = document.querySelector(".pop-up-calview-navi");
+  nav.style.border = "";
   const colorPickerContainer = colorOptions.querySelector(".color-picker");
   colorPickerContainer.style.borderRadius = "";
   colorOptions.classList.remove("in-popup");
