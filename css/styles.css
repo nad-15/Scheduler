@@ -3112,7 +3112,7 @@ ic {
 
 .event-content {
     display: flex;
-    /* font-size: 12px; */
+    font-size: 13px;
     width: 100%;
     /* 1rem */
     padding: 5px 10px;
