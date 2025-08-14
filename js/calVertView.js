@@ -469,9 +469,8 @@ function cleanUpNoTasksText() {
         const newTitle = newEvent.querySelector(".event-title");
         if (newTitle) {
           newTitle.contentEditable = "true";
-          newEvent.style.outline = "none";
-          newEvent.style.border = "1px solid #ccc";
-
+          // newEvent.style.outline = "none";
+          newEvent.style.border = "2px solid #00aaff";
           newTitle.focus();
 
           const range = document.createRange();
