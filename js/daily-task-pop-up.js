@@ -1000,7 +1000,7 @@ function moveColorOptionsToPopup() {
   const popup = document.getElementById("calendar-pop-up");
   const nav = popup.querySelector(".pop-up-calview-navi");
   nav.style.border = "0";
-  nav.style.paddingTop = "0";
+  nav.style.paddingTop = "4px";
 
 
   if (nav) {
