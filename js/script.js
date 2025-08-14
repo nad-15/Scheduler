@@ -497,11 +497,11 @@ const fullscreenIcon = document.getElementById('fullscreen-icon');
 
 taskInput.addEventListener('focus', () => {
     const isFullScreen = window.innerHeight === screen.height; // Check if full screen
-    // const delay = isFullScreen ? 1500 : 500; // Set delay based on full screen status
+    const delay = isFullScreen ? 1500 : 500; // Set delay based on full screen status
 
-    // setTimeout(() => {
-    //     taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // }, delay);
+    setTimeout(() => {
+        taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, delay);
 });
 
 
