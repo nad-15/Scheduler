@@ -327,6 +327,39 @@ function showDayTasksEditable(date, focusInfo = null) {
   const dayTasks = dayTasksForEdit;
   popupTasks.innerHTML = "";
 
+  const selectAllContainer = document.createElement("div");
+  selectAllContainer.className = "select-all-container";
+  selectAllContainer.innerHTML = `
+        <span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span>
+        <span class="select-all-text">Select All</span>
+      `;
+
+  popupTasks.appendChild(selectAllContainer);
+
+  // Directly use selectAllContainer — no need to query again
+  selectAllContainer.addEventListener("click", () => {
+    const allButtons = popupTasks.querySelectorAll(".select-dayTask");
+    const isSelecting = selectAllContainer.innerHTML.includes("check_box_outline_blank");
+
+    // Toggle select-all icon
+    selectAllContainer.innerHTML = isSelecting
+      ? `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Select All</span>`
+      : `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
+
+    // Apply change to each task
+    allButtons.forEach(btn => {
+      const eventDiv = btn.closest(".event");
+
+      btn.innerHTML = isSelecting
+        ? `<span class="material-symbols-outlined " id="check_box">check_box</span>`
+        : `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
+
+      eventDiv.classList.toggle("selected-task-popup", isSelecting);
+    });
+  });
+
+
+
   if (!dayTasks) {
     // const noTask = document.createElement("p");
     // noTask.textContent = "No tasks for this day.";
@@ -339,7 +372,11 @@ function showDayTasksEditable(date, focusInfo = null) {
       section.classList.add("period-section");
 
       const divider = document.createElement("div");
+
       divider.className = "section-divider";
+      if (period === "morning") {
+        divider.classList.add("morning-divider-in-editmode");
+      }
       divider.textContent = period.charAt(0).toUpperCase() + period.slice(1);
       section.appendChild(divider);
 
@@ -548,42 +585,42 @@ const handlePopupClick = (e) => {
 
   // Select button clicked?
   const selectBtn = target.closest(".select-dayTask");
-if (selectBtn && popupTasks.contains(selectBtn)) {
-  e.stopPropagation();
-  e.preventDefault();
-  const selectAllBtn = document.querySelector(".select-all-container");
-  const eventDiv = e.target.closest(".event");
+  if (selectBtn && popupTasks.contains(selectBtn)) {
+    e.stopPropagation();
+    e.preventDefault();
+    const selectAllBtn = document.querySelector(".select-all-container");
+    const eventDiv = e.target.closest(".event");
 
-  // Toggle individual
-  if (selectBtn.innerHTML.includes("check_box_outline_blank")) {
-    selectBtn.innerHTML = `<span class="material-symbols-outlined" id="check_box">check_box</span>`;
-    eventDiv.classList.add("selected-task-popup");
-  } else {
-    selectBtn.innerHTML = `<span class="material-symbols-outlined" id="check_box">check_box_outline_blank</span>`;
-    eventDiv.classList.remove("selected-task-popup");
+    // Toggle individual
+    if (selectBtn.innerHTML.includes("check_box_outline_blank")) {
+      selectBtn.innerHTML = `<span class="material-symbols-outlined" id="check_box">check_box</span>`;
+      eventDiv.classList.add("selected-task-popup");
+    } else {
+      selectBtn.innerHTML = `<span class="material-symbols-outlined" id="check_box">check_box_outline_blank</span>`;
+      eventDiv.classList.remove("selected-task-popup");
+    }
+
+    // Sync Select All button state
+    const allEventDivs = popupTasks.querySelectorAll(".event");
+    const allSelected = Array.from(allEventDivs).every(div =>
+      div.classList.contains("selected-task-popup")
+    );
+
+
+
+
+
+
+
+
+    if (allSelected) {
+      selectAllBtn.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Select All</span>`;
+    } else {
+      selectAllBtn.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
+    }
+
+    return;
   }
-
-  // Sync Select All button state
-  const allEventDivs = popupTasks.querySelectorAll(".event");
-  const allSelected = Array.from(allEventDivs).every(div =>
-    div.classList.contains("selected-task-popup")
-  );
-
-
-
-  
-  
-
-
-
-  if (allSelected) {
-    selectAllBtn.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Unselect All</span>`;
-  } else {
-    selectAllBtn.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
-  }
-
-  return;
-}
 
   // Arrow Up button clicked?
   const arrowUp = target.closest(".arrow-up-dayTask");
@@ -944,38 +981,6 @@ function moveColorOptionsToPopup() {
     if (!extras) {
       extras = document.createElement("div");
       extras.id = "edit-extras-container";
-
-      const selectAllContainer = document.createElement("div");
-      selectAllContainer.className = "select-all-container";
-      selectAllContainer.innerHTML = `
-        <span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span>
-        <span class="select-all-text">Select All</span>
-      `;
-
-      extras.appendChild(selectAllContainer);
-
-      // Directly use selectAllContainer — no need to query again
-selectAllContainer.addEventListener("click", () => {
-  const allButtons = popupTasks.querySelectorAll(".select-dayTask");
-  const isSelecting = selectAllContainer.innerHTML.includes("check_box_outline_blank");
-
-  // Toggle select-all icon
-  selectAllContainer.innerHTML = isSelecting
-    ? `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Unselect All</span>`
-    : `<span class="material-symbols-outlined" id="icon-checkbox">check_box_outline_blank</span> <span class="select-all-text">Select All</span>`;
-
-  // Apply change to each task
-  allButtons.forEach(btn => {
-    const eventDiv = btn.closest(".event");
-
-    btn.innerHTML = isSelecting
-      ? `<span class="material-symbols-outlined " id="check_box">check_box</span>`
-      :  `<span class="material-symbols-outlined " id="check_box">check_box_outline_blank</span>`;
-
-    eventDiv.classList.toggle("selected-task-popup", isSelecting);
-  });
-});
-
     }
 
     // Move colorOptions into extras

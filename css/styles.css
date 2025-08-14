@@ -2948,6 +2948,10 @@ h2 {
     font-size: 8px;
 }
 
+.morning-divider-in-editmode {
+    margin-top: 0;
+}
+
 .section-divider::before,
 .section-divider::after {
     content: '';
@@ -2959,7 +2963,7 @@ h2 {
 
 
 
-#arrows-popup{
+#arrows-popup {
     font-size: 20px;
     font-variation-settings: 'wght' 200;
     font-weight: 200;
@@ -2967,25 +2971,45 @@ h2 {
 }
 
 
-#check_box {
-    font-size: 18px ;
-        color: grey;
+#check_box, ic {
+    font-size: 18px;
+    color: grey;
+}
+
+.select-all-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    /* font-weight: bold; */
+    /* border: 2px solid red; */
+    margin-right: auto;
+}
+
+#icon-checkbox {
+    font-size: 16px;
+    color: grey;
+
 }
 
 
 .arrow-up-dayTask {
 
-  transform: rotate(90deg); /* left → up */
+    transform: rotate(90deg);
+    /* left → up */
 }
 
 .arrow-down-dayTask {
 
-  transform: rotate(-90deg); /* left → down */
+    transform: rotate(-90deg);
+    /* left → down */
 }
 
 
 .arrow-up-dayTask,
-.arrow-down-dayTask, .select-dayTask {
+.arrow-down-dayTask,
+.select-dayTask {
     background: none;
     border: none;
     padding: 4px;
@@ -2998,53 +3022,32 @@ h2 {
 }
 
 .selected-task-popup {
-  /* outline: 2px solid #00aaff; */
-  background-color: rgba(0, 170, 255, 0.1);
+    /* outline: 2px solid #00aaff; */
+    background-color: rgba(0, 170, 255, 0.1);
+}
+
+/* Extras container */
+#edit-extras-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-top: 2px solid #ccc;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 5px;
 }
 
 /* Color options container adjustments when inside popup */
 .color-button-options.in-popup {
-  transform: scale(0.87);
-  width: 100%;
+    transform: scale(0.87);
+    width: 100%;
 }
 
 /* The inner color picker */
 .color-button-options.in-popup .color-picker {
-  border-radius: 10px;
+    border-radius: 10px;
 }
-
-
-/* Extras container */
-#edit-extras-container {
-    box-sizing: border-box;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  margin-bottom: 5px;
-  /* background-color: red; */
-  width: 100%;
-  flex-direction: column;
-  border-top: 2px solid #ccc;
-  border-radius: 10px;
-  padding-top: 5px;
-}
-
-.select-all-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 20px;
-    font-size: 13px;
-    font-weight: bold;
-    /* border: 2px solid red; */
-}
-
-#icon-checkbox{
-    font-size: 15px;
-}
-
-
-
 
 .event {
     display: flex;
@@ -3056,14 +3059,19 @@ h2 {
     position: relative;
 
     /* cuts at top-left and bottom-right */
-    clip-path: polygon(
-        8px 0,                       /* a bit right from top-left */
-        100% 0,                       /* top-right */
-        100% calc(100% - 8px),        /* a bit above bottom-right */
-        calc(100% - 8px) 100%,        /* a bit left from bottom-right */
-        0 100%,                       /* bottom-left */
-        0 8px                         /* a bit down from top-left */
-    );
+    clip-path: polygon(8px 0,
+            /* a bit right from top-left */
+            100% 0,
+            /* top-right */
+            100% calc(100% - 8px),
+            /* a bit above bottom-right */
+            calc(100% - 8px) 100%,
+            /* a bit left from bottom-right */
+            0 100%,
+            /* bottom-left */
+            0 8px
+            /* a bit down from top-left */
+        );
 }
 
 
@@ -3137,7 +3145,8 @@ h2 {
 }
 
 
-.edit-mode.hidden, .normal-mode.hidden {
+.edit-mode.hidden,
+.normal-mode.hidden {
     display: none;
 }
 

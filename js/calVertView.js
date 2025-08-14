@@ -367,7 +367,7 @@ function startDraggingPopUp(x, y, target) {
   for (let prop of [
     'width', 'height', 'padding', 'margin',
     'font', 'fontSize', 'fontWeight',
-    'border', 'borderLeft', 'borderRadius', 'boxSizing', 'backgroundColor'
+    'border', 'borderLeft', 'borderRadius', 'boxSizing'
   ]) {
     ghost.style[prop] = computed[prop];
   }
