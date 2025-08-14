@@ -1000,6 +1000,8 @@ function moveColorOptionsToPopup() {
   const popup = document.getElementById("calendar-pop-up");
   const nav = popup.querySelector(".pop-up-calview-navi");
   nav.style.border = "0";
+  nav.style.paddingTop = "0";
+
 
   if (nav) {
     // Create extras container if not present
@@ -1022,7 +1024,7 @@ function moveColorOptionsToPopup() {
 
 
 function restoreColorOptions() {
-  // document.querySelector(".popup-header").classList.remove("in-edit-mode");
+
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions || !originalColorOptionsParent) return;
 
@@ -1047,6 +1049,8 @@ function restoreColorOptions() {
   // Reset styles
   const nav = document.querySelector(".pop-up-calview-navi");
   nav.style.border = "";
+  nav.style.paddingTop = "";
+
   const colorPickerContainer = colorOptions.querySelector(".color-picker");
   colorPickerContainer.style.borderRadius = "";
   colorOptions.classList.remove("in-popup");

@@ -3063,7 +3063,8 @@ ic {
     border-top: 2px solid #ccc;
     margin: 0;
     padding: 0;
-    margin-bottom: 5px;
+    /* margin-bottom: 5px; */
+    /* border: 2px solid red; */
 }
 
 /* Color options container adjustments when inside popup */
@@ -3196,21 +3197,25 @@ ic {
     border-top: 1px solid #ccc;
     display: flex;
     z-index: 10;
-    padding: 0;
+    /* padding: 0; */
+    padding: 8px 0;
+
     /* background-color: red; */
 
 }
-
 
 .calendar-icon-button {
     flex: 1;
     background: none;
     border: none;
-    padding: 8px 0;
+    /* padding: 8px 0; */
+    /* padding-top: 0px; */
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    /* border: 2px solid red; */
+    padding: 0;
 }
 
 .calendar-icon-wrapper {
