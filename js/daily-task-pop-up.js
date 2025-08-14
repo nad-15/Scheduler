@@ -471,7 +471,7 @@ function showDayTasksEditable(date, focusInfo = null) {
           const newTitle = newEvent.querySelector(".event-title");
           if (newTitle) {
             newTitle.contentEditable = "true";
-            newEvent.stylel.border = "2px solid #00aaff";
+            newEvent.style.border = "2px solid #00aaff";
             newTitle.focus();
 
             const range = document.createRange();
@@ -481,7 +481,10 @@ function showDayTasksEditable(date, focusInfo = null) {
             sel.addRange(range);
           }
 
+
           noTask.remove();
+          console.log("Task not remove");
+
         });
 
 
