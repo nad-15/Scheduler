@@ -497,11 +497,11 @@ const fullscreenIcon = document.getElementById('fullscreen-icon');
 
 taskInput.addEventListener('focus', () => {
     const isFullScreen = window.innerHeight === screen.height; // Check if full screen
-    const delay = isFullScreen ? 1500 : 500; // Set delay based on full screen status
+    // const delay = isFullScreen ? 1500 : 500; // Set delay based on full screen status
 
-    setTimeout(() => {
-        taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, delay);
+    // setTimeout(() => {
+    //     taskInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // }, delay);
 });
 
 
@@ -1879,26 +1879,15 @@ floatingAddBtn.addEventListener('click', () => {
         slidingInputView.classList.toggle("show");
 
         floatingAddBtn.style.transform = 'rotate(225deg)'; //rotate button
-        // floatingAddBtn.style.backgroundColor = '#f44336'; 
-        // Change button color to red
+
         floatingAddBtn.style.backgroundColor = 'rgba(244, 67, 54, 0.9)';
 
-        // Adjust the button positions based on the sliding input view
-        // const slidingInputHeight = 33 * window.innerHeight / 100;
-
-        //repositioning
-        // floatingAddBtn.style.bottom = `${130 + 10}px`;
-        // clearButton.style.bottom = `${130 + 70}px`;
         taskToolbar.style.bottom = `${130 + 10}px`;
     } else {
         slidingInputView.classList.toggle("show");
 
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
         floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
-
-        // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        // floatingAddBtn.style.bottom = `${20}px`;
-        // clearButton.style.bottom = `${80}px`;
         taskToolbar.style.bottom = `${20}px`;
     }
 });
