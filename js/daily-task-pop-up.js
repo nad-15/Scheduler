@@ -330,7 +330,7 @@ function showDayTasksEditable(date, focusInfo = null) {
         <span class="select-all-text">Select All</span>
       `;
 
-  
+
   document.getElementById("popup-date").appendChild(selectAllContainer);
 
   // Directly use selectAllContainer — no need to query again
@@ -996,6 +996,7 @@ function moveColorOptionsToPopup() {
 
 
 function restoreColorOptions() {
+  document.querySelector(".popup-header").classList.remove("in-edit-mode");
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions || !originalColorOptionsParent) return;
 

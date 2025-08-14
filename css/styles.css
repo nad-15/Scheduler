@@ -2820,6 +2820,12 @@ h2 {
 
 }
 
+.popup-header.in-edit-mode {
+        padding-bottom: 0px;
+}
+
+
+
 
 #popup-date {
     /* background-color: red; */
