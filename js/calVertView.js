@@ -379,6 +379,7 @@ function startDraggingPopUp(x, y, target) {
 
   document.body.appendChild(ghost);
   target.classList.add('dragging');
+  document.body.classList.add('dragging');
 }
 
 
@@ -497,6 +498,7 @@ function endDraggingPopUp() {
   document.querySelectorAll(".ghost").forEach(el => {
     // console.log("Removing lingering ghost:", el);
     el.remove();
+
   });
 
   ghost = null;
@@ -513,6 +515,8 @@ function endDraggingPopUp() {
     draggedItem.classList.remove('dragging');
     draggedItem = null;
   }
+
+  document.body.classList.remove('dragging');
 }
 
 
@@ -594,7 +598,9 @@ function handleTouchMovePopUp(e) {
 
   if (draggedItem) {
     moveGhostThrottledPopUp(touch.clientY);
+
     e.preventDefault(); // prevent scroll
+    e.stopPropagation();
   }
 }
 
