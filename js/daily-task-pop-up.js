@@ -317,7 +317,7 @@ function showDayTasks(d) {
 
 
 // Assume dayTasksForEdit is a global or passed in variable representing the day's tasks copy for editing
-function showDayTasksEditable(date, focusInfo = null) {
+function showDayTasksEditable(date) {
   console.log("rerendering");
   let selectAllContainer = document.querySelector(".select-all-container");
 
@@ -428,6 +428,13 @@ function showDayTasksEditable(date, focusInfo = null) {
           eventDiv.appendChild(arrowDown);
 
           title.addEventListener("blur", () => {
+            const afterEditState = saveTaskOrderToTemp();
+            // Only push to undo stack if something changed
+            if (JSON.stringify(beforeEditState) !== JSON.stringify(afterEditState)) {
+              undoStack.push(beforeEditState);
+              redoStack.length = 0;
+            }
+            beforeEditState = null;
             title.contentEditable = "false";
             // Remove outline from .event parent
             const eventDiv = title.closest('.event');
@@ -435,6 +442,11 @@ function showDayTasksEditable(date, focusInfo = null) {
               eventDiv.style.outline = 'none';
               eventDiv.style.border = "1px solid #ccc";
             }
+          });
+
+          title.addEventListener("focus", () => {
+            beforeEditState = saveTaskOrderToTemp();
+            console.log("title is focuses");
           });
 
           section.appendChild(eventDiv);
@@ -536,54 +548,54 @@ const handlePopupClick = (e) => {
   const target = e.target;
 
   // "No tasks" placeholder clicked?
-const noTask = target.closest(".no-tasks-text");
-if (noTask && popupTasks.contains(noTask)) {
-  e.stopPropagation();
-  e.preventDefault();
+  const noTask = target.closest(".no-tasks-text");
+  if (noTask && popupTasks.contains(noTask)) {
+    e.stopPropagation();
+    e.preventDefault();
 
-  const section = noTask.closest(".period-section");
-  const period = noTask.dataset?.period || noTask.textContent.match(/for\s+(\w+)/)?.[1];
+    const section = noTask.closest(".period-section");
+    const period = noTask.dataset?.period || noTask.textContent.match(/for\s+(\w+)/)?.[1];
 
-  const currentState = saveTaskOrderToTemp();
-  undoStack.push(currentState);
-  redoStack.length = 0;
+    const currentState = saveTaskOrderToTemp();
+    undoStack.push(currentState);
+    redoStack.length = 0;
 
-  // Create new event element
-  const newEvent = createEventElement({
-    task: "No Title",
-    color: chosenColor,
-    period: period,
-    index: null,
-    isSelected: false,
-  });
+    // Create new event element
+    const newEvent = createEventElement({
+      task: "No Title",
+      color: chosenColor,
+      period: period,
+      index: null,
+      isSelected: false,
+    });
 
-  section.appendChild(newEvent);
-  renderAppropriateStyle();
-  blurCurrentlyEditing();
-  autoFocusEventTitle(newEvent);
+    section.appendChild(newEvent);
+    renderAppropriateStyle();
+    blurCurrentlyEditing();
+    autoFocusEventTitle(newEvent);
 
-  // Focus and select content
-  const newTitle = newEvent.querySelector(".event-title");
-  if (newTitle) {
-    newTitle.contentEditable = "true";
-    newEvent.style.border = "2px solid #00aaff";
-    newTitle.focus();
+    // Focus and select content
+    const newTitle = newEvent.querySelector(".event-title");
+    if (newTitle) {
+      newTitle.contentEditable = "true";
+      newEvent.style.border = "2px solid #00aaff";
+      newTitle.focus();
 
-    const range = document.createRange();
-    range.selectNodeContents(newTitle);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+      const range = document.createRange();
+      range.selectNodeContents(newTitle);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    // Remove the placeholder
+    noTask.remove();
+
+    // Update select all button if needed
+    selectAllBtnUpdate();
+
+    return;
   }
-
-  // Remove the placeholder
-  noTask.remove();
-
-  // Update select all button if needed
-  selectAllBtnUpdate();
-
-  return;
-}
 
 
   // Title clicked?
@@ -591,7 +603,6 @@ if (noTask && popupTasks.contains(noTask)) {
   if (title && popupTasks.contains(title)) {
     e.stopPropagation();
     e.preventDefault();
-
     const eventDiv = title.closest(".event");
 
     // First click → make editable + select all
@@ -767,17 +778,33 @@ function createEventElement({ task = "No Title", color = "#007bff", period, inde
   title.className = "event-title";
   title.textContent = task;
 
+
+
   content.appendChild(title);
 
 
   title.addEventListener("blur", function onBlur() {
     console.log("blurred");
+    const afterEditState = saveTaskOrderToTemp();
+
+    // Only push to undo stack if something changed
+    if (JSON.stringify(beforeEditState) !== JSON.stringify(afterEditState)) {
+      undoStack.push(beforeEditState);
+      redoStack.length = 0;
+    }
+
+    // Clear temp state
+    beforeEditState = null;
     title.contentEditable = "false";
     eventDiv.style.border = "1px solid #ccc";
     eventDiv.style.border = "1px solid #ccc";
     // title.removeEventListener("blur", onBlur);
   });
 
+  title.addEventListener("focus", () => {
+    beforeEditState = saveTaskOrderToTemp();
+    console.log("title is focuses");
+  });
 
   // Arrow Up button
   const arrowUp = document.createElement("button");

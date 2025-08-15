@@ -12,6 +12,7 @@ let swipeEnabledPopUp = true;
 
 // let selectedTasksPopup = [];
 
+let beforeEditState = null; //for title focus and blur
 const undoStack = [];
 const redoStack = [];
 
