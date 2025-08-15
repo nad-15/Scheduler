@@ -1040,7 +1040,7 @@ function copyTasksForDate(dateKey) {
 let originalColorOptionsParent = null;
 let originalColorOptionsNextSibling = null;
 
-function moveColorOptionsToPopup() {
+function setUpEditMode() {
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions) return;
 
@@ -1074,9 +1074,7 @@ function moveColorOptionsToPopup() {
   }
 }
 
-
 function restoreChangesFromEditMode() {
-
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions || !originalColorOptionsParent) return;
 
