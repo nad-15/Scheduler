@@ -564,7 +564,7 @@ toggleEditBtn.addEventListener('click', () => {
   const events = document.querySelectorAll(".event");
 
   if (isEditing) {
-    setUpEditMode();
+    moveColorOptionsToPopup();
 
     normalButtons.forEach(btn => btn.classList.add('hidden'));
     editButtons.forEach(btn => btn.classList.remove('hidden'));
