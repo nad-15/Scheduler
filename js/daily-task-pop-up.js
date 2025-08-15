@@ -941,7 +941,7 @@ function hidePopup() {
     editButtons.forEach(btn => btn.classList.add('hidden'));
   }
 
-  restoreChangesFromEditMode();
+  restoreColorOptions();
 
   undoStack.length = 0;
   redoStack.length = 0;
@@ -1075,7 +1075,7 @@ function moveColorOptionsToPopup() {
 }
 
 
-function restoreChangesFromEditMode() {
+function restoreColorOptions() {
 
   const colorOptions = document.querySelector(".color-button-options");
   if (!colorOptions || !originalColorOptionsParent) return;

@@ -1,5 +1,6 @@
-
+// === SETUP DOM ELEMENTS ===
 const calendarContainerVertView = document.getElementById("calendar-container-vert-view");
+// const showCalendarBtnVertView = document.getElementById("show-vert-calendar-btn");
 const daysGridVertView = document.getElementById("days-grid-vert-view");
 const monthLabelVertView = document.getElementById("month-label-vert-view");
 const calIconVertView = document.getElementById("icon-month-label-vert-view");
@@ -7,21 +8,27 @@ const prevMonthBtnVertView = document.getElementById("prev-month-vert-view");
 const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 
 const yearContainer = document.getElementById('year-container');
+let swipeEnabledPopUp = true;
+
+// let selectedTasksPopup = [];
 
 const undoStack = [];
 const redoStack = [];
 
-let swipeEnabledPopUp = true;
 let chosenColor = '#6a5044';
 let lineDivider = null;
+
 
 let dayTasksForEdit = null;
 let popupTimeout;
 let lastClickedCell = null;
 
+
+// === TIME VARIABLES ===
 let currentMonthContainer = null;
 let nextMonthContainer = null;
 let prevMonthContainer = null;
+
 
 let todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
 let currentMonthVertView = todayVertView.getMonth();
@@ -29,12 +36,35 @@ let currentYearVertView = todayVertView.getFullYear();
 
 let currentMonthValue = currentMonthVertView;
 let currentYearValue = currentYearVertView;
+
+
 let popUpDate = `${todayVertView.getFullYear()}-${todayVertView.getMonth()}-${todayVertView.getDate()}`;
+console.log("POPUPDATE IS:", popUpDate);
 
 
 let touchStartX = 0;
 let touchStartY = 0;
 let isEditing = false;
+
+// function showSavePopup(callback) {
+//   const popup = document.getElementById("savePopup");
+//   popup.style.display = "flex";
+
+//   const yesBtn = popup.querySelector(".confirm-yes");
+//   const noBtn = popup.querySelector(".confirm-no");
+
+//   // Cleanup old listeners to avoid duplicates
+//   yesBtn.onclick = () => {
+//     popup.style.display = "none";
+//     callback(true);
+//   };
+
+//   noBtn.onclick = () => {
+//     popup.style.display = "none";
+//     callback(false);
+//   };
+// }
+
 
 
 calendarContainerVertView.addEventListener("touchstart", (e) => {
@@ -79,6 +109,9 @@ function handleMobileSwipe(startX, endX, startY, endY) {
   updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
 }
 
+
+
+
 // === RESIZE THE CALENDAR VIEW MINUS THE ADDRESS BAR ===
 function adjustCalendarHeight() {
   calendarContainerVertView.style.height = `${window.innerHeight}px`;
@@ -91,9 +124,12 @@ function adjustCalendarHeight() {
   }
 }
 
+
 // Call initially and on resize
 adjustCalendarHeight();
 window.addEventListener('resize', adjustCalendarHeight);
+
+
 
 // === LOAD TASKS ===
 function loadTasksFromLocalStorage() {
@@ -119,6 +155,8 @@ function createCalendarGrid() {
     dayCell.appendChild(taskContainer);
     daysGridVertView.appendChild(dayCell);
   }
+
+
 
   // === SET MAX HEIGHT for each task container after DOM elements are in place
   const allDayCells = daysGridVertView.querySelectorAll(".day-vert-view");
@@ -154,6 +192,8 @@ function updateCalendarWithTasks(month, year) {
   monthLabelVertView.textContent = `${monthNames[month]} ${year}`;
 
   const dayCells = daysGridVertView.children;
+
+
 
   for (let i = 0; i < 42; i++) {
     const cell = dayCells[i];
@@ -232,7 +272,11 @@ function updateCalendarWithTasks(month, year) {
         }
       });
     }
-
+    //here
+    // cell.addEventListener("click", () => {
+    //   const fullDate = cell.getAttribute("data-full-date");
+    //   showDayTasks(fullDate);
+    // });
     cell.addEventListener('click', () => {
 
       document.querySelectorAll(".grid-cell").forEach(cell => {
@@ -256,19 +300,20 @@ function updateCalendarWithTasks(month, year) {
 }
 
 
-// // === REMOVE THIS HELPER FUNCTION ONCE PUT IN SHCEDULER ===
-// function fadeColor(color, alpha = 0.6) {
-//   // If color is in rgb format, return it with the alpha applied
-//   if (color.startsWith('rgb')) {
-//     return color.replace(')', `, ${alpha})`).replace('rgba', 'rgb');
-//   }
 
-//   // Otherwise, treat it as a hex color and convert to rgba
-//   const r = parseInt(color.substr(1, 2), 16);
-//   const g = parseInt(color.substr(3, 2), 16);
-//   const b = parseInt(color.substr(5, 2), 16);
-//   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-// }
+// === REMOVE THIS HELPER FUNCTION ONCE PUT IN SHCEDULER ===
+function fadeColor(color, alpha = 0.6) {
+  // If color is in rgb format, return it with the alpha applied
+  if (color.startsWith('rgb')) {
+    return color.replace(')', `, ${alpha})`).replace('rgba', 'rgb');
+  }
+
+  // Otherwise, treat it as a hex color and convert to rgba
+  const r = parseInt(color.substr(1, 2), 16);
+  const g = parseInt(color.substr(3, 2), 16);
+  const b = parseInt(color.substr(5, 2), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 
 // === NAVIGATION ===
@@ -292,7 +337,25 @@ nextMonthBtnVertView.addEventListener("click", () => {
 
 
 
-// ========pop up task drag logic
+// document.getElementById("
+// ").addEventListener("click", () => {
+//   document.getElementById("calendar-pop-up").style.display = "none";
+//   document.getElementById("backdrop").style.display = "none";
+// });
+
+// document.getElementById("backdrop").addEventListener("click", () => {
+//   document.getElementById("calendar-pop-up").style.display = "none";
+//   document.getElementById("backdrop").style.display = "none";
+// });
+
+
+// === INITIAL SETUP ===
+// createCalendarGrid();
+// updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+
+
+
+
 let draggedItem = null;
 let ghost = null;
 let offsetYforEditPopUp = 0;
@@ -372,6 +435,21 @@ function moveGhost(y) {
 
   cleanUpNoTasksText();
 }
+// function cleanUpNoTasksText() {
+//   document.querySelectorAll('.period-section').forEach(section => {
+//     const events = Array.from(section.children).filter(child => child.classList.contains('event'));
+//     const existingNoTask = section.querySelector('.no-tasks-text');
+
+//     if (events.length === 0 && !existingNoTask) {
+//       const noTask = document.createElement("p");
+//       noTask.className = "no-tasks-text";
+//       noTask.textContent = "No tasks for this period.";
+//       section.appendChild(noTask);
+//     } else if (events.length > 0 && existingNoTask) {
+//       existingNoTask.remove();
+//     }
+//   });
+// }
 
 function cleanUpNoTasksText() {
   document.querySelectorAll('.period-section').forEach(section => {
@@ -390,6 +468,45 @@ function cleanUpNoTasksText() {
       noTask.textContent = `Click to add new task for ${period}`;
       noTask.style.cursor = "pointer";
       noTask.title = "Click to add a new task";
+
+
+      // noTask.addEventListener("click", () => {
+
+      //   const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+      //   undoStack.push(currentState);
+      //   redoStack.length = 0; // clear redo stack because new action happened
+      //   const newEvent = createEventElement({
+      //     task: "No Title",
+      //     color: chosenColor,
+      //     period: period,
+      //     index: null,
+      //     isSelected: false,
+      //   });
+
+      //   section.appendChild(newEvent);
+      //   renderAppropriateStyle();
+      //   blurCurrentlyEditing();
+      //   autoFocusEventTitle(newEvent);
+
+      //   // Optionally, focus and highlight the new event's title:
+      //   const newTitle = newEvent.querySelector(".event-title");
+      //   if (newTitle) {
+      //     newTitle.contentEditable = "true";
+      //     // newEvent.style.outline = "none";
+      //     newEvent.style.border = "2px solid #00aaff";
+      //     newTitle.focus();
+
+      //     const range = document.createRange();
+      //     range.selectNodeContents(newTitle);
+      //     const sel = window.getSelection();
+      //     sel.removeAllRanges();
+      //     sel.addRange(range);
+      //   }
+
+      //   noTask.remove();
+      //   selectAllBtnUpdate();
+      // });
+
 
       section.appendChild(noTask);
     } else if (events.length > 0 && existingNoTask) {
@@ -422,8 +539,47 @@ function endDraggingPopUp() {
     draggedItem = null;
   }
 
+  // document.body.classList.remove('dragging');
 }
 
+
+// function handlePointerDownPopUp(e) {
+//   if (isTouch) return;
+
+//   const target = e.target.closest('.event');
+//   if (!target) return;
+
+//   startY = e.clientY;
+//   dragTarget = target;
+//   canStartDrag = false;
+
+//   dragTimeout = setTimeout(() => {
+//     canStartDrag = true;
+//   }, 100);
+// }
+
+// function handlePointerMovePopUp(e) {
+//   const distance = Math.abs(e.clientY - startY);
+
+//   if (dragTimeout && distance > MAX_DRAG_DISTANCE) {
+//     clearTimeout(dragTimeout);
+//     dragTimeout = null;
+//     dragTarget = null;
+//     canStartDrag = false;
+//   }
+
+//   if (!draggedItem && canStartDrag && dragTarget) {
+//     requestAnimationFrame(() => {
+//       startDraggingPopUp(e.clientX, e.clientY, dragTarget);
+//     });
+//   }
+
+//   if (draggedItem) moveGhostThrottledPopUp(e.clientY);
+// }
+
+// function handlePointerUpPopUp() {
+//   endDraggingPopUp();
+// }
 
 function handleTouchStartPopUp(e) {
 
@@ -460,6 +616,10 @@ function handleTouchMovePopUp(e) {
     canStartDrag = false;
   }
 
+  // if (!draggedItem && canStartDrag && dragTarget) {
+  //   startDraggingPopUp(touch.clientX, touch.clientY, dragTarget);
+  // }
+
   if (draggedItem) {
     moveGhostThrottledPopUp(touch.clientY);
 
@@ -469,9 +629,10 @@ function handleTouchMovePopUp(e) {
 }
 
 function handleTouchEndPopUp() {
+  // saveTaskOrderToTemp();
+  // showDayTasksEditable(popUpDate);
   endDraggingPopUp();
 }
-
 function addDragListeners() {
   applyBordersToEventContent();
   swipeEnabledPopUp = false;
@@ -484,6 +645,13 @@ function addDragListeners() {
   goTodayBtn.classList.add(`disabled-btn`);
 
   const popupTasks = document.getElementById("popup-tasks");
+
+
+  // document.addEventListener('pointerdown', handlePointerDownPopUp);
+  // document.addEventListener('pointermove', handlePointerMovePopUp);
+  // document.addEventListener('pointerup', handlePointerUpPopUp);
+  // document.addEventListener('pointercancel', endDraggingPopUp);
+
 
   // Add listeners to popupTasks element instead of document
   popupTasks.addEventListener('touchstart', handleTouchStartPopUp, { passive: false });
@@ -504,6 +672,12 @@ function removeDragListeners() {
   goTodayBtn.classList.remove(`disabled-btn`);
 
   const popupTasks = document.getElementById("popup-tasks");
+
+
+  // document.removeEventListener('pointerdown', handlePointerDownPopUp);
+  // document.removeEventListener('pointermove', handlePointerMovePopUp);
+  // document.removeEventListener('pointerup', handlePointerUpPopUp);
+  // document.removeEventListener('pointercancel', endDraggingPopUp);
 
   // Later, to remove them:
   popupTasks.removeEventListener('touchstart', handleTouchStartPopUp, { passive: false });
@@ -531,100 +705,110 @@ function removeExtraBordersFromEventContent() {
   });
 }
 
+
 document.getElementById('go-to-today').addEventListener('click', () => {
   const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
   const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
   showDayTasks(todayKey);
 });
 
-//====Find Cancel button
-document.getElementById('cancel-btn-popup').addEventListener('click', () => {
-  const normalButtons = document.querySelectorAll('.normal-mode');
-  const editButtons = document.querySelectorAll('.edit-mode');
-  editButtons.forEach(btn => btn.classList.add('hidden'));
-  normalButtons.forEach(btn => btn.classList.remove('hidden'));
-  console.log("cancel button clicked");
-  isEditing = false;
-  document.getElementById("closePopupBtn").click();
-  showDayTasks(popUpDate);
-});
 
-//====Find Edit button 
+
 const toggleEditBtn = document.getElementById('toggle-edit');
+
+
 toggleEditBtn.addEventListener('click', () => {
+
   isEditing = !isEditing;
+
+  // document.querySelector(".popup-header").classList.add("in-edit-mode");
 
   const normalButtons = document.querySelectorAll('.normal-mode');
   const editButtons = document.querySelectorAll('.edit-mode');
   const icon = toggleEditBtn.querySelector('.material-symbols-outlined');
   const label = toggleEditBtn.querySelector('.calendar-icon-label');
 
-  const eventContents = document.querySelectorAll(".event-content");
-  const eventControls = document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask");
-  const events = document.querySelectorAll(".event");
 
   if (isEditing) {
     moveColorOptionsToPopup();
-
     normalButtons.forEach(btn => btn.classList.add('hidden'));
     editButtons.forEach(btn => btn.classList.remove('hidden'));
-
     icon.textContent = 'save_as';
-    icon.style.color = 'red';
+    icon.style.color = 'red';     // change icon to "save_as"
     label.textContent = 'Save';
-    label.style.color = 'red';
-
+    label.style.color = 'red';     // change text to "Save"
     addDragListeners();
 
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
     dayTasksForEdit = storedTasks[popUpDate] ? JSON.parse(JSON.stringify(storedTasks[popUpDate])) : {};
     showDayTasksEditable(popUpDate);
 
-    eventContents.forEach(el => {
+
+    document.querySelectorAll(".event-content").forEach(el => {
       el.style.marginLeft = "0";
       el.style.marginRight = "0";
     });
 
-    eventControls.forEach(el => el.style.display = "inline-flex");
-    events.forEach(el => {
+    //   document.querySelectorAll(".event").forEach(el => {
+    //     el.style.backgroundColor = "rgba(0, 170, 255, 0.1)";
+    // });
+
+
+    document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+      el.style.display = "inline-flex"; // or "block" depending on layout
+    });
+
+    document.querySelectorAll(".event").forEach(el => {
       el.style.border = "1px solid #ccc";
-      el.style.borderRadius = "2px";
+      el.style.borderRadius = "2x";
     });
 
   } else {
-    restoreChangesFromEditMode();
 
+    restoreColorOptions();
     normalButtons.forEach(btn => btn.classList.remove('hidden'));
     editButtons.forEach(btn => btn.classList.add('hidden'));
-
+    // icon.textContent = 'note_alt';
     dayTasksForEdit = null;
     icon.textContent = 'edit_note';
-    icon.style.color = '';
-    label.textContent = 'Edit';
-    label.style.color = '';
 
+    icon.style.color = '';   // revert back to edit icon
+    label.textContent = 'Edit';
+    label.style.color = '';   // revert back to edit label
     endDraggingPopUp();
+
     removeDragListeners();
 
-    if (popUpDate) saveTaskOrderToLocalStorage(popUpDate);
+    if (popUpDate) {
+      saveTaskOrderToLocalStorage(popUpDate);
+    }
 
     showDayTasks(popUpDate);
 
-    eventControls.forEach(el => el.style.display = "none");
-    events.forEach(el => el.style.border = "none");
-    eventContents.forEach(el => {
+    document.querySelectorAll(".delete-dayTask, .arrow-up-dayTask, .arrow-down-dayTask").forEach(el => {
+      el.style.display = "none";
+
+      document.querySelectorAll(".event").forEach(el => {
+        el.style.border = "none";
+        // el.style.backgroundColor = "";
+      });
+    });
+
+    document.querySelectorAll(".event-content").forEach(el => {
       el.style.marginLeft = "20px";
       el.style.marginRight = "20px";
     });
+
   }
 });
-
 
 function redo() {
   if (redoStack.length === 0) return;
 
   // Save current state to undo stack before redoing
   undoStack.push(saveTaskOrderToTemp());
+
+
   // Restore next state
   const nextState = redoStack.pop();
 
@@ -687,6 +871,8 @@ function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+
+
 document.getElementById('undo-btn-popup').addEventListener('click', () => {
   undo();
 });
@@ -695,6 +881,20 @@ document.getElementById('redo-btn-popup').addEventListener('click', () => {
   redo();
 });
 
+
+
+
+
+document.getElementById('cancel-btn-popup').addEventListener('click', () => {
+  const normalButtons = document.querySelectorAll('.normal-mode');
+  const editButtons = document.querySelectorAll('.edit-mode');
+  editButtons.forEach(btn => btn.classList.add('hidden'));
+  normalButtons.forEach(btn => btn.classList.remove('hidden'));
+  console.log("cancel button clicked");
+  isEditing = false;
+  document.getElementById("closePopupBtn").click();
+  showDayTasks(popUpDate);
+});
 
 function saveTaskOrderToLocalStorage(popUpDate) {
   const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
@@ -741,6 +941,8 @@ function saveTaskOrderToLocalStorage(popUpDate) {
   }
 }
 
+
+
 function saveTaskOrderToTemp() {
   if (!dayTasksForEdit) return null;
 
@@ -772,10 +974,13 @@ function saveTaskOrderToTemp() {
   return snapshot;
 }
 
-// function rgbToHex(rgb) {
-//   const result = rgb.match(/\d+/g).map(n => (+n).toString(16).padStart(2, "0"));
-//   return `#${result.join("")}`;
-// }
+
+
+
+function rgbToHex(rgb) {
+  const result = rgb.match(/\d+/g).map(n => (+n).toString(16).padStart(2, "0"));
+  return `#${result.join("")}`;
+}
 
 
 
