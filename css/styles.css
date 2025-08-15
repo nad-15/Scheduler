@@ -2767,6 +2767,7 @@ h2 {
     align-items: center;
     overflow: hidden;
     background-color: white;
+    /* background-color: transparent; */
     color: black;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
@@ -2872,6 +2873,9 @@ h2 {
     padding-top: 20px;
     padding-left: 20px;
     padding-right: 20px;
+    background-color: white;
+    border: 1px solid white;
+
 
 
 }
@@ -2902,7 +2906,11 @@ h2 {
     font-weight: normal;
     /* border: 2px solid red; */
     width: 100%;
-    margin-left: 40px;
+    padding-left: 40px;
+    background-color: white;
+    border: 1px solid white;
+
+
 
 }
 
@@ -2980,8 +2988,11 @@ h2 {
     flex-grow: 1;
     padding-left: 20px;
     padding-right: 20px;
-    /* border: 2px solid lime; */
+    background-color: white;
+    border: 1px solid white;
 
+
+    /* border: 2px solid lime; */
 }
 
 /* POP OUT ANIMATION */
@@ -3107,6 +3118,10 @@ ic {
     padding: 0;
     /* margin-bottom: 5px; */
     /* border: 2px solid red; */
+    /* background-color: rgba(255, 255, 255, 0.8); */
+    /* background-color: rgb(0, 0, 0, 0.5); */
+
+
 }
 
 /* Color options container adjustments when inside popup */
@@ -3243,6 +3258,8 @@ ic {
     padding: 8px 0;
 
     /* background-color: red; */
+    background-color: white;
+
 
 }
 
