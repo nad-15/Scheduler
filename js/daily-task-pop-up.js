@@ -663,12 +663,6 @@ if (noTask && popupTasks.contains(noTask)) {
     );
 
 
-
-
-
-
-
-
     if (allSelected) {
       selectAllBtn.innerHTML = `<span class="material-symbols-outlined" id="icon-checkbox">check_box</span> <span class="select-all-text">Select All</span>`;
     } else {
@@ -709,7 +703,7 @@ if (noTask && popupTasks.contains(noTask)) {
     renderAppropriateStyle();
     blurCurrentlyEditing();
     autoFocusEventTitle(newEvent);
-
+    selectAllBtnUpdate();
     return;
 
   }
