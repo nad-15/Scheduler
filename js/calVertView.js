@@ -760,7 +760,7 @@ toggleEditBtn.addEventListener('click', () => {
 
     document.querySelectorAll(".event").forEach(el => {
       el.style.border = "1px solid #ccc";
-      el.style.borderRadius = "2x";
+      el.style.borderRadius = "2px";
     });
 
   } else {
