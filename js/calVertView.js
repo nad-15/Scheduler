@@ -471,6 +471,7 @@ function cleanUpNoTasksText() {
 
 
       noTask.addEventListener("click", () => {
+
         const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
         undoStack.push(currentState);
         redoStack.length = 0; // clear redo stack because new action happened
@@ -503,6 +504,7 @@ function cleanUpNoTasksText() {
         }
 
         noTask.remove();
+        selectAllBtnUpdate();
       });
 
 

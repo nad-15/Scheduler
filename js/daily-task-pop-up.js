@@ -482,6 +482,7 @@ function showDayTasksEditable(date, focusInfo = null) {
 
 
           noTask.remove();
+          selectAllBtnUpdate();
           console.log("Task not remove");
 
         });
@@ -876,7 +877,7 @@ function showPopup() {
 
 function hidePopup() {
   if (isEditing && undoStack.length > 0) {
-    if (confirm("Do you want to save changes?")) {
+    if (confirm("Do you want to save changes?\n Click ok to save, Click cancel to exit without saving")) {
       document.getElementById("toggle-edit").click();
     }
   }

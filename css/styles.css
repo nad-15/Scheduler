@@ -779,12 +779,13 @@ h2 {
     /* background-color: rgb(249, 252, 255, 0.9); */
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2);
     /* overflow: hidden; */
-
     transform: translateY(100%);
     /* Start hidden */
     transition: transform 0.3s ease-in-out;
     /* Smooth transition */
-    z-index: 1999;
+    /* z-index: 1999; */
+    z-index: 1998;
+
 }
 
 .show {
