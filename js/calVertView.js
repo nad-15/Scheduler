@@ -470,42 +470,42 @@ function cleanUpNoTasksText() {
       noTask.title = "Click to add a new task";
 
 
-      noTask.addEventListener("click", () => {
+      // noTask.addEventListener("click", () => {
 
-        const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
-        undoStack.push(currentState);
-        redoStack.length = 0; // clear redo stack because new action happened
-        const newEvent = createEventElement({
-          task: "No Title",
-          color: chosenColor,
-          period: period,
-          index: null,
-          isSelected: false,
-        });
+      //   const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+      //   undoStack.push(currentState);
+      //   redoStack.length = 0; // clear redo stack because new action happened
+      //   const newEvent = createEventElement({
+      //     task: "No Title",
+      //     color: chosenColor,
+      //     period: period,
+      //     index: null,
+      //     isSelected: false,
+      //   });
 
-        section.appendChild(newEvent);
-        renderAppropriateStyle();
-        blurCurrentlyEditing();
-        autoFocusEventTitle(newEvent);
+      //   section.appendChild(newEvent);
+      //   renderAppropriateStyle();
+      //   blurCurrentlyEditing();
+      //   autoFocusEventTitle(newEvent);
 
-        // Optionally, focus and highlight the new event's title:
-        const newTitle = newEvent.querySelector(".event-title");
-        if (newTitle) {
-          newTitle.contentEditable = "true";
-          // newEvent.style.outline = "none";
-          newEvent.style.border = "2px solid #00aaff";
-          newTitle.focus();
+      //   // Optionally, focus and highlight the new event's title:
+      //   const newTitle = newEvent.querySelector(".event-title");
+      //   if (newTitle) {
+      //     newTitle.contentEditable = "true";
+      //     // newEvent.style.outline = "none";
+      //     newEvent.style.border = "2px solid #00aaff";
+      //     newTitle.focus();
 
-          const range = document.createRange();
-          range.selectNodeContents(newTitle);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
+      //     const range = document.createRange();
+      //     range.selectNodeContents(newTitle);
+      //     const sel = window.getSelection();
+      //     sel.removeAllRanges();
+      //     sel.addRange(range);
+      //   }
 
-        noTask.remove();
-        selectAllBtnUpdate();
-      });
+      //   noTask.remove();
+      //   selectAllBtnUpdate();
+      // });
 
 
       section.appendChild(noTask);

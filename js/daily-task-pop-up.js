@@ -447,45 +447,45 @@ function showDayTasksEditable(date, focusInfo = null) {
         noTask.style.cursor = "pointer";
         noTask.title = "Click to add a new task";
 
-        noTask.addEventListener("click", () => {
-          const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
-          undoStack.push(currentState);
-          redoStack.length = 0; // clear redo stack because new action happened
-          // const clickToAddNewTaskParagraph = section.querySelector()
-          // existingNoTask.remove();
-          const newEvent = createEventElement({
-            task: "No Title",
-            color: chosenColor,
-            period: period,
-            index: null,
-            isSelected: false,
-          });
+        // noTask.addEventListener("click", () => {
+        //   const currentState = saveTaskOrderToTemp(); // Get fresh snapshot of current tasks
+        //   undoStack.push(currentState);
+        //   redoStack.length = 0; // clear redo stack because new action happened
+        //   // const clickToAddNewTaskParagraph = section.querySelector()
+        //   // existingNoTask.remove();
+        //   const newEvent = createEventElement({
+        //     task: "No Title",
+        //     color: chosenColor,
+        //     period: period,
+        //     index: null,
+        //     isSelected: false,
+        //   });
 
-          section.appendChild(newEvent);
-          renderAppropriateStyle();
-          blurCurrentlyEditing();
-          autoFocusEventTitle(newEvent);
+        //   section.appendChild(newEvent);
+        //   renderAppropriateStyle();
+        //   blurCurrentlyEditing();
+        //   autoFocusEventTitle(newEvent);
 
-          // Optionally, focus and highlight the new event's title:
-          const newTitle = newEvent.querySelector(".event-title");
-          if (newTitle) {
-            newTitle.contentEditable = "true";
-            newEvent.style.border = "2px solid #00aaff";
-            newTitle.focus();
+        //   // Optionally, focus and highlight the new event's title:
+        //   const newTitle = newEvent.querySelector(".event-title");
+        //   if (newTitle) {
+        //     newTitle.contentEditable = "true";
+        //     newEvent.style.border = "2px solid #00aaff";
+        //     newTitle.focus();
 
-            const range = document.createRange();
-            range.selectNodeContents(newTitle);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
+        //     const range = document.createRange();
+        //     range.selectNodeContents(newTitle);
+        //     const sel = window.getSelection();
+        //     sel.removeAllRanges();
+        //     sel.addRange(range);
+        //   }
 
 
-          noTask.remove();
-          selectAllBtnUpdate();
-          console.log("Task not remove");
+        //   noTask.remove();
+        //   selectAllBtnUpdate();
+        //   console.log("Task not remove");
 
-        });
+        // });
 
 
         section.appendChild(noTask);
@@ -534,6 +534,57 @@ const handlePopupClick = (e) => {
 
   if (!isEditing) return;
   const target = e.target;
+
+  // "No tasks" placeholder clicked?
+const noTask = target.closest(".no-tasks-text");
+if (noTask && popupTasks.contains(noTask)) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  const section = noTask.closest(".period-section");
+  const period = noTask.dataset?.period || noTask.textContent.match(/for\s+(\w+)/)?.[1];
+
+  const currentState = saveTaskOrderToTemp();
+  undoStack.push(currentState);
+  redoStack.length = 0;
+
+  // Create new event element
+  const newEvent = createEventElement({
+    task: "No Title",
+    color: chosenColor,
+    period: period,
+    index: null,
+    isSelected: false,
+  });
+
+  section.appendChild(newEvent);
+  renderAppropriateStyle();
+  blurCurrentlyEditing();
+  autoFocusEventTitle(newEvent);
+
+  // Focus and select content
+  const newTitle = newEvent.querySelector(".event-title");
+  if (newTitle) {
+    newTitle.contentEditable = "true";
+    newEvent.style.border = "2px solid #00aaff";
+    newTitle.focus();
+
+    const range = document.createRange();
+    range.selectNodeContents(newTitle);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // Remove the placeholder
+  noTask.remove();
+
+  // Update select all button if needed
+  selectAllBtnUpdate();
+
+  return;
+}
+
 
   // Title clicked?
   const title = target.closest(".event-title");
