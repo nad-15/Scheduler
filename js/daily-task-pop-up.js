@@ -877,7 +877,7 @@ function showPopup() {
 
 function hidePopup() {
   if (isEditing && undoStack.length > 0) {
-    if (confirm("Do you want to save changes?\n Click ok to save, Click cancel to exit without saving")) {
+    if (confirm("Save changes befoe exiting? Click OK to save, or Cancel to exit without saving.")) {
       document.getElementById("toggle-edit").click();
     }
   }
