@@ -44,6 +44,28 @@ console.log("POPUPDATE IS:", popUpDate);
 
 let touchStartX = 0;
 let touchStartY = 0;
+let isEditing = false;
+
+// function showSavePopup(callback) {
+//   const popup = document.getElementById("savePopup");
+//   popup.style.display = "flex";
+
+//   const yesBtn = popup.querySelector(".confirm-yes");
+//   const noBtn = popup.querySelector(".confirm-no");
+
+//   // Cleanup old listeners to avoid duplicates
+//   yesBtn.onclick = () => {
+//     popup.style.display = "none";
+//     callback(true);
+//   };
+
+//   noBtn.onclick = () => {
+//     popup.style.display = "none";
+//     callback(false);
+//   };
+// }
+
+
 
 calendarContainerVertView.addEventListener("touchstart", (e) => {
   touchStartX = e.changedTouches[0].screenX;
@@ -691,7 +713,7 @@ document.getElementById('go-to-today').addEventListener('click', () => {
 
 
 const toggleEditBtn = document.getElementById('toggle-edit');
-let isEditing = false;
+
 
 toggleEditBtn.addEventListener('click', () => {
 
