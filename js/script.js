@@ -2056,6 +2056,7 @@ jumPingText.addEventListener("click", () => {
 
 
 function rgbToHex(rgb) {
+    console.log("RGBtoHEx f caleed");
 
     if (rgb.startsWith('#')) {
         return color;
