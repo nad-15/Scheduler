@@ -867,6 +867,7 @@ document.getElementById("backdrop").addEventListener("click", () => {
 });
 
 
+
 function showPopup() {
 
   const popup = document.getElementById("calendar-pop-up");
@@ -877,7 +878,8 @@ function showPopup() {
 
 function hidePopup() {
   if (isEditing && undoStack.length > 0) {
-    if (confirm("Do you want to save changes?\n Click ok to save, Click cancel to exit without saving")) {
+"Save changes before exiting?Click OK to save, or Cancel to exit without saving."
+    if (confirm()) {
       document.getElementById("toggle-edit").click();
     }
   }
