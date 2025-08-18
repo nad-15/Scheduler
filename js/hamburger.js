@@ -40,8 +40,16 @@ const menuButton = document.querySelector('.menu-button');
 const menuSlider = document.querySelector('.menu-slider');
 const overlayMenu = document.querySelector('.overlay-menu');
 const closeButtonMenu = document.querySelector('.close-button-menu');
-const themeList = document.querySelector('.theme-list'); // Make sure this matches your HTML
+const themeList = document.querySelector('.theme-submenu'); // Make sure this matches your HTML
 const theme = document.querySelector('.theme'); // "Theme" li element to toggle the list
+const genSettings = document.querySelector(".settings");
+
+genSettings.addEventListener("click", ()=>{
+    const settingsSub = document.querySelector(".settings-submenu");
+    settingsSub.style.display = "block";
+});
+
+
 
 // Populate the theme list
 for (const theme in colorThemes) {

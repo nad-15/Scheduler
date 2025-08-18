@@ -574,9 +574,7 @@ h2 {
 
 
 
-.theme,
-.about,
-.other-webapps {
+.menu-item {
     display: inline-flex;
     align-items: center;
     /* vertical center */
@@ -584,7 +582,6 @@ h2 {
     /* space between icon and text */
 
 }
-
 
 
 /* =================== */
@@ -625,41 +622,68 @@ h2 {
     margin-bottom: 10px;
 }
 
+
+.submenu {
+    display: none;
+}
+
+
+.show {
+    display: block;
+}
+
+
+
+
 .menu-slider ul {
     list-style: none;
     padding: 0px;
     margin: 0;
+    /* background-color: red; */
 }
 
-.menu-slider li {
+.menu-item, .budget-calc-link {
     font-size: 1.1rem;
     padding: 0.6rem 0;
     color: #eee;
     transition: color 0.3s, transform 0.2s;
     cursor: pointer;
+    /* background-color: green; */
+        text-decoration: none;
 }
 
-.menu-slider li:hover {
+
+
+
+.menu-item:hover {
     color: #ffffff;
     transform: translateX(4px);
 }
 
-/* =================== */
 /* 🔽 SUBMENU */
-.theme-list,
-.size-submenu {
+.submenu, .sub-submenu {
+    display: none;
+    display: flex;
     margin-top: 0.5rem;
-    padding-left: 1rem;
+    padding-left: 2rem;
     display: none;
     max-height: 160px;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #999 transparent;
+    font-size: 30px;
+
+    /* background-color: blue; */
 }
 
-.theme-list.show,
-.size-submenu.show {
-    display: block;
+.submenu.show {
+    display: flex;
+
+}
+
+.sub-submenu{
+    padding-left: 1.5rem;
+        background-color: red;
 }
 
 .theme-list::-webkit-scrollbar {
@@ -671,8 +695,14 @@ h2 {
     border-radius: 10px;
 }
 
+.budget-calc-link {
+        text-decoration: none;
+}
+
 /* =================== */
-/* 🌚 OVERLAY */
+
+
+
 .overlay-menu {
     position: fixed;
     top: 0;
@@ -718,13 +748,13 @@ h2 {
 
 /* =================== */
 /* 🧠 ICONS */
-.material-icons.menu-icon {
+/* .material-icons.menu-icon {
     font-size: 22px;
-}
+} */
 
 /* =================== */
 /* ✅ "KalKulator" BUTTON */
-.menu-slider .btn {
+/* .menu-slider .btn {
     font-size: 1.1rem;
     display: inline-block;
     text-decoration: none;
@@ -732,7 +762,7 @@ h2 {
     color: #eee;
     transition: color 0.3s, transform 0.2s;
     cursor: pointer;
-}
+} */
 
 .menu-slider .btn:hover {
     transform: translateY(-2px) scale(1.05);
