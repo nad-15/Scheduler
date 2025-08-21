@@ -79,14 +79,15 @@ themeSubmenu.addEventListener("click", (event) => {
 
 function renderThemeSubmenu(themeSubmenu) {
   themeSubmenu.innerHTML = "";
-  Object.keys(colorThemes).forEach(key => {
+  Object.entries(colorThemes).forEach(([key, theme]) => {
     const li = document.createElement("li");
     li.dataset.theme = key;
     li.classList.add("menu-item");
     li.innerHTML = `
       <div class="menu-label" data-theme="${key}">
-        <span class="material-symbols-outlined">palette</span>
-        <span class="menu-text">${key}</span>
+        <div class="theme-swatch">
+          <span class="theme-letter" style="color:${theme.sunday}">K</span>
+        </div>
       </div>
     `;
     themeSubmenu.appendChild(li);
