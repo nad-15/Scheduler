@@ -217,7 +217,11 @@
 
                     <!-- Backups (submenu) -->
                     <li data-section="backups" class="menu-item has-submenu">
-                        <input type="file" id="uploadBackup" accept=".json" style="display:none">
+                        <input type="file" id="uploadBackup"
+                            accept=".json,application/json,text/plain,application/octet-stream" style="display:none">
+
+
+
 
                         <div class="menu-label">
                             <span class="material-symbols-outlined">backup</span>

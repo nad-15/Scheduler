@@ -166,22 +166,29 @@ function runMenuAction(item) {
     console.log(`Backup action: ${backup}`);
 
     if (backup === "download") {
-      // Download all localStorage
       const backupData = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         backupData[key] = localStorage.getItem(key);
       }
 
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
+      // Add signature & version
+      const wrappedBackup = {
+        signature: "SkhayedulerBackup_v1",
+        data: backupData
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(wrappedBackup));
+
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
       downloadAnchor.setAttribute("download", "Skhayeduler_localStorage_backup.json");
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
-
-    } else if (backup === "upload") {
+    }
+    if (backup === "upload") {
       // Trigger hidden file input
       const uploadInput = document.getElementById("uploadBackup");
       if (uploadInput) uploadInput.click();
@@ -202,26 +209,32 @@ document.getElementById("uploadBackup").addEventListener("change", (e) => {
   const reader = new FileReader();
   reader.onload = function (event) {
     try {
-      const backupData = JSON.parse(event.target.result);
+      const parsed = JSON.parse(event.target.result);
+
+      // Check signature
+      if (!parsed.signature || parsed.signature !== "SkhayedulerBackup_v1") {
+        throw new Error("Invalid backup signature.");
+      }
+
+      const backupData = parsed.data;
+
       for (const key in backupData) {
         localStorage.setItem(key, backupData[key]);
       }
-      // Alert user first
-      alert("Backup restored successfully! The page will reload to apply changes.");
 
-      // Reload after a short delay
-      setTimeout(() => {
-        location.reload();
-      }, 500); // 500ms delay, adjust if needed
+      alert("Backup restored successfully! Reloading...");
+      setTimeout(() => location.reload(), 500);
+
     } catch (err) {
-      alert("Invalid backup file.");
+      alert("Invalid backup file. " + err.message);
     }
   };
   reader.readAsText(file);
 
-  // Reset input so user can upload the same file again if needed
+  // Reset input
   e.target.value = "";
 });
+
 
 
 
