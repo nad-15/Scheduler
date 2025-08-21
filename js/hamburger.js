@@ -85,8 +85,8 @@ function renderThemeSubmenu(themeSubmenu) {
     li.classList.add("menu-item");
     li.innerHTML = `
       <div class="menu-label" data-theme="${key}">
-        <div class="theme-swatch">
-          <span class="theme-letter" style="color:${theme.sunday}">K</span>
+        <div class="theme-swatch" style="background-color:${theme.sunday}">
+          <span class="theme-letter" style="color: white">K</span>
         </div>
       </div>
     `;
