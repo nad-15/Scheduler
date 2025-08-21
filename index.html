@@ -148,99 +148,114 @@
                     <div class="slider-menu-tagline">"The official tracker of your sleepless days."</div>
                 </div>
 
-                <div class="menuslider-divider"></div>
+                <div class="divider"></div>
 
                 <!-- Main Menu -->
                 <ul class="menu-list">
-
-                    <!-- To-Do -->
-                    <li data-section="todo">
-                        <span class="menu-item todo">
+                    <!-- To-Do (leaf) -->
+                    <li data-section="todo" class="menu-item">
+                        <div class="menu-label">
                             <span class="material-symbols-outlined">checklist</span>
-                            To-Do
-                        </span>
+                            <span class="menu-text">To-Do</span>
+                        </div>
                     </li>
 
-                    <div class="menuslider-divider"></div>
+                    <!-- Divider -->
+                    <li class="divider" role="separator"></li>
 
-                    <!-- General Settings -->
-                    <li data-section="settings">
-                        <span class="menu-item settings">
+                    <!-- Settings (submenu) -->
+                    <li data-section="settings" class="menu-item has-submenu">
+                        <div class="menu-label">
                             <span class="material-symbols-outlined">settings</span>
-                            General Settings
-                        </span>
-                        <ul class="submenu settings-submenu">
-                            <!-- Theme -->
-                            <li data-setting="theme">
-                                <span class="menu-item theme">
+                            <span class="menu-text">General Settings</span>
+                        </div>
+                        <ul class="submenu">
+                            <li data-setting="theme" class="menu-item has-submenu">
+                                <div class="menu-label">
                                     <span class="material-symbols-outlined">routine</span>
-                                    Theme
-                                </span>
-                                <ul class="sub-submenu theme-submenu">
-                                    <!-- Theme list will be populated dynamically -->
+                                    <span class="menu-text">Color Theme</span>
+                                </div>
+                                <ul class="sub-submenu">
+                                    <!-- insert them here -->
                                 </ul>
                             </li>
-
-                            <!-- Default View -->
-                            <li data-setting="default-view">
-                                <span class="menu-item default-view">
+                            <li data-setting="default-view" class="menu-item has-submenu">
+                                <div class="menu-label">
                                     <span class="material-symbols-outlined">view_agenda</span>
-                                    Default View
-                                </span>
-                                <ul class="sub-submenu default-view-submenu">
-                                    <li data-view="list">List View</li>
-                                    <li data-view="month">Month View</li>
+                                    <span class="menu-text">Default View</span>
+                                </div>
+                                <ul class="sub-submenu">
+                                    <li data-view="list" class="menu-item">
+                                        <div class="menu-label">
+                                            <span class="menu-text">List View</span>
+                                        </div>
+                                    </li>
+                                    <li data-view="month" class="menu-item">
+                                        <div class="menu-label">
+                                            <span class="menu-text">Month View</span>
+                                        </div>
+                                    </li>
                                 </ul>
                             </li>
-
-                            <!-- Startup Popup -->
-                            <li data-setting="startup-popup">
-                                <span class="menu-item startup-popup">
+                            <li data-setting="startup-popup" class="menu-item">
+                                <div class="menu-label">
                                     <span class="material-symbols-outlined">notifications</span>
-                                    Show Pop-up at Startup
-                                </span>
+                                    <span class="menu-text">Show Pop-up at Startup</span>
+                                </div>
                             </li>
-
-                            <!-- Weather Widget -->
-                            <li data-setting="weather-widget">
-                                <span class="menu-item weather-widget">
+                            <li data-setting="weather-widget" class="menu-item">
+                                <div class="menu-label">
                                     <span class="material-symbols-outlined">cloud</span>
-                                    Weather Widget
-                                </span>
+                                    <span class="menu-text">Weather Widget</span>
+                                </div>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Backups -->
-                    <li data-section="backups">
-                        <span class="menu-item backups">
+                    <!-- Backups (submenu) -->
+                    <li data-section="backups" class="menu-item has-submenu">
+                        <div class="menu-label">
                             <span class="material-symbols-outlined">backup</span>
-                            Backups
-                        </span>
-                        <ul class="submenu backup-submenu">
-                            <li data-backup="download">Download Tasks</li>
-                            <li data-backup="upload">Upload Tasks</li>
+                            <span class="menu-text">Backups</span>
+                        </div>
+                        <ul class="submenu">
+                            <li data-backup="download" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">download</span>
+                                    <span class="menu-text">Download Tasks</span>
+                                </div>
+                            </li>
+                            <li data-backup="upload" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">upload</span>
+                                    <span class="menu-text">Upload Tasks</span>
+                                </div>
+                            </li>
                         </ul>
                     </li>
 
-                    <!-- About -->
-                    <li data-section="about">
-                        <span class="menu-item about">
+                    <!-- About (leaf) -->
+                    <li data-section="about" class="menu-item">
+                        <div class="menu-label">
                             <span class="material-symbols-outlined">info</span>
-                            About
-                        </span>
+                            <span class="menu-text">About</span>
+                        </div>
+                    </li>
+
+                    <li class="divider" role="separator"></li>
+
+                    <!-- External Link -->
+                    <li class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">calculate</span>
+                            <a class="menu-item" href="https://nad-15.github.io/BudgetCalculator/" target="_blank" class="menu-text">
+                                Budget KalKulator
+                            </a>
+                        </div>
                     </li>
                 </ul>
 
-                <div class="menuslider-divider"></div>
 
-                <!-- External Webapps -->
-                <div class="menu-item other-webapps">
-                    <span class="material-symbols-outlined">calculate</span>
-                    <a href="https://nad-15.github.io/BudgetCalculator/" target="_blank" class="budget-calc-link">
-                        Budget KalKulator
-                    </a>
-                </div>
             </div>
 
 

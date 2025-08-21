@@ -544,6 +544,29 @@ h2 {
 
 /* =================== */
 /* 🧊 SLIDER PANEL 🧊 */
+
+.close-button-menu {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.close-button-menu:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: rotate(90deg);
+}
 .menu-slider {
     position: fixed;
     top: 0;
@@ -565,27 +588,58 @@ h2 {
     scrollbar-width: none;
 }
 
-/* *{
-    border:1px solid lime;
-} */
+
 .menu-slider.open {
     transform: translateX(0);
 }
+/* =======MENU LISTS==== */
 
 
-
-.menu-item {
-    display: inline-flex;
+.menu-label {
+    display: flex;
     align-items: center;
-    /* vertical center */
-    gap: 8px;
-    /* space between icon and text */
+    gap: 8px; /* space between icon and text */
+}
 
+.menu-text {
+    display: inline-block;
+}
+
+.menu-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Each menu-item stacks its label + submenu */
+.menu-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Submenu containers are vertical lists */
+.submenu,
+.sub-submenu {
+    display: flex;
+    flex-direction: column;
+}
+
+/* -------- Indentation -------- */
+
+/* Indent submenu level 1 */
+.submenu .menu-label {
+    padding-left: 16px;
+}
+
+/* Indent submenu level 2 */
+.sub-submenu .menu-label {
+    padding-left: 32px;
 }
 
 
+
 /* =================== */
-/* 🎯 HEADINGS & TEXT */
+/* MENU HEADINGS & TEXT */
 .side-menu-header-container {
     display: flex;
     flex-direction: column;
@@ -616,23 +670,20 @@ h2 {
     font-family: 'Kaushan Script', cursive;
 }
 
-.menuslider-divider {
+.divider {
     /* height: 2px; */
     border: 1px solid white;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
 }
 
-
-.submenu {
-    display: none;
+.submenu, .sub-submenu {
+  display: none;
+  margin-left: 1rem;
 }
 
-
-.show {
-    display: block;
+.submenu.open, .sub-submenu.open {
+  display: block;
 }
-
-
 
 
 .menu-slider ul {
@@ -653,38 +704,11 @@ h2 {
 }
 
 
-
-
 .menu-item:hover {
     color: #ffffff;
     transform: translateX(4px);
 }
 
-/* 🔽 SUBMENU */
-.submenu, .sub-submenu {
-    display: none;
-    display: flex;
-    margin-top: 0.5rem;
-    padding-left: 2rem;
-    display: none;
-    max-height: 160px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #999 transparent;
-    font-size: 30px;
-
-    /* background-color: blue; */
-}
-
-.submenu.show {
-    display: flex;
-
-}
-
-.sub-submenu{
-    padding-left: 1.5rem;
-        background-color: red;
-}
 
 .theme-list::-webkit-scrollbar {
     width: 6px;
@@ -721,53 +745,7 @@ h2 {
     visibility: visible;
 }
 
-/* =================== */
-/* ❌ CLOSE BUTTON */
-.close-button-menu {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    font-size: 2rem;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
 
-.close-button-menu:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: rotate(90deg);
-}
-
-/* =================== */
-/* 🧠 ICONS */
-/* .material-icons.menu-icon {
-    font-size: 22px;
-} */
-
-/* =================== */
-/* ✅ "KalKulator" BUTTON */
-/* .menu-slider .btn {
-    font-size: 1.1rem;
-    display: inline-block;
-    text-decoration: none;
-    padding: 0.6rem 0;
-    color: #eee;
-    transition: color 0.3s, transform 0.2s;
-    cursor: pointer;
-} */
-
-.menu-slider .btn:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 25px rgba(0, 255, 200, 0.5);
-}
 
 /* =================== */
 
