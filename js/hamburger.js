@@ -196,25 +196,31 @@ function runMenuAction(item) {
 
 
 document.getElementById("uploadBackup").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        try {
-            const backupData = JSON.parse(event.target.result);
-            for (const key in backupData) {
-                localStorage.setItem(key, backupData[key]);
-            }
-            alert("Backup restored successfully!");
-        } catch (err) {
-            alert("Invalid backup file.");
-        }
-    };
-    reader.readAsText(file);
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    try {
+      const backupData = JSON.parse(event.target.result);
+      for (const key in backupData) {
+        localStorage.setItem(key, backupData[key]);
+      }
+      // Alert user first
+      alert("Backup restored successfully! The page will reload to apply changes.");
 
-    // Reset input so user can upload the same file again if needed
-    e.target.value = "";
+      // Reload after a short delay
+      setTimeout(() => {
+        location.reload();
+      }, 500); // 500ms delay, adjust if needed
+    } catch (err) {
+      alert("Invalid backup file.");
+    }
+  };
+  reader.readAsText(file);
+
+  // Reset input so user can upload the same file again if needed
+  e.target.value = "";
 });
 
 
