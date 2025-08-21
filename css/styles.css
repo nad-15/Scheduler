@@ -567,6 +567,7 @@ h2 {
     background: rgba(255, 255, 255, 0.25);
     transform: rotate(90deg);
 }
+
 .menu-slider {
     position: fixed;
     top: 0;
@@ -592,13 +593,15 @@ h2 {
 .menu-slider.open {
     transform: translateX(0);
 }
+
 /* =======MENU LISTS==== */
 
 
 .menu-label {
     display: flex;
     align-items: center;
-    gap: 8px; /* space between icon and text */
+    gap: 8px;
+    /* space between icon and text */
 }
 
 .menu-text {
@@ -676,35 +679,39 @@ h2 {
     /* margin-bottom: 10px; */
 }
 
-.submenu, .sub-submenu {
-  display: none;
-  margin-left: 1rem;
+.submenu,
+.sub-submenu {
+    display: none;
+    margin-left: 1rem;
 }
 
-.submenu.open, .sub-submenu.open {
-  display: block;
+.submenu.open,
+.sub-submenu.open {
+    display: flex;
 }
 
 .sub-submenu.theme-submenu {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;       /* items that don’t fit move to next row */       /* minimal spacing between swatches */
-  padding: 3px;
+    margin-left: 1rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 3px;   
+    gap: 3px;
+
 }
 
 .sub-submenu.theme-submenu .theme-swatch {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .sub-submenu.theme-submenu .theme-letter {
-  font-weight: bold;
-  font-size: 14px;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 
@@ -716,14 +723,14 @@ h2 {
     /* background-color: red; */
 }
 
-.menu-item, .budget-calc-link {
+.menu-item {
     font-size: 1.1rem;
     padding: 0.6rem 0;
     color: #eee;
     transition: color 0.3s, transform 0.2s;
     cursor: pointer;
     /* background-color: green; */
-        text-decoration: none;
+    text-decoration: none;
 }
 
 
@@ -742,9 +749,6 @@ h2 {
     border-radius: 10px;
 }
 
-.budget-calc-link {
-        text-decoration: none;
-}
 
 /* =================== */
 
@@ -2711,55 +2715,56 @@ h2 {
 
 
 .popup-overlay {
-  display: none; /* Show it by setting display:flex */
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.3);
-  z-index: 3000;
+    display: none;
+    /* Show it by setting display:flex */
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 3000;
 
-  /* display: flex; */
-  justify-content: center;
-  align-items: center;
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
 }
 
 .confirmation-popup {
-  background: white;
-  padding: 15px;
-  border-radius: 6px;
-  width: 80%;
-  max-width: 300px;
-  text-align: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .popup-question {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 12px;
 }
 
 .confirmation-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 .confirmation-buttons button {
-  padding: 6px 18px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
+    padding: 6px 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
 .confirm-yes {
-  background-color: #4caf50;
-  color: white;
+    background-color: #4caf50;
+    color: white;
 }
 
 .confirm-no {
-  background-color: #f44336;
-  color: white;
+    background-color: #f44336;
+    color: white;
 }
 
 

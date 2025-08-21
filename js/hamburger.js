@@ -64,10 +64,10 @@ const themeSubmenu = themeItem.querySelector('.sub-submenu');
 let themeRendered = false;
 
 themeSubmenu.addEventListener("click", (event) => {
-  const li = event.target.closest("li[data-theme]");
-  if (!li) return;
+  const div = event.target.closest("div[data-theme]");
+  if (!div) return;
 
-  const theme = li.dataset.theme;
+  const theme = div.dataset.theme;
   console.log("theme selected", theme);
 
   if (theme && colorThemes[theme]) {
@@ -80,17 +80,15 @@ themeSubmenu.addEventListener("click", (event) => {
 function renderThemeSubmenu(themeSubmenu) {
   themeSubmenu.innerHTML = "";
   Object.entries(colorThemes).forEach(([key, theme]) => {
-    const li = document.createElement("li");
-    li.dataset.theme = key;
-    li.classList.add("menu-item");
-    li.innerHTML = `
-      <div class="menu-label" data-theme="${key}">
-        <div class="theme-swatch" style="background-color:${theme.sunday}">
-          <span class="theme-letter" style="color: white">K</span>
-        </div>
+    const div = document.createElement("div");
+    div.classList.add("color-theme-container");
+    div.dataset.theme = key;
+    div.innerHTML = `
+      <div class="theme-swatch" style="background-color:${theme.sunday}">
+        <span class="theme-letter" style="color: white">K</span>
       </div>
     `;
-    themeSubmenu.appendChild(li);
+    themeSubmenu.appendChild(div);
   });
 }
 
