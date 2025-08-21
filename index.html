@@ -175,7 +175,7 @@
                                     <span class="material-symbols-outlined">routine</span>
                                     <span class="menu-text">Color Theme</span>
                                 </div>
-                             <ul class="sub-submenu theme-submenu">
+                                <ul class="sub-submenu theme-submenu">
                                     <!-- insert them here -->
                                 </ul>
                             </li>
@@ -217,6 +217,8 @@
 
                     <!-- Backups (submenu) -->
                     <li data-section="backups" class="menu-item has-submenu">
+                        <input type="file" id="uploadBackup" accept=".json" style="display:none">
+
                         <div class="menu-label">
                             <span class="material-symbols-outlined">backup</span>
                             <span class="menu-text">Backups</span>
@@ -225,13 +227,13 @@
                             <li data-backup="download" class="menu-item">
                                 <div class="menu-label">
                                     <span class="material-symbols-outlined">download</span>
-                                    <span class="menu-text">Download Tasks</span>
+                                    <span class="menu-text">Download Data</span>
                                 </div>
                             </li>
                             <li data-backup="upload" class="menu-item">
                                 <div class="menu-label">
                                     <span class="material-symbols-outlined">upload</span>
-                                    <span class="menu-text">Upload Tasks</span>
+                                    <span class="menu-text">Upload Data</span>
                                 </div>
                             </li>
                         </ul>

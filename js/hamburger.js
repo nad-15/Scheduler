@@ -23,28 +23,36 @@ function closeMenu() {
 
 
 const colorThemes = {
-  // #1F456E // aegon
-  default: { even: '#82c6a2', odd: '#53ab8b', sunday: '#3388cc' },
+  // Default / Gray (neutral)
+  default: { even: '#bdbdbd', odd: '#9e9e9e', sunday: '#616161' },
+
+  // Browns / Neutrals
   rustic: { even: '#c8b7a6', odd: '#5c4033', sunday: '#3e2723' },
-  almond: { even: '#dac0a3', odd: '#6f4e37', sunday: '#5d4037' },
-  mocha: { even: '#a1887f', odd: '#5d4037', sunday: '#3e2723' },
+  mocha: { even: '#a1887f', odd: '#5d4037', sunday: '#432d1f' },
+  espresso: { even: '#bfa58a', odd: '#704214', sunday: '#68291cff' },
   cocoa: { even: '#bcaaa4', odd: '#6d4c41', sunday: '#4e342e' },
+  almond: { even: '#dac0a3', odd: '#6f4e37', sunday: '#5d4037' },
   tan: { even: '#ccb59d', odd: '#795548', sunday: '#6d4c41' },
   latte: { even: '#e0c3a5', odd: '#8b5e3c', sunday: '#5d4037' },
-  earthy: { even: '#d7ccc8', odd: '#8d6e63', sunday: '#5c4033' },
-  espresso: { even: '#bfa58a', odd: '#704214', sunday: '#4e342e' },
+
+
+  // Blues & Indigo
+  legacy: { even: '#82c6a2', odd: '#53ab8b', sunday: '#3388cc' }, // your old theme
   indigo: { even: '#7986cb', odd: '#3f51b5', sunday: '#1a237e' },
   blue: { even: '#6a8caf', odd: '#4a6a8a', sunday: '#1a3d5f' },
   slate: { even: '#90a4ae', odd: '#455a64', sunday: '#1F456E' },
-  gray: { even: '#bdbdbd', odd: '#9e9e9e', sunday: '#616161' },
-  purple: { even: '#b39ddb', odd: '#9575cd', sunday: '#673ab7' },
-  lavender: { even: '#e1bee7', odd: '#ab47bc', sunday: '#6a1b9a' },
   cyan: { even: '#4dd0e1', odd: '#0288d1', sunday: '#01579b' },
   turquoise: { even: '#80deea', odd: '#00bcd4', sunday: '#00838f' },
+  teal: { even: '#4db6ac', odd: '#00897b', sunday: '#00695c' },
+
+  // Greens
+  fatigue: { even: '#6c7c47', odd: '#3e4d34', sunday: '#2b3d28' },
   green: { even: '#82c6a2', odd: '#53ab8b', sunday: '#4a7c59' },
   mint: { even: '#a5d6a7', odd: '#388e3c', sunday: '#1b5e20' },
   lime: { even: '#dce775', odd: '#8bc34a', sunday: '#558b2f' },
-  teal: { even: '#4db6ac', odd: '#00897b', sunday: '#00695c' },
+  earthy: { even: '#d7ccc8', odd: '#8d6e63', sunday: '#5c4033' },
+
+  // Reds / Oranges
   red: { even: '#ef9a9a', odd: '#e57373', sunday: '#d32f2f' },
   coral: { even: '#ff8a65', odd: '#d32f2f', sunday: '#bf360c' },
   pink: { even: '#f48fb1', odd: '#f06292', sunday: '#ad1457' },
@@ -52,8 +60,13 @@ const colorThemes = {
   peach: { even: '#ffcc80', odd: '#f57c00', sunday: '#e65100' },
   gold: { even: '#ffb74d', odd: '#f57c00', sunday: '#e65100' },
   yellow: { even: '#fff176', odd: '#ffd54f', sunday: '#fbc02d' },
-  fatigue: { even: '#6c7c47', odd: '#3e4d34', sunday: '#2b3d28' },
+
+  // Purples / Lavenders
+  purple: { even: '#b39ddb', odd: '#9575cd', sunday: '#673ab7' },
+  lavender: { even: '#e1bee7', odd: '#ab47bc', sunday: '#6a1b9a' },
 };
+
+
 
 // Load the selected theme from localStorage or use 'default'
 let selectedTheme = localStorage.getItem('theme') || 'default';
@@ -79,6 +92,8 @@ themeSubmenu.addEventListener("click", (event) => {
 
 function renderThemeSubmenu(themeSubmenu) {
   themeSubmenu.innerHTML = "";
+  const selectedTheme = localStorage.getItem('theme') || 'default';
+
   Object.entries(colorThemes).forEach(([key, theme]) => {
     const div = document.createElement("div");
     div.classList.add("color-theme-container");
@@ -88,6 +103,12 @@ function renderThemeSubmenu(themeSubmenu) {
         <span class="theme-letter" style="color: white">K</span>
       </div>
     `;
+
+    // Highlight selected theme
+    if (key === selectedTheme) {
+      div.style.border = "2px solid white"; // or any thickness you prefer
+    }
+
     themeSubmenu.appendChild(div);
   });
 }
@@ -143,14 +164,58 @@ function runMenuAction(item) {
   }
   if (backup) {
     console.log(`Backup action: ${backup}`);
-    // runBackup(backup);
+
+    if (backup === "download") {
+      // Download all localStorage
+      const backupData = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        backupData[key] = localStorage.getItem(key);
+      }
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "Skhayeduler_localStorage_backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+    } else if (backup === "upload") {
+      // Trigger hidden file input
+      const uploadInput = document.getElementById("uploadBackup");
+      if (uploadInput) uploadInput.click();
+    }
   }
+
   if (view) {
     console.log(`Switching view: ${view}`);
     // runView(view);
   }
 }
 
+
+document.getElementById("uploadBackup").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const backupData = JSON.parse(event.target.result);
+            for (const key in backupData) {
+                localStorage.setItem(key, backupData[key]);
+            }
+            alert("Backup restored successfully!");
+        } catch (err) {
+            alert("Invalid backup file.");
+        }
+    };
+    reader.readAsText(file);
+
+    // Reset input so user can upload the same file again if needed
+    e.target.value = "";
+});
 
 
 
