@@ -63,21 +63,10 @@ const themeItem = document.querySelector('.menu-item.has-submenu[data-setting="t
 const themeSubmenu = themeItem.querySelector('.sub-submenu');
 let themeRendered = false;
 
-// themeItem.addEventListener('click', () => {
-//   // Render only once per session
-//   if (!themeRendered) {
-//     renderThemeSubmenu(themeSubmenu);
-//     themeRendered = true;
-//   }
-
-//   // Just toggle visibility
-//   themeSubmenu.classList.toggle('visible');
-// });
-
 themeSubmenu.addEventListener("click", (event) => {
   const li = event.target.closest("li[data-theme]");
   if (!li) return;
-  
+
   const theme = li.dataset.theme;
   console.log("theme selected", theme);
 
@@ -103,7 +92,6 @@ function renderThemeSubmenu(themeSubmenu) {
     themeSubmenu.appendChild(li);
   });
 }
-
 
 
 // Select all menu items
@@ -139,12 +127,17 @@ function runMenuAction(item) {
   const setting = item.dataset.setting;
   const backup = item.dataset.backup;
   const view = item.dataset.view;
-  const about = item.dataset.about;
 
   if (section) {
-    console.log(`Opening section: ${section}`);
-    // runSection(section);
+    if (section === "about") {
+      alert("All about you...");
+      // or call a function to show About content
+    } else {
+      console.log(`Opening section: ${section}`);
+      // runSection(section);
+    }
   }
+
   if (setting) {
     console.log(`Changing setting: ${setting}`);
     // runSetting(setting);
@@ -156,9 +149,6 @@ function runMenuAction(item) {
   if (view) {
     console.log(`Switching view: ${view}`);
     // runView(view);
-  }
-  if (about) {
-    alert("All about you...");
   }
 }
 
