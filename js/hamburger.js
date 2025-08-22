@@ -106,7 +106,9 @@ function renderThemeSubmenu(themeSubmenu) {
 
     // Highlight selected theme
     if (key === selectedTheme) {
-      div.style.border = "2px solid white"; // or any thickness you prefer
+      div.style.outline = "2px solid white"; // or any thickness you prefer
+
+
     }
 
     themeSubmenu.appendChild(div);

@@ -117,7 +117,9 @@ function todayScroll(todayDate) {
       behavior: "smooth",
       block: "center"
     });
-    todayElement.click();
+    
+    // todayElement.click();
+    showDayTasks(todayDate);
   }
 }
 
