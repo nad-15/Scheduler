@@ -116,6 +116,7 @@ function handleMobileSwipe(startX, endX, startY, endY) {
 // === RESIZE THE CALENDAR VIEW MINUS THE ADDRESS BAR ===
 function adjustCalendarHeight() {
   calendarContainerVertView.style.height = `${window.innerHeight}px`;
+  menuSlider.style.height = `${window.innerHeight}px`;
 
   // Adjust popup max-height as well
   const popup = document.getElementById("calendar-pop-up");

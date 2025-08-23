@@ -147,7 +147,7 @@ h1 {
     align-items: center;
     justify-content: space-between;
     width: 170px;
-    height: 100px;
+    height: 103px;
     height: fit-content;
     width: fit-content;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -159,6 +159,7 @@ h1 {
     z-index: 10;
     gap: 10px;
     -webkit-tap-highlight-color: transparent;
+
 
 }
 
@@ -574,7 +575,7 @@ h2 {
     left: 0;
     width: 60vw;
     max-width: 340px;
-    height: 100vh;
+    /* height: 100vh; */
     padding: 2rem;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
@@ -594,6 +595,11 @@ h2 {
 
 .menu-slider.open {
     transform: translateX(0);
+}
+
+.month-radio,
+.list-radio {
+    margin-left: auto;
 }
 
 .switch {
@@ -648,6 +654,43 @@ input:checked+.slider:before {
     transform: translateX(20px);
     /* adjusted movement for smaller width */
 }
+
+/* remove browser default */
+input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #666;
+    border-radius: 4px;
+    /* square corners = checkbox look */
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+/* checked state */
+input[type="radio"]:checked {
+    background-color: #4caf50;
+    /* green fill */
+    border-color: #4caf50;
+}
+
+/* checkmark inside */
+input[type="radio"]:checked::after {
+    content: "✔";
+    color: white;
+    font-size: 12px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
 
 /* =======MENU LISTS==== */
 .menu-label {
@@ -710,6 +753,9 @@ input:checked+.slider:before {
 
 }
 
+
+
+
 .slider-menu-header-title {
     font-size: 2.5rem;
     font-weight: 700;
@@ -719,7 +765,7 @@ input:checked+.slider:before {
 }
 
 #slider-menu-header-logo {
-    font-size: 150px;
+    font-size: 140px;
 }
 
 .slider-menu-tagline {
@@ -746,7 +792,7 @@ input:checked+.slider:before {
 }
 
 .sub-submenu.theme-submenu {
-    margin-left: 1rem;
+    margin-left: 2rem;
     flex-direction: row;
     flex-wrap: wrap;
     padding: 3px;
@@ -787,27 +833,6 @@ input:checked+.slider:before {
     /* background-color: green; */
     text-decoration: none;
 }
-
-
-.menu-item:hover {
-    color: #ffffff;
-    transform: translateX(4px);
-}
-
-
-.theme-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.theme-list::-webkit-scrollbar-thumb {
-    background: #999;
-    border-radius: 10px;
-}
-
-
-/* =================== */
-
-
 
 .overlay-menu {
     position: fixed;
@@ -2518,8 +2543,26 @@ input:checked+.slider:before {
 
 }
 
+.month-view-header {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-icon-month-view{
+    color: black;
+}
+
+.menu-button.hamburger-month-view{
+    background-color: transparent;
+}
+
+.menu-button.hamburger-month-view:active{
+    transform: scale(0.9);
+}
 .material-symbols-outlined.header-icon-vert-view {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
 }
 
 .month-label-vert-view {

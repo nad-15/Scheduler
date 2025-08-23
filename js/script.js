@@ -296,7 +296,6 @@ const showHorViewBtn = document.getElementById('calendar-icon-horview');
 
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
-    getWeather();
 });
 
 let expanded = false;

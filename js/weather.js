@@ -72,6 +72,30 @@ async function getWeather() {
         setInterval(updateTime, 1000);
 
     } catch (error) {
-        console.error('Error fetching weather data:', error);
+    console.error('Error fetching weather data:', error);
+
+    // Fallback content so the widget exists
+    const todayName = document.getElementById('today-name');
+    if (todayName) {
+        todayName.innerHTML = `
+            <div class="time-container">
+                <div id="today-location">Kitchener, ON</div>
+                <div id="today-date">--, ----</div>
+                <div id="today-time">
+                    <span id="today-hour-minute">--:--</span>
+                </div>
+                <span id="today-seconds">:-- --</span>
+            </div>
+
+            <div class="weather-container">
+                <div id="today-icon">
+                    <img src="https://fonts.gstatic.com/s/i/materialicons/umbrella/v1/24px.svg" alt="W.icon">
+                </div>
+                <div id="today-temp">--°</div>
+                <div id="today-weather">Weather unavailable</div>
+            </div>
+        `;
     }
+}
+
 }

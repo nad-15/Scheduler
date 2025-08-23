@@ -1,6 +1,7 @@
 
 // Select elements
 const menuButton = document.querySelector('.menu-button');
+const menuButtonMonthView = document.querySelector(".hamburger-month-view");
 const menuSlider = document.querySelector('.menu-slider');
 const overlayMenu = document.querySelector('.overlay-menu');
 const closeButtonMenu = document.querySelector('.close-button-menu');
@@ -9,6 +10,10 @@ const closeButtonMenu = document.querySelector('.close-button-menu');
 menuButton.addEventListener('click', () => {
   menuSlider.classList.toggle('open');
   overlayMenu.classList.add('show');
+});
+
+menuButtonMonthView.addEventListener("click", ()=>{
+  menuButton.click();
 });
 
 // Close the menu

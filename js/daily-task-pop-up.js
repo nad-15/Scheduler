@@ -117,9 +117,9 @@ function todayScroll(todayDate) {
       behavior: "smooth",
       block: "center"
     });
-    
+
     // todayElement.click();
-    showDayTasks(todayDate);
+
   }
 }
 
@@ -1130,6 +1130,94 @@ function restoreColorOptions() {
   colorPickerContainer.style.borderRadius = "";
   colorOptions.classList.remove("in-popup");
 }
+// ===== Constants =====
+const SETTINGS_KEY = "appSettings";
 
+// ===== Defaults =====
+const DEFAULT_SETTINGS = {
+  "startup-popup": true,
+  "weather-widget": true,
+  "view-mode": "list"
+};
 
+// ===== Helpers =====
+function loadSettings() {
+  const saved = localStorage.getItem(SETTINGS_KEY);
+  let settings = saved ? JSON.parse(saved) : {};
+
+  // merge defaults (only apply when a setting is missing)
+  settings = { ...DEFAULT_SETTINGS, ...settings };
+
+  return settings;
+}
+
+function saveSettings(settings) {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+// ===== Init =====
+function initSettings() {
+  const settings = loadSettings();
+
+  // Handle checkboxes (toggles)
+  document.querySelectorAll(".menu-item input[type='checkbox']").forEach(input => {
+    const settingName = input.id.replace("-toggle", "");
+    input.checked = settings[settingName] ?? false;
+
+    input.addEventListener("change", () => {
+      settings[settingName] = input.checked;
+      saveSettings(settings);
+    });
+  });
+
+  // Handle radio buttons (view selection)
+  document.querySelectorAll(".menu-item input[type='radio'][name='view-mode']").forEach(input => {
+    const settingName = "view-mode"; // one shared setting for radios
+
+    // Restore saved selection
+    input.checked = settings[settingName] === input.value;
+
+    input.addEventListener("change", () => {
+      if (input.checked) {
+        settings[settingName] = input.value; // "list" or "month"
+        saveSettings(settings);
+      }
+    });
+  });
+}
+
+// ===== Use Settings =====
+function runStartupFeatures() {
+  const settings = loadSettings();
+
+  getWeather().finally(() => {
+    const offset = 8;
+    const todayName = document.getElementById("today-name");
+    if (!todayName) return;
+
+    // If user chose to hide widget, slide it
+    if (!settings["weather-widget"]) {
+      requestAnimationFrame(() => {
+        const todayNameWidth = todayName.offsetWidth || 170;
+        todayName.style.transform = `translateX(${todayNameWidth + offset}px)`;
+        hideWidgetBtn.classList.add("is-true");
+      });
+    }
+  });
+
+  // Apply saved view mode
+  if (settings["view-mode"] === "month") {
+      showVertViewBtn.click();
+  } else if (settings["view-mode"] === "list") {
+    console.log("Switched to List View");
+  }
+
+  if (settings["startup-popup"]) {
+    showDayTasks(popUpDate);
+    console.log("pop up shown");
+  }
+}
+
+initSettings();
+runStartupFeatures();
 
