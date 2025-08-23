@@ -111,16 +111,23 @@ h1 {
 } */
 
 .aurora-for-app-name {
-  background: linear-gradient(135deg,
-    rgba(0, 255, 255, 0.9),   /* Cyan */
-    rgba(0, 255, 127, 0.9),   /* Spring Green */
-    rgba(255, 20, 147, 0.9),  /* Deep Pink */
-    rgba(255, 140, 0, 0.9),   /* Dark Orange */
-    rgba(138, 43, 226, 0.9)); /* Blue Violet */
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: aurora 15s ease infinite;
+    background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.9),
+            /* Cyan */
+            rgba(0, 255, 127, 0.9),
+            /* Spring Green */
+            rgba(255, 20, 147, 0.9),
+            /* Deep Pink */
+            rgba(138, 43, 226, 0.9),
+            /* Dark Orange */
+            rgba(255, 140, 0, 0.9));
+    /* Blue Violet */
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: aurora 15s ease infinite;
+    text-shadow: none;
+
 }
 
 
@@ -2568,17 +2575,18 @@ input[type="radio"]:checked::after {
 
 }
 
-.menu-icon-month-view{
+.menu-icon-month-view {
     color: black;
 }
 
-.menu-button.hamburger-month-view{
+.menu-button.hamburger-month-view {
     background-color: transparent;
 }
 
-.menu-button.hamburger-month-view:active{
+.menu-button.hamburger-month-view:active {
     transform: scale(0.9);
 }
+
 .material-symbols-outlined.header-icon-vert-view {
     font-size: 1.4rem;
 }
