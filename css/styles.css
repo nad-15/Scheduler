@@ -124,6 +124,8 @@ h1 {
     /* Blue Violet */
     background-size: 400% 400%;
     -webkit-background-clip: text;
+    background-clip: text;
+    /* Standard property */
     -webkit-text-fill-color: transparent;
     animation: aurora 15s ease infinite;
     text-shadow: none;
