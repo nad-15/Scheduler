@@ -551,9 +551,10 @@
     <div class="calendar-container-vert-view" id="calendar-container-vert-view">
         <div class="calendar-header-vert-view">
             <div class="month-view-header">
-                <button class="menu-button hamburger-month-view"><span class="material-icons menu-icon-month-view">menu</span></button>
+                <button class="menu-button hamburger-month-view"><span
+                        class="material-icons menu-icon-month-view">menu</span></button>
                 <div class="month-label-vert-view" id="month-label-vert-view">May 2025</div>
-                                <span class="material-symbols-outlined header-icon-vert-view" id="icon-month-label-vert-view">
+                <span class="material-symbols-outlined header-icon-vert-view" id="icon-month-label-vert-view">
                     event_note
                 </span>
             </div>
@@ -697,176 +698,170 @@
 
     </div>
 
-    <!--     
-<div class="popup-overlay" id="savePopup">
-  <div class="confirmation-popup">
-    <p class="popup-question">Do you want to save changes?</p>
-    <div class="confirmation-buttons">
-      <button class="confirm-yes">Yes</button>
-      <button class="confirm-no">No</button>
-    </div>
-  </div>
-</div> -->
 
-            <!-- MENU SIDE SLIDER -->
-            <div class="menu-slider">
-                <!-- Close Button -->
-                <button class="close-button-menu">
-                    <span class="material-icons close-button-menu-icon">close</span>
-                </button>
 
-                <!-- Header -->
-                <div class="side-menu-header-container">
-                    <div class="slider-menu-header-logo-container">
-                        <span class="material-symbols-outlined" id="slider-menu-header-logo">acute</span>
-                    </div>
-                    <div class="slider-menu-header-title">Skhayeduler</div>
-                    <div class="slider-menu-tagline">"The official tracker of your sleepless days."</div>
+    <!-- MENU SIDE SLIDER -->
+    <div class="menu-slider">
+        <!-- Close Button -->
+        <button class="close-button-menu">
+            <span class="material-icons close-button-menu-icon">close</span>
+        </button>
+
+        <!-- Header -->
+        <div class="side-menu-header-container">
+            <div class="slider-menu-header-logo-container">
+                <span class="material-symbols-outlined" id="slider-menu-header-logo">acute</span>
+            </div>
+            <div class="slider-menu-header-title">
+                S<span class="aurora-for-app-name">khaye</span>duler
+            </div>
+
+            <div class="slider-menu-tagline">"The official tracker of your sleepless days."</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Main Menu -->
+        <ul class="menu-list">
+            <!-- To-Do (leaf) -->
+            <li data-section="todo" class="menu-item">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">checklist</span>
+                    <span class="menu-text">To-Do</span>
                 </div>
+            </li>
 
-                <div class="divider"></div>
+            <!-- Divider -->
+            <li class="divider" role="separator"></li>
 
-                <!-- Main Menu -->
-                <ul class="menu-list">
-                    <!-- To-Do (leaf) -->
-                    <li data-section="todo" class="menu-item">
+            <!-- Settings (submenu) -->
+            <li data-section="settings" class="menu-item has-submenu">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="menu-text">Settings</span>
+                </div>
+                <ul class="submenu">
+                    <li data-setting="theme" class="menu-item has-submenu">
                         <div class="menu-label">
-                            <span class="material-symbols-outlined">checklist</span>
-                            <span class="menu-text">To-Do</span>
+                            <span class="material-symbols-outlined">routine</span>
+                            <span class="menu-text">Color Theme</span>
                         </div>
+                        <ul class="sub-submenu theme-submenu">
+                            <!-- insert them here -->
+                        </ul>
                     </li>
-
-                    <!-- Divider -->
-                    <li class="divider" role="separator"></li>
-
-                    <!-- Settings (submenu) -->
-                    <li data-section="settings" class="menu-item has-submenu">
+                    <li data-setting="default-view" class="menu-item has-submenu">
                         <div class="menu-label">
-                            <span class="material-symbols-outlined">settings</span>
-                            <span class="menu-text">Settings</span>
+                            <span class="material-symbols-outlined">view_agenda</span>
+                            <span class="menu-text">Default View</span>
                         </div>
-                        <ul class="submenu">
-                            <li data-setting="theme" class="menu-item has-submenu">
+                        <ul class="sub-submenu">
+                            <li data-view="list" class="menu-item">
                                 <div class="menu-label">
-                                    <span class="material-symbols-outlined">routine</span>
-                                    <span class="menu-text">Color Theme</span>
-                                </div>
-                                <ul class="sub-submenu theme-submenu">
-                                    <!-- insert them here -->
-                                </ul>
-                            </li>
-                            <li data-setting="default-view" class="menu-item has-submenu">
-                                <div class="menu-label">
-                                    <span class="material-symbols-outlined">view_agenda</span>
-                                    <span class="menu-text">Default View</span>
-                                </div>
-                                <ul class="sub-submenu">
-                                    <li data-view="list" class="menu-item">
-                                        <div class="menu-label">
-                                            <span class="material-symbols-outlined">event_note</span>
-                                            <span class="menu-text">List View</span>
-                                            <label class="list-radio">
-                                                <input type="radio" name="view-mode" value="list">
-                                            </label>
-                                        </div>
-
-                                    </li>
-                                    <li data-view="month" class="menu-item">
-                                        <div class="menu-label">
-                                            <span class="material-symbols-outlined">calendar_month</span>
-                                            <span class="menu-text">Month View</span>
-                                            <label class="month-radio">
-                                                <input type="radio" name="view-mode" value="month">
-                                            </label>
-                                        </div>
-
-                                    </li>
-
-                                </ul>
-
-
-                            </li>
-                            <li data-setting="startup-popup" class="menu-item">
-                                <div class="menu-label">
-                                    <span class="material-symbols-outlined">notifications</span>
-                                    <span class="menu-text">Show Pop-up at Startup</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="startup-popup-toggle">
-                                        <span class="slider"></span>
+                                    <span class="material-symbols-outlined">event_note</span>
+                                    <span class="menu-text">List View</span>
+                                    <label class="list-radio">
+                                        <input type="radio" name="view-mode" value="list">
                                     </label>
                                 </div>
 
                             </li>
-
-                            <li data-setting="weather-widget" class="menu-item">
+                            <li data-view="month" class="menu-item">
                                 <div class="menu-label">
-                                    <span class="material-symbols-outlined">cloud</span>
-                                    <span class="menu-text">Show Weather Widget at Startup</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="weather-widget-toggle">
-                                        <span class="slider"></span>
+                                    <span class="material-symbols-outlined">calendar_month</span>
+                                    <span class="menu-text">Month View</span>
+                                    <label class="month-radio">
+                                        <input type="radio" name="view-mode" value="month">
                                     </label>
                                 </div>
 
                             </li>
 
                         </ul>
+
+
                     </li>
-
-                    <!-- Backups (submenu) -->
-                    <li data-section="backups" class="menu-item has-submenu">
-                        <input type="file" id="uploadBackup"
-                            accept=".json,application/json,text/plain,application/octet-stream" style="display:none">
-
-
-
-
+                    <li data-setting="startup-popup" class="menu-item">
                         <div class="menu-label">
-                            <span class="material-symbols-outlined">backup</span>
-                            <span class="menu-text">Backups</span>
+                            <span class="material-symbols-outlined">notifications</span>
+                            <span class="menu-text">Show Pop-up at Startup</span>
+                            <label class="switch">
+                                <input type="checkbox" id="startup-popup-toggle">
+                                <span class="slider"></span>
+                            </label>
                         </div>
-                        <ul class="submenu">
-                            <li data-backup="download" class="menu-item">
-                                <div class="menu-label">
-                                    <span class="material-symbols-outlined">download</span>
-                                    <span class="menu-text">Download Data</span>
-                                </div>
-                            </li>
-                            <li data-backup="upload" class="menu-item">
-                                <div class="menu-label">
-                                    <span class="material-symbols-outlined">upload</span>
-                                    <span class="menu-text">Upload Data</span>
-                                </div>
-                            </li>
-                        </ul>
+
                     </li>
 
-                    <!-- About (leaf) -->
-                    <li data-section="about" class="menu-item">
+                    <li data-setting="weather-widget" class="menu-item">
                         <div class="menu-label">
-                            <span class="material-symbols-outlined">info</span>
-                            <span class="menu-text">About</span>
+                            <span class="material-symbols-outlined">cloud</span>
+                            <span class="menu-text">Show Weather Widget at Startup</span>
+                            <label class="switch">
+                                <input type="checkbox" id="weather-widget-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                    </li>
+
+                </ul>
+            </li>
+
+            <!-- Backups (submenu) -->
+            <li data-section="backups" class="menu-item has-submenu">
+                <input type="file" id="uploadBackup" accept=".json,application/json,text/plain,application/octet-stream"
+                    style="display:none">
+
+
+
+
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">backup</span>
+                    <span class="menu-text">Backups</span>
+                </div>
+                <ul class="submenu">
+                    <li data-backup="download" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">download</span>
+                            <span class="menu-text">Download Data</span>
                         </div>
                     </li>
-
-                    <li class="divider" role="separator"></li>
-
-                    <!-- External Link -->
-                    <li class="menu-item">
+                    <li data-backup="upload" class="menu-item">
                         <div class="menu-label">
-                            <span class="material-symbols-outlined">calculate</span>
-                            <a class="menu-item" href="https://nad-15.github.io/BudgetCalculator/" target="_blank"
-                                class="menu-text">
-                                Budget KalKulator
-                            </a>
+                            <span class="material-symbols-outlined">upload</span>
+                            <span class="menu-text">Upload Data</span>
                         </div>
                     </li>
                 </ul>
+            </li>
+
+            <!-- About (leaf) -->
+            <li data-section="about" class="menu-item">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">info</span>
+                    <span class="menu-text">About</span>
+                </div>
+            </li>
+
+            <li class="divider" role="separator"></li>
+
+            <!-- External Link -->
+            <li class="menu-item">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">calculate</span>
+                    <a class="menu-item" href="https://nad-15.github.io/BudgetCalculator/" target="_blank"
+                        class="menu-text">
+                        Budget KalKulator
+                    </a>
+                </div>
+            </li>
+        </ul>
 
 
-            </div>
+    </div>
 
-            <div class="overlay-menu"></div> <!-- Make sure this exists for the overlay to work -->
+    <div class="overlay-menu"></div> <!-- Make sure this exists for the overlay to work -->
 
 
     <div id="backdrop" class="backdrop"></div>

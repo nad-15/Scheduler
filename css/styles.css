@@ -110,6 +110,21 @@ h1 {
 
 } */
 
+.aurora-for-app-name {
+  background: linear-gradient(135deg,
+    rgba(0, 255, 255, 0.9),   /* Cyan */
+    rgba(0, 255, 127, 0.9),   /* Spring Green */
+    rgba(255, 20, 147, 0.9),  /* Deep Pink */
+    rgba(255, 140, 0, 0.9),   /* Dark Orange */
+    rgba(138, 43, 226, 0.9)); /* Blue Violet */
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: aurora 15s ease infinite;
+}
+
+
+
 
 #today-name {
     position: fixed;
@@ -2538,8 +2553,10 @@ input[type="radio"]:checked::after {
     background-color: var(--calendar-day-bg);
     /* background-color: rgb(223, 223, 223); */
     padding: 1rem 1rem;
+    padding-left: 8px;
     /* border-radius: 10px; */
     /* margin-bottom: 0.5rem; */
+
 
 }
 
@@ -2548,6 +2565,7 @@ input[type="radio"]:checked::after {
     gap: 0.4rem;
     justify-content: center;
     align-items: center;
+
 }
 
 .menu-icon-month-view{
