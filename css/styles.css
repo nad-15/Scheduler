@@ -594,11 +594,12 @@ h2 {
 }
 
 .menu-slider {
+    box-sizing: border-box;
     position: fixed;
     top: 0;
     left: 0;
-    width: 60vw;
-    max-width: 340px;
+    width: 77vw;
+    /* max-width: 340px; */
     /* height: 100vh; */
     padding: 2rem;
     background: rgba(255, 255, 255, 0.08);
@@ -722,6 +723,17 @@ input[type="radio"]:checked::after {
     align-items: center;
     gap: 8px;
     /* space between icon and text */
+}
+
+.submenu-indicator {
+    margin-left: auto;
+}
+
+.submenu-indicator {
+  transition: transform 0.3s ease;
+}
+.submenu-indicator.rotated {
+  transform: rotate(90deg);
 }
 
 .menu-text {

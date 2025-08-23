@@ -12,7 +12,7 @@ menuButton.addEventListener('click', () => {
   overlayMenu.classList.add('show');
 });
 
-menuButtonMonthView.addEventListener("click", ()=>{
+menuButtonMonthView.addEventListener("click", () => {
   menuButton.click();
 });
 
@@ -139,7 +139,13 @@ menuItems.forEach(item => {
     // Now toggle submenu normally
     if (item.classList.contains("has-submenu")) {
       const submenu = item.querySelector(".submenu, .sub-submenu");
-      if (submenu) submenu.classList.toggle("open");
+      const indicator = item.querySelector(".submenu-indicator");
+      if (submenu) {
+        submenu.classList.toggle("open");
+        if (indicator) {
+          indicator.classList.toggle("rotated", submenu.classList.contains("open"));
+        }
+      }
     } else {
       runMenuAction(item);
     }
@@ -167,7 +173,6 @@ function runMenuAction(item) {
 
   if (setting) {
     console.log(`Changing setting: ${setting}`);
-    // runSetting(setting);
   }
   if (backup) {
     console.log(`Backup action: ${backup}`);
