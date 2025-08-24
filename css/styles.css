@@ -49,7 +49,7 @@ body {
 
 
 .todo-fab {
-  position: absolute; /* relative to #todo-container */
+  position: fixed; /* relative to #todo-container */
   bottom: 20px;
   right: 20px;
   background: #ff69b4;
