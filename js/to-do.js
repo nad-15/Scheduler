@@ -35,8 +35,8 @@ function renderTodos() {
       </div>
 
       <div class="todo-actions">
-        <button class="pin-btn material-symbols-outlined">
-          ${todo.pinned ? "keep" : "keep_off"}
+        <button class="pin-btn material-symbols-outlined ${todo.pinned ? 'pinned' : ''}">
+          ${todo.pinned ? "star" : "star_border"}
         </button>
 
         <button class="color-btn material-symbols-outlined">palette</button>
@@ -88,8 +88,25 @@ function renderTodos() {
   });
 }
 
+function ran(max) {
+  return Math.floor(Math.random() * (max + 1));
+}
+
+function rgbToHexToDo(r, g, b) {
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => x.toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
+function getRandomColor() {
+  return rgbToHexToDo(ran(255), ran(255), ran(255));
+}
+
 // === Create a todo ===
-function createTodo(text, { pinned = false, color = "#cccccc", dueDate = null } = {}) {
+function createTodo(text, { pinned = false, color = getRandomColor(), dueDate = null } = {}) {
   const todo = {
     id: `todo-${Date.now()}`,
     text,

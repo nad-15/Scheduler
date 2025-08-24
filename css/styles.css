@@ -49,63 +49,71 @@ body {
 
 
 .todo-fab {
-  position: fixed; /* relative to #todo-container */
-  bottom: 20px;
-  right: 20px;
-  background: #ff69b4;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
+    position: fixed;
+    /* relative to #todo-container */
+    bottom: 20px;
+    right: 20px;
+    background: #ff69b4;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
 }
 
 
 #todo-container {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: none;   
-  flex-direction: column;
-  box-sizing: border-box;
-  z-index: 5000;
-  margin: 0;
-  /* padding: 1rem; */
-  height: 100vh;
-  width: 100%;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    box-sizing: border-box;
+    z-index: 5000;
+    margin: 0;
+    /* padding: 1rem; */
+    height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
+
 #todo-container {
-  position: fixed; /* stays full-screen */
+    position: fixed;
+    /* stays full-screen */
 }
+
 #todo-container.active {
-  display: flex;  
+    display: flex;
 }
 
-.todo-header-container{
+.todo-header-container {
     display: flex;
     height: 7rem;
-background: linear-gradient(
-  135deg,
-  rgba(173, 216, 230, 0.85),  /* soft pastel blue */
-  rgba(187, 222, 214, 0.85),  /* soft aqua/teal */
-  rgba(255, 204, 213, 0.85),  /* soft pink */
-  rgba(218, 187, 255, 0.85),  /* soft lilac */
-  rgba(255, 229, 180, 0.85)   /* soft peach/yellow */
-);
-background-size: 400% 400%;
-animation: aurora 18s ease infinite;
+    background: linear-gradient(135deg,
+            rgba(173, 216, 230, 0.85),
+            /* soft pastel blue */
+            rgba(187, 222, 214, 0.85),
+            /* soft aqua/teal */
+            rgba(255, 204, 213, 0.85),
+            /* soft pink */
+            rgba(218, 187, 255, 0.85),
+            /* soft lilac */
+            rgba(255, 229, 180, 0.85)
+            /* soft peach/yellow */
+        );
+    background-size: 400% 400%;
+    animation: aurora 18s ease infinite;
 }
 
-.todo-title{
+.todo-title {
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
@@ -123,74 +131,87 @@ animation: aurora 18s ease infinite;
 
 /* Container for all todos */
 .todos-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 1rem;
 }
 
 /* Each todo item (the card) */
 .todo-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border-left: 6px solid #ccc; /* default, overridden by JS */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: border-color 0.3s, background 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border-left: 6px solid #ccc;
+    /* default, overridden by JS */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: border-color 0.3s, background 0.3s;
 }
 
 /* Checkbox */
 .done-checkbox {
-  width: 22px;
-  height: 22px;
-  cursor: pointer;
-  accent-color: green; /* modern browsers -> green when checked */
-  margin-right: 12px;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    accent-color: green;
+    /* modern browsers -> green when checked */
+    margin-right: 12px;
 }
 
 /* Todo text */
 .todo-text {
-  flex: 1;
-  font-size: 16px;
-  color: #333;
-  word-break: break-word;
-  transition: color 0.3s, text-decoration 0.3s;
+    flex: 1;
+    font-size: 16px;
+    color: #333;
+    word-break: break-word;
+    transition: color 0.3s, text-decoration 0.3s;
 }
 
 .todo-text.done {
-  color: #777;
-  text-decoration: line-through;
+    color: #777;
+    text-decoration: line-through;
 }
 
 /* Action buttons */
 .todo-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .todo-actions button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 22px;
-  padding: 4px;
-  border-radius: 6px;
-  color: #555;
-  transition: background 0.2s, color 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    padding: 4px;
+    border-radius: 6px;
+    color: #555;
+    transition: background 0.2s, color 0.2s;
 }
 
 .todo-actions button:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: #000;
+    background: rgba(0, 0, 0, 0.06);
+    color: #000;
 }
+
+.pin-btn.pinned {
+    color: #ffd700;
+    /* Gold/yellow color */
+}
+
+/* Optional: Add a hover effect */
+.pin-btn:hover {
+    color: #ffed4e;
+}
+
 
 /* Hide actual color input */
 .color-picker {
-  display: none;
+    display: none;
 }
 
 
