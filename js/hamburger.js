@@ -25,6 +25,21 @@ function closeMenu() {
   overlayMenu.classList.remove('show');
 }
 
+const todoMenuItem = document.getElementById("to-do");
+const todoContainer = document.getElementById("todo-container");
+const todoCloseBtn = todoContainer.querySelector(".todo-close-btn");
+
+// Open when clicking menu
+todoMenuItem.addEventListener("click", () => {
+  todoContainer.classList.add("active");
+});
+
+// Close when clicking ×
+todoCloseBtn.addEventListener("click", () => {
+  todoContainer.classList.remove("active");
+});
+
+
 
 
 const colorThemes = {

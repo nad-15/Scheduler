@@ -20,6 +20,28 @@
         Please use a mobile device, press <kbd>F12</kbd>, or resize the window to view the mobile design.
     </div>
 
+    <div id="todo-container" class="todos">
+        <div class="todo-header-container">
+            <div class="todo-title">
+                <div class="todo-greet">Good Day, Bangsi!</div>
+                <div class="todo-appname">What’s Next?</div>
+            </div>
+            <button class="todo-close-btn">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="todos-list">
+            <!-- insert todos here -->
+        </div>
+
+        <!-- Floating Add Button -->
+        <button class="todo-fab">
+            <span class="material-icons">add</span>
+        </button>
+    </div>
+
+
     <div class="container" id="main-container">
 
         <div id="today-name">
@@ -724,7 +746,7 @@
         <!-- Main Menu -->
         <ul class="menu-list">
             <!-- To-Do (leaf) -->
-            <li data-section="todo" class="menu-item">
+            <li data-section="todo" id="to-do" class="menu-item">
                 <div class="menu-label">
                     <span class="material-symbols-outlined">checklist</span>
                     <span class="menu-text">To-Do</span>
@@ -755,7 +777,7 @@
                     <li data-setting="default-view" class="menu-item has-submenu">
                         <div class="menu-label">
                             <span class="material-symbols-outlined">view_agenda</span>
-                            <span class="menu-text">Default View</span>
+                            <span class="menu-text">Default View at Startup</span>
                             <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
                         </div>
                         <ul class="sub-submenu">
@@ -864,15 +886,13 @@
 
 
     </div>
-
-    <div class="overlay-menu"></div> <!-- Make sure this exists for the overlay to work -->
-
-
+    <div class="overlay-menu"></div>
     <div id="backdrop" class="backdrop"></div>
-
     <div id="toast">Toast message</div>
     <!-- ===========DAYTASK SINGLE DIV -->
-    <footer></footer>
+    <footer>
+
+    </footer>
     </main>
     </div>
     <script src="./js/data-migration.js"></script>
@@ -883,6 +903,7 @@
     <script src="./js/weather.js"></script>
     <script src="./js/daily-task-pop-up.js"></script>
     <script src="./js/drag-and-drop-task.js"></script>
+    <script src="./js/to-do.js"></script>
 </body>
 
 </html>
