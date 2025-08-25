@@ -133,5 +133,3 @@ document.querySelector(".todo-fab").addEventListener("click", () => {
   if (todoText) createTodo(todoText);
 });
 
-// === Initial render ===
-renderTodos();

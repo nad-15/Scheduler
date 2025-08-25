@@ -111,6 +111,8 @@ body {
         );
     background-size: 400% 400%;
     animation: aurora 18s ease infinite;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
 }
 
 .todo-title {
@@ -133,8 +135,8 @@ body {
 .todos-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 1rem;
+    gap: 2px;
+    padding: 2px;
 }
 
 /* Each todo item (the card) */
@@ -144,11 +146,13 @@ body {
     justify-content: space-between;
     background: #fff;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: 2px;
     border-left: 6px solid #ccc;
     /* default, overridden by JS */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     transition: border-color 0.3s, background 0.3s;
+    height: 50px;
+    min-height: 50px;
 }
 
 /* Checkbox */
@@ -164,7 +168,7 @@ body {
 /* Todo text */
 .todo-text {
     flex: 1;
-    font-size: 16px;
+    font-size: 1.2rem;
     color: #333;
     word-break: break-word;
     transition: color 0.3s, text-decoration 0.3s;

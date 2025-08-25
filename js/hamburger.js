@@ -32,6 +32,8 @@ const todoCloseBtn = todoContainer.querySelector(".todo-close-btn");
 // Open when clicking menu
 todoMenuItem.addEventListener("click", () => {
   todoContainer.classList.add("active");
+  // === Initial render ===
+renderTodos();
 });
 
 // Close when clicking ×
