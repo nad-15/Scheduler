@@ -137,6 +137,8 @@ body {
     flex-direction: column;
     gap: 2px;
     padding: 2px;
+    /* height: 100vh; */
+    overflow-y: auto; 
 }
 
 /* Each todo item (the card) */
@@ -151,16 +153,16 @@ body {
     /* default, overridden by JS */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     transition: border-color 0.3s, background 0.3s;
-    height: 50px;
-    min-height: 50px;
+    /* height: 50px;
+    min-height: 50px; */
 }
 
 /* Checkbox */
 .done-checkbox {
-    width: 22px;
-    height: 22px;
+    width: 1rem;
+    height: 1rem;
     cursor: pointer;
-    accent-color: green;
+    accent-color: blue;
     /* modern browsers -> green when checked */
     margin-right: 12px;
 }
@@ -168,7 +170,7 @@ body {
 /* Todo text */
 .todo-text {
     flex: 1;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #333;
     word-break: break-word;
     transition: color 0.3s, text-decoration 0.3s;
