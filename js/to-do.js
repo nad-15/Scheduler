@@ -1,6 +1,35 @@
 // js/to-do.js
+function migrateTodos() {
+  let changed = false;
+
+  todos.forEach(todo => {
+    // Add new keys only if missing
+    if (todo.priority === undefined) {
+      todo.priority = null; // default no priority
+      changed = true;
+    }
+    if (todo.subtasks === undefined) {
+      todo.subtasks = []; // default empty list
+      changed = true;
+    }
+    if (todo.description === undefined) {
+      todo.description = ""; // default no description
+      changed = true;
+    }
+    if (todo.lastPriority === undefined) {
+      todo.lastPriority = null; // backup for when unpinning
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }
+}
+
 
 let todos = JSON.parse(localStorage.getItem("todos")) || [];
+migrateTodos();
 
 // === Helper function to ensure 6-digit hex color ===
 function normalizeColor(color) {
@@ -106,20 +135,35 @@ function getRandomColor() {
 }
 
 // === Create a todo ===
-function createTodo(text, { pinned = false, color = getRandomColor(), dueDate = null } = {}) {
+function createTodo(
+  text,
+  {
+    pinned = false,
+    color = getRandomColor(),
+    dueDate = null,
+    description = "",
+    priority = null, // "top" | "middle" | "not-so" | null
+    subtasks = []    // [{ title: "..." , done: false }]
+  } = {}
+) {
   const todo = {
     id: `todo-${Date.now()}`,
     text,
     pinned,
-    color: normalizeColor(color), // Normalize the color when creating
+    color: normalizeColor(color),
     done: false,
     createdAt: Date.now(),
-    dueDate
+    dueDate,
+    description,
+    priority,
+    subtasks,
+    lastPriority: null // used when pinning/unpinning
   };
 
   todos.push(todo);
   saveAndRender();
 }
+
 
 // === Save + re-render ===
 function saveAndRender() {
