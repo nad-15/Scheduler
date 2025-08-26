@@ -49,6 +49,7 @@ body {
 
 
 .todo-fab {
+    z-index: 9000;
     position: fixed;
     /* relative to #todo-container */
     bottom: 20px;
@@ -250,7 +251,7 @@ body {
   border-radius: 6px;
   padding: 4px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  z-index: 5002 ;
+  z-index: 9002 ;
 }
 
 .todo-priority-dropdown button {
@@ -568,7 +569,7 @@ body {
 }
 
 /* === FAB === */
-.todo-fab {
+/* .todo-fab {
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -583,7 +584,7 @@ body {
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
   transition: all 0.3s ease;
   z-index: 1000;
-}
+} */
 
 .todo-fab:hover {
   transform: scale(1.1);

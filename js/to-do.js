@@ -259,6 +259,7 @@ priorityDropdown.querySelectorAll("button").forEach((btn) => {
 
 // === Edit/Create Modal ===
 function todoOpenEditModal(todo = null) {
+  console.log("fab clicked");
   const isEdit = todo !== null;
 
   const modal = document.createElement("div");
@@ -448,6 +449,7 @@ function todoSaveAndRender() {
 
 // fab
 document.querySelector(".todo-fab").addEventListener("click", () => {
+  console.log("fab clicked");
   todoOpenEditModal();
 });
 
