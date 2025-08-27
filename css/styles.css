@@ -1271,7 +1271,7 @@ h2 {
 
 /* =================== */
 /* ✨ MENU BUTTON ✨ */
-.menu-button {
+.menu-button, .hamburger-todo {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -3320,15 +3320,15 @@ input[type="radio"]:checked::after {
 
 }
 
-.menu-icon-month-view {
+.menu-icon-month-view, .menu-icon-todo {
     color: black;
 }
 
-.menu-button.hamburger-month-view {
+.menu-button.hamburger-month-view, .hamburger-todo {
     background-color: transparent;
 }
 
-.menu-button.hamburger-month-view:active {
+.menu-button.hamburger-month-view:active, .menu-button.hamburger-todo:active {
     transform: scale(0.9);
 }
 
