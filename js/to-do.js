@@ -107,10 +107,26 @@ function renderTodos() {
                 <span class="material-symbols-outlined todo-priority-icon">flag</span>
             </button>
               <div class="todo-priority-dropdown" style="display: none;">
-                <button data-priority="null">None</button>
-                <button data-priority="low">Low</button>
-                <button data-priority="medium">Medium</button>
-                <button data-priority="high">High</button>
+<button data-priority="null">
+  <span class="material-symbols-outlined todo-priority-flag">flag</span>
+  None
+</button>
+
+<button data-priority="low">
+  <span class="material-symbols-outlined todo-priority-flag">flag</span>
+  Low
+</button>
+
+<button data-priority="medium">
+  <span class="material-symbols-outlined todo-priority-flag">flag</span>
+  Medium
+</button>
+
+<button data-priority="high">
+  <span class="material-symbols-outlined todo-priority-flag">flag</span>
+  High
+</button>
+
               </div>
           </div>
 
@@ -149,16 +165,16 @@ function renderTodos() {
           todo.dueDate
         )}</span>`;
       } else {
-        contentHTML += `<span class="todo-created-at">Created: ${todoFormatDate(
+        contentHTML += `<span class="todo-created-at">Added: ${todoFormatDate(
           todo.createdAt
         )}</span>`;
       }
 
       if (todo.timeEstimate) {
-        contentHTML += `<span class="todo-time-estimate">⏱️ ${todo.timeEstimate}</span>`;
+        contentHTML += `<span class="todo-time-estimate">⏱ ${todo.timeEstimate}</span>`;
       }
 
-       contentHTML += `
+      contentHTML += `
       <div class="todo-menu">
         <button class="todo-menu-btn">
             <span class="material-symbols-outlined todo-menu-icon">more_vert</span>
@@ -175,9 +191,17 @@ function renderTodos() {
       contentHTML += "</div>";
     }
 
-   
+
 
     item.innerHTML = contentHTML;
+
+const titleEl = item.querySelector(".todo-title");
+if (titleEl) {
+  titleEl.style.textDecoration = "underline";
+  titleEl.style.textDecorationColor = normalizedColor;
+  titleEl.style.textDecorationThickness = "3px"; // ← thickness here
+}
+
 
     // === Event Listeners ===
     item

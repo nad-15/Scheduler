@@ -161,7 +161,7 @@ body {
     padding: 2px 0 100px 0;
     flex: 1;
     overflow-y: auto;
-    z-index: 5001;
+    /* z-index: 5001; */
 }
 
 .todo-item {
@@ -175,7 +175,7 @@ body {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     /* min-height: 80px; */
     /* margin: 0 20px; */
-    z-index: 5001;
+    /* z-index: 5001; */
 
 }
 
@@ -188,9 +188,10 @@ body {
 .todo-header {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    /* gap: 12px; */
     /* margin-bottom: 8px;
   min-height: 44px; */
+  /* border: 2px solid green; */
 }
 /* 
 .todo-done-checkbox {
@@ -245,6 +246,7 @@ body {
     font-weight: 500;
     word-wrap: break-word;
     transition: all 0.3s ease;
+    margin-left: 12px;
 }
 
 .todo-title.done {
@@ -256,27 +258,33 @@ body {
 .todo-header-actions {
     display: flex;
     align-items: center;
-    /* gap: 8px; */
+    justify-content: center;
+    gap: 8px;
     flex-shrink: 0;
     /* min-width: 64px; */
     /* border: 2px solid red; */
     padding: 0;
-    height: fit-content;
+    margin: 0;
+    margin-left: 8px;
+    /* height: fit-content; */
+        /* border: 2px solid lime; */
+
+
 }
+
 
 .todo-priority-btn,
 .todo-pin-btn {
-    height: fit-content;
-
     background: none;
     border: none;
     cursor: pointer;
-    /* padding: 4px; */
+    padding: 4px;
     border-radius: 6px;
     transition: all 0.2s ease;
     font-size: 12px;
-    padding: none;
+    padding: 0;
     margin: 0;
+    /* background-color: red; */
 }
 
 
@@ -289,22 +297,34 @@ body {
 
 .todo-priority {
     position: relative;
-    display: inline-block;
+    display: flex;
     padding: 0;
-    height: fit-content;
+    border: none;
+    /* height: fit-content; */
 }
 
-.todo-priority-dropdown {
+
+
+
+
+.todo-priority-dropdown {   
     position: absolute;
-    top: 100%;
-    left: 0;
-    background: #fff;
+    bottom: 100%;
+    right: 0;
+    background: white;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 4px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    z-index: 9002;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 120px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    z-index: 10000;
 }
+
+
+/* *{
+    border: 2px solid limegreen;
+} */
 
 .todo-priority-dropdown button {
     display: block;
@@ -314,7 +334,22 @@ body {
     border: none;
     background: none;
     cursor: pointer;
+    
 }
+.todo-priority-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* space between flag + text */
+}
+
+.todo-priority-flag {
+      font-variation-settings: 'FILL' 1; 
+}
+
+.todo-priority-dropdown button[data-priority="null"]   .todo-priority-flag { color: #ccc; }
+.todo-priority-dropdown button[data-priority="low"]    .todo-priority-flag { color: #4caf50; }
+.todo-priority-dropdown button[data-priority="medium"] .todo-priority-flag { color: #ff8800; }
+.todo-priority-dropdown button[data-priority="high"]   .todo-priority-flag { color: #ff4444; }
 
 .todo-priority-dropdown button:hover {
     background: #f0f0f0;
@@ -340,14 +375,14 @@ body {
 } */
 /* === TODO CONTENT === */
 .todo-description {
-    margin: 0px 0 8px 32px;
+    margin: 0px 0 8px 44px;
     color: #666;
     font-size: 14px;
     line-height: 1.5;
 }
 
 .todo-subtasks {
-    margin: 8px 0 8px 32px;
+    margin: 8px 0 8px 56px;
 }
 
 .todo-subtask-item {
@@ -382,7 +417,7 @@ body {
     justify-content: space-between;
     align-items: center;
     /* margin-top: 12px; */
-    margin-left: 32px;
+    margin-left: 44px;
     margin-right: 0;
     font-size: 13px;
     color: #888;
@@ -413,7 +448,8 @@ body {
     border-radius: 6px;
     color: #888;
     transition: all 0.2s ease;
-    font-size: 18px;
+    font-size: 12px;
+    /* background-color: RED; */
     margin-left: auto;
 
 }
@@ -427,18 +463,19 @@ body {
     color: #333;
 }
 
+
 .todo-menu-dropdown {
     position: absolute;
-    bottom: 100%;
+    /* bottom: 100%; */
     right: 0;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
     min-width: 120px;
     overflow: hidden;
     margin-bottom: 8px;
+    z-index: 10000;
 }
 
 .todo-menu-dropdown button {
