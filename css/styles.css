@@ -99,7 +99,7 @@ body {
 .todo-header-container {
     box-sizing: border-box;
     display: flex;
-    height: 7rem;
+    height: 5rem;
     background: linear-gradient(135deg,
             rgba(173, 216, 230, 0.85),
             rgba(187, 222, 214, 0.85),
@@ -119,16 +119,20 @@ body {
 
 
 .todo-greet {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 4px;
+    font-size: 16px;
+        font-weight: 400;
+
+        color: #666;
+
+
 }
 
 .todo-appname {
-    font-size: 16px;
-    color: #666;
-    font-weight: 400;
+        font-size: 24px;
+    margin-bottom: 4px;
+    color: #333;
+        font-weight: 600;
+
 }
 
 .todo-close-btn {
@@ -160,7 +164,7 @@ body {
     overflow-y: auto;
     background-color: white;
     /* z-index: 5001; */
-        border-top: 2px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(0, 0, 0, 1);
 }
 
 .todo-item {
@@ -172,7 +176,7 @@ body {
     /* border-left: 6px solid #ddd; */
     position: relative;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 1);
     /* border-top: 1px solid rgba(0, 0, 0, 0.1); */
     /* min-height: 80px; */
     /* margin: 0 20px; */
@@ -249,6 +253,8 @@ body {
     word-wrap: break-word;
     transition: all 0.3s ease;
     margin-left: 12px;
+
+    
     text-decoration: underline;
     text-decoration-color: var(--priority-color, currentColor);
     text-decoration-thickness: 3px;
