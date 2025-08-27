@@ -110,7 +110,7 @@ body {
     animation: aurora 18s ease infinite;
     /* border-bottom-right-radius: 8px;
   border-bottom-left-radius: 8px; */
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding: 0 20px;
     width: 100%;
