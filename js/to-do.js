@@ -62,18 +62,26 @@ function todoFormatDueDate(dueDate) {
   if (!dueDate) return "";
 
   const date = new Date(dueDate);
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
 
-  if (date.toDateString() === today.toDateString()) {
+  const today = new Date(todayVertView); // your global Toronto time
+  today.setHours(0, 0, 0, 0);
+
+  const diffTime = target - today;
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
     return "Today";
-  } else if (date.toDateString() === tomorrow.toDateString()) {
+  } else if (diffDays === 1) {
     return "Tomorrow";
+  } else if (diffDays > 1) {
+    return `${target.toLocaleDateString("en-US")} (in ${diffDays} days)`;
   } else {
-    return date.toLocaleDateString();
+    return `${target.toLocaleDateString("en-US")} (${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
   }
 }
+
 
 // === Cycle through priority levels ===
 function todoCyclePriority(currentPriority) {
@@ -194,13 +202,11 @@ function renderTodos() {
 
 
     item.innerHTML = contentHTML;
+    const titleEl = item.querySelector(".todo-title");
+    if (titleEl) {
+      titleEl.style.setProperty("--priority-color", normalizedColor);
+    }
 
-const titleEl = item.querySelector(".todo-title");
-if (titleEl) {
-  titleEl.style.textDecoration = "underline";
-  titleEl.style.textDecorationColor = normalizedColor;
-  titleEl.style.textDecorationThickness = "3px"; // ← thickness here
-}
 
 
     // === Event Listeners ===
@@ -481,8 +487,26 @@ function todoFormatDate(timestamp) {
   if (!timestamp) return "";
 
   const date = new Date(Number(timestamp));
-  return date.toLocaleDateString("en-US");
+
+  // normalize the target date (midnight)
+  const targetDate = new Date(date);
+  targetDate.setHours(0, 0, 0, 0);
+
+  // use global todayVertView (already set to Toronto midnight)
+  const diffTime = targetDate - todayVertView;
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+  const formattedDate = date.toLocaleDateString("en-US");
+
+  if (diffDays > 0) {
+    return `${formattedDate} (${diffDays} day${diffDays > 1 ? "s" : ""} remaining)`;
+  } else if (diffDays === 0) {
+    return `${formattedDate} (Today)`;
+  } else {
+    return `${formattedDate} (${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
+  }
 }
+
 
 
 
