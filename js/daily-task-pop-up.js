@@ -1207,9 +1207,13 @@ function runStartupFeatures() {
 
   // Apply saved view mode
   if (settings["view-mode"] === "month") {
-      showVertViewBtn.click();
+    showVertViewBtn.click();
   } else if (settings["view-mode"] === "list") {
     console.log("Switched to List View");
+  } else if (settings["view-mode"] === "todo") {
+    const todoContainer = document.getElementById("todo-container");
+    todoContainer.classList.add("active");
+    renderTodos();
   }
 
   if (settings["startup-popup"]) {

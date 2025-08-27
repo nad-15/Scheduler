@@ -506,9 +506,3 @@ function todoFormatDate(timestamp) {
     return `${formattedDate} (${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
   }
 }
-
-
-
-
-// initial render
-renderTodos();

@@ -1354,7 +1354,7 @@ h2 {
 }
 
 .month-radio,
-.list-radio {
+.list-radio, .todo-radio {
     margin-left: auto;
 }
 
