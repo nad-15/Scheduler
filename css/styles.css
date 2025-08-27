@@ -520,12 +520,10 @@ body {
 }
 
 
-
-
 .todo-menu-dropdown {
     position: absolute;
-    /* bottom: 100%; */
-    right: 0;
+    bottom: 0;
+    right: 36px;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
