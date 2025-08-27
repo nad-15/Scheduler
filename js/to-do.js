@@ -94,20 +94,18 @@ function renderTodos() {
     item.className = "todo-item";
 
     const normalizedColor = todoNormalizeColor(todo.color);
-    item.style.borderLeft = `6px solid ${normalizedColor}`;
+    // item.style.borderLeft = `6px solid ${normalizedColor}`;
 
     let contentHTML = `
       <div class="todo-header">
-        <input type="checkbox" class="todo-done-checkbox" ${
-          todo.done ? "checked" : ""
-        }>
+        <input type="checkbox" class="todo-done-checkbox" ${todo.done ? "checked" : ""
+      }>
         <div class="todo-title ${todo.done ? "done" : ""}">${todo.text}</div>
         <div class="todo-header-actions">
          <div class="todo-priority">
-  <button class="todo-priority-btn material-symbols-outlined" 
-          style="color: ${TODO_PRIORITY_COLORS[todo.priority]}">
-    flag
-  </button>
+<button class="todo-priority-btn" style="color: ${TODO_PRIORITY_COLORS[todo.priority]}">
+  <span class="material-symbols-outlined todo-priority-icon">flag</span>
+</button>
   <div class="todo-priority-dropdown" style="display: none;">
     <button data-priority="null">None</button>
     <button data-priority="low">Low</button>
@@ -116,11 +114,10 @@ function renderTodos() {
   </div>
 </div>
 
-          <button class="todo-pin-btn material-symbols-outlined ${
-            todo.pinned ? "pinned" : ""
-          }">
-            ${todo.pinned ? "keep" : "keep_off"}
-          </button>
+<button class="todo-pin-btn ${todo.pinned ? "pinned" : ""}">
+  <span class="material-symbols-outlined todo-pin-icon">star</span>
+</button>
+
         </div>
       </div>
     `;
@@ -137,9 +134,8 @@ function renderTodos() {
             <input type="checkbox" class="todo-subtask-checkbox" 
                    ${subtask.done ? "checked" : ""} 
                    data-index="${index}">
-            <span class="todo-subtask-text ${
-              subtask.done ? "done" : ""
-            }">${subtask.title}</span>
+            <span class="todo-subtask-text ${subtask.done ? "done" : ""
+          }">${subtask.title}</span>
           </div>
         `;
       });
@@ -194,26 +190,26 @@ function renderTodos() {
     });
 
     const priorityBtn = item.querySelector(".todo-priority-btn");
-const priorityDropdown = item.querySelector(".todo-priority-dropdown");
+    const priorityDropdown = item.querySelector(".todo-priority-dropdown");
 
-// toggle dropdown
-priorityBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  document.querySelectorAll(".todo-priority-dropdown").forEach((menu) => {
-    if (menu !== priorityDropdown) menu.style.display = "none";
-  });
-  priorityDropdown.style.display =
-    priorityDropdown.style.display === "none" ? "block" : "none";
-});
+    // toggle dropdown
+    priorityBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      document.querySelectorAll(".todo-priority-dropdown").forEach((menu) => {
+        if (menu !== priorityDropdown) menu.style.display = "none";
+      });
+      priorityDropdown.style.display =
+        priorityDropdown.style.display === "none" ? "block" : "none";
+    });
 
-// handle selection
-priorityDropdown.querySelectorAll("button").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const selected = btn.getAttribute("data-priority");
-    todo.priority = selected === "null" ? null : selected;
-    todoSaveAndRender();
-  });
-});
+    // handle selection
+    priorityDropdown.querySelectorAll("button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const selected = btn.getAttribute("data-priority");
+        todo.priority = selected === "null" ? null : selected;
+        todoSaveAndRender();
+      });
+    });
 
 
     item.querySelector(".todo-pin-btn").addEventListener("click", () => {
@@ -250,10 +246,10 @@ priorityDropdown.querySelectorAll("button").forEach((btn) => {
   });
 
   document.addEventListener("click", () => {
-  document.querySelectorAll(".todo-menu-dropdown, .todo-priority-dropdown").forEach((menu) => {
-    menu.style.display = "none";
+    document.querySelectorAll(".todo-menu-dropdown, .todo-priority-dropdown").forEach((menu) => {
+      menu.style.display = "none";
+    });
   });
-});
 
 }
 
@@ -298,11 +294,10 @@ function todoOpenEditModal(todo = null) {
         <div>
           <label>Due Date:</label>
           <input type="date" id="todo-due-date" 
-                 value="${
-                   todo?.dueDate
-                     ? new Date(todo.dueDate).toISOString().split("T")[0]
-                     : ""
-                 }">
+                 value="${todo?.dueDate
+      ? new Date(todo.dueDate).toISOString().split("T")[0]
+      : ""
+    }">
         </div>
         <div>
           <label>Time Estimate:</label>
@@ -312,9 +307,8 @@ function todoOpenEditModal(todo = null) {
       </div>
       
       <div class="todo-modal-actions">
-        <button type="button" id="todo-save-task">${
-          isEdit ? "Save" : "Create"
-        }</button>
+        <button type="button" id="todo-save-task">${isEdit ? "Save" : "Create"
+    }</button>
         <button type="button" id="todo-cancel-task">Cancel</button>
       </div>
     </div>
