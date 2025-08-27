@@ -68,9 +68,7 @@ body {
     transition: transform 0.2s ease, background 0.2s ease;
 }
 
-/* * {
-    border: 2px solid green;
-} */
+
 
 /* === TODO CONTAINER === */
 #todo-container {
@@ -265,9 +263,7 @@ body {
     padding: 0;
     height: fit-content;
 }
-/* *{
-    border: 2px solid green;
-} */
+
 .todo-priority-btn,
 .todo-pin-btn {
     height: fit-content;
@@ -385,9 +381,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 12px;
+    /* margin-top: 12px; */
     margin-left: 32px;
-    margin-right: 40px;
+    margin-right: 0;
     font-size: 13px;
     color: #888;
 }
@@ -401,13 +397,13 @@ body {
 }
 
 /* === MENU SYSTEM === */
-.todo-menu {
+/* .todo-menu {
     position: absolute;
     bottom: 8px;
-    right: 12px;
+    right: 12px; */
     /* min-height: 32px; */
-    padding: 0;
-}
+    /* padding: 0;
+} */
 
 .todo-menu-btn {
     background: none;
@@ -418,6 +414,7 @@ body {
     color: #888;
     transition: all 0.2s ease;
     font-size: 18px;
+    margin-left: auto;
 
 }
 

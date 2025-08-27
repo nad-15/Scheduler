@@ -103,20 +103,20 @@ function renderTodos() {
         <div class="todo-title ${todo.done ? "done" : ""}">${todo.text}</div>
         <div class="todo-header-actions">
          <div class="todo-priority">
-<button class="todo-priority-btn" style="color: ${TODO_PRIORITY_COLORS[todo.priority]}">
-  <span class="material-symbols-outlined todo-priority-icon">flag</span>
-</button>
-  <div class="todo-priority-dropdown" style="display: none;">
-    <button data-priority="null">None</button>
-    <button data-priority="low">Low</button>
-    <button data-priority="medium">Medium</button>
-    <button data-priority="high">High</button>
-  </div>
-</div>
+            <button class="todo-priority-btn" style="color: ${TODO_PRIORITY_COLORS[todo.priority]}">
+                <span class="material-symbols-outlined todo-priority-icon">flag</span>
+            </button>
+              <div class="todo-priority-dropdown" style="display: none;">
+                <button data-priority="null">None</button>
+                <button data-priority="low">Low</button>
+                <button data-priority="medium">Medium</button>
+                <button data-priority="high">High</button>
+              </div>
+          </div>
 
-<button class="todo-pin-btn ${todo.pinned ? "pinned" : ""}">
-  <span class="material-symbols-outlined todo-pin-icon">star</span>
-</button>
+      <button class="todo-pin-btn ${todo.pinned ? "pinned" : ""}">
+            <span class="material-symbols-outlined todo-pin-icon">star</span>
+        </button>
 
         </div>
       </div>
@@ -158,18 +158,24 @@ function renderTodos() {
         contentHTML += `<span class="todo-time-estimate">⏱️ ${todo.timeEstimate}</span>`;
       }
 
-      contentHTML += "</div>";
-    }
-
-    contentHTML += `
+       contentHTML += `
       <div class="todo-menu">
-        <button class="todo-menu-btn material-symbols-outlined">more_vert</button>
+        <button class="todo-menu-btn">
+            <span class="material-symbols-outlined todo-menu-icon">more_vert</span>
+        </button>
+
         <div class="todo-menu-dropdown" style="display: none;">
           <button class="todo-menu-edit">✏️ Edit</button>
           <button class="todo-menu-delete">🗑️ Delete</button>
         </div>
       </div>
     `;
+
+
+      contentHTML += "</div>";
+    }
+
+   
 
     item.innerHTML = contentHTML;
 
@@ -449,15 +455,12 @@ document.querySelector(".todo-fab").addEventListener("click", () => {
 
 function todoFormatDate(timestamp) {
   if (!timestamp) return "";
+
   const date = new Date(Number(timestamp));
-  return date.toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return date.toLocaleDateString("en-US");
 }
+
+
 
 // initial render
 renderTodos();
