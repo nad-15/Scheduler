@@ -48,6 +48,9 @@ body {
     margin-left: auto;
 }
 
+/* *{
+    border: 2px solid green;
+} */
 
 .todo-fab {
     z-index: 9000;
@@ -69,8 +72,64 @@ body {
     transition: transform 0.2s ease, background 0.2s ease;
 }
 
+.sort-buttons-toggle{
+    margin-left: 4px;
+}
+.todo-sort-controls {
+        margin-left: 4px;
+  /* margin-bottom: 20px; */
+  /* padding: 10px; */
+}
+
+.todo-sort-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
 
 
+.todo-sort-btn {
+  padding: 2px 4px;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 10px;
+}
+
+
+
+.todo-sort-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.todo-sort-btn:hover {
+  background: #f8f9fa;
+}
+
+.todo-sort-btn.active:hover {
+  background: #0056b3;
+}
+
+.todo-group-header {
+  /* margin: 20px 0 10px 0; */
+  padding: 10px 0;
+  border-bottom: 2px solid #eee;
+  /* background-color: red; */
+}
+
+.todo-group-header h4 {
+  margin: 0;
+  color: #555;
+  font-size: 16px;
+  font-weight: 600;
+}
 /* === TODO CONTAINER === */
 #todo-container {
 
@@ -179,10 +238,12 @@ body {
     padding: 5px 4px 100px 4px;
     flex: 1;
     overflow-y: auto;
+        /* overflow: visible; */
     /* background-color: white; */
     /* z-index: 5001; */
     /* border-top: 1px solid rgba(0, 0, 0, 0.5); */
     scrollbar-width: none;
+
 }
 
 .todo-item {
@@ -194,6 +255,7 @@ body {
     /* border-left: 6px solid #ddd; */
     position: relative;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+
     /* border-bottom: 1px solid rgba(0, 0, 0, 0.5); */
     /* border-top: 1px solid rgba(0, 0, 0, 0.1); */
     /* min-height: 80px; */
@@ -341,7 +403,7 @@ body {
 
 .todo-priority-dropdown {
     position: absolute;
-    bottom: 100%;
+    top: 24px;
     right: 0;
     background: white;
     border: 1px solid #ddd;
@@ -538,7 +600,7 @@ body {
 
 .todo-menu-dropdown {
     position: absolute;
-    bottom: 0;
+    bottom: -80px;
     right: 36px;
     background: white;
     border: 1px solid #ddd;
