@@ -87,14 +87,11 @@ body {
 }
 
 .material-icons.todo-collapse-icon,
-.material-icons.todo-delete-icon {
-    font-size: 20px;
+.material-icons.todo-delete-icon, .material-icons.todo-close-icon {
+    font-size: 16px;
     font-weight: bolder;
 }
 
-.material-icons.todo-close-icon {
-    font-weight: bolder;
-}
 
 .sort-icon {
     transition: transform 0.3s ease;
@@ -300,8 +297,8 @@ body {
     /* slightly dark text/icon */
     font-size: 2rem;
     /* large icon/text inside */
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     /* inner padding handled by size */
     border-radius: 50%;
