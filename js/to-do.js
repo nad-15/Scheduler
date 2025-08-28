@@ -842,7 +842,6 @@ const todoToggleSortBy = document.querySelector(".sort-buttons-toggle");
 todoToggleSortBy.addEventListener("click", () => {
   const sortButtons = document.querySelector(".todo-sort-buttons");
   if (sortButtons.classList.contains("open")) {
-
     sortButtons.style.maxHeight = 0;
     sortButtons.classList.remove("open");
   } else {
@@ -850,6 +849,7 @@ todoToggleSortBy.addEventListener("click", () => {
     sortButtons.classList.add("open");
   }
 });
+
 
 
 document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {

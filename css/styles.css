@@ -85,11 +85,16 @@ body {
 .todo-sort-buttons {
   display: flex;
   gap: 5px;
-  flex-wrap: wrap;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease;
+  padding: 0; /* no padding when closed */
+  transition: max-height 0.3s ease, padding 0.3s ease;
 }
+
+.todo-sort-buttons.open {
+  padding: 4px; /* or 2px if you like */
+}
+
 
 /* * {
     border: 2px solid green;
@@ -99,7 +104,7 @@ body {
   padding: 2px 4px;
   border: 1px solid #ddd;
   background: white;
-  border-radius: 20px;
+  border-radius: 2px;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 10px;
@@ -277,6 +282,7 @@ body {
     margin: 0 0;
     /* padding: 20px 0 100px 0; */
     padding: 4px 4px 100px 4px;
+    padding-top: 0;
     flex: 1;
     overflow-y: auto;
         /* overflow: visible; */
