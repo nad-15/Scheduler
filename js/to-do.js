@@ -247,7 +247,7 @@ function getGroupedTodos(sortedTodos) {
       let groupTitle;
 
       if (todo.pinned) {
-        groupTitle = "⭐ Starred";
+        groupTitle = "Starred";
       } else if (todo.dueDate) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -258,18 +258,18 @@ function getGroupedTodos(sortedTodos) {
         const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays < 0) {
-          groupTitle = "🚨 Overdue";
+          groupTitle = "Overdue";
         } else if (diffDays === 0) {
-          groupTitle = "📅 Due Today";
+          groupTitle = "Due Today";
         } else if (diffDays === 1) {
-          groupTitle = "⏰ Due Tomorrow";
+          groupTitle = "Due Tomorrow";
         } else if (diffDays <= 7) {
-          groupTitle = "📆 Due This Week";
+          groupTitle = "Due This Week";
         } else {
-          groupTitle = "📋 Due Later";
+          groupTitle = "Due Later";
         }
       } else {
-        groupTitle = "⏳ No Due Date";
+        groupTitle = "No Due Date";
       }
 
       if (!currentGroup || currentGroup.title !== groupTitle) {
@@ -285,11 +285,11 @@ function getGroupedTodos(sortedTodos) {
       let groupTitle;
 
       if (todo.pinned) {
-        groupTitle = "⭐ Starred";
+        groupTitle = "Starred";
       } else if (todo.done) {
-        groupTitle = "✅ Completed";
+        groupTitle = "Completed";
       } else {
-        groupTitle = "📋 Not Completed";
+        groupTitle = "To do";
       }
 
       if (!currentGroup || currentGroup.title !== groupTitle) {
@@ -305,24 +305,24 @@ function getGroupedTodos(sortedTodos) {
       let groupTitle;
 
       if (todo.pinned) {
-        groupTitle = "⭐ Starred";
+        groupTitle = "Starred";
       } else {
         const timeMinutes = parseTimeEstimate(todo.timeEstimate);
 
         if (timeMinutes === 0) {
-          groupTitle = "❓ No Time Estimate";
+          groupTitle = "No Time Estimate";
         } else if (timeMinutes <= 15) {
-          groupTitle = "⚡ Quick Tasks (≤ 15 min)";
+          groupTitle = "Quick Tasks (≤ 15 min)";
         } else if (timeMinutes <= 30) {
-          groupTitle = "🏃 Short Tasks (16-30 min)";
+          groupTitle = "Short Tasks (16-30 min)";
         } else if (timeMinutes <= 60) {
-          groupTitle = "🚶 Medium Tasks (31-60 min)";
+          groupTitle = "Medium Tasks (31-60 min)";
         } else if (timeMinutes <= 120) {
-          groupTitle = "📚 Long Tasks (1-2 hours)";
+          groupTitle = "Long Tasks (1-2 hours)";
         } else if (timeMinutes <= 480) {
-          groupTitle = "📊 Extended Tasks (2-8 hours)";
+          groupTitle = "Extended Tasks (2-8 hours)";
         } else {
-          groupTitle = "🏔️ Major Projects (8+ hours)";
+          groupTitle = "Major Projects (8+ hours)";
         }
       }
 
@@ -339,23 +339,23 @@ function getGroupedTodos(sortedTodos) {
       let groupTitle;
 
       if (todo.pinned) {
-        groupTitle = "⭐ Starred";
+        groupTitle = "Starred";
       } else if (todo.done) {
-        groupTitle = "✅ Completed";
+        groupTitle = "Completed";
       } else {
         switch (todo.priority) {
           case "high":
-            groupTitle = "🔴 High Priority";
+            groupTitle = "High Priority";
             break;
           case "medium":
-            groupTitle = "🟠 Medium Priority";
+            groupTitle = "Medium Priority";
             break;
           case "low":
-            groupTitle = "🟢 Low Priority";
+            groupTitle = "Low Priority";
             break;
           case null:
           default:
-            groupTitle = "📋 No Priority";
+            groupTitle = "No Priority";
             break;
         }
       }
@@ -392,22 +392,22 @@ function renderTodos() {
     sortControls.innerHTML = `
       <div class="todo-sort-buttons">
         <button class="todo-sort-btn ${currentSortMode === 'date-newest' ? 'active' : ''}" data-sort="date-newest">
-          📅 Newest First
+          Newest First
         </button>
         <button class="todo-sort-btn ${currentSortMode === 'date-oldest' ? 'active' : ''}" data-sort="date-oldest">
-          📅 Oldest First
+          Oldest First
         </button>
         <button class="todo-sort-btn ${currentSortMode === 'group' ? 'active' : ''}" data-sort="group">
-          📊 Group by Priority
+          By Priority
         </button>
         <button class="todo-sort-btn ${currentSortMode === 'due-date' ? 'active' : ''}" data-sort="due-date">
-          📆 By Due Date
+          By Due Date
         </button>
         <button class="todo-sort-btn ${currentSortMode === 'completion' ? 'active' : ''}" data-sort="completion">
-          ✅ By Completion
+          By Completion
         </button>
         <button class="todo-sort-btn ${currentSortMode === 'time-estimate' ? 'active' : ''}" data-sort="time-estimate">
-          ⏱️ By Time Estimate
+          By Time Estimate
         </button>
       </div>
     `;
@@ -446,11 +446,16 @@ function renderTodos() {
       item.className = "todo-item";
 
       const normalizedColor = todoNormalizeColor(todo.color);
-
+//here
       let contentHTML = `
         <div class="todo-header">
           <input type="checkbox" class="todo-done-checkbox" ${todo.done ? "checked" : ""}>
-          <div class="todo-title ${todo.done ? "done" : ""}">${todo.text}</div>
+<div class="todo-title">
+  <span class="title-text ${todo.done ? "done" : ""}">${todo.text}</span>
+  <span class="todo-seemore hidden material-symbols-outlined">chevron_right</span>
+</div>
+
+
           <div class="todo-header-actions">
            <div class="todo-priority">
               <button class="todo-priority-btn" style="color: ${TODO_PRIORITY_COLORS[todo.priority]}">
@@ -536,7 +541,7 @@ function renderTodos() {
       }
 
       item.innerHTML = contentHTML;
-      const titleEl = item.querySelector(".todo-title");
+      const titleEl = item.querySelector(".title-text");
       if (titleEl) {
         titleEl.style.setProperty("--priority-color", normalizedColor);
       }
@@ -616,7 +621,11 @@ function renderTodos() {
       menu.style.display = "none";
     });
   });
+
+
 }
+
+
 
 // === Edit/Create Modal ===
 function todoOpenEditModal(todo = null) {
@@ -839,5 +848,20 @@ todoToggleSortBy.addEventListener("click", () => {
   } else {
     sortButtons.style.maxHeight = sortButtons.scrollHeight + "px";
     sortButtons.classList.add("open");
+  }
+});
+
+
+document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
+  document.querySelectorAll(".todo-item").forEach(item => {
+    item.classList.toggle("collapsed");
+  });
+
+  // toggle icon too
+  const icon = document.querySelector(".collapse-toggle-btn .material-icons");
+  if (icon.textContent === "unfold_less") {
+    icon.textContent = "unfold_more";
+  } else {
+    icon.textContent = "unfold_less";
   }
 });

@@ -74,6 +74,7 @@ body {
 
 .sort-buttons-toggle{
     margin-left: 4px;
+    font-size: 12px;
 }
 .todo-sort-controls {
         margin-left: 4px;
@@ -90,9 +91,13 @@ body {
   transition: max-height 0.3s ease;
 }
 
+/* * {
+    border: 2px solid green;
+} */
+
 .todo-sort-btn {
   padding: 2px 4px;
-  border: 2px solid #ddd;
+  border: 1px solid #ddd;
   background: white;
   border-radius: 20px;
   cursor: pointer;
@@ -117,18 +122,34 @@ body {
 }
 
 .todo-group-header {
-  /* margin: 20px 0 10px 0; */
-  padding: 10px 0;
-  border-bottom: 2px solid #eee;
-  /* background-color: red; */
+  padding: 8px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* ensure full span */
 }
 
 .todo-group-header h4 {
   margin: 0;
   color: #555;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 600;
+
+  display: flex;           /* make h4 flex so ::before/::after work */
+  align-items: center;
+  width: 100%;             /* take up full row */
+  text-align: center;      /* center the label */
 }
+
+.todo-group-header h4::before,
+.todo-group-header h4::after {
+  content: "";
+  flex: 1;                 /* push lines out */
+  border-bottom: 1px solid #ccc;
+  margin: 0 10px;
+}
+
+
 /* === TODO CONTAINER === */
 #todo-container {
 
@@ -172,21 +193,19 @@ body {
   border-bottom-left-radius: 8px; */
     justify-content: center;
     align-items: flex-start;
-    /* padding: 8px 20px; */
-    padding-top: 16px;
-    padding-bottom: 16px;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 8px 16px;
     width: 100%;
         /* border: 2px solid green; */
 }
 
 .todo-title-header {
-
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
     gap: 0;
+
 }
+
 
 
 .todo-greet {
@@ -208,6 +227,22 @@ body {
   margin-left: 5px;
   padding: 0;
   line-height: 1; /* remove extra vertical spacing */
+}
+
+.collapse-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 20px;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+
+.todo-item.collapsed .todo-description,
+.todo-item.collapsed .todo-subtasks {
+  display: none;
 }
 
 
@@ -241,7 +276,7 @@ body {
     width: 100vw;
     margin: 0 0;
     /* padding: 20px 0 100px 0; */
-    padding: 12px 4px 100px 4px;
+    padding: 4px 4px 100px 4px;
     flex: 1;
     overflow-y: auto;
         /* overflow: visible; */
@@ -268,8 +303,8 @@ body {
     /* min-height: 80px; */
     /* margin: 0 20px; */
     /* z-index: 5001; */
-    margin-left: 12px;
-    margin-right: 12px;
+    /* margin-left: 12px;
+    margin-right: 12px; */
 
 }
 
@@ -288,21 +323,6 @@ body {
     /* border: 2px solid green; */
 }
 
-/* 
-.todo-done-checkbox {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid #ddd;
-    cursor: pointer;
-    margin-top: 2px;
-    flex-shrink: 0;
-}
-
-.todo-done-checkbox:checked {
-    background: #4CAF50;
-    border-color: #4CAF50;
-} */
 
 .todo-done-checkbox {
     width: 22px;
@@ -334,20 +354,40 @@ body {
     font-size: 14px;
     font-weight: bold;
 }
-
 .todo-title {
-    flex: 1;
-    font-size: 16px;
-    font-weight: 500;
-    word-wrap: break-word;
-    transition: all 0.3s ease;
-    margin-left: 12px;
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+  word-wrap: break-word;
+  transition: all 0.3s ease;
+  margin-left: 12px;
+
+  display: inline;       /* inline flow so arrow follows text */
+}
+
+.todo-title .title-text {
+  text-decoration: underline;
+  text-decoration-color: var(--priority-color, currentColor);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+}
+
+.todo-seemore {
+  margin-left: 1px;
+  font-size: 12px;
+  color: #555;
+  transition: transform 0.2s ease;
+  vertical-align: middle; /* keeps arrow nicely aligned */
+  /* border: 2px solid green; */
+}
+
+.todo-seemore.hidden {
+  display: none;
+}
 
 
-    text-decoration: underline;
-    text-decoration-color: var(--priority-color, currentColor);
-    text-decoration-thickness: 3px;
-    text-underline-offset: 5px;
+.todo-title.expanded .todo-seemore {
+  transform: rotate(90deg);
 }
 
 /* 
@@ -526,7 +566,7 @@ body {
     opacity: 0.5;
 }
 
-.todo-title.done {
+.title-text.done {
     text-decoration: line-through underline;
     text-decoration-color: var(--priority-color, currentColor);
     text-decoration-thickness: 3px;
