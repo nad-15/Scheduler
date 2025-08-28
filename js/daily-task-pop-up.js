@@ -1134,11 +1134,13 @@ function restoreColorOptions() {
 const SETTINGS_KEY = "appSettings";
 
 // ===== Defaults =====
-const DEFAULT_SETTINGS = {
-  "startup-popup": true,
-  "weather-widget": true,
-  "view-mode": "list"
-};
+// const DEFAULT_SETTINGS = {
+//   "startup-popup": true,
+//   "weather-widget": true,
+//   "view-mode": "list",
+//   "todo-sort-mode": "date-newest" // added default
+// };
+
 
 // ===== Helpers =====
 function loadSettings() {

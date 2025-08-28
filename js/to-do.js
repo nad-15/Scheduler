@@ -1,3 +1,5 @@
+
+
 // === Cycle through priority levels ===// js/to-do.js
 function migrateTodos() {
   let changed = false;
@@ -34,7 +36,9 @@ let todos = JSON.parse(localStorage.getItem("todos")) || [];
 migrateTodos();
 
 // === Sort settings ===
-let currentSortMode = localStorage.getItem("todoSortMode") || "date-newest"; // "date-newest", "date-oldest", "group", "due-date", "completion", "time-estimate"
+// let currentSortMode = localStorage.getItem("todoSortMode") || "date-newest"; // "date-newest", "date-oldest", "group", "due-date", "completion", "time-estimate"
+let currentSortMode = appSettings["todo-sort-mode"];
+
 
 // === Priority colors ===
 const TODO_PRIORITY_COLORS = {
@@ -88,15 +92,15 @@ function todoFormatDueDate(dueDate) {
 // === Helper function to parse time estimates ===
 function parseTimeEstimate(timeStr) {
   if (!timeStr || timeStr.trim() === "") return 0;
-  
+
   const str = timeStr.toLowerCase().trim();
   let totalMinutes = 0;
-  
+
   // Match patterns like: 2h, 30m, 1h 30m, 2 hours, 30 minutes, etc.
   const hourMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:h|hr|hrs|hour|hours)/);
   const minuteMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:m|min|mins|minute|minutes)/);
   const dayMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:d|day|days)/);
-  
+
   if (dayMatch) {
     totalMinutes += parseFloat(dayMatch[1]) * 24 * 60; // Convert days to minutes
   }
@@ -106,7 +110,7 @@ function parseTimeEstimate(timeStr) {
   if (minuteMatch) {
     totalMinutes += parseFloat(minuteMatch[1]); // Minutes
   }
-  
+
   // If no time units found, assume it's just a number (treat as minutes)
   if (totalMinutes === 0) {
     const numMatch = str.match(/(\d+(?:\.\d+)?)/);
@@ -114,7 +118,7 @@ function parseTimeEstimate(timeStr) {
       totalMinutes = parseFloat(numMatch[1]);
     }
   }
-  
+
   return totalMinutes;
 }
 function todoCyclePriority(currentPriority) {
@@ -161,11 +165,11 @@ function sortTodos(todos) {
 
         const aOrder = getPriorityOrder(a);
         const bOrder = getPriorityOrder(b);
-        
+
         if (aOrder !== bOrder) {
           return aOrder - bOrder;
         }
-        
+
         // Within same group, sort by creation date (newest first)
         return b.createdAt - a.createdAt;
       });
@@ -175,14 +179,14 @@ function sortTodos(todos) {
         // Pinned items always on top
         if (a.pinned && !b.pinned) return -1;
         if (!a.pinned && b.pinned) return 1;
-        
+
         // Handle due dates: overdue first, then by due date, then no due date last
         if (a.dueDate && b.dueDate) {
           return a.dueDate - b.dueDate; // Earlier due dates first
         }
         if (a.dueDate && !b.dueDate) return -1; // Items with due dates before items without
         if (!a.dueDate && b.dueDate) return 1;
-        
+
         // If both have no due date, sort by creation date (newest first)
         return b.createdAt - a.createdAt;
       });
@@ -192,12 +196,12 @@ function sortTodos(todos) {
         // Pinned items always on top (regardless of completion)
         if (a.pinned && !b.pinned) return -1;
         if (!a.pinned && b.pinned) return 1;
-        
+
         // Then sort by completion status
         if (a.done !== b.done) {
           return a.done ? 1 : -1; // Not completed first, then completed
         }
-        
+
         // Within same completion status, sort by creation date (newest first)
         return b.createdAt - a.createdAt;
       });
@@ -207,18 +211,18 @@ function sortTodos(todos) {
         // Pinned items always on top
         if (a.pinned && !b.pinned) return -1;
         if (!a.pinned && b.pinned) return 1;
-        
+
         // Parse time estimates
         const aTime = parseTimeEstimate(a.timeEstimate);
         const bTime = parseTimeEstimate(b.timeEstimate);
-        
+
         // Sort: tasks with estimates first (shorter first), then tasks without estimates
         if (aTime > 0 && bTime > 0) {
           return aTime - bTime; // Shorter tasks first
         }
         if (aTime > 0 && bTime === 0) return -1; // Tasks with estimates before tasks without
         if (aTime === 0 && bTime > 0) return 1;
-        
+
         // If both have no time estimate, sort by creation date (newest first)
         return b.createdAt - a.createdAt;
       });
@@ -241,7 +245,7 @@ function getGroupedTodos(sortedTodos) {
     // Group by due date categories
     sortedTodos.forEach(todo => {
       let groupTitle;
-      
+
       if (todo.pinned) {
         groupTitle = "⭐ Starred";
       } else if (todo.dueDate) {
@@ -249,10 +253,10 @@ function getGroupedTodos(sortedTodos) {
         today.setHours(0, 0, 0, 0);
         const dueDate = new Date(todo.dueDate);
         dueDate.setHours(0, 0, 0, 0);
-        
+
         const diffTime = dueDate - today;
         const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays < 0) {
           groupTitle = "🚨 Overdue";
         } else if (diffDays === 0) {
@@ -272,14 +276,14 @@ function getGroupedTodos(sortedTodos) {
         currentGroup = { title: groupTitle, todos: [] };
         groups.push(currentGroup);
       }
-      
+
       currentGroup.todos.push(todo);
     });
   } else if (currentSortMode === "completion") {
     // Group by completion status
     sortedTodos.forEach(todo => {
       let groupTitle;
-      
+
       if (todo.pinned) {
         groupTitle = "⭐ Starred";
       } else if (todo.done) {
@@ -292,19 +296,19 @@ function getGroupedTodos(sortedTodos) {
         currentGroup = { title: groupTitle, todos: [] };
         groups.push(currentGroup);
       }
-      
+
       currentGroup.todos.push(todo);
     });
   } else if (currentSortMode === "time-estimate") {
     // Group by time estimate ranges
     sortedTodos.forEach(todo => {
       let groupTitle;
-      
+
       if (todo.pinned) {
         groupTitle = "⭐ Starred";
       } else {
         const timeMinutes = parseTimeEstimate(todo.timeEstimate);
-        
+
         if (timeMinutes === 0) {
           groupTitle = "❓ No Time Estimate";
         } else if (timeMinutes <= 15) {
@@ -326,14 +330,14 @@ function getGroupedTodos(sortedTodos) {
         currentGroup = { title: groupTitle, todos: [] };
         groups.push(currentGroup);
       }
-      
+
       currentGroup.todos.push(todo);
     });
   } else {
     // Original group mode by priority
     sortedTodos.forEach(todo => {
       let groupTitle;
-      
+
       if (todo.pinned) {
         groupTitle = "⭐ Starred";
       } else if (todo.done) {
@@ -360,7 +364,7 @@ function getGroupedTodos(sortedTodos) {
         currentGroup = { title: groupTitle, todos: [] };
         groups.push(currentGroup);
       }
-      
+
       currentGroup.todos.push(todo);
     });
   }
@@ -371,7 +375,8 @@ function getGroupedTodos(sortedTodos) {
 // === Change sort mode ===
 function changeSortMode(newMode) {
   currentSortMode = newMode;
-  localStorage.setItem("todoSortMode", newMode);
+  appSettings["todo-sort-mode"] = newMode;
+  localStorage.setItem("appSettings", JSON.stringify(appSettings)); // save to localStorage
   renderTodos();
 }
 
@@ -406,13 +411,13 @@ function renderTodos() {
         </button>
       </div>
     `;
-    
+
     // Add event listeners for sort buttons
     sortControls.addEventListener('click', (e) => {
       if (e.target.classList.contains('todo-sort-btn')) {
         const newSort = e.target.getAttribute('data-sort');
         changeSortMode(newSort);
-        
+
         // Update active button
         sortControls.querySelectorAll('.todo-sort-btn').forEach(btn => {
           btn.classList.remove('active');
@@ -420,7 +425,7 @@ function renderTodos() {
         e.target.classList.add('active');
       }
     });
-    
+
     list.parentNode.insertBefore(sortControls, list);
   }
 
@@ -826,7 +831,7 @@ function todoFormatDate(timestamp) {
 const todoToggleSortBy = document.querySelector(".sort-buttons-toggle");
 
 todoToggleSortBy.addEventListener("click", () => {
-  const sortButtons= document.querySelector(".todo-sort-buttons");
+  const sortButtons = document.querySelector(".todo-sort-buttons");
   if (sortButtons.classList.contains("open")) {
 
     sortButtons.style.maxHeight = 0;

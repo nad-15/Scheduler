@@ -1,4 +1,18 @@
 
+const DEFAULT_SETTINGS = {
+  "startup-popup": true,
+  "weather-widget": true,
+  "view-mode": "list",
+  "todo-sort-mode": "date-newest",
+  "clamp-expanded": true
+};
+
+if (localStorage.getItem("todoSortMode") !== null) {
+  localStorage.removeItem("todoSortMode");
+}
+
+let appSettings = JSON.parse(localStorage.getItem("appSettings"));
+
 // Select elements
 const menuButton = document.querySelector('.menu-button');
 const menuButtonMonthView = document.querySelector(".hamburger-month-view");
@@ -33,7 +47,7 @@ const todoCloseBtn = todoContainer.querySelector(".todo-close-btn");
 todoMenuItem.addEventListener("click", () => {
   todoContainer.classList.add("active");
   // === Initial render ===
-renderTodos();
+  renderTodos();
 });
 
 // Close when clicking ×
