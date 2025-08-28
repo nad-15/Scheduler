@@ -298,12 +298,13 @@ window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
 });
 
-let expanded = false;
+let expanded = appSettings["clamp-expanded"] ?? true;
 document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('toggleClampBtn');
     const toggleIcon = document.getElementById('toggleIcon');
 
-    expanded = localStorage.getItem('clampExpanded') === 'true';
+    // expanded = localStorage.getItem('clampExpanded') === 'true';
+  // true/false
 
     document.querySelectorAll('.clamp-text').forEach(span => {
         span.classList.toggle('expanded', expanded);
@@ -321,7 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Toggle icon
         toggleIcon.textContent = expanded ? 'compress' : 'expand';
 
-        localStorage.setItem('clampExpanded', expanded ? 'true' : 'false');
+        // localStorage.setItem('clampExpanded', expanded ? 'true' : 'false');
+        // update the value inside appSettings
+        appSettings["clamp-expanded"] = expanded;
+        // save the whole appSettings object back to localStorage
+        localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
 
     });
 

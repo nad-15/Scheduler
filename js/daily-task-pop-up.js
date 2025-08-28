@@ -1142,16 +1142,17 @@ const SETTINGS_KEY = "appSettings";
 // };
 
 
-// ===== Helpers =====
 function loadSettings() {
   const saved = localStorage.getItem(SETTINGS_KEY);
   let settings = saved ? JSON.parse(saved) : {};
-
-  // merge defaults (only apply when a setting is missing)
   settings = { ...DEFAULT_SETTINGS, ...settings };
+
+  // save back so defaults persist
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 
   return settings;
 }
+
 
 function saveSettings(settings) {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));

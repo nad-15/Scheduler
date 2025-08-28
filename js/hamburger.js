@@ -7,11 +7,24 @@ const DEFAULT_SETTINGS = {
   "clamp-expanded": true
 };
 
+
+
 if (localStorage.getItem("todoSortMode") !== null) {
   localStorage.removeItem("todoSortMode");
 }
 
-let appSettings = JSON.parse(localStorage.getItem("appSettings"));
+if (localStorage.getItem("clampExpanded") !== null) {
+  localStorage.removeItem("clampExpanded");
+}
+
+// load from localStorage or use defaults
+let appSettings = JSON.parse(localStorage.getItem("appSettings")) || { ...DEFAULT_SETTINGS };
+
+// make sure all new defaults are added even if user already has saved settings
+appSettings = { ...DEFAULT_SETTINGS, ...appSettings };
+
+// save back in case defaults added something new
+localStorage.setItem("appSettings", JSON.stringify(appSettings));
 
 // Select elements
 const menuButton = document.querySelector('.menu-button');
