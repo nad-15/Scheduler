@@ -90,7 +90,6 @@ body {
   transition: max-height 0.3s ease;
 }
 
-
 .todo-sort-btn {
   padding: 2px 4px;
   border: 2px solid #ddd;
@@ -171,9 +170,13 @@ body {
     animation: aurora 18s ease infinite;
     /* border-bottom-right-radius: 8px;
   border-bottom-left-radius: 8px; */
-    justify-content: flex-start;
-    align-items: center;
-    padding: 8px 16px;
+    justify-content: center;
+    align-items: flex-start;
+    /* padding: 8px 20px; */
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 8px;
+    padding-right: 8px;
     width: 100%;
         /* border: 2px solid green; */
 }
@@ -181,7 +184,7 @@ body {
 .todo-title-header {
 
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0;
 }
 
@@ -196,20 +199,23 @@ body {
     margin: 0;
 
 }
-
 .todo-appname {
-
-    display: flex;
-    font-size: 24px;
-    /* margin-bottom: 4px; */
-    color: #333;
-    font-weight: 600;
-    /* border: 2px solid green; */
-    padding: 0;
-    margin: 0;
-    margin-left: 5px;
-
+  display: flex;
+  font-size: 24px;
+  color: #333;
+  font-weight: 600;
+  margin: 0;
+  margin-left: 5px;
+  padding: 0;
+  line-height: 1; /* remove extra vertical spacing */
 }
+
+
+.appname-sort-container{
+    display: flex;
+    flex-direction: column;
+}
+
 
 .todo-close-btn {
     background: none;
@@ -235,7 +241,7 @@ body {
     width: 100vw;
     margin: 0 0;
     /* padding: 20px 0 100px 0; */
-    padding: 5px 4px 100px 4px;
+    padding: 12px 4px 100px 4px;
     flex: 1;
     overflow-y: auto;
         /* overflow: visible; */
@@ -243,6 +249,7 @@ body {
     /* z-index: 5001; */
     /* border-top: 1px solid rgba(0, 0, 0, 0.5); */
     scrollbar-width: none;
+    
 
 }
 
@@ -261,6 +268,8 @@ body {
     /* min-height: 80px; */
     /* margin: 0 20px; */
     /* z-index: 5001; */
+    margin-left: 12px;
+    margin-right: 12px;
 
 }
 
