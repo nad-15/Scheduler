@@ -1,12 +1,11 @@
-
 const DEFAULT_SETTINGS = {
   "startup-popup": true,
   "weather-widget": true,
   "view-mode": "list",
   "todo-sort-mode": "date-newest",
-  "clamp-expanded": true
+  "clamp-expanded": true,
+  "todo-collapsed": false
 };
-
 
 
 if (localStorage.getItem("todoSortMode") !== null) {

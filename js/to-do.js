@@ -621,6 +621,62 @@ function renderTodos() {
       menu.style.display = "none";
     });
   });
+if (appSettings["todo-collapsed"]) {
+  document.querySelectorAll(".todo-item").forEach(item => {
+    const hasDescription = !!item.querySelector(".todo-description");
+    const hasSubtasks = !!item.querySelector(".todo-subtasks");
+    const seeMore = item.querySelector(".todo-seemore");
+
+    // only collapse and show arrow if it has something to hide
+    if (hasDescription || hasSubtasks) {
+      item.classList.add("collapsed");
+      seeMore?.classList.remove("hidden");
+    } else {
+      // no description/subtasks -> keep expanded & no arrow
+      item.classList.remove("collapsed");
+      seeMore?.classList.add("hidden");
+    }
+  });
+
+  const icon = document.querySelector(".collapse-toggle-btn .material-icons");
+  if (icon) icon.textContent = "unfold_more";
+
+} else {
+  document.querySelectorAll(".todo-item").forEach(item => {
+    const hasDescription = !!item.querySelector(".todo-description");
+    const hasSubtasks = !!item.querySelector(".todo-subtasks");
+    const seeMore = item.querySelector(".todo-seemore");
+
+    // expand all
+    item.classList.remove("collapsed");
+    // arrow only if it actually has description/subtasks
+    if (hasDescription || hasSubtasks) {
+      seeMore?.classList.add("hidden");
+    } else {
+      seeMore?.classList.add("hidden"); // stays hidden anyway
+    }
+  });
+
+  const icon = document.querySelector(".collapse-toggle-btn .material-icons");
+  if (icon) icon.textContent = "unfold_less";
+}
+
+
+document.querySelectorAll(".todo-seemore").forEach(seemore => {
+  seemore.addEventListener("click", () => {
+    console.log("todo seemore clicked");
+
+    const todoItem = seemore.closest(".todo-item");
+    const todoTitle = todoItem.querySelector(".todo-title");
+
+    // toggle collapsed state on parent
+    todoItem.classList.toggle("collapsed");
+
+    // rotate arrow
+    todoTitle.classList.toggle("expanded");
+  });
+});
+
 
 
 }
@@ -850,18 +906,20 @@ todoToggleSortBy.addEventListener("click", () => {
   }
 });
 
-
-
 document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
-  document.querySelectorAll(".todo-item").forEach(item => {
-    item.classList.toggle("collapsed");
-  });
-
-  // toggle icon too
   const icon = document.querySelector(".collapse-toggle-btn .material-icons");
-  if (icon.textContent === "unfold_less") {
-    icon.textContent = "unfold_more";
-  } else {
-    icon.textContent = "unfold_less";
-  }
+
+  // flip the state
+  appSettings["todo-collapsed"] = !appSettings["todo-collapsed"];
+
+  // update the icon
+  icon.textContent = appSettings["todo-collapsed"]
+    ? "unfold_more"
+    : "unfold_less";
+
+  // persist setting
+  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
+  // let renderTodos handle the collapsed/expanded UI
+  renderTodos();
 });

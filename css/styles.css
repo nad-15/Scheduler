@@ -234,21 +234,6 @@ body {
   line-height: 1; /* remove extra vertical spacing */
 }
 
-.collapse-toggle-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-left: 8px;
-  font-size: 20px;
-  color: #555;
-  display: flex;
-  align-items: center;
-}
-
-.todo-item.collapsed .todo-description,
-.todo-item.collapsed .todo-subtasks {
-  display: none;
-}
 
 
 .appname-sort-container{
@@ -378,7 +363,26 @@ body {
   text-underline-offset: 5px;
 }
 
+.collapse-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 20px;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+
+.todo-item.collapsed .todo-description,
+.todo-item.collapsed .todo-subtasks {
+  display: none;
+}
+
+
+
 .todo-seemore {
+  display: block;
   margin-left: 1px;
   font-size: 12px;
   color: #555;
@@ -391,10 +395,12 @@ body {
   display: none;
 }
 
-
+/* expanded → rotate arrow */
 .todo-title.expanded .todo-seemore {
   transform: rotate(90deg);
 }
+
+
 
 /* 
 .todo-title.done {
