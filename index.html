@@ -26,25 +26,55 @@
             <div class="todo-title-header">
                 <!-- <div class="todo-greet">Good Day, Khaye!</div> -->
                 <button class="hamburger-todo">
-                    <span class="material-icons menu-icon-todo">menu</span>
+                    <span class="material-icons menu-icon-todo">settings</span>
                 </button>
                 <div class="appname-sort-container">
                     <div class="todo-appname">What’s Next?</div>
-                    <div class="sort-buttons-toggle">
-                        Sort by
-                        <span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle;">
-                            expand_more
-                        </span>
+                    <div style="display: flex;">
+                        <div class="sort-buttons-toggle">
+                            <label class="sort-label">
+                                Sort by
+                                <span class="material-symbols-outlined sort-icon">chevron_right</span>
+                            </label>
+
+
+                            <div class="todo-sort-controls">
+                                <div class="todo-sort-buttons">
+                                    <button class="todo-sort-btn" data-sort="date-newest">Newest First</button>
+                                    <button class="todo-sort-btn" data-sort="date-oldest">Oldest First</button>
+                                    <button class="todo-sort-btn" data-sort="group">By Priority</button>
+                                    <button class="todo-sort-btn" data-sort="due-date">By Due Date</button>
+                                    <button class="todo-sort-btn" data-sort="completion">By Completion</button>
+                                    <button class="todo-sort-btn" data-sort="time-estimate">By Time Estimate</button>
+                                </div>
+                            </div>
+                        </div>
+
+
+
                     </div>
+
+
+
                 </div>
-                <button class="collapse-toggle-btn">
-                    <span class="material-icons">unfold_less</span>
-                </button>
+
 
             </div>
-            <button class="todo-close-btn">
-                <span class="material-icons">close</span>
-            </button>
+            <div>
+
+            </div>
+            <div style="display: flex; gap: 6px;">
+                <button class="todo-delete-btn">
+                    <span class="material-icons todo-delete-icon">delete</span>
+                </button>
+                <button class="collapse-toggle-btn">
+                    <span class="material-icons todo-collapse-icon">compress</span>
+                </button>
+                <button class="todo-close-btn">
+                    <span class="material-icons todo-close-icon">close</span>
+                </button>
+            </div>
+
         </div>
 
         <div class="todo-list">

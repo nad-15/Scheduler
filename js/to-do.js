@@ -386,48 +386,48 @@ function renderTodos() {
   list.innerHTML = "";
 
   // Add sort controls if they don't exist
-  if (!document.querySelector(".todo-sort-controls")) {
-    const sortControls = document.createElement("div");
-    sortControls.className = "todo-sort-controls";
-    sortControls.innerHTML = `
-      <div class="todo-sort-buttons">
-        <button class="todo-sort-btn ${currentSortMode === 'date-newest' ? 'active' : ''}" data-sort="date-newest">
-          Newest First
-        </button>
-        <button class="todo-sort-btn ${currentSortMode === 'date-oldest' ? 'active' : ''}" data-sort="date-oldest">
-          Oldest First
-        </button>
-        <button class="todo-sort-btn ${currentSortMode === 'group' ? 'active' : ''}" data-sort="group">
-          By Priority
-        </button>
-        <button class="todo-sort-btn ${currentSortMode === 'due-date' ? 'active' : ''}" data-sort="due-date">
-          By Due Date
-        </button>
-        <button class="todo-sort-btn ${currentSortMode === 'completion' ? 'active' : ''}" data-sort="completion">
-          By Completion
-        </button>
-        <button class="todo-sort-btn ${currentSortMode === 'time-estimate' ? 'active' : ''}" data-sort="time-estimate">
-          By Time Estimate
-        </button>
-      </div>
-    `;
+  // if (!document.querySelector(".todo-sort-controls")) {
+  //   const sortControls = document.createElement("div");
+  //   sortControls.className = "todo-sort-controls";
+  //   sortControls.innerHTML = `
+  //     <div class="todo-sort-buttons">
+  //       <button class="todo-sort-btn ${currentSortMode === 'date-newest' ? 'active' : ''}" data-sort="date-newest">
+  //         Newest First
+  //       </button>
+  //       <button class="todo-sort-btn ${currentSortMode === 'date-oldest' ? 'active' : ''}" data-sort="date-oldest">
+  //         Oldest First
+  //       </button>
+  //       <button class="todo-sort-btn ${currentSortMode === 'group' ? 'active' : ''}" data-sort="group">
+  //         By Priority
+  //       </button>
+  //       <button class="todo-sort-btn ${currentSortMode === 'due-date' ? 'active' : ''}" data-sort="due-date">
+  //         By Due Date
+  //       </button>
+  //       <button class="todo-sort-btn ${currentSortMode === 'completion' ? 'active' : ''}" data-sort="completion">
+  //         By Completion
+  //       </button>
+  //       <button class="todo-sort-btn ${currentSortMode === 'time-estimate' ? 'active' : ''}" data-sort="time-estimate">
+  //         By Time Estimate
+  //       </button>
+  //     </div>
+  //   `;
 
-    // Add event listeners for sort buttons
-    sortControls.addEventListener('click', (e) => {
-      if (e.target.classList.contains('todo-sort-btn')) {
-        const newSort = e.target.getAttribute('data-sort');
-        changeSortMode(newSort);
+  //   // Add event listeners for sort buttons
+  //   sortControls.addEventListener('click', (e) => {
+  //     if (e.target.classList.contains('todo-sort-btn')) {
+  //       const newSort = e.target.getAttribute('data-sort');
+  //       changeSortMode(newSort);
 
-        // Update active button
-        sortControls.querySelectorAll('.todo-sort-btn').forEach(btn => {
-          btn.classList.remove('active');
-        });
-        e.target.classList.add('active');
-      }
-    });
+  //       // Update active button
+  //       sortControls.querySelectorAll('.todo-sort-btn').forEach(btn => {
+  //         btn.classList.remove('active');
+  //       });
+  //       e.target.classList.add('active');
+  //     }
+  //   });
 
-    list.parentNode.insertBefore(sortControls, list);
-  }
+  //   list.parentNode.insertBefore(sortControls, list);
+  // }
 
   const sortedTodos = sortTodos(todos);
   const groupedTodos = getGroupedTodos(sortedTodos);
@@ -639,7 +639,7 @@ if (appSettings["todo-collapsed"]) {
   });
 
   const icon = document.querySelector(".collapse-toggle-btn .material-icons");
-  if (icon) icon.textContent = "unfold_more";
+  if (icon) icon.textContent = "expand";
 
 } else {
   document.querySelectorAll(".todo-item").forEach(item => {
@@ -658,7 +658,7 @@ if (appSettings["todo-collapsed"]) {
   });
 
   const icon = document.querySelector(".collapse-toggle-btn .material-icons");
-  if (icon) icon.textContent = "unfold_less";
+  if (icon) icon.textContent = "compress";
 }
 
 
@@ -893,18 +893,18 @@ function todoFormatDate(timestamp) {
   }
 }
 
-const todoToggleSortBy = document.querySelector(".sort-buttons-toggle");
+// const todoToggleSortBy = document.querySelector(".sort-buttons-toggle");
 
-todoToggleSortBy.addEventListener("click", () => {
-  const sortButtons = document.querySelector(".todo-sort-buttons");
-  if (sortButtons.classList.contains("open")) {
-    sortButtons.style.maxHeight = 0;
-    sortButtons.classList.remove("open");
-  } else {
-    sortButtons.style.maxHeight = sortButtons.scrollHeight + "px";
-    sortButtons.classList.add("open");
-  }
-});
+// todoToggleSortBy.addEventListener("click", () => {
+//   const sortButtons = document.querySelector(".todo-sort-buttons");
+//   if (sortButtons.classList.contains("open")) {
+//     sortButtons.style.maxHeight = 0;
+//     sortButtons.classList.remove("open");
+//   } else {
+//     sortButtons.style.maxHeight = sortButtons.scrollHeight + "px";
+//     sortButtons.classList.add("open");
+//   }
+// });
 
 document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
   const icon = document.querySelector(".collapse-toggle-btn .material-icons");
@@ -914,12 +914,41 @@ document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
 
   // update the icon
   icon.textContent = appSettings["todo-collapsed"]
-    ? "unfold_more"
-    : "unfold_less";
+    ? "expand"
+    : "compress";
 
   // persist setting
   localStorage.setItem("appSettings", JSON.stringify(appSettings));
 
   // let renderTodos handle the collapsed/expanded UI
   renderTodos();
+});
+
+
+const toggleLabel = document.querySelector(".sort-label");
+const controls = document.querySelector(".todo-sort-controls");
+const sortIcon = document.querySelector(".sort-icon");
+
+toggleLabel.addEventListener("click", () => {
+  controls.classList.toggle("show");   // show/hide popup
+  sortIcon.classList.toggle("rotated"); // rotate only the icon
+});
+
+controls.addEventListener("click", (e) => {
+  if (e.target.classList.contains("todo-sort-btn")) {
+    const newSort = e.target.dataset.sort;
+    changeSortMode(newSort);
+
+    controls.querySelectorAll(".todo-sort-btn").forEach(btn => btn.classList.remove("active"));
+    e.target.classList.add("active");
+
+    controls.classList.remove("show"); // optionally close popup
+  }
+});
+// Close popup if clicking outside
+document.addEventListener("click", (e) => {
+  if (!toggleLabel.contains(e.target) && !controls.contains(e.target)) {
+    controls.classList.remove("show");
+    sortIcon.classList.remove("rotated"); // reset rotation
+  }
 });
