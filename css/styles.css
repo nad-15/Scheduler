@@ -727,12 +727,20 @@ body {
     color: #888;
 }
 
+.todo-due-date{
+    /* flex: 1.2; */
+}
+
+.todo-created-at {
+    /* flex: 1 */
+}
 
 .todo-due-date,
 .todo-created-at {
     display: flex;
     align-items: center;
     gap: 4px;
+        /* border: 1px solid red; */
 }
 
 .material-symbols-outlined.time-estimate-icon {
@@ -745,12 +753,14 @@ body {
 }
 
 .time-estimate-container {
+    /* flex: 1; */
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 2px;
     color: #888;
     font-size: 11px;
+    /* border: 1px solid red; */
 }
 
 

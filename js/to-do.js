@@ -64,54 +64,117 @@ function todoNormalizeColor(color) {
   return color;
 }
 
+
+function getTorontoNow() {
+  return new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Toronto" })
+  ).getTime();
+}
 // === Format due date ===
+// function todoFormatDueDate(dueDate) {
+//   if (!dueDate) return "";
+
+//   let target;
+//   if (typeof dueDate === "string") {
+//     // If from date picker → "YYYY-MM-DD"
+//     const [year, month, day] = dueDate.split("-").map(Number);
+//     target = new Date(getTorontoNow());
+//     target.setFullYear(year, month - 1, day);
+//     target.setHours(0, 0, 0, 0);
+//   } else {
+//     // If already a Date / timestamp
+//     target = new Date(dueDate);
+//   }
+
+//   // Today in Toronto at midnight
+//   const today = new Date(getTorontoNow());
+//   today.setHours(0, 0, 0, 0);
+
+//   const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
+
+//   if (diffDays === 0) return "Today";
+//   if (diffDays === 1) return "Tomorrow";
+//   if (diffDays > 1) return `${diffDays}d left`;
+//   return `${Math.abs(diffDays)}d ago`;
+// }
+
+
 function todoFormatDueDate(dueDate) {
   if (!dueDate) return "";
 
-  const date = new Date(dueDate);
-  const target = new Date(date);
-  target.setHours(0, 0, 0, 0);
+  let target;
+  if (typeof dueDate === "string") {
+    const [year, month, day] = dueDate.split("-").map(Number);
+    target = new Date(getTorontoNow());
+    target.setFullYear(year, month - 1, day);
+  } else {
+    target = new Date(dueDate);
+  }
 
-  const today = new Date(todayVertView); // your global Toronto time
+  // Only compare dates, ignore hours
+  target.setHours(0, 0, 0, 0);
+  const today = new Date(getTorontoNow());
   today.setHours(0, 0, 0, 0);
 
-  const diffTime = target - today;
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
+  const monthDay = target.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
-  if (diffDays === 0) {
-    return "Today";
-  } else if (diffDays === 1) {
-    return "Tomorrow";
-  } else if (diffDays > 1) {
-    return `${target.toLocaleDateString("en-US")} (in ${diffDays} days)`;
-  } else {
-    return `${target.toLocaleDateString("en-US")} (${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
-  }
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Tomorrow";
+  if (diffDays > 1) return `${monthDay} (${diffDays}d left)`;
+  return `${monthDay} (${Math.abs(diffDays)}d ago)`;
 }
+
+// function todoFormatDueDate(dueDate) {
+//   if (!dueDate) return "";
+
+//   let target;
+//   if (typeof dueDate === "string") {
+//     const [year, month, day] = dueDate.split("-").map(Number);
+//     target = new Date(getTorontoNow());
+//     target.setFullYear(year, month - 1, day);
+//   } else {
+//     target = new Date(dueDate);
+//   }
+
+//   // Only compare dates, ignore hours
+//   target.setHours(0, 0, 0, 0);
+//   const today = new Date(getTorontoNow());
+//   today.setHours(0, 0, 0, 0);
+
+//   const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
+//   const monthDayWeek = target.toLocaleDateString("en-US", {
+//     weekday: "short",
+//     month: "short",
+//     day: "numeric",
+//   });
+
+//   if (diffDays === 0) return "Today";
+//   if (diffDays === 1) return "Tomorrow";
+//   if (diffDays > 1) return `${monthDayWeek} (${diffDays}d left)`;
+//   return `${monthDayWeek} (${Math.abs(diffDays)}d ago)`;
+// }
+
+
+
 
 function todoFormatDate(timestamp) {
   if (!timestamp) return "";
 
   const date = new Date(Number(timestamp));
+  const nowToronto = getTorontoNow(); // ✅ recalc live Toronto time
+  const diffMs = nowToronto - date;
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  // normalize the target date (midnight)
-  const targetDate = new Date(date);
-  targetDate.setHours(0, 0, 0, 0);
-
-  // use global todayVertView (already set to Toronto midnight)
-  const diffTime = targetDate - todayVertView;
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-  const formattedDate = date.toLocaleDateString("en-US");
-
-  if (diffDays > 0) {
-    return `${formattedDate} (${diffDays} day${diffDays > 1 ? "s" : ""} remaining)`;
-  } else if (diffDays === 0) {
-    return `${formattedDate} (Today)`;
+  if (diffDays < 1) {
+    return `${diffHours}h ago`;
   } else {
-    return `${formattedDate} (${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
+    return `${diffDays}d ago`;
   }
 }
+
+
 // === Helper function to parse time estimates ===
 function parseTimeEstimate(timeStr) {
   if (!timeStr || timeStr.trim() === "") return 0;
@@ -514,21 +577,34 @@ function renderTodos() {
 
       if (todo.dueDate || todo.timeEstimate || todo.createdAt) {
         contentHTML += '<div class="todo-bottom">';
+
+
+        // Created date
+        if (todo.createdAt) {
+          contentHTML += `<span class="todo-created-at">Created: ${todoFormatDate(todo.createdAt)}</span>`;
+        }
+        // Due date
         if (todo.dueDate) {
           contentHTML += `<span class="todo-due-date">Due: ${todoFormatDueDate(todo.dueDate)}</span>`;
         } else {
-          contentHTML += `<span class="todo-created-at">Added: ${todoFormatDate(todo.createdAt)}</span>`;
+           contentHTML += `<span class="todo-due-date">Due: -- </span>`;
         }
 
+        // Time estimate
         if (todo.timeEstimate) {
-          // contentHTML += `<span class="todo-time-estimate">⏱ ${todo.timeEstimate}</span>`;
           contentHTML += `
-                          <span class="time-estimate-container"> 
-                            <span class="material-symbols-outlined time-estimate-icon">hourglass_top</span>
-                            <span class="todo-time-estimate">${todo.timeEstimate}</span>
-                          </span> 
-                        `;
-
+            <span class="time-estimate-container"> 
+              <span class="material-symbols-outlined time-estimate-icon">hourglass_top</span>
+              <span class="todo-time-estimate">${todo.timeEstimate}</span>
+            </span> 
+          `;
+        } else {
+           contentHTML += `
+            <span class="time-estimate-container"> 
+              <span class="material-symbols-outlined time-estimate-icon">hourglass_top</span>
+              <span class="todo-time-estimate">--</span>
+            </span> 
+          `;
         }
 
         contentHTML += `
@@ -691,24 +767,17 @@ function renderTodos() {
 
 
 }
-
 function formatTimeEstimate(hours, minutes) {
   const h = parseInt(hours) || 0;
   const m = parseInt(minutes) || 0;
 
   let timeString = '';
+  if (h > 0) timeString += `${h}h`;
+  if (m > 0) timeString += (h > 0 ? ', ' : '') + `${m}m`;
 
-  if (h > 0) {
-    timeString += `${h}hr${h > 1 ? 's' : ''}`;
-  }
-
-  if (m > 0) {
-    if (timeString) timeString += ' & ';
-    timeString += `${m}min${m > 1 ? 's' : ''}`;
-  }
-
-  return timeString || '0mins'; // fallback if both are 0
+  return timeString || '0m';
 }
+
 
 
 
@@ -891,7 +960,7 @@ function todoCreate(
     pinned,
     color: todoNormalizeColor(color),
     done: false,
-    createdAt: Date.now(),
+    createdAt: getTorontoNow(),
     dueDate,
     description,
     priority,
