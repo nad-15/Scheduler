@@ -99,6 +99,7 @@ body {
 #todo-container.active {
     display: flex;
 }
+
 .todo-header-container {
     box-sizing: border-box;
     display: flex;
@@ -116,13 +117,16 @@ body {
     background: white;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 16px 20px 12px 20px; /* increased padding for thickness */
+    padding: 16px 20px 12px 20px;
+    /* increased padding for thickness */
     width: 100%;
     margin-bottom: 2px;
 
     /* New additions for “thicker” feel */
-    border-bottom: 2px solid #ccc; /* subtle bottom border */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* soft shadow for depth */
+    border-bottom: 2px solid #ccc;
+    /* subtle bottom border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* soft shadow for depth */
     /* border: 2px solid green; */
 }
 
@@ -202,9 +206,9 @@ body {
     right: 0;
     background: white;
     border: 1px solid #ddd;
-    border-radius: 8px;  
+    border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    padding: 8px; 
+    padding: 8px;
     min-width: 130px;
     z-index: 10000;
     word-wrap: break-word;
@@ -305,8 +309,9 @@ body {
     background: none;
     cursor: pointer;
     transition: all 0.2s;
-    text-align: left; /* aligns text to the left */
-        /* border: 2px solid red; */
+    text-align: left;
+    /* aligns text to the left */
+    /* border: 2px solid red; */
 
 
 }
@@ -365,27 +370,28 @@ body {
     margin-right: 12px; */
 
 }
+
 .todo-group-header {
     display: flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
     margin-top: 3px;
 }
 
 .todo-group-header .pill {
     /* width: 110px; */
     min-width: 85px;
-    display: inline-flex;      
+    display: inline-flex;
     align-items: center;
     /* justify-content: center; */
-    padding: 6px 12px 6px 16px; 
-    border-radius: 30px 6px 6px 0px; 
+    padding: 6px 12px 6px 16px;
+    border-radius: 30px 6px 6px 0px;
     background: white;
     font-size: 12px;
     font-weight: 900;
     color: #555;
     line-height: 1;
     white-space: nowrap;
-    position: relative;       
+    position: relative;
 }
 
 .todo-group-header .pill .bullet {
@@ -394,7 +400,8 @@ body {
     height: 6px;
     background-color: black;
     border-radius: 50%;
-    margin-right: 6px;          /* spacing from text */
+    margin-right: 6px;
+    /* spacing from text */
 }
 
 
@@ -704,6 +711,8 @@ body {
     margin-right: 0;
     font-size: 11px;
     color: #888;
+    /* border: 1px solid green; */
+
 }
 
 .todo-due-date,
@@ -712,6 +721,26 @@ body {
     display: flex;
     align-items: center;
     gap: 4px;
+}
+
+
+
+.material-symbols-outlined.time-estimate-icon {
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    vertical-align: middle;
+    border: 1px solid white;
+
+}
+
+.time-estimate-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: 1px solid white;
 }
 
 /* === MENU SYSTEM === */

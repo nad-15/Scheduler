@@ -549,7 +549,14 @@ function renderTodos() {
         }
 
         if (todo.timeEstimate) {
-          contentHTML += `<span class="todo-time-estimate">⏱ ${todo.timeEstimate}</span>`;
+          // contentHTML += `<span class="todo-time-estimate">⏱ ${todo.timeEstimate}</span>`;
+          contentHTML += `
+                          <span class="time-estimate-container"> 
+                            <span class="material-symbols-outlined time-estimate-icon">hourglass_top</span>
+                            <span class="todo-time-estimate">${todo.timeEstimate}</span>
+                          </span> 
+                        `;
+
         }
 
         contentHTML += `
