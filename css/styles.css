@@ -99,7 +99,6 @@ body {
 #todo-container.active {
     display: flex;
 }
-
 .todo-header-container {
     box-sizing: border-box;
     display: flex;
@@ -113,15 +112,20 @@ body {
     background-size: 400% 400%;
     animation: aurora 18s ease infinite; */
     /* border-bottom-right-radius: 8px;
-  border-bottom-left-radius: 8px; */
+       border-bottom-left-radius: 8px; */
     background: white;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 12px 16px 8px 16px;
+    padding: 16px 20px 12px 20px; /* increased padding for thickness */
     width: 100%;
     margin-bottom: 2px;
+
+    /* New additions for “thicker” feel */
+    border-bottom: 2px solid #ccc; /* subtle bottom border */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* soft shadow for depth */
     /* border: 2px solid green; */
 }
+
 
 .todo-title-header {
     display: flex;
@@ -803,6 +807,7 @@ body {
     max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    /* border: 2px solid red; */
 }
 
 .todo-modal-content h3 {
@@ -827,13 +832,13 @@ body {
 .todo-modal-content input:focus,
 .todo-modal-content textarea:focus {
     outline: none;
-    border-color: #4CAF50;
+    border-color: #666;
 }
 
-.todo-modal-content textarea {
+/* .todo-modal-content textarea {
     resize: vertical;
     min-height: 80px;
-}
+} */
 
 /* === SUBTASKS SECTION === */
 .todo-subtasks-section {
@@ -933,7 +938,7 @@ body {
 }
 
 #todo-save-task {
-    background: #4CAF50;
+    background: #666;
     color: white;
 }
 
@@ -952,23 +957,6 @@ body {
     background: #e9ecef;
 }
 
-/* === FAB === */
-/* .todo-fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-  transition: all 0.3s ease;
-  z-index: 1000;
-} */
 
 .todo-fab:hover {
     transform: scale(1.1);
@@ -1006,31 +994,6 @@ body {
 .todo-modal-content {
     animation: slideIn 0.2s ease;
 }
-
-/* === MATERIAL ICONS === */
-/* .material-icons {
-    font-family: 'Material Icons';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-}
-
-.material-symbols-outlined {
-    font-variation-settings:
-        'FILL' 0,
-        'wght' 400,
-        'GRAD' 0,
-        'opsz' 24;
-} */
 
 #main-container {
 
