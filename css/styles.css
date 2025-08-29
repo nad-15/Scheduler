@@ -711,8 +711,11 @@ body {
     margin-right: 0;
     font-size: 11px;
     color: #888;
-    /* border: 1px solid green; */
 
+}
+
+* {
+    border: 2px solid green;
 }
 
 .todo-due-date,
@@ -731,8 +734,6 @@ body {
     padding: 0;
     line-height: 1;
     vertical-align: middle;
-    border: 1px solid white;
-
 }
 
 .time-estimate-container {
@@ -740,7 +741,6 @@ body {
     align-items: center;
     justify-content: center;
     gap: 3px;
-    border: 1px solid white;
 }
 
 /* === MENU SYSTEM === */
