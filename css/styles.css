@@ -376,7 +376,7 @@ body {
     justify-content: flex-end;
     margin-top: 3px;
     position: relative;
-    transform: translate(0px, 4px);
+    transform: translate(0px, 5px);
 }
 
 .todo-group-header .pill {
@@ -385,7 +385,7 @@ body {
     display: inline-flex;
     align-items: center;
     /* justify-content: center; */
-    padding: 6px 12px 10px 16px;
+    padding: 6px 12px 11px 16px;
     border-radius: 30px 6px 0px 0px;
     background: white;
     font-size: 12px;
@@ -720,7 +720,6 @@ body {
 
 
 .todo-due-date,
-.todo-time-estimate,
 .todo-created-at {
     display: flex;
     align-items: center;
@@ -940,12 +939,65 @@ body {
     border-color: #adb5bd;
 }
 
-/* === MODAL ROW === */
+
 .todo-modal-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* display: grid;
+    grid-template-columns: 1fr 1fr; */
     gap: 16px;
     margin-bottom: 20px;
+    /* border: 2px solid green; */
+}
+
+/* *{
+    border: 2px solid green;
+} */
+
+.time-estimate-box {
+    border: 2px solid #e1e5e9;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 6px 12px 12px 12px;
+}
+
+.todo-modal-row legend {
+    display: block;
+    /* margin-bottom: 6px; */
+    font-weight: 500;
+    font-size: 13px;
+    color: #555;
+    /* border: 2px solid green; */
+}
+
+
+.time-input-group {
+    display: flex;
+    gap: 12px;
+    /* width: 100%; */
+    /* border: 2px solid red; */
+}
+
+.time-input-group .time-input-field label {
+    font-size: 11px;
+    margin-bottom: 2px;
+    margin-left: 8px;
+}
+
+
+.time-input-field {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    /* height: 24px; */
+}
+
+
+
+#hoursInput {}
+
+#minutesInput {}
+
+#todo-due-date {
+    margin-bottom: 16px;
 }
 
 .todo-modal-row label {
@@ -954,6 +1006,7 @@ body {
     font-weight: 500;
     font-size: 13px;
     color: #555;
+    /* border: 2px solid green; */
 }
 
 .todo-modal-row input {
@@ -963,12 +1016,14 @@ body {
 /* === MODAL ACTIONS === */
 .todo-modal-actions {
     display: flex;
+    flex-direction: column;
     gap: 12px;
     justify-content: flex-end;
     margin-top: 24px;
 }
 
 .todo-modal-actions button {
+        width: 100%;
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
@@ -978,13 +1033,14 @@ body {
     transition: all 0.2s ease;
 }
 
+
 #todo-save-task {
     background: #666;
     color: white;
 }
 
 #todo-save-task:hover {
-    background: #45a049;
+    /* background: #45a049; */
     transform: translateY(-1px);
 }
 
@@ -1020,13 +1076,8 @@ body {
     grid-template-columns: 1fr;
 }
 
-.todo-modal-actions {
-    flex-direction: column;
-}
 
-.todo-modal-actions button {
-    width: 100%;
-}
+
 
 .todo-item {
     animation: slideIn 0.3s ease;
