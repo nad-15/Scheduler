@@ -815,15 +815,6 @@ function todoOpenEditModal(todo = null) {
                         </div>
                       </fieldset>
                     </div>
-
-
-
-
-
-
-                    
-                    
-                    
                     <div class="todo-modal-actions">
                       <button type="button" id="todo-save-task">${isEdit ? "Save" : "Create"}</button>
                       <button type="button" id="todo-cancel-task">Cancel</button>
