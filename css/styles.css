@@ -354,17 +354,17 @@ body {
 .todo-group-header {
     display: flex;
     justify-content: flex-end; 
+    margin-top: 3px;
 }
 
 .todo-group-header .pill {
-    width: 110px;
+    /* width: 110px; */
     display: inline-flex;      
     align-items: center;
     /* justify-content: center; */
     padding: 6px 12px 6px 16px; 
     border-radius: 30px 6px 6px 0px; 
     background: white;
-   
     font-size: 12px;
     font-weight: 900;
     color: #555;
