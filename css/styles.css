@@ -311,46 +311,12 @@ body {
     background: #0056b3;
 }
 
-.todo-group-header {
-    padding: 8px 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    /* ensure full span */
-}
-
-.todo-group-header h4 {
-    margin: 0;
-    color: #555;
-    font-size: 12px;
-    font-weight: 600;
-
-    display: flex;
-    /* make h4 flex so ::before/::after work */
-    align-items: center;
-    width: 100%;
-    /* take up full row */
-    text-align: center;
-    /* center the label */
-}
-
-.todo-group-header h4::before,
-.todo-group-header h4::after {
-    content: "";
-    flex: 1;
-    /* push lines out */
-    border-bottom: 1px solid #ccc;
-    margin: 0 10px;
-}
-
-
 /* === TODO LIST === */
 .todo-list {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    /* gap: 2px; */
     width: 100vw;
     margin: 0 0;
     /* padding: 20px 0 100px 0; */
@@ -363,8 +329,6 @@ body {
     /* z-index: 5001; */
     /* border-top: 1px solid rgba(0, 0, 0, 0.5); */
     scrollbar-width: none;
-
-
 }
 
 .todo-item {
@@ -372,6 +336,7 @@ body {
     background: white;
     border-radius: 6px;
     padding: 12px;
+    margin-bottom: 3px;
     /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
     /* border-left: 6px solid #ddd; */
     position: relative;
@@ -386,6 +351,38 @@ body {
     margin-right: 12px; */
 
 }
+.todo-group-header {
+    display: flex;
+    justify-content: flex-end; 
+}
+
+.todo-group-header .pill {
+    width: 110px;
+    display: inline-flex;      
+    align-items: center;
+    /* justify-content: center; */
+    padding: 6px 12px 6px 16px; 
+    border-radius: 30px 6px 6px 0px; 
+    background: white;
+   
+    font-size: 12px;
+    font-weight: 900;
+    color: #555;
+    line-height: 1;
+    white-space: nowrap;
+    position: relative;       
+}
+
+.todo-group-header .pill .bullet {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: black;
+    border-radius: 50%;
+    margin-right: 6px;          /* spacing from text */
+}
+
+
 
 /* .todo-item:hover {
     transform: translateY(-2px);

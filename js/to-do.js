@@ -310,19 +310,19 @@ function getGroupedTodos(sortedTodos) {
         const timeMinutes = parseTimeEstimate(todo.timeEstimate);
 
         if (timeMinutes === 0) {
-          groupTitle = "No Time Estimate";
+          groupTitle = "No Estimate";
         } else if (timeMinutes <= 15) {
-          groupTitle = "Quick Tasks (≤ 15 min)";
+          groupTitle = "Quick (≤15m)";
         } else if (timeMinutes <= 30) {
-          groupTitle = "Short Tasks (16-30 min)";
+          groupTitle = "Short (16-30m)";
         } else if (timeMinutes <= 60) {
-          groupTitle = "Medium Tasks (31-60 min)";
+          groupTitle = "Medium (31-60m)";
         } else if (timeMinutes <= 120) {
-          groupTitle = "Long Tasks (1-2 hours)";
+          groupTitle = "Long (1-2h)";
         } else if (timeMinutes <= 480) {
-          groupTitle = "Extended Tasks (2-8 hours)";
+          groupTitle = "Extended (2-8h)";
         } else {
-          groupTitle = "Major Projects (8+ hours)";
+          groupTitle = "Major (8+h)";
         }
       }
 
@@ -437,7 +437,13 @@ function renderTodos() {
     if (group.title && group.todos.length > 0) {
       const groupHeader = document.createElement("div");
       groupHeader.className = "todo-group-header";
-      groupHeader.innerHTML = `<h4>${group.title}</h4>`;
+      // groupHeader.innerHTML = `<span>• ${group.title}</span>`;
+      groupHeader.innerHTML = `
+            <div class="pill">
+              <span class="bullet"></span>
+              <span class="group-title">${group.title}</span>
+            </div>
+          `;
       list.appendChild(groupHeader);
     }
 
@@ -446,7 +452,7 @@ function renderTodos() {
       item.className = "todo-item";
 
       const normalizedColor = todoNormalizeColor(todo.color);
-//here
+      //here
       let contentHTML = `
         <div class="todo-header">
           <input type="checkbox" class="todo-done-checkbox" ${todo.done ? "checked" : ""}>
@@ -620,61 +626,63 @@ function renderTodos() {
       menu.style.display = "none";
     });
   });
-if (appSettings["todo-collapsed"]) {
-  document.querySelectorAll(".todo-item").forEach(item => {
-    const hasDescription = !!item.querySelector(".todo-description");
-    const hasSubtasks = !!item.querySelector(".todo-subtasks");
-    const seeMore = item.querySelector(".todo-seemore");
 
-    // only collapse and show arrow if it has something to hide
-    if (hasDescription || hasSubtasks) {
-      item.classList.add("collapsed");
-      seeMore?.classList.remove("hidden");
-    } else {
-      // no description/subtasks -> keep expanded & no arrow
+  
+  if (appSettings["todo-collapsed"]) {
+    document.querySelectorAll(".todo-item").forEach(item => {
+      const hasDescription = !!item.querySelector(".todo-description");
+      const hasSubtasks = !!item.querySelector(".todo-subtasks");
+      const seeMore = item.querySelector(".todo-seemore");
+
+      // only collapse and show arrow if it has something to hide
+      if (hasDescription || hasSubtasks) {
+        item.classList.add("collapsed");
+        seeMore?.classList.remove("hidden");
+      } else {
+        // no description/subtasks -> keep expanded & no arrow
+        item.classList.remove("collapsed");
+        seeMore?.classList.add("hidden");
+      }
+    });
+
+    const icon = document.querySelector(".collapse-toggle-btn .material-icons");
+    if (icon) icon.textContent = "expand";
+
+  } else {
+    document.querySelectorAll(".todo-item").forEach(item => {
+      const hasDescription = !!item.querySelector(".todo-description");
+      const hasSubtasks = !!item.querySelector(".todo-subtasks");
+      const seeMore = item.querySelector(".todo-seemore");
+
+      // expand all
       item.classList.remove("collapsed");
-      seeMore?.classList.add("hidden");
-    }
+      // arrow only if it actually has description/subtasks
+      if (hasDescription || hasSubtasks) {
+        seeMore?.classList.add("hidden");
+      } else {
+        seeMore?.classList.add("hidden"); // stays hidden anyway
+      }
+    });
+
+    const icon = document.querySelector(".collapse-toggle-btn .material-icons");
+    if (icon) icon.textContent = "compress";
+  }
+
+
+  document.querySelectorAll(".todo-seemore").forEach(seemore => {
+    seemore.addEventListener("click", () => {
+      console.log("todo seemore clicked");
+
+      const todoItem = seemore.closest(".todo-item");
+      const todoTitle = todoItem.querySelector(".todo-title");
+
+      // toggle collapsed state on parent
+      todoItem.classList.toggle("collapsed");
+
+      // rotate arrow
+      todoTitle.classList.toggle("expanded");
+    });
   });
-
-  const icon = document.querySelector(".collapse-toggle-btn .material-icons");
-  if (icon) icon.textContent = "expand";
-
-} else {
-  document.querySelectorAll(".todo-item").forEach(item => {
-    const hasDescription = !!item.querySelector(".todo-description");
-    const hasSubtasks = !!item.querySelector(".todo-subtasks");
-    const seeMore = item.querySelector(".todo-seemore");
-
-    // expand all
-    item.classList.remove("collapsed");
-    // arrow only if it actually has description/subtasks
-    if (hasDescription || hasSubtasks) {
-      seeMore?.classList.add("hidden");
-    } else {
-      seeMore?.classList.add("hidden"); // stays hidden anyway
-    }
-  });
-
-  const icon = document.querySelector(".collapse-toggle-btn .material-icons");
-  if (icon) icon.textContent = "compress";
-}
-
-
-document.querySelectorAll(".todo-seemore").forEach(seemore => {
-  seemore.addEventListener("click", () => {
-    console.log("todo seemore clicked");
-
-    const todoItem = seemore.closest(".todo-item");
-    const todoTitle = todoItem.querySelector(".todo-title");
-
-    // toggle collapsed state on parent
-    todoItem.classList.toggle("collapsed");
-
-    // rotate arrow
-    todoTitle.classList.toggle("expanded");
-  });
-});
 
 
 
@@ -941,14 +949,17 @@ controls.addEventListener("click", (e) => {
     controls.querySelectorAll(".todo-sort-btn").forEach(btn => btn.classList.remove("active"));
     e.target.classList.add("active");
 
-    controls.classList.remove("show"); // optionally close popup
+    controls.classList.remove("show"); 
+    sortIcon.classList.remove("rotated"); 
+
+
   }
 });
 // Close popup if clicking outside
 document.addEventListener("click", (e) => {
   if (!toggleLabel.contains(e.target) && !controls.contains(e.target)) {
     controls.classList.remove("show");
-    sortIcon.classList.remove("rotated"); // reset rotation
+    sortIcon.classList.remove("rotated"); 
   }
 });
 
