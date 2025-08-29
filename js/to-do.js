@@ -249,7 +249,7 @@ function getGroupedTodos(sortedTodos) {
       if (todo.pinned) {
         groupTitle = "Starred";
       } else if (todo.dueDate) {
-        const today = new Date();
+        const today = new Date(todayVertView);
         today.setHours(0, 0, 0, 0);
         const dueDate = new Date(todo.dueDate);
         dueDate.setHours(0, 0, 0, 0);
@@ -462,26 +462,25 @@ function renderTodos() {
                   <span class="material-symbols-outlined todo-priority-icon">flag</span>
               </button>
                 <div class="todo-priority-dropdown" style="display: none;">
-  <button data-priority="null">
-    <span class="material-symbols-outlined todo-priority-flag">flag</span>
-    None
-  </button>
+                      <button data-priority="null">
+                        <span class="material-symbols-outlined todo-priority-flag">flag</span>
+                        None
+                      </button>
 
-  <button data-priority="low">
-    <span class="material-symbols-outlined todo-priority-flag">flag</span>
-    Low
-  </button>
+                      <button data-priority="low">
+                        <span class="material-symbols-outlined todo-priority-flag">flag</span>
+                        Low
+                      </button>
 
-  <button data-priority="medium">
-    <span class="material-symbols-outlined todo-priority-flag">flag</span>
-    Medium
-  </button>
+                      <button data-priority="medium">
+                        <span class="material-symbols-outlined todo-priority-flag">flag</span>
+                        Medium
+                      </button>
 
-  <button data-priority="high">
-    <span class="material-symbols-outlined todo-priority-flag">flag</span>
-    High
-  </button>
-
+                      <button data-priority="high">
+                        <span class="material-symbols-outlined todo-priority-flag">flag</span>
+                        High
+                      </button>
                 </div>
             </div>
 
@@ -950,5 +949,44 @@ document.addEventListener("click", (e) => {
   if (!toggleLabel.contains(e.target) && !controls.contains(e.target)) {
     controls.classList.remove("show");
     sortIcon.classList.remove("rotated"); // reset rotation
+  }
+});
+
+
+const deleteBtn = document.querySelector(".todo-delete-btn");
+const deleteDropdown = document.querySelector(".todo-delete-dropdown");
+const deleteAllBtn = document.querySelector(".delete-all-btn");
+const deleteCompletedBtn = document.querySelector(".delete-completed-btn");
+
+
+// Toggle dropdown
+deleteBtn.addEventListener("click", (e) => {
+  deleteDropdown.style.display = deleteDropdown.style.display === "block" ? "none" : "block";
+  e.stopPropagation();
+});
+// Delete all except pinned (starred)
+deleteAllBtn.addEventListener("click", () => {
+  if (confirm("Are you sure you want to delete all tasks? Starred/pinned tasks will be kept.")) {
+    todos = todos.filter(todo => todo.pinned); // keep pinned (starred) todos
+    localStorage.setItem("todos", JSON.stringify(todos));
+    todoSaveAndRender();
+  }
+  deleteDropdown.style.display = "none";
+});
+
+// Delete completed except pinned
+deleteCompletedBtn.addEventListener("click", () => {
+  if (confirm("Are you sure you want to delete all completed tasks? Starred/pinned tasks will be kept.")) {
+    todos = todos.filter(todo => todo.pinned || !todo.done); // keep pinned and incomplete
+    localStorage.setItem("todos", JSON.stringify(todos));
+    todoSaveAndRender();
+  }
+  deleteDropdown.style.display = "none";
+});
+
+// Close dropdown when clicking outside
+document.addEventListener("click", (e) => {
+  if (!deleteDropdown.contains(e.target) && !deleteBtn.contains(e.target)) {
+    deleteDropdown.style.display = "none";
   }
 });

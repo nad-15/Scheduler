@@ -191,6 +191,22 @@ body {
     transition: background 0.3s, transform 0.2s, color 0.2s ease;
 }
 
+.todo-delete-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: white;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+.todo-delete-dropdown button:hover {
+    background: #f0f0f0;
+}
+
 .todo-close-btn:hover {
     background: #f0f0f0;
     color: #333;
@@ -272,6 +288,9 @@ body {
     cursor: pointer;
     font-size: 12px;
     transition: all 0.2s;
+        text-align: left; /* aligns text to the left */
+
+
 }
 
 .todo-sort-btn.active {

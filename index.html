@@ -54,9 +54,18 @@
 
             </div>
             <div style="display: flex; gap: 6px;">
-                <button class="todo-delete-btn">
-                    <span class="material-icons todo-delete-icon">delete</span>
-                </button>
+                <div class="todo-delete-container" style="position: relative;">
+                    <button class="todo-delete-btn">
+                        <span class="material-icons todo-delete-icon">delete</span>
+                    </button>
+
+                    <div class="todo-delete-dropdown"
+                        style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 1000;">
+                        <button class="delete-all-btn">Delete All Tasks</button>
+                        <button class="delete-completed-btn">Delete Completed Tasks</button>
+                    </div>
+                </div>
+
                 <button class="collapse-toggle-btn">
                     <span class="material-icons todo-collapse-icon">compress</span>
                 </button>
