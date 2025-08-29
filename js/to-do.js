@@ -806,17 +806,22 @@ function todoOpenEditModal(todo = null) {
                         <div class="time-input-group">
                           <div class="time-input-field">
                             <label>Hours</label>
-                            <input type="number" id="hoursInput" min="0" max="23" placeholder="0">
+                            <input type="number" id="hoursInput" min="0" max="23" placeholder="0" value="${hours || ""}">
                           </div>
                           <div class="time-input-field">
                             <label>Minutes</label>
-                            <input type="number" id="minutesInput" min="0" max="59" placeholder="0">
+                            <input type="number" id="minutesInput" min="0" max="59" placeholder="0" value="${minutes || ""}">
                           </div>
                         </div>
                       </fieldset>
-
                     </div>
 
+
+
+
+
+
+                    
                     
                     
                     <div class="todo-modal-actions">

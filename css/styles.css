@@ -714,9 +714,7 @@ body {
     margin-right: 0;
     font-size: 11px;
     color: #888;
-
 }
-
 
 
 .todo-due-date,
@@ -726,22 +724,25 @@ body {
     gap: 4px;
 }
 
-
-
 .material-symbols-outlined.time-estimate-icon {
     font-size: 11px;
     margin: 0;
     padding: 0;
     line-height: 1;
     vertical-align: middle;
+    color: #888;
 }
 
 .time-estimate-container {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 2px;
+    color: #888;
+    font-size: 11px;
 }
+
+
 
 /* === MENU SYSTEM === */
 /* .todo-menu {
@@ -1023,7 +1024,7 @@ body {
 }
 
 .todo-modal-actions button {
-        width: 100%;
+    width: 100%;
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
