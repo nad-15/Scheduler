@@ -835,10 +835,10 @@ body {
     border-color: #666;
 }
 
-/* .todo-modal-content textarea {
+.todo-modal-content textarea {
     resize: vertical;
     min-height: 80px;
-} */
+}
 
 /* === SUBTASKS SECTION === */
 .todo-subtasks-section {
