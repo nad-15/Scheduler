@@ -423,49 +423,6 @@ function renderTodos() {
   const list = document.querySelector(".todo-list");
   list.innerHTML = "";
 
-  // Add sort controls if they don't exist
-  // if (!document.querySelector(".todo-sort-controls")) {
-  //   const sortControls = document.createElement("div");
-  //   sortControls.className = "todo-sort-controls";
-  //   sortControls.innerHTML = `
-  //     <div class="todo-sort-buttons">
-  //       <button class="todo-sort-btn ${currentSortMode === 'date-newest' ? 'active' : ''}" data-sort="date-newest">
-  //         Newest First
-  //       </button>
-  //       <button class="todo-sort-btn ${currentSortMode === 'date-oldest' ? 'active' : ''}" data-sort="date-oldest">
-  //         Oldest First
-  //       </button>
-  //       <button class="todo-sort-btn ${currentSortMode === 'group' ? 'active' : ''}" data-sort="group">
-  //         By Priority
-  //       </button>
-  //       <button class="todo-sort-btn ${currentSortMode === 'due-date' ? 'active' : ''}" data-sort="due-date">
-  //         By Due Date
-  //       </button>
-  //       <button class="todo-sort-btn ${currentSortMode === 'completion' ? 'active' : ''}" data-sort="completion">
-  //         By Completion
-  //       </button>
-  //       <button class="todo-sort-btn ${currentSortMode === 'time-estimate' ? 'active' : ''}" data-sort="time-estimate">
-  //         By Time Estimate
-  //       </button>
-  //     </div>
-  //   `;
-
-  //   // Add event listeners for sort buttons
-  //   sortControls.addEventListener('click', (e) => {
-  //     if (e.target.classList.contains('todo-sort-btn')) {
-  //       const newSort = e.target.getAttribute('data-sort');
-  //       changeSortMode(newSort);
-
-  //       // Update active button
-  //       sortControls.querySelectorAll('.todo-sort-btn').forEach(btn => {
-  //         btn.classList.remove('active');
-  //       });
-  //       e.target.classList.add('active');
-  //     }
-  //   });
-
-  //   list.parentNode.insertBefore(sortControls, list);
-  // }
 
   const sortedTodos = sortTodos(todos);
   const groupedTodos = getGroupedTodos(sortedTodos);
@@ -615,6 +572,7 @@ function renderTodos() {
 
       // toggle dropdown
       priorityBtn.addEventListener("click", (e) => {
+        closeAllDropdowns();
         e.stopPropagation();
         document.querySelectorAll(".todo-priority-dropdown").forEach((menu) => {
           if (menu !== priorityDropdown) menu.style.display = "none";
@@ -641,6 +599,7 @@ function renderTodos() {
       const menuDropdown = item.querySelector(".todo-menu-dropdown");
 
       menuBtn.addEventListener("click", (e) => {
+        closeAllDropdowns();
         e.stopPropagation();
         document.querySelectorAll(".todo-menu-dropdown").forEach((menu) => {
           if (menu !== menuDropdown) menu.style.display = "none";
@@ -666,11 +625,11 @@ function renderTodos() {
     });
   });
 
-  document.addEventListener("click", () => {
-    document.querySelectorAll(".todo-menu-dropdown, .todo-priority-dropdown").forEach((menu) => {
-      menu.style.display = "none";
-    });
-  });
+  // document.addEventListener("click", () => {
+  //   document.querySelectorAll(".todo-menu-dropdown, .todo-priority-dropdown").forEach((menu) => {
+  //     menu.style.display = "none";
+  //   });
+  // });
 
 
   if (appSettings["todo-collapsed"]) {
@@ -979,8 +938,8 @@ const controls = document.querySelector(".todo-sort-controls");
 const sortIcon = document.querySelector(".sort-icon");
 
 toggleLabel.addEventListener("click", () => {
-  controls.classList.toggle("show");   // show/hide popup
-  sortIcon.classList.toggle("rotated"); // rotate only the icon
+  controls.classList.toggle("show");
+  sortIcon.classList.toggle("rotated");
 });
 
 controls.addEventListener("click", (e) => {
@@ -998,12 +957,12 @@ controls.addEventListener("click", (e) => {
   }
 });
 // Close popup if clicking outside
-document.addEventListener("click", (e) => {
-  if (!toggleLabel.contains(e.target) && !controls.contains(e.target)) {
-    controls.classList.remove("show");
-    sortIcon.classList.remove("rotated");
-  }
-});
+// document.addEventListener("click", (e) => {
+//   if (!toggleLabel.contains(e.target) && !controls.contains(e.target)) {
+//     controls.classList.remove("show");
+//     sortIcon.classList.remove("rotated");
+//   }
+// });
 
 
 const deleteBtn = document.querySelector(".todo-delete-btn");
@@ -1013,6 +972,7 @@ const deleteCompletedBtn = document.querySelector(".delete-completed-btn");
 
 // Toggle dropdown
 deleteBtn.addEventListener("click", (e) => {
+  closeAllDropdowns();
   deleteDropdown.style.display = deleteDropdown.style.display === "block" ? "none" : "block";
   e.stopPropagation();
 });
@@ -1037,8 +997,50 @@ deleteCompletedBtn.addEventListener("click", () => {
 });
 
 // Close dropdown when clicking outside
+// document.addEventListener("click", (e) => {
+//   if (!deleteDropdown.contains(e.target) && !deleteBtn.contains(e.target)) {
+//     deleteDropdown.style.display = "none";
+//   }
+// });
+
+
 document.addEventListener("click", (e) => {
-  if (!deleteDropdown.contains(e.target) && !deleteBtn.contains(e.target)) {
-    deleteDropdown.style.display = "none";
+  // --- close all dropdowns by default
+  document.querySelectorAll(".todo-menu-dropdown, .todo-priority-dropdown").forEach((menu) => {
+    if (!menu.contains(e.target)) {
+      menu.style.display = "none";
+    }
+  });
+
+  // --- close sort controls if clicked outside
+  if (typeof toggleLabel !== "undefined" && typeof controls !== "undefined") {
+    if (!toggleLabel.contains(e.target) && !controls.contains(e.target)) {
+      controls.classList.remove("show");
+      sortIcon.classList.remove("rotated");
+    }
+  }
+
+  // --- close delete dropdown if clicked outside
+  if (typeof deleteDropdown !== "undefined" && typeof deleteBtn !== "undefined") {
+    if (!deleteDropdown.contains(e.target) && !deleteBtn.contains(e.target)) {
+      deleteDropdown.style.display = "none";
+    }
   }
 });
+
+
+function closeAllDropdowns() {
+  document.querySelectorAll(
+    ".todo-menu-dropdown, .todo-priority-dropdown, .todo-delete-dropdown"
+  ).forEach(menu => {
+    menu.style.display = "none";
+    menu.classList.remove("show");
+  });
+
+  const controls = document.querySelector(".todo-sort-controls");
+  const sortIcon = document.querySelector(".sort-icon");
+  controls.classList.remove("show");
+  sortIcon.classList.remove("rotated");
+
+
+}
