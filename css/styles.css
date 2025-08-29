@@ -375,6 +375,8 @@ body {
     display: flex;
     justify-content: flex-end;
     margin-top: 3px;
+    position: relative;
+    transform: translate(0px, 4px);
 }
 
 .todo-group-header .pill {
@@ -383,8 +385,8 @@ body {
     display: inline-flex;
     align-items: center;
     /* justify-content: center; */
-    padding: 6px 12px 6px 16px;
-    border-radius: 30px 6px 6px 0px;
+    padding: 6px 12px 10px 16px;
+    border-radius: 30px 6px 0px 0px;
     background: white;
     font-size: 12px;
     font-weight: 900;
@@ -392,6 +394,7 @@ body {
     line-height: 1;
     white-space: nowrap;
     position: relative;
+
 }
 
 .todo-group-header .pill .bullet {
@@ -714,9 +717,7 @@ body {
 
 }
 
-* {
-    /* border: 2px solid green; */
-}
+
 
 .todo-due-date,
 .todo-time-estimate,
