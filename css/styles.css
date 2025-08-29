@@ -195,6 +195,22 @@ body {
     transition: background 0.3s, transform 0.2s, color 0.2s ease;
 }
 
+.todo-delete-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;  
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px; 
+    min-width: 120px;
+    z-index: 1000;
+    word-wrap: break-word;
+}
+
+
 .todo-delete-dropdown button {
     display: block;
     width: 100%;
@@ -359,6 +375,7 @@ body {
 
 .todo-group-header .pill {
     /* width: 110px; */
+    min-width: 85px;
     display: inline-flex;      
     align-items: center;
     /* justify-content: center; */

@@ -89,6 +89,29 @@ function todoFormatDueDate(dueDate) {
   }
 }
 
+function todoFormatDate(timestamp) {
+  if (!timestamp) return "";
+
+  const date = new Date(Number(timestamp));
+
+  // normalize the target date (midnight)
+  const targetDate = new Date(date);
+  targetDate.setHours(0, 0, 0, 0);
+
+  // use global todayVertView (already set to Toronto midnight)
+  const diffTime = targetDate - todayVertView;
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+  const formattedDate = date.toLocaleDateString("en-US");
+
+  if (diffDays > 0) {
+    return `${formattedDate} (${diffDays} day${diffDays > 1 ? "s" : ""} remaining)`;
+  } else if (diffDays === 0) {
+    return `${formattedDate} (Today)`;
+  } else {
+    return `${formattedDate} (${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
+  }
+}
 // === Helper function to parse time estimates ===
 function parseTimeEstimate(timeStr) {
   if (!timeStr || timeStr.trim() === "") return 0;
@@ -688,8 +711,6 @@ function renderTodos() {
 
 }
 
-
-
 // === Edit/Create Modal ===
 function todoOpenEditModal(todo = null) {
   console.log("fab clicked");
@@ -876,43 +897,6 @@ document.querySelector(".todo-fab").addEventListener("click", () => {
   todoOpenEditModal();
 });
 
-function todoFormatDate(timestamp) {
-  if (!timestamp) return "";
-
-  const date = new Date(Number(timestamp));
-
-  // normalize the target date (midnight)
-  const targetDate = new Date(date);
-  targetDate.setHours(0, 0, 0, 0);
-
-  // use global todayVertView (already set to Toronto midnight)
-  const diffTime = targetDate - todayVertView;
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-  const formattedDate = date.toLocaleDateString("en-US");
-
-  if (diffDays > 0) {
-    return `${formattedDate} (${diffDays} day${diffDays > 1 ? "s" : ""} remaining)`;
-  } else if (diffDays === 0) {
-    return `${formattedDate} (Today)`;
-  } else {
-    return `${formattedDate} (${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
-  }
-}
-
-// const todoToggleSortBy = document.querySelector(".sort-buttons-toggle");
-
-// todoToggleSortBy.addEventListener("click", () => {
-//   const sortButtons = document.querySelector(".todo-sort-buttons");
-//   if (sortButtons.classList.contains("open")) {
-//     sortButtons.style.maxHeight = 0;
-//     sortButtons.classList.remove("open");
-//   } else {
-//     sortButtons.style.maxHeight = sortButtons.scrollHeight + "px";
-//     sortButtons.classList.add("open");
-//   }
-// });
-
 document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
   const icon = document.querySelector(".collapse-toggle-btn .material-icons");
 
@@ -930,7 +914,6 @@ document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
   // let renderTodos handle the collapsed/expanded UI
   renderTodos();
 });
-
 
 const toggleLabel = document.querySelector(".sort-label");
 const controls = document.querySelector(".todo-sort-controls");
@@ -968,7 +951,6 @@ const deleteBtn = document.querySelector(".todo-delete-btn");
 const deleteDropdown = document.querySelector(".todo-delete-dropdown");
 const deleteAllBtn = document.querySelector(".delete-all-btn");
 const deleteCompletedBtn = document.querySelector(".delete-completed-btn");
-
 
 // Toggle dropdown
 deleteBtn.addEventListener("click", (e) => {
