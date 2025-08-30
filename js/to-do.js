@@ -1,5 +1,11 @@
+const toggleLabel = document.querySelector(".sort-label");
+const controls = document.querySelector(".todo-sort-controls");
+const sortIcon = document.querySelector(".sort-icon");
 
-
+const deleteBtn = document.querySelector(".todo-delete-btn");
+const deleteDropdown = document.querySelector(".todo-delete-dropdown");
+const deleteAllBtn = document.querySelector(".delete-all-btn");
+const deleteCompletedBtn = document.querySelector(".delete-completed-btn");
 // === Cycle through priority levels ===// js/to-do.js
 function migrateTodos() {
   let changed = false;
@@ -155,9 +161,6 @@ function todoFormatDueDate(dueDate) {
 //   return `${monthDayWeek} (${Math.abs(diffDays)}d ago)`;
 // }
 
-
-
-
 function todoFormatDate(timestamp) {
   if (!timestamp) return "";
 
@@ -173,7 +176,6 @@ function todoFormatDate(timestamp) {
     return `${diffDays}d ago`;
   }
 }
-
 
 // === Helper function to parse time estimates ===
 function parseTimeEstimate(timeStr) {
@@ -220,12 +222,6 @@ function parseTimeEstimateToSaveInLocal(timeString) {
     hours: hoursMatch ? parseInt(hoursMatch[1]) : 0,
     minutes: minutesMatch ? parseInt(minutesMatch[1]) : 0
   };
-}
-
-function todoCyclePriority(currentPriority) {
-  const cycle = [null, "low", "medium", "high"];
-  const currentIndex = cycle.indexOf(currentPriority);
-  return cycle[(currentIndex + 1) % cycle.length];
 }
 
 // === Sort todos based on current mode ===
@@ -770,9 +766,6 @@ function formatTimeEstimate(hours, minutes) {
   return timeString || '0m';
 }
 
-
-
-
 // === Edit/Create Modal ===
 function todoOpenEditModal(todo = null) {
   const isEdit = todo !== null;
@@ -994,9 +987,7 @@ document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
   renderTodos();
 });
 
-const toggleLabel = document.querySelector(".sort-label");
-const controls = document.querySelector(".todo-sort-controls");
-const sortIcon = document.querySelector(".sort-icon");
+
 
 toggleLabel.addEventListener("click", () => {
   controls.classList.toggle("show");
@@ -1024,12 +1015,6 @@ controls.addEventListener("click", (e) => {
 //     sortIcon.classList.remove("rotated");
 //   }
 // });
-
-
-const deleteBtn = document.querySelector(".todo-delete-btn");
-const deleteDropdown = document.querySelector(".todo-delete-dropdown");
-const deleteAllBtn = document.querySelector(".delete-all-btn");
-const deleteCompletedBtn = document.querySelector(".delete-completed-btn");
 
 // Toggle dropdown
 deleteBtn.addEventListener("click", (e) => {
