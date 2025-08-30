@@ -2,10 +2,11 @@ const toggleLabel = document.querySelector(".sort-label");
 const controls = document.querySelector(".todo-sort-controls");
 const sortIcon = document.querySelector(".sort-icon");
 
-const deleteBtn = document.querySelector(".todo-delete-btn");
-const deleteDropdown = document.querySelector(".todo-delete-dropdown");
+const deleteBtn = document.querySelector(".todo-actions-btn");
+const deleteDropdown = document.querySelector(".todo-actions-dropdown");
 const deleteAllBtn = document.querySelector(".delete-all-btn");
 const deleteCompletedBtn = document.querySelector(".delete-completed-btn");
+const archiveCompletedBtn = document.querySelector(".archive-completed-btn");
 
 
 const filterToggleBtn = document.querySelector(".todo-filter-mode-btn");
@@ -750,6 +751,9 @@ function renderTodos() {
               <div class="todo-menu-dropdown" style="display: none;">
                 <button class="todo-menu-edit">✏️ Edit</button>
                 <button class="todo-menu-delete">🗑️ Delete</button>
+                <button class="todo-menu-archive">
+                  ${todo.isArchive ? '📤 Unarchive' : '📁 Archive'}
+                </button>
               </div>
             </div>
           `;
@@ -827,6 +831,12 @@ function renderTodos() {
           todos = todos.filter((t) => t.id !== todo.id);
           todoSaveAndRender();
         }
+        menuDropdown.style.display = "none";
+      });
+
+      item.querySelector(".todo-menu-archive").addEventListener("click", () => {
+        todo.isArchive = !todo.isArchive;
+        todoSaveAndRender();
         menuDropdown.style.display = "none";
       });
 
@@ -1227,6 +1237,20 @@ deleteCompletedBtn.addEventListener("click", () => {
 //   }
 // });
 
+archiveCompletedBtn.addEventListener("click", () => {
+  if (confirm("Archive all completed tasks? Important/pinned tasks will be kept.")) {
+    todos = todos.map(todo => {
+      if (todo.done && !todo.pinned) {
+        return { ...todo, isArchive: true }; // mark as archived
+      }
+      return todo;
+    });
+    localStorage.setItem("todos", JSON.stringify(todos));
+    todoSaveAndRender();
+  }
+  deleteDropdown.style.display = "none";
+});
+
 
 filterToggleBtn.addEventListener("click", (e) => {
   // closeAllDropdowns();
@@ -1271,7 +1295,7 @@ document.addEventListener("click", (e) => {
 
 function closeAllDropdowns() {
   document.querySelectorAll(
-    ".todo-menu-dropdown, .todo-priority-dropdown, .todo-delete-dropdown").forEach(menu => {
+    ".todo-menu-dropdown, .todo-priority-dropdown, .todo-actions-dropdown").forEach(menu => {
       menu.style.display = "none";
       menu.classList.remove("show");
     });

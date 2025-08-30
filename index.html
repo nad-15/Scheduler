@@ -31,10 +31,10 @@
                     </button>
                     <div class="todo-filter-dropdown">
                         <button class="todo-filter-btn" data-filter="all">All</button>
-                        <button class="todo-filter-btn" data-filter="archive">Archive</button>
-                        <button class="todo-filter-btn" data-filter="not-archived">Not Archived</button>
                         <button class="todo-filter-btn" data-filter="in-progress">In Progress</button>
                         <button class="todo-filter-btn" data-filter="done">Completed</button>
+                        <button class="todo-filter-btn" data-filter="archive">Archive</button>
+                        <button class="todo-filter-btn" data-filter="not-archived">Not Archived</button>
                     </div>
                 </div>
 
@@ -69,12 +69,13 @@
 
             </div>
             <div style="display: flex; gap: 6px;">
-                <div class="todo-delete-container" style="position: relative;">
-                    <button class="todo-delete-btn">
-                        <span class="material-icons todo-delete-icon">delete</span>
+                <div class="todo-actions-container" style="position: relative;">
+                    <button class="todo-actions-btn">
+                        <span class="material-icons todo-actions-icon">more_vert</span>
                     </button>
 
-                    <div class="todo-delete-dropdown">
+                    <div class="todo-actions-dropdown">
+                        <button class="archive-completed-btn">Archive Completed Tasks</button>
                         <button class="delete-all-btn">Delete All Tasks</button>
                         <button class="delete-completed-btn">Delete Completed Tasks</button>
                     </div>

@@ -189,7 +189,7 @@ body {
 
 .todo-close-btn,
 .collapse-toggle-btn,
-.todo-delete-btn {
+.todo-actions-btn {
     background: rgba(0, 0, 0, 0.15);
     border: none;
     color: #666;
@@ -210,7 +210,7 @@ body {
     font-family: inherit;
 }
 
-.todo-delete-dropdown {
+.todo-actions-dropdown {
     display: none;
     position: absolute;
     top: 100%;
@@ -227,7 +227,7 @@ body {
 }
 
 
-.todo-delete-dropdown button {
+.todo-actions-dropdown button {
     display: block;
     width: 100%;
     border: none;
@@ -243,7 +243,7 @@ body {
       font-size: 14px;
 }
 
-.todo-delete-dropdown button:hover {
+.todo-actions-dropdown button:hover {
     background: #f0f0f0;
 }
 
@@ -260,14 +260,14 @@ body {
 
 .sort-label,
 .collapse-toggle-btn,
-.todo-delete-btn {
+.todo-actions-btn {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
 }
 
 .material-icons.todo-collapse-icon,
-.material-icons.todo-delete-icon,
+.material-symbols-outlined.todo-delete-icon,
 .material-icons.todo-close-icon {
     font-size: 16px;
     font-weight: bolder;
