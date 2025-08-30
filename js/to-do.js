@@ -514,16 +514,25 @@ function renderTodos() {
       let contentHTML = `
         <div class="todo-header">
           <input type="checkbox" class="todo-done-checkbox" ${todo.done ? "checked" : ""}>
-<div class="todo-title">
-  <span class="title-text ${todo.done ? "done" : ""}">${todo.text}</span>
-  <span class="todo-seemore hidden material-symbols-outlined">chevron_right</span>
-</div>
+                <div class="todo-title">
+
+                  <span class="title-text ${todo.done ? "done" : ""}">${todo.text}</span>
+                                    
+                  <span class="time-estimate-container"> 
+                    <span class="material-symbols-outlined time-estimate-icon">hourglass_top</span>
+                    <span class="todo-time-estimate">
+                      ${todo.timeEstimate === "0m" ? "--" : todo.timeEstimate}
+                    </span>
+                  </span>
 
 
+                  <span class="todo-seemore hidden material-symbols-outlined">chevron_right</span>
+
+                </div>
           <div class="todo-header-actions">
            <div class="todo-priority">
               <button class="todo-priority-btn" style="color: ${TODO_PRIORITY_COLORS[todo.priority]}">
-                  <span class="material-symbols-outlined todo-priority-icon">flag</span>
+                <span class="material-symbols-outlined todo-priority-icon">flag</span>
               </button>
                 <div class="todo-priority-dropdown" style="display: none;">
                       <button data-priority="null">
@@ -574,55 +583,38 @@ function renderTodos() {
         });
         contentHTML += "</div>";
       }
-
-      if (todo.dueDate || todo.timeEstimate || todo.createdAt) {
         contentHTML += '<div class="todo-bottom">';
-
-
         // Created date
-        if (todo.createdAt) {
-          contentHTML += `<span class="todo-created-at"> ${todoFormatDate(todo.createdAt)}</span>`;
-        }
-        // Due date
-        if (todo.dueDate) {
-          contentHTML += `<span class="todo-due-date">Due: ${todoFormatDueDate(todo.dueDate)}</span>`;
-        } else {
-           contentHTML += `<span class="todo-due-date">Due: -- </span>`;
-        }
-
-        // Time estimate
-        if (todo.timeEstimate) {
+            contentHTML += `
+              <span class="todo-date-container">
+                <span class="bullet created-bullet"></span>
+                <span class="todo-created-at">Created: ${todoFormatDate(todo.createdAt)}</span>
+              </span>
+            `;
+          // Due date
           contentHTML += `
-            <span class="time-estimate-container"> 
-              <span class="material-symbols-outlined time-estimate-icon">hourglass_top</span>
-              <span class="todo-time-estimate">${todo.timeEstimate}</span>
-            </span> 
+            <span class="todo-date-container">
+              <span class="bullet due-bullet"></span>
+              <span class="todo-due-date">Due: ${todo.dueDate ? todoFormatDueDate(todo.dueDate) : '--'}</span>
+            </span>
           `;
-        } else {
-           contentHTML += `
-            <span class="time-estimate-container"> 
-              <span class="material-symbols-outlined time-estimate-icon">hourglass_top</span>
-              <span class="todo-time-estimate">--</span>
-            </span> 
+
+          //Menu more options ...
+          contentHTML += `
+            <div class="todo-menu">
+              <button class="todo-menu-btn">
+                  <span class="material-symbols-outlined todo-menu-icon">more_vert</span>
+              </button>
+
+              <div class="todo-menu-dropdown" style="display: none;">
+                <button class="todo-menu-edit">✏️ Edit</button>
+                <button class="todo-menu-delete">🗑️ Delete</button>
+              </div>
+            </div>
           `;
-        }
 
-        contentHTML += `
-        <div class="todo-menu">
-          <button class="todo-menu-btn">
-              <span class="material-symbols-outlined todo-menu-icon">more_vert</span>
-          </button>
-
-          <div class="todo-menu-dropdown" style="display: none;">
-            <button class="todo-menu-edit">✏️ Edit</button>
-            <button class="todo-menu-delete">🗑️ Delete</button>
-          </div>
-        </div>
-      `;
-
-        contentHTML += "</div>";
-      }
-
+      contentHTML += "</div>";
+      
       item.innerHTML = contentHTML;
       const titleEl = item.querySelector(".title-text");
       if (titleEl) {

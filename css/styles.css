@@ -717,9 +717,6 @@ body {
     color: #888;
 }
 
-/* *{
-    border: 2px solid green;
-} */
 
 /* === TODO BOTTOM === */
 .todo-bottom {
@@ -727,36 +724,49 @@ body {
     justify-content: space-between;
     align-items: flex-end;
     /* margin-top: 12px; */
-    margin-left: 44px;
+    margin-left: 41px;
     margin-right: 0;
     font-size: 11px;
     color: #888;
 }
 
-.todo-due-date{
-    /* flex: 1.2; */
+.todo-bottom .todo-date-container {
+    display: inline-flex;
+    flex: 1;
+    /* justify-content: center; */
+    align-items: center; 
+    /* border: 2px solid violet; */
 }
 
-.todo-created-at {
-    /* flex: 1 */
+.todo-bottom .bullet {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.created-bullet {
+    background-color: #81c784;
+}
+
+.due-bullet {
+    background-color: #ff6b6b;
 }
 
 .todo-due-date,
 .todo-created-at {
     display: flex;
+
     align-items: center;
+    text-align: start;
     gap: 4px;
-        /* border: 1px solid red; */
+    color: #888;
+    font-size: 11px;
+    /* border: 2px solid violet; */
+    
 }
 
-.material-symbols-outlined.time-estimate-icon {
-    font-size: 11px;
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-    vertical-align: middle;
-    color: #888;
-}
 
 .time-estimate-container {
     /* flex: 1; */
@@ -765,8 +775,18 @@ body {
     justify-content: flex-start;
     gap: 2px;
     color: #888;
-    font-size: 11px;
+    font-size: 9px;
     /* border: 1px solid red; */
+    color: #1976d2;
+}
+
+.material-symbols-outlined.time-estimate-icon {
+    font-size: 9px;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    vertical-align: middle;
+    /* color: #888; */
 }
 
 
