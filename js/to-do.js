@@ -23,7 +23,7 @@ function filterTodosByMode(todos, mode) {
       return todos.filter(t => !t.isArchive);
     case "done":
       return todos.filter(t => t.done && !t.isArchive);
-    case "incomplete":
+    case "in-progress":
     default:
       return todos.filter(t => !t.done && !t.isArchive);
   }
