@@ -581,7 +581,7 @@ function renderTodos() {
 
         // Created date
         if (todo.createdAt) {
-          contentHTML += `<span class="todo-created-at">Created: ${todoFormatDate(todo.createdAt)}</span>`;
+          contentHTML += `<span class="todo-created-at"> ${todoFormatDate(todo.createdAt)}</span>`;
         }
         // Due date
         if (todo.dueDate) {

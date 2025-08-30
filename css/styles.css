@@ -505,8 +505,9 @@ body {
 
 
 .material-symbols-outlined.todo-seemore {
-    font-size: 16px;
+    font-size: 20px;
     padding: 1px;
+    cursor: pointer;
     /* border: 2px solid red; */
 }
 
