@@ -504,6 +504,11 @@ body {
 }
 
 
+.material-symbols-outlined.todo-seemore {
+    font-size: 16px;
+    padding: 1px;
+    /* border: 2px solid red; */
+}
 
 .todo-seemore {
     display: block;
