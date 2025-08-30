@@ -724,24 +724,24 @@ function renderTodos() {
         });
         contentHTML += "</div>";
       }
-        contentHTML += '<div class="todo-bottom">';
-        // Created date
-            contentHTML += `
+      contentHTML += '<div class="todo-bottom">';
+      // Created date
+      contentHTML += `
               <span class="todo-date-container">
                 <span class="bullet created-bullet"></span>
                 <span class="todo-created-at">Created: ${todoFormatDate(todo.createdAt)}</span>
               </span>
             `;
-          // Due date
-          contentHTML += `
+      // Due date
+      contentHTML += `
             <span class="todo-date-container">
               <span class="bullet due-bullet"></span>
               <span class="todo-due-date">Due: ${todo.dueDate ? todoFormatDueDate(todo.dueDate) : '--'}</span>
             </span>
           `;
 
-          //Menu more options ...
-          contentHTML += `
+      //Menu more options ...
+      contentHTML += `
             <div class="todo-menu">
               <button class="todo-menu-btn">
                   <span class="material-symbols-outlined todo-menu-icon">more_vert</span>
@@ -755,7 +755,7 @@ function renderTodos() {
           `;
 
       contentHTML += "</div>";
-      
+
       item.innerHTML = contentHTML;
       const titleEl = item.querySelector(".title-text");
       if (titleEl) {
@@ -1265,19 +1265,19 @@ document.addEventListener("click", (e) => {
       filterDropdown.classList.remove("show");
     }
   }
-  
+
 });
 
 
 function closeAllDropdowns() {
   document.querySelectorAll(
     ".todo-menu-dropdown, .todo-priority-dropdown, .todo-delete-dropdown").forEach(menu => {
-    menu.style.display = "none";
-    menu.classList.remove("show");
-  });
+      menu.style.display = "none";
+      menu.classList.remove("show");
+    });
 
-  filterDropdown.classList.remove("show"); 
-      
+  filterDropdown.classList.remove("show");
+
   const controls = document.querySelector(".todo-sort-controls");
   const sortIcon = document.querySelector(".sort-icon");
 
@@ -1294,9 +1294,14 @@ document.querySelectorAll(".todo-filter-btn").forEach(btn => {
     localStorage.setItem("appSettings", JSON.stringify(appSettings));
 
     // now this works because mode was declared with let
-    filterMode = selectedFilter;  
+    filterMode = selectedFilter;
 
     // applyTodoFilter(mode);
     renderTodos();
+    closeFilterPopup();
   });
 });
+
+function closeFilterPopup() {
+  filterDropdown.classList.remove("show");
+}
