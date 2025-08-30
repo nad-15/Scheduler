@@ -4,8 +4,10 @@ const DEFAULT_SETTINGS = {
   "view-mode": "list",
   "todo-sort-mode": "date-newest",
   "clamp-expanded": true,
-  "todo-collapsed": false
+  "todo-collapsed": false,
+  "todo-filter-mode": "incomplete" // new key
 };
+
 
 
 if (localStorage.getItem("todoSortMode") !== null) {

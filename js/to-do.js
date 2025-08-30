@@ -6,7 +6,61 @@ const deleteBtn = document.querySelector(".todo-delete-btn");
 const deleteDropdown = document.querySelector(".todo-delete-dropdown");
 const deleteAllBtn = document.querySelector(".delete-all-btn");
 const deleteCompletedBtn = document.querySelector(".delete-completed-btn");
+
+
+const filterToggleBtn = document.querySelector(".todo-filter-mode-btn");
+const filterDropdown = document.querySelector(".todo-filter-dropdown");
+
+
+let filterMode = (appSettings["todo-filter-mode"] || DEFAULT_SETTINGS["todo-filter-mode"]);
+function filterTodosByMode(todos, mode) {
+  switch (mode) {
+    case "all":
+      return todos;
+    case "archive":
+      return todos.filter(t => t.isArchive);
+    case "not-archived":
+      return todos.filter(t => !t.isArchive);
+    case "done":
+      return todos.filter(t => t.done && !t.isArchive);
+    case "incomplete":
+    default:
+      return todos.filter(t => !t.done && !t.isArchive);
+  }
+}
+
 // === Cycle through priority levels ===// js/to-do.js
+// function migrateTodos() {
+//   let changed = false;
+
+//   todos.forEach(todo => {
+//     if (todo.priority === undefined) {
+//       todo.priority = null;
+//       changed = true;
+//     }
+//     if (todo.subtasks === undefined) {
+//       todo.subtasks = [];
+//       changed = true;
+//     }
+//     if (todo.description === undefined) {
+//       todo.description = "";
+//       changed = true;
+//     }
+//     if (todo.dueDate === undefined) {
+//       todo.dueDate = null;
+//       changed = true;
+//     }
+//     if (todo.timeEstimate === undefined) {
+//       todo.timeEstimate = "";
+//       changed = true;
+//     }
+//   });
+
+//   if (changed) {
+//     localStorage.setItem("todos", JSON.stringify(todos));
+//   }
+// }
+
 function migrateTodos() {
   let changed = false;
 
@@ -31,12 +85,17 @@ function migrateTodos() {
       todo.timeEstimate = "";
       changed = true;
     }
+    if (todo.isArchive === undefined) {
+      todo.isArchive = false; // default for existing todos
+      changed = true;
+    }
   });
 
   if (changed) {
     localStorage.setItem("todos", JSON.stringify(todos));
   }
 }
+
 
 let todos = JSON.parse(localStorage.getItem("todos")) || [];
 migrateTodos();
@@ -567,8 +626,9 @@ function renderTodos() {
   const list = document.querySelector(".todo-list");
   list.innerHTML = "";
 
+  const visibleTodos = filterTodosByMode(todos, filterMode);
 
-  const sortedTodos = sortTodos(todos);
+  const sortedTodos = sortTodos(visibleTodos);
   const groupedTodos = getGroupedTodos(sortedTodos);
 
   groupedTodos.forEach(group => {
@@ -1012,6 +1072,36 @@ function todoGetRandomColor() {
 }
 
 // create
+// function todoCreate(
+//   text,
+//   {
+//     pinned = false,
+//     color = todoGetRandomColor(),
+//     dueDate = null,
+//     description = "",
+//     priority = null,
+//     subtasks = [],
+//     timeEstimate = "",
+//   } = {}
+// ) {
+//   const todo = {
+//     id: `todo-${Date.now()}`,
+//     text,
+//     pinned,
+//     color: todoNormalizeColor(color),
+//     done: false,
+//     createdAt: getTorontoNow(),
+//     dueDate,
+//     description,
+//     priority,
+//     subtasks,
+//     timeEstimate,
+//   };
+
+//   todos.push(todo);
+//   todoSaveAndRender();
+// }
+
 function todoCreate(
   text,
   {
@@ -1022,6 +1112,7 @@ function todoCreate(
     priority = null,
     subtasks = [],
     timeEstimate = "",
+    isArchive = false, // <-- new flag
   } = {}
 ) {
   const todo = {
@@ -1036,11 +1127,13 @@ function todoCreate(
     priority,
     subtasks,
     timeEstimate,
+    isArchive, // <-- added here
   };
 
   todos.push(todo);
   todoSaveAndRender();
 }
+
 
 // save + render
 function todoSaveAndRender() {
@@ -1135,6 +1228,15 @@ deleteCompletedBtn.addEventListener("click", () => {
 // });
 
 
+filterToggleBtn.addEventListener("click", (e) => {
+  // closeAllDropdowns();
+  e.stopPropagation(); // prevent bubbling to document
+  filterDropdown.classList.toggle("show");
+});
+
+
+
+
 document.addEventListener("click", (e) => {
   // --- close all dropdowns by default
   document.querySelectorAll(".todo-menu-dropdown, .todo-priority-dropdown").forEach((menu) => {
@@ -1157,21 +1259,44 @@ document.addEventListener("click", (e) => {
       deleteDropdown.style.display = "none";
     }
   }
+  // --- close filter dropdown if clicked outside
+  if (typeof filterDropdown !== "undefined" && typeof filterToggleBtn !== "undefined") {
+    if (!filterDropdown.contains(e.target) && !filterToggleBtn.contains(e.target)) {
+      filterDropdown.classList.remove("show");
+    }
+  }
+  
 });
 
 
 function closeAllDropdowns() {
   document.querySelectorAll(
-    ".todo-menu-dropdown, .todo-priority-dropdown, .todo-delete-dropdown"
-  ).forEach(menu => {
+    ".todo-menu-dropdown, .todo-priority-dropdown, .todo-delete-dropdown").forEach(menu => {
     menu.style.display = "none";
     menu.classList.remove("show");
   });
 
+  filterDropdown.classList.remove("show"); 
+      
   const controls = document.querySelector(".todo-sort-controls");
   const sortIcon = document.querySelector(".sort-icon");
-  controls.classList.remove("show");
-  sortIcon.classList.remove("rotated");
 
-
+  if (controls) controls.classList.remove("show");
+  if (sortIcon) sortIcon.classList.remove("rotated");
 }
+
+
+document.querySelectorAll(".todo-filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const selectedFilter = btn.dataset.filter;
+
+    appSettings["todo-filter-mode"] = selectedFilter;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
+    // now this works because mode was declared with let
+    filterMode = selectedFilter;  
+
+    // applyTodoFilter(mode);
+    renderTodos();
+  });
+});

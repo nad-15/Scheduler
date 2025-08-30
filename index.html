@@ -24,9 +24,20 @@
     <div id="todo-container" class="todos">
         <div class="todo-header-container">
             <div class="todo-title-header">
-                <button class="hamburger-todo">
-                    <span class="material-icons menu-icon-todo">sort</span>
-                </button>
+                <!-- Filter -->
+                <div class="todo-filter-container">
+                    <button class="todo-filter-mode-btn">
+                        <span class="material-icons todo-filter-mode-icon">sort</span>
+                    </button>
+                    <div class="todo-filter-dropdown">
+                        <button class="todo-filter-btn" data-filter="all">All</button>
+                        <button class="todo-filter-btn" data-filter="archive">Archive</button>
+                        <button class="todo-filter-btn" data-filter="not-archived">Not Archived</button>
+                        <button class="todo-filter-btn" data-filter="incomplete">Incomplete</button>
+                        <button class="todo-filter-btn" data-filter="done">Completed</button>
+                    </div>
+                </div>
+
                 <div class="appname-sort-container">
                     <!-- <div class="todo-greet">Good Day, Khaye!</div> -->
                     <div class="todo-appname">What’s Next?</div>
@@ -52,7 +63,7 @@
 
 
 
-                
+
             </div>
             <div>
 
@@ -614,7 +625,7 @@
     </div>
 
 
-    
+
     <!-- ===========DAYTASK SINGLE DIV -->
     <!-- vertical view calendar -->
     <!-- Button to Toggle Calendar Visibility -->

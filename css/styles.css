@@ -65,7 +65,7 @@ body {
     font-size: 30px;
 }
 
-.hamburger-todo {
+.todo-filter-mode-btn {
     display: flex;
     justify-content: center;
     border-radius: 50%;
@@ -560,7 +560,7 @@ body {
 
 
 .todo-priority-btn,
-.todo-pin-btn {
+.todo-pin-btn{
     background: none;
     border: none;
     cursor: pointer;
@@ -588,10 +588,35 @@ body {
     border: none;
     /* height: fit-content; */
 }
+.todo-filter-dropdown {
+  display: none; /* hidden by default */
+  position: absolute;
+  top: 40px;
+  left: 24px; /* you missed 'px' before */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  z-index: 10000;
+}
 
+.todo-filter-dropdown.show {
+  display: block; /* visible when toggled */
+}
 
-
-
+.todo-filter-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 6px 12px;
+    font-size: 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
 
 .todo-priority-dropdown {
     position: absolute;
@@ -3630,12 +3655,12 @@ input[type="radio"]:checked::after {
 }
 
 .menu-button.hamburger-month-view,
-.hamburger-todo {
+.todo-filter-mode-btn {
     background-color: transparent;
 }
 
 .menu-button.hamburger-month-view:active,
-.menu-button.hamburger-todo:active {
+.menu-button.todo-filter-mode-btn:active {
     transform: scale(0.9);
 }
 
