@@ -83,6 +83,10 @@ body {
     color: #666;
 }
 
+.material-symbols-outlined.todo-filter-mode-icon {
+    font-weight: bolder;
+}
+
 
 /* === TODO CONTAINER === */
 #todo-container {
