@@ -227,7 +227,7 @@ body {
     min-width: 130px;
     z-index: 10000;
     word-wrap: break-word;
-      font-family: inherit;
+    font-family: inherit;
 }
 
 
@@ -243,8 +243,8 @@ body {
     padding: 4px 8px;
     background: none;
     cursor: pointer;
-      font-family: inherit;
-      font-size: 14px;
+    font-family: inherit;
+    font-size: 14px;
 }
 
 .todo-actions-dropdown button:hover {
@@ -570,7 +570,7 @@ body {
 
 
 .todo-priority-btn,
-.todo-pin-btn{
+.todo-pin-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -598,23 +598,27 @@ body {
     border: none;
     /* height: fit-content; */
 }
+
 .todo-filter-dropdown {
-  display: none; /* hidden by default */
-  position: absolute;
-  top: 40px;
-  left: 24px; /* you missed 'px' before */
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 120px;
-  overflow: hidden;
-  margin-bottom: 8px;
-  z-index: 10000;
+    display: none;
+    /* hidden by default */
+    position: absolute;
+    top: 40px;
+    left: 24px;
+    /* you missed 'px' before */
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 120px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    z-index: 10000;
 }
 
 .todo-filter-dropdown.show {
-  display: block; /* visible when toggled */
+    display: block;
+    /* visible when toggled */
 }
 
 .todo-filter-btn {
@@ -626,8 +630,8 @@ body {
     border: none;
     background: none;
     cursor: pointer;
-      font-family: inherit;
-          font-size: 14px;
+    font-family: inherit;
+    font-size: 14px;
 }
 
 .todo-priority-dropdown {
@@ -657,8 +661,8 @@ body {
     border: none;
     background: none;
     cursor: pointer;
-          font-family: inherit;
-              font-size: 14px;
+    font-family: inherit;
+    font-size: 14px;
 }
 
 .todo-priority-dropdown button {
@@ -773,7 +777,7 @@ body {
     display: inline-flex;
     flex: 1;
     /* justify-content: center; */
-    align-items: center; 
+    align-items: center;
     /* border: 2px solid violet; */
 }
 
@@ -803,7 +807,7 @@ body {
     color: #888;
     font-size: 11px;
     /* border: 2px solid violet; */
-    
+
 }
 
 
@@ -905,189 +909,190 @@ body {
     font-size: 14px;
     transition: background 0.2s ease;
     font-family: inherit;
-        /* font-size: 14px; */
+    /* font-size: 14px; */
 }
 
 .todo-menu-dropdown button:hover {
     background: #f8f9fa;
 }
 
+/* MODAL============= */
 
-      .todo-modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: flex-end;
-        z-index: 50000;
-      }
-      
-      .todo-modal-content {
-        width: 100%;
-        background: white;
-        border-radius: 16px 16px 0 0;
-        padding: 16px;
-        max-height: 80vh;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-      }
-      
-      .todo-title-section input {
-        width: 100%;
-        border: none;
-        outline: none;
-        font-size: 16px;
-        padding: 12px 0;
-        background: transparent;
-        font-weight: 500;
-      }
-      
-      .todo-description-section textarea {
-        width: 100%;
-        border: none;
-        outline: none;
-        font-size: 14px;
-        padding: 8px 0;
-        background: transparent;
-        resize: none;
-        font-family: inherit;
-      }
-      
-      .todo-date-section input {
-        width: 100%;
-        border: none;
-        outline: none;
-        font-size: 14px;
-        padding: 8px 0;
-        background: transparent;
-      }
-      
-      .todo-time-section {
-        padding: 8px 0;
-      }
-      
-      .time-input-group {
-        display: flex;
-        gap: 16px;
-      }
-      
-      .time-input-field {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-      
-      .time-input-field label {
-        font-size: 12px;
-        color: #666;
-        font-weight: 500;
-      }
-      
-      .time-input-field input {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 8px;
-        font-size: 14px;
-        width: 60px;
-      }
-      
-      .todo-subtasks-section {
-        padding: 8px 0;
-      }
-      
-      .todo-subtask-input {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-      }
-      
-      .todo-subtask-input input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-      }
-      
-      .todo-subtask-input input[type="text"] {
-        flex: 1;
-        border: none;
-        outline: none;
-        font-size: 14px;
-        padding: 8px 0;
-        background: transparent;
-      }
-      
-      .todo-remove-subtask {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 4px;
-        display: flex;
-        align-items: center;
-        color: #666;
-      }
-      
-      .todo-modal-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 8px;
-        border-top: 1px solid #eee;
-        margin-top: 8px;
-      }
-      
-      .todo-action-icons {
-        display: flex;
-        gap: 8px;
-      }
-      
-      .todo-action-icon {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #666;
-        transition: background-color 0.2s;
-      }
-      
-      .todo-action-icon:hover {
-        background-color: #f0f0f0;
-      }
-      
-      .todo-action-icon.active {
-        color: #1976d2;
-        background-color: #e3f2fd;
-      }
-      
-      .todo-save-btn {
-        background: none;
-        border: none;
-        color: #1976d2;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        padding: 8px 16px;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-      }
-      
-      .todo-save-btn:hover {
-        background-color: #e3f2fd;
-      }
-      
-      .material-symbols-outlined {
-        font-size: 20px;
-      }
+.todo-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    z-index: 50000;
+}
 
+.todo-modal-content {
+    width: 100%;
+    background: white;
+    border-radius: 16px 16px 0 0;
+    padding: 16px;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.todo-title-section input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 12px 0;
+    background: transparent;
+    font-weight: 500;
+}
+
+.todo-description-section textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 8px 0;
+    background: transparent;
+    resize: none;
+    font-family: inherit;
+}
+
+.todo-date-section input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 8px 0;
+    background: transparent;
+}
+
+.todo-time-section {
+    padding: 8px 0;
+}
+
+.time-input-group {
+    display: flex;
+    gap: 16px;
+}
+
+.time-input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.time-input-field label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.time-input-field input {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 14px;
+    width: 60px;
+}
+
+.todo-subtasks-section {
+    padding: 8px 0;
+}
+
+.todo-subtask-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.todo-subtask-input input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.todo-subtask-input input[type="text"] {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 8px 0;
+    background: transparent;
+}
+
+.todo-remove-subtask {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    color: #666;
+}
+
+.todo-modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+    margin-top: 8px;
+}
+
+.todo-action-icons {
+    display: flex;
+    gap: 8px;
+}
+
+.todo-action-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: background-color 0.2s;
+}
+
+.todo-action-icon:hover {
+    background-color: #f0f0f0;
+}
+
+.todo-action-icon.active {
+    color: #1976d2;
+    background-color: #e3f2fd;
+}
+
+.todo-save-btn {
+    background: none;
+    border: none;
+    color: #1976d2;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.todo-save-btn:hover {
+    background-color: #e3f2fd;
+}
+
+.material-symbols-outlined {
+    font-size: 20px;
+}
+/* END OF MODAL */
 #main-container {
 
     background-color: #e5f5e0;

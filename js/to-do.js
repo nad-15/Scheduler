@@ -1108,6 +1108,13 @@ function todoOpenEditModal(todo = null) {
         <textarea id="todo-task-description" placeholder="Add description" 
                   rows="3">${todo?.description || ""}</textarea>
       </div>
+
+      <!-- Subtasks Section (Initially Hidden) -->
+      <div class="todo-subtasks-section" style="display: none;">
+        <div id="todo-subtasks-container">
+          ${subtasksHTML}
+        </div>
+      </div>
       
       <!-- Date Section (Initially Hidden) -->
       <div class="todo-date-section" style="display: none;">
@@ -1129,13 +1136,6 @@ function todoOpenEditModal(todo = null) {
         </div>
       </div>
       
-      <!-- Subtasks Section (Initially Hidden) -->
-      <div class="todo-subtasks-section" style="display: none;">
-        <div id="todo-subtasks-container">
-          ${subtasksHTML}
-        </div>
-      </div>
-      
       <!-- Action Icons and Save Button -->
       <div class="todo-modal-actions">
         <div class="todo-action-icons">
@@ -1146,7 +1146,7 @@ function todoOpenEditModal(todo = null) {
             <span class="material-symbols-outlined">checklist</span>
           </button>
           <button type="button" id="todo-toggle-date" class="todo-action-icon" title="Add due date">
-            <span class="material-symbols-outlined">schedule</span>
+            <span class="material-symbols-outlined">calendar_add_on</span>
           </button>
           <button type="button" id="todo-toggle-time" class="todo-action-icon" title="Add time estimate">
             <span class="material-symbols-outlined">timer</span>
@@ -1205,14 +1205,24 @@ function todoOpenEditModal(todo = null) {
   });
 
   // Toggle date
-  dateBtn.addEventListener("click", () => {
-    const isVisible = dateSection.style.display !== "none";
-    dateSection.style.display = isVisible ? "none" : "block";
-    dateBtn.classList.toggle("active");
-    if (!isVisible) {
-      modal.querySelector("#todo-due-date").focus();
-    }
-  });
+  // Toggle date - open picker immediately
+dateBtn.addEventListener("click", () => {
+  const dateInput = modal.querySelector("#todo-due-date");
+  dateInput.showPicker(); // This opens the date picker immediately
+});
+
+// Handle date input changes
+modal.querySelector("#todo-due-date").addEventListener("change", (e) => {
+  if (e.target.value) {
+    // Date selected - show the section
+    dateSection.style.display = "block";
+    dateBtn.classList.add("active");
+  } else {
+    // Date cleared - hide the section
+    dateSection.style.display = "none";
+    dateBtn.classList.remove("active");
+  }
+});
 
   // Toggle time estimate
   timeBtn.addEventListener("click", () => {
