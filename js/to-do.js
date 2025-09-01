@@ -582,7 +582,7 @@ function getGroupedTodos(sortedTodos) {
 
       if (todo.pinned) {
         groupTitle = "Important";
-      } 
+      }
       // else if (todo.done) {
       //   groupTitle = "Completed";
       // } 
@@ -923,8 +923,153 @@ function formatTimeEstimate(hours, minutes) {
   return timeString || '0m';
 }
 
+// // === Edit/Create Modal ===
+// function todoOpenEditModal(todo = null) {
+//   const isEdit = todo !== null;
+
+//   const modal = document.createElement("div");
+//   modal.className = "todo-modal-overlay";
+
+//   console.log(todo?.timeEstimate);
+
+//   const { hours, minutes } = parseTimeEstimateToSaveInLocal(todo?.timeEstimate || "");
+
+//   console.log(hours, minutes);
+
+//   const subtasksHTML = (todo?.subtasks || [])
+//     .map(
+//       (subtask, index) => `
+//     <div class="todo-subtask-input">
+//       <input type="text" value="${subtask.title}" placeholder="Subtask">
+//       <button type="button" class="todo-remove-subtask">❌</button>
+//     </div>
+//   `
+//     )
+//     .join("");
+
+//   modal.innerHTML = `
+//                   <div class="todo-modal-content">
+//                     <h3>${isEdit ? "Edit Task" : "New Task"}</h3>
+
+//                     <input type="text" id="todo-task-title" placeholder="Task title" 
+//                           value="${todo?.text || ""}" required>
+
+//                     <textarea id="todo-task-description" placeholder="Description (optional)" 
+//                               rows="3">${todo?.description || ""}</textarea>
+
+//                     <div class="todo-subtasks-section">
+//                       <label>Subtasks:</label>
+//                       <div id="todo-subtasks-container">
+//                         ${subtasksHTML}
+//                       </div>
+//                       <button type="button" id="todo-add-subtask">➕ Add Subtask</button>
+//                     </div>
+
+//                     <div class="todo-modal-row">
+//                       <div>
+//                         <label>Due Date:</label>
+//                         <input type="date" id="todo-due-date" 
+//                               value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split("T")[0] : ""}">
+//                       </div>
+//                       <fieldset class="time-estimate-box">
+//                         <legend>Time Estimate</legend>
+//                         <div class="time-input-group">
+//                           <div class="time-input-field">
+//                             <label>Hours</label>
+//                             <input type="number" id="hoursInput" min="0" max="23" placeholder="0" value="${hours || ""}">
+//                           </div>
+//                           <div class="time-input-field">
+//                             <label>Minutes</label>
+//                             <input type="number" id="minutesInput" min="0" max="59" placeholder="0" value="${minutes || ""}">
+//                           </div>
+//                         </div>
+//                       </fieldset>
+//                     </div>
+//                     <div class="todo-modal-actions">
+//                       <button type="button" id="todo-save-task">${isEdit ? "Save" : "Create"}</button>
+//                       <button type="button" id="todo-cancel-task">Cancel</button>
+//                     </div>
+//                   </div>
+//                 `;
+
+
+//   document.body.appendChild(modal);
+
+//   // subtask add/remove
+//   const addSubtaskBtn = modal.querySelector("#todo-add-subtask");
+//   const subtasksContainer = modal.querySelector("#todo-subtasks-container");
+
+//   addSubtaskBtn.addEventListener("click", () => {
+//     const subtaskDiv = document.createElement("div");
+//     subtaskDiv.className = "todo-subtask-input";
+//     subtaskDiv.innerHTML = `
+//       <input type="text" placeholder="Subtask">
+//       <button type="button" class="todo-remove-subtask">❌</button>
+//     `;
+//     subtasksContainer.appendChild(subtaskDiv);
+//   });
+
+//   subtasksContainer.addEventListener("click", (e) => {
+//     if (e.target.classList.contains("todo-remove-subtask")) {
+//       e.target.parentElement.remove();
+//     }
+//   });
+
+//   // save
+//   modal.querySelector("#todo-save-task").addEventListener("click", () => {
+//     const title = modal.querySelector("#todo-task-title").value.trim();
+//     if (!title) {
+//       alert("Task title is required!");
+//       return;
+//     }
+
+//     const description = modal.querySelector("#todo-task-description").value.trim();
+//     const dueDate = modal.querySelector("#todo-due-date").value || null;
+
+//     const hoursInput = document.getElementById('hoursInput');
+//     const minutesInput = document.getElementById('minutesInput');
+//     const timeEstimate = formatTimeEstimate(hoursInput.value, minutesInput.value);
+
+//     // const timeEstimate = modal.querySelector("#todo-time-estimate").value.trim();
+
+//     const subtaskInputs = modal.querySelectorAll(".todo-subtask-input input");
+//     const subtasks = Array.from(subtaskInputs)
+//       .map((input) => input.value.trim())
+//       .filter((text) => text)
+//       .map((title) => ({ title, done: false }));
+
+//     if (isEdit) {
+//       todo.text = title;
+//       todo.description = description;
+//       todo.dueDate = dueDate ? new Date(dueDate).getTime() : null;
+//       todo.timeEstimate = timeEstimate;
+//       todo.subtasks = subtasks;
+//     } else {
+//       todoCreate(title, {
+//         description,
+//         dueDate: dueDate ? new Date(dueDate).getTime() : null,
+//         timeEstimate,
+//         subtasks,
+//       });
+//     }
+//     document.body.removeChild(modal);
+//     todoSaveAndRender();
+//   });
+
+//   modal.querySelector("#todo-cancel-task").addEventListener("click", () => {
+//     document.body.removeChild(modal);
+//   });
+
+//   modal.addEventListener("click", (e) => {
+//     if (e.target === modal) {
+//       document.body.removeChild(modal);
+//     }
+//   });
+// }
+
 // === Edit/Create Modal ===
 function todoOpenEditModal(todo = null) {
+  console.log("opeingn modal");
   const isEdit = todo !== null;
 
   const modal = document.createElement("div");
@@ -940,82 +1085,179 @@ function todoOpenEditModal(todo = null) {
     .map(
       (subtask, index) => `
     <div class="todo-subtask-input">
+      <input type="checkbox" ${subtask.done ? 'checked' : ''}>
       <input type="text" value="${subtask.title}" placeholder="Subtask">
-      <button type="button" class="todo-remove-subtask">❌</button>
+      <button type="button" class="todo-remove-subtask">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
   `
     )
     .join("");
 
   modal.innerHTML = `
-                  <div class="todo-modal-content">
-                    <h3>${isEdit ? "Edit Task" : "New Task"}</h3>
-                    
-                    <input type="text" id="todo-task-title" placeholder="Task title" 
-                          value="${todo?.text || ""}" required>
-                    
-                    <textarea id="todo-task-description" placeholder="Description (optional)" 
-                              rows="3">${todo?.description || ""}</textarea>
-                    
-                    <div class="todo-subtasks-section">
-                      <label>Subtasks:</label>
-                      <div id="todo-subtasks-container">
-                        ${subtasksHTML}
-                      </div>
-                      <button type="button" id="todo-add-subtask">➕ Add Subtask</button>
-                    </div>
-                    
-                    <div class="todo-modal-row">
-                      <div>
-                        <label>Due Date:</label>
-                        <input type="date" id="todo-due-date" 
-                              value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split("T")[0] : ""}">
-                      </div>
-                      <fieldset class="time-estimate-box">
-                        <legend>Time Estimate</legend>
-                        <div class="time-input-group">
-                          <div class="time-input-field">
-                            <label>Hours</label>
-                            <input type="number" id="hoursInput" min="0" max="23" placeholder="0" value="${hours || ""}">
-                          </div>
-                          <div class="time-input-field">
-                            <label>Minutes</label>
-                            <input type="number" id="minutesInput" min="0" max="59" placeholder="0" value="${minutes || ""}">
-                          </div>
-                        </div>
-                      </fieldset>
-                    </div>
-                    <div class="todo-modal-actions">
-                      <button type="button" id="todo-save-task">${isEdit ? "Save" : "Create"}</button>
-                      <button type="button" id="todo-cancel-task">Cancel</button>
-                    </div>
-                  </div>
-                `;
+    <div class="todo-modal-content">
+      <!-- Title Section -->
+      <div class="todo-title-section">
+        <input type="text" id="todo-task-title" placeholder="New task" 
+              value="${todo?.text || ""}" required>
+      </div>
+      
+      <!-- Description Section (Initially Hidden) -->
+      <div class="todo-description-section" style="display: none;">
+        <textarea id="todo-task-description" placeholder="Add description" 
+                  rows="3">${todo?.description || ""}</textarea>
+      </div>
+      
+      <!-- Date Section (Initially Hidden) -->
+      <div class="todo-date-section" style="display: none;">
+        <input type="date" id="todo-due-date" 
+              value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split("T")[0] : ""}">
+      </div>
+      
+      <!-- Time Estimate Section (Initially Hidden) -->
+      <div class="todo-time-section" style="display: none;">
+        <div class="time-input-group">
+          <div class="time-input-field">
+            <label>Hours</label>
+            <input type="number" id="hoursInput" min="0" max="23" placeholder="0" value="${hours || ""}">
+          </div>
+          <div class="time-input-field">
+            <label>Minutes</label>
+            <input type="number" id="minutesInput" min="0" max="59" placeholder="0" value="${minutes || ""}">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Subtasks Section (Initially Hidden) -->
+      <div class="todo-subtasks-section" style="display: none;">
+        <div id="todo-subtasks-container">
+          ${subtasksHTML}
+        </div>
+      </div>
+      
+      <!-- Action Icons and Save Button -->
+      <div class="todo-modal-actions">
+        <div class="todo-action-icons">
+          <button type="button" id="todo-toggle-description" class="todo-action-icon" title="Add description">
+            <span class="material-symbols-outlined">description</span>
+          </button>
+          <button type="button" id="todo-add-subtask" class="todo-action-icon" title="Add subtask">
+            <span class="material-symbols-outlined">checklist</span>
+          </button>
+          <button type="button" id="todo-toggle-date" class="todo-action-icon" title="Add due date">
+            <span class="material-symbols-outlined">schedule</span>
+          </button>
+          <button type="button" id="todo-toggle-time" class="todo-action-icon" title="Add time estimate">
+            <span class="material-symbols-outlined">timer</span>
+          </button>
+        </div>
+        <button type="button" id="todo-save-task" class="todo-save-btn">${isEdit ? "Save" : "Save"}</button>
+      </div>
+    </div>
+  `;
 
 
   document.body.appendChild(modal);
 
-  // subtask add/remove
-  const addSubtaskBtn = modal.querySelector("#todo-add-subtask");
+  // Focus on title input
+  const titleInput = modal.querySelector("#todo-task-title");
+  setTimeout(() => titleInput.focus(), 100);
+
+  // Toggle sections functionality
+  const descriptionBtn = modal.querySelector("#todo-toggle-description");
+  const dateBtn = modal.querySelector("#todo-toggle-date");
+  const timeBtn = modal.querySelector("#todo-toggle-time");
+  const subtaskBtn = modal.querySelector("#todo-add-subtask");
+
+  const descriptionSection = modal.querySelector(".todo-description-section");
+  const dateSection = modal.querySelector(".todo-date-section");
+  const timeSection = modal.querySelector(".todo-time-section");
+  const subtasksSection = modal.querySelector(".todo-subtasks-section");
   const subtasksContainer = modal.querySelector("#todo-subtasks-container");
 
-  addSubtaskBtn.addEventListener("click", () => {
-    const subtaskDiv = document.createElement("div");
-    subtaskDiv.className = "todo-subtask-input";
-    subtaskDiv.innerHTML = `
-      <input type="text" placeholder="Subtask">
-      <button type="button" class="todo-remove-subtask">❌</button>
-    `;
-    subtasksContainer.appendChild(subtaskDiv);
-  });
+  // Show sections if they have content (for edit mode)
+  if (todo?.description) {
+    descriptionSection.style.display = "block";
+    descriptionBtn.classList.add("active");
+  }
+  if (todo?.dueDate) {
+    dateSection.style.display = "block";
+    dateBtn.classList.add("active");
+  }
+  if (todo?.timeEstimate) {
+    timeSection.style.display = "block";
+    timeBtn.classList.add("active");
+  }
+  if (todo?.subtasks && todo.subtasks.length > 0) {
+    subtasksSection.style.display = "block";
+    subtaskBtn.classList.add("active");
+  }
 
-  subtasksContainer.addEventListener("click", (e) => {
-    if (e.target.classList.contains("todo-remove-subtask")) {
-      e.target.parentElement.remove();
+  // Toggle description
+  descriptionBtn.addEventListener("click", () => {
+    const isVisible = descriptionSection.style.display !== "none";
+    descriptionSection.style.display = isVisible ? "none" : "block";
+    descriptionBtn.classList.toggle("active");
+    if (!isVisible) {
+      modal.querySelector("#todo-task-description").focus();
     }
   });
 
-  // save
+  // Toggle date
+  dateBtn.addEventListener("click", () => {
+    const isVisible = dateSection.style.display !== "none";
+    dateSection.style.display = isVisible ? "none" : "block";
+    dateBtn.classList.toggle("active");
+    if (!isVisible) {
+      modal.querySelector("#todo-due-date").focus();
+    }
+  });
+
+  // Toggle time estimate
+  timeBtn.addEventListener("click", () => {
+    const isVisible = timeSection.style.display !== "none";
+    timeSection.style.display = isVisible ? "none" : "block";
+    timeBtn.classList.toggle("active");
+    if (!isVisible) {
+      modal.querySelector("#hoursInput").focus();
+    }
+  });
+
+  // Add subtask
+  subtaskBtn.addEventListener("click", () => {
+    subtasksSection.style.display = "block";
+    subtaskBtn.classList.add("active");
+
+    const subtaskDiv = document.createElement("div");
+    subtaskDiv.className = "todo-subtask-input";
+    subtaskDiv.innerHTML = `
+      <input type="checkbox">
+      <input type="text" placeholder="Subtask">
+      <button type="button" class="todo-remove-subtask">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    `;
+    subtasksContainer.appendChild(subtaskDiv);
+
+    // Focus on the new subtask input
+    subtaskDiv.querySelector('input[type="text"]').focus();
+  });
+
+  // Remove subtask functionality
+  subtasksContainer.addEventListener("click", (e) => {
+    if (e.target.closest(".todo-remove-subtask")) {
+      e.target.closest(".todo-subtask-input").remove();
+
+      // Hide subtasks section if no subtasks left
+      if (subtasksContainer.children.length === 0) {
+        subtasksSection.style.display = "none";
+        subtaskBtn.classList.remove("active");
+      }
+    }
+  });
+
+  // Save functionality (keeping your original logic)
   modal.querySelector("#todo-save-task").addEventListener("click", () => {
     const title = modal.querySelector("#todo-task-title").value.trim();
     if (!title) {
@@ -1030,13 +1272,15 @@ function todoOpenEditModal(todo = null) {
     const minutesInput = document.getElementById('minutesInput');
     const timeEstimate = formatTimeEstimate(hoursInput.value, minutesInput.value);
 
-    // const timeEstimate = modal.querySelector("#todo-time-estimate").value.trim();
-
-    const subtaskInputs = modal.querySelectorAll(".todo-subtask-input input");
+    const subtaskInputs = modal.querySelectorAll(".todo-subtask-input");
     const subtasks = Array.from(subtaskInputs)
-      .map((input) => input.value.trim())
-      .filter((text) => text)
-      .map((title) => ({ title, done: false }));
+      .map((subtaskDiv) => {
+        const textInput = subtaskDiv.querySelector('input[type="text"]');
+        const checkbox = subtaskDiv.querySelector('input[type="checkbox"]');
+        const title = textInput.value.trim();
+        return title ? { title, done: checkbox.checked } : null;
+      })
+      .filter(subtask => subtask !== null);
 
     if (isEdit) {
       todo.text = title;
@@ -1056,17 +1300,22 @@ function todoOpenEditModal(todo = null) {
     todoSaveAndRender();
   });
 
-  modal.querySelector("#todo-cancel-task").addEventListener("click", () => {
-    document.body.removeChild(modal);
-  });
-
+  // Cancel/dismiss functionality
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       document.body.removeChild(modal);
     }
   });
-}
 
+  // ESC key to close
+  const handleEsc = (e) => {
+    if (e.key === 'Escape') {
+      document.body.removeChild(modal);
+      document.removeEventListener('keydown', handleEsc);
+    }
+  };
+  document.addEventListener('keydown', handleEsc);
+}
 // utils
 function todoRan(max) {
   return Math.floor(Math.random() * (max + 1));
