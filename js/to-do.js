@@ -1541,11 +1541,11 @@ archiveCompletedBtn.addEventListener("click", () => {
 });
 
 
-filterToggleBtn.addEventListener("click", (e) => {
-  // closeAllDropdowns();
-  e.stopPropagation(); // prevent bubbling to document
-  filterDropdown.classList.toggle("show");
-});
+// filterToggleBtn.addEventListener("click", (e) => {
+//   // closeAllDropdowns();
+//   e.stopPropagation(); // prevent bubbling to document
+//   filterDropdown.classList.toggle("show");
+// });
 
 
 

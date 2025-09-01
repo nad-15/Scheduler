@@ -85,6 +85,7 @@ body {
 
 .material-symbols-outlined.todo-filter-mode-icon {
     font-weight: bolder;
+    border: none;
 }
 
 
@@ -114,7 +115,39 @@ body {
     display: flex;
 }
 
+
 .todo-header-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    /* height: 5rem; */
+    /* background: linear-gradient(135deg,
+            rgba(173, 216, 230, 0.85),
+            rgba(187, 222, 214, 0.85),
+            rgba(255, 204, 213, 0.85),
+            rgba(218, 187, 255, 0.85),
+            rgba(255, 229, 180, 0.85));
+    background-size: 400% 400%;
+    animation: aurora 18s ease infinite; */
+    /* border-bottom-right-radius: 8px;
+       border-bottom-left-radius: 8px; */
+    background: white;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 0px 6px 0px;
+    /* increased padding for thickness */
+    width: 100%;
+    margin-bottom: 2px;
+
+    /* New additions for “thicker” feel */
+    border-bottom: 2px solid #ccc;
+    /* subtle bottom border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* soft shadow for depth */
+    /* border: 2px solid green; */
+}
+
+.todo-header-container-top {
     box-sizing: border-box;
     display: flex;
     /* height: 5rem; */
@@ -131,17 +164,63 @@ body {
     background: white;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 16px 20px 12px 20px;
+    padding: 0px 20px 0px 20px;
     /* increased padding for thickness */
     width: 100%;
-    margin-bottom: 2px;
+    /* margin-bottom: 2px; */
 
     /* New additions for “thicker” feel */
-    border-bottom: 2px solid #ccc;
+    /* border-bottom: 2px solid #ccc; */
     /* subtle bottom border */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
     /* soft shadow for depth */
     /* border: 2px solid green; */
+}
+
+.todo-header-container-bottom{
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    /* justify-content: center; */
+    align-items: center;
+    padding-right: 8px;
+}
+
+.todo-folder-container {
+    width: 100%;
+  display: flex;
+  font-size: 18px;
+  overflow-x: auto;     /* horizontal scroll if needed */
+  white-space: nowrap;  /* no wrapping */
+  justify-content: space-around;
+}
+
+.todo-filter-btn {
+  flex: 0 0 auto;       /* don’t shrink, keep natural width */
+  display: inline-block;/* inline-block works well inside flex */
+  text-align: left;
+  padding: 12px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+
+.sort-icon {
+    transition: transform 0.3s ease;
+}
+
+/* .sort-icon.rotated {
+    transform: rotate(90deg);
+} */
+
+
+.material-symbols-outlined.sort-icon {
+    font-size: 24px;
+    padding: 3px;
+    
 }
 
 
@@ -278,24 +357,12 @@ body {
 }
 
 
-.sort-icon {
-    transition: transform 0.3s ease;
-}
-
-.sort-icon.rotated {
-    transform: rotate(90deg);
-}
-
-
-.material-symbols-outlined.sort-icon {
-    font-size: 18px;
-}
 
 .todo-sort-controls {
     display: none;
     position: absolute;
     top: calc(100% + 5px);
-    left: 0;
+    right: 0;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -621,18 +688,6 @@ body {
     /* visible when toggled */
 }
 
-.todo-filter-btn {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 6px 12px;
-    /* font-size: 12px; */
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 14px;
-}
 
 .todo-priority-dropdown {
     position: absolute;
