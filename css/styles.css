@@ -948,20 +948,25 @@ body {
     border: none;
     outline: none;
     font-size: 16px;
-    padding: 12px 0;
+    /* padding: 12px 0; */
     background: transparent;
     font-weight: 500;
+    /* border:1px solid red; */
+
 }
 
 .todo-description-section textarea {
     width: 100%;
+    /* height: 18px; */
     border: none;
     outline: none;
     font-size: 14px;
-    padding: 8px 0;
+    /* padding: 8px 0; */
     background: transparent;
     resize: none;
     font-family: inherit;
+    /* resize:vertical; */
+    /* border:1px solid red; */
 }
 
 .todo-date-section input {
@@ -980,12 +985,17 @@ body {
 .time-input-group {
     display: flex;
     gap: 16px;
+    /* border: 2px solid red; */
 }
 
 .time-input-field {
+    flex: 1;
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    align-items: center;
     gap: 4px;
+    /* border: 2px solid green; */
 }
 
 .time-input-field label {
@@ -999,7 +1009,8 @@ body {
     border-radius: 4px;
     padding: 8px;
     font-size: 14px;
-    width: 60px;
+    /* width: 60px; */
+    width: 100%;
 }
 
 .todo-subtasks-section {
@@ -1010,7 +1021,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+    /* margin-bottom: 8px; */
 }
 
 .todo-subtask-input input[type="checkbox"] {

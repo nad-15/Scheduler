@@ -1143,7 +1143,7 @@ function todoOpenEditModal(todo = null) {
             <span class="material-symbols-outlined">description</span>
           </button>
           <button type="button" id="todo-add-subtask" class="todo-action-icon" title="Add subtask">
-            <span class="material-symbols-outlined">checklist</span>
+            <span class="material-symbols-outlined">add_task</span>
           </button>
           <button type="button" id="todo-toggle-date" class="todo-action-icon" title="Add due date">
             <span class="material-symbols-outlined">calendar_add_on</span>
