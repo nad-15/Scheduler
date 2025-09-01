@@ -663,7 +663,7 @@ function renderTodos() {
                   <span class="title-text ${todo.done ? "done" : ""}">${todo.text}</span>
                                     
                   <span class="time-estimate-container"> 
-                    <span class="material-symbols-outlined time-estimate-icon">hourglass_top</span>
+                    <span class="material-symbols-outlined time-estimate-icon">timer</span>
                     <span class="todo-time-estimate">
                       ${todo.timeEstimate === "0m" ? "--" : todo.timeEstimate}
                     </span>
@@ -1099,14 +1099,16 @@ function todoOpenEditModal(todo = null) {
     <div class="todo-modal-content">
       <!-- Title Section -->
       <div class="todo-title-section">
-        <input type="text" id="todo-task-title" placeholder="New task" 
-              value="${todo?.text || ""}" required>
+        <textarea id="todo-task-title" 
+                  placeholder="Add task title" 
+                  rows="1" required>${todo?.text || ""}</textarea>
       </div>
+
       
       <!-- Description Section (Initially Hidden) -->
-      <div class="todo-description-section" style="display: none;">
+      <div class="todo-description-section" style="display: none;" >
         <textarea id="todo-task-description" placeholder="Add description" 
-                  rows="3">${todo?.description || ""}</textarea>
+                  rows="1">${todo?.description || ""}</textarea>
       </div>
 
       <!-- Subtasks Section (Initially Hidden) -->
@@ -1176,11 +1178,26 @@ function todoOpenEditModal(todo = null) {
   const subtasksSection = modal.querySelector(".todo-subtasks-section");
   const subtasksContainer = modal.querySelector("#todo-subtasks-container");
 
-  // Show sections if they have content (for edit mode)
-  if (todo?.description) {
-    descriptionSection.style.display = "block";
-    descriptionBtn.classList.add("active");
-  }
+  function autoResize(textarea) {
+  textarea.style.height = "auto";
+  textarea.style.height = textarea.scrollHeight + "px";
+}
+
+// attach to all auto-expanding textareas
+modal.querySelectorAll("#todo-task-title, #todo-task-description")
+  .forEach(el => {
+    autoResize(el); 
+    el.addEventListener("input", () => autoResize(el));
+  });
+// Show sections if they have content (for edit mode)
+if (todo?.description) {
+  descriptionSection.style.display = "block";
+  descriptionBtn.classList.add("active");
+
+  const textarea = descriptionSection.querySelector("#todo-task-description");
+  autoResize(textarea); // <-- resize for prefilled text
+}
+
   if (todo?.dueDate) {
     dateSection.style.display = "block";
     dateBtn.classList.add("active");
@@ -1194,35 +1211,39 @@ function todoOpenEditModal(todo = null) {
     subtaskBtn.classList.add("active");
   }
 
-  // Toggle description
-  descriptionBtn.addEventListener("click", () => {
-    const isVisible = descriptionSection.style.display !== "none";
-    descriptionSection.style.display = isVisible ? "none" : "block";
-    descriptionBtn.classList.toggle("active");
-    if (!isVisible) {
-      modal.querySelector("#todo-task-description").focus();
-    }
-  });
+// Toggle description
+descriptionBtn.addEventListener("click", () => {
+  const isVisible = descriptionSection.style.display !== "none";
+  descriptionSection.style.display = isVisible ? "none" : "block";
+  descriptionBtn.classList.toggle("active");
+
+  if (!isVisible) {
+    const textarea = modal.querySelector("#todo-task-description");
+    autoResize(textarea);   // <-- fix prefilled size
+    textarea.focus();
+  }
+});
+
 
   // Toggle date
   // Toggle date - open picker immediately
-dateBtn.addEventListener("click", () => {
-  const dateInput = modal.querySelector("#todo-due-date");
-  dateInput.showPicker(); // This opens the date picker immediately
-});
+  dateBtn.addEventListener("click", () => {
+    const dateInput = modal.querySelector("#todo-due-date");
+    dateInput.showPicker(); // This opens the date picker immediately
+  });
 
-// Handle date input changes
-modal.querySelector("#todo-due-date").addEventListener("change", (e) => {
-  if (e.target.value) {
-    // Date selected - show the section
-    dateSection.style.display = "block";
-    dateBtn.classList.add("active");
-  } else {
-    // Date cleared - hide the section
-    dateSection.style.display = "none";
-    dateBtn.classList.remove("active");
-  }
-});
+  // Handle date input changes
+  modal.querySelector("#todo-due-date").addEventListener("change", (e) => {
+    if (e.target.value) {
+      // Date selected - show the section
+      dateSection.style.display = "block";
+      dateBtn.classList.add("active");
+    } else {
+      // Date cleared - hide the section
+      dateSection.style.display = "none";
+      dateBtn.classList.remove("active");
+    }
+  });
 
   // Toggle time estimate
   timeBtn.addEventListener("click", () => {
