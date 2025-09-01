@@ -954,7 +954,6 @@ body {
     background: transparent;
     font-weight: 500;
     /* border:1px solid red; */
-
 }
 
 #todo-task-title {
@@ -971,31 +970,33 @@ body {
   box-sizing: border-box;
 }
 
-
 .todo-description-section textarea {
   width: 100%;
   border: none;
   outline: none;
   font-size: 14px;
   font-family: inherit;
-  line-height: 1.4;       /* better readability */
-  resize: none;           /* no manual resize */
-  overflow: hidden;       /* prevent scrollbar */
+  line-height: 1.4;
+  resize: none;
+  overflow: hidden;
   background: transparent;
-  padding: 2px 0;         /* keep it slim like input */
+  padding: 2px 0;
   box-sizing: border-box; 
   /* border: 2px solid red; */
 }
 
-
 .todo-date-section input {
-    width: 100%;
+    /* width: 100%; */
     border: none;
     outline: none;
     font-size: 14px;
     padding: 8px 0;
     background: transparent;
+    /* border: 1px solid #666; */
+    border-radius: 3px;
 }
+
+
 
 .todo-time-section {
     padding: 8px 0;
@@ -1003,7 +1004,8 @@ body {
 
 .time-input-group {
     display: flex;
-    gap: 16px;
+    gap: 3px;
+    align-items: center;
     /* border: 2px solid red; */
 }
 
@@ -1018,10 +1020,14 @@ body {
 }
 
 .time-input-field label {
-    font-size: 12px;
+    font-size: 8px;
     color: #666;
     font-weight: 500;
 }
+
+/* .todo-time-date-section label {
+    font-size: 8px;
+} */
 
 .time-input-field input {
     border: 1px solid #ddd;
@@ -1107,7 +1113,7 @@ body {
     background: none;
     border: none;
     color: #1976d2;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     padding: 8px 16px;

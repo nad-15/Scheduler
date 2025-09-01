@@ -1100,14 +1100,14 @@ function todoOpenEditModal(todo = null) {
       <!-- Title Section -->
       <div class="todo-title-section">
         <textarea id="todo-task-title" 
-                  placeholder="Add task title" 
+                  placeholder="New Task" 
                   rows="1" required>${todo?.text || ""}</textarea>
       </div>
 
       
       <!-- Description Section (Initially Hidden) -->
       <div class="todo-description-section" style="display: none;" >
-        <textarea id="todo-task-description" placeholder="Add description" 
+        <textarea id="todo-task-description" placeholder="Add details" 
                   rows="1">${todo?.description || ""}</textarea>
       </div>
 
@@ -1118,26 +1118,34 @@ function todoOpenEditModal(todo = null) {
         </div>
       </div>
       
+      <!-- TIME and Date Section (Initially Hidden) -->
+      <div class="todo-time-date-section" style="display: flex; border: none; gap: 4px; align-items: center; ">
+
+
       <!-- Date Section (Initially Hidden) -->
       <div class="todo-date-section" style="display: none;">
+       <!-- <label>Due: </label> -->
         <input type="date" id="todo-due-date" 
               value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split("T")[0] : ""}">
       </div>
       
       <!-- Time Estimate Section (Initially Hidden) -->
       <div class="todo-time-section" style="display: none;">
+        
         <div class="time-input-group">
+        <label>Duration:</label>
           <div class="time-input-field">
-            <label>Hours</label>
-            <input type="number" id="hoursInput" min="0" max="23" placeholder="0" value="${hours || ""}">
+           <!-- <label>Hours</label>-->
+            <input type="number" id="hoursInput" min="0" max="23" placeholder="hrs" value="${hours || ""}">
           </div>
           <div class="time-input-field">
-            <label>Minutes</label>
-            <input type="number" id="minutesInput" min="0" max="59" placeholder="0" value="${minutes || ""}">
+            <!--<label>Minutes</label>-->
+            <input type="number" id="minutesInput" min="0" max="59" placeholder="mins" value="${minutes || ""}">
           </div>
         </div>
       </div>
-      
+      </div>
+
       <!-- Action Icons and Save Button -->
       <div class="todo-modal-actions">
         <div class="todo-action-icons">
@@ -1225,7 +1233,6 @@ descriptionBtn.addEventListener("click", () => {
 });
 
 
-  // Toggle date
   // Toggle date - open picker immediately
   dateBtn.addEventListener("click", () => {
     const dateInput = modal.querySelector("#todo-due-date");
