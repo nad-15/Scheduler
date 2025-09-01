@@ -285,195 +285,195 @@ function parseTimeEstimateToSaveInLocal(timeString) {
 }
 
 // === Sort todos based on current mode ===
-// function sortTodos(todos) {
-//   switch (currentSortMode) {
-//     case "date-newest":
-//       return [...todos].sort((a, b) => {
-//         // Pinned items always on top
-//         if (a.pinned && !b.pinned) return -1;
-//         if (!a.pinned && b.pinned) return 1;
-//         // Then by date (newest first)
-//         return b.createdAt - a.createdAt;
-//       });
-
-//     case "date-oldest":
-//       return [...todos].sort((a, b) => {
-//         // Pinned items always on top
-//         if (a.pinned && !b.pinned) return -1;
-//         if (!a.pinned && b.pinned) return 1;
-//         // Then by date (oldest first)
-//         return a.createdAt - b.createdAt;
-//       });
-
-//     case "group":
-//       return [...todos].sort((a, b) => {
-//         // Define priority order for grouping
-//         const getPriorityOrder = (todo) => {
-//           if (todo.pinned) return 0; // Important
-//           if (todo.done) return 5; // Completed
-//           switch (todo.priority) {
-//             case "high": return 1;
-//             case "medium": return 2;
-//             case "low": return 3;
-//             case null: return 4;
-//             default: return 4;
-//           }
-//         };
-
-//         const aOrder = getPriorityOrder(a);
-//         const bOrder = getPriorityOrder(b);
-
-//         if (aOrder !== bOrder) {
-//           return aOrder - bOrder;
-//         }
-
-//         // Within same group, sort by creation date (newest first)
-//         return b.createdAt - a.createdAt;
-//       });
-
-//     case "due-date":
-//       return [...todos].sort((a, b) => {
-//         // Pinned items always on top
-//         if (a.pinned && !b.pinned) return -1;
-//         if (!a.pinned && b.pinned) return 1;
-
-//         // Handle due dates: overdue first, then by due date, then no due date last
-//         if (a.dueDate && b.dueDate) {
-//           return a.dueDate - b.dueDate; // Earlier due dates first
-//         }
-//         if (a.dueDate && !b.dueDate) return -1; // Items with due dates before items without
-//         if (!a.dueDate && b.dueDate) return 1;
-
-//         // If both have no due date, sort by creation date (newest first)
-//         return b.createdAt - a.createdAt;
-//       });
-
-//     case "completion":
-//       return [...todos].sort((a, b) => {
-//         // Pinned items always on top (regardless of completion)
-//         if (a.pinned && !b.pinned) return -1;
-//         if (!a.pinned && b.pinned) return 1;
-
-//         // Then sort by completion status
-//         if (a.done !== b.done) {
-//           return a.done ? 1 : -1; // Not completed first, then completed
-//         }
-
-//         // Within same completion status, sort by creation date (newest first)
-//         return b.createdAt - a.createdAt;
-//       });
-
-//     case "time-estimate":
-//       return [...todos].sort((a, b) => {
-//         // Pinned items always on top
-//         if (a.pinned && !b.pinned) return -1;
-//         if (!a.pinned && b.pinned) return 1;
-
-//         // Parse time estimates
-//         const aTime = parseTimeEstimate(a.timeEstimate);
-//         const bTime = parseTimeEstimate(b.timeEstimate);
-
-//         // Sort: tasks with estimates first (shorter first), then tasks without estimates
-//         if (aTime > 0 && bTime > 0) {
-//           return aTime - bTime; // Shorter tasks first
-//         }
-//         if (aTime > 0 && bTime === 0) return -1; // Tasks with estimates before tasks without
-//         if (aTime === 0 && bTime > 0) return 1;
-
-//         // If both have no time estimate, sort by creation date (newest first)
-//         return b.createdAt - a.createdAt;
-//       });
-
-//     default:
-//       return todos;
-//   }
-// }
 function sortTodos(todos) {
-  // Separate todos into categories
-  const pinnedTodos = todos.filter(todo => todo.pinned);
-  const incompleteTodos = todos.filter(todo => !todo.pinned && !todo.done);
-  const completedTodos = todos.filter(todo => !todo.pinned && todo.done);
+  switch (currentSortMode) {
+    case "date-newest":
+      return [...todos].sort((a, b) => {
+        // Pinned items always on top
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        // Then by date (newest first)
+        return b.createdAt - a.createdAt;
+      });
 
-  // Helper function to sort a group of todos
-  const sortGroup = (todoGroup) => {
-    switch (currentSortMode) {
-      case "date-newest":
-        return [...todoGroup].sort((a, b) => b.createdAt - a.createdAt);
+    case "date-oldest":
+      return [...todos].sort((a, b) => {
+        // Pinned items always on top
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        // Then by date (oldest first)
+        return a.createdAt - b.createdAt;
+      });
 
-      case "date-oldest":
-        return [...todoGroup].sort((a, b) => a.createdAt - b.createdAt);
-
-      case "group":
-        return [...todoGroup].sort((a, b) => {
-          // Define priority order for grouping (without pinned since we handle that separately)
-          const getPriorityOrder = (todo) => {
-            switch (todo.priority) {
-              case "high": return 1;
-              case "medium": return 2;
-              case "low": return 3;
-              case null: return 4;
-              default: return 4;
-            }
-          };
-
-          const aOrder = getPriorityOrder(a);
-          const bOrder = getPriorityOrder(b);
-
-          if (aOrder !== bOrder) {
-            return aOrder - bOrder;
+    case "group":
+      return [...todos].sort((a, b) => {
+        // Define priority order for grouping
+        const getPriorityOrder = (todo) => {
+          if (todo.pinned) return 0; // Important
+          // if (todo.done) return 5; // Completed
+          switch (todo.priority) {
+            case "high": return 1;
+            case "medium": return 2;
+            case "low": return 3;
+            case null: return 4;
+            default: return 4;
           }
+        };
 
-          // Within same group, sort by creation date (newest first)
-          return b.createdAt - a.createdAt;
-        });
+        const aOrder = getPriorityOrder(a);
+        const bOrder = getPriorityOrder(b);
 
-      case "due-date":
-        return [...todoGroup].sort((a, b) => {
-          // Handle due dates: overdue first, then by due date, then no due date last
-          if (a.dueDate && b.dueDate) {
-            return a.dueDate - b.dueDate; // Earlier due dates first
-          }
-          if (a.dueDate && !b.dueDate) return -1; // Items with due dates before items without
-          if (!a.dueDate && b.dueDate) return 1;
+        if (aOrder !== bOrder) {
+          return aOrder - bOrder;
+        }
 
-          // If both have no due date, sort by creation date (newest first)
-          return b.createdAt - a.createdAt;
-        });
+        // Within same group, sort by creation date (newest first)
+        return b.createdAt - a.createdAt;
+      });
 
-      case "completion":
-        // For completion sorting, we still sort by creation date within each group
-        return [...todoGroup].sort((a, b) => b.createdAt - a.createdAt);
+    case "due-date":
+      return [...todos].sort((a, b) => {
+        // Pinned items always on top
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
 
-      case "time-estimate":
-        return [...todoGroup].sort((a, b) => {
-          // Parse time estimates
-          const aTime = parseTimeEstimate(a.timeEstimate);
-          const bTime = parseTimeEstimate(b.timeEstimate);
+        // Handle due dates: overdue first, then by due date, then no due date last
+        if (a.dueDate && b.dueDate) {
+          return a.dueDate - b.dueDate; // Earlier due dates first
+        }
+        if (a.dueDate && !b.dueDate) return -1; // Items with due dates before items without
+        if (!a.dueDate && b.dueDate) return 1;
 
-          // Sort: tasks with estimates first (shorter first), then tasks without estimates
-          if (aTime > 0 && bTime > 0) {
-            return aTime - bTime; // Shorter tasks first
-          }
-          if (aTime > 0 && bTime === 0) return -1; // Tasks with estimates before tasks without
-          if (aTime === 0 && bTime > 0) return 1;
+        // If both have no due date, sort by creation date (newest first)
+        return b.createdAt - a.createdAt;
+      });
 
-          // If both have no time estimate, sort by creation date (newest first)
-          return b.createdAt - a.createdAt;
-        });
+    case "completion":
+      return [...todos].sort((a, b) => {
+        // Pinned items always on top (regardless of completion)
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
 
-      default:
-        return todoGroup;
-    }
-  };
+        // Then sort by completion status
+        if (a.done !== b.done) {
+          return a.done ? 1 : -1; // Not completed first, then completed
+        }
 
-  // Sort each group independently
-  const sortedPinned = sortGroup(pinnedTodos);
-  const sortedIncomplete = sortGroup(incompleteTodos);
-  const sortedCompleted = sortGroup(completedTodos);
+        // Within same completion status, sort by creation date (newest first)
+        return b.createdAt - a.createdAt;
+      });
 
-  // Combine: pinned first, then incomplete, then completed
-  return [...sortedPinned, ...sortedIncomplete, ...sortedCompleted];
+    case "time-estimate":
+      return [...todos].sort((a, b) => {
+        // Pinned items always on top
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+
+        // Parse time estimates
+        const aTime = parseTimeEstimate(a.timeEstimate);
+        const bTime = parseTimeEstimate(b.timeEstimate);
+
+        // Sort: tasks with estimates first (shorter first), then tasks without estimates
+        if (aTime > 0 && bTime > 0) {
+          return aTime - bTime; // Shorter tasks first
+        }
+        if (aTime > 0 && bTime === 0) return -1; // Tasks with estimates before tasks without
+        if (aTime === 0 && bTime > 0) return 1;
+
+        // If both have no time estimate, sort by creation date (newest first)
+        return b.createdAt - a.createdAt;
+      });
+
+    default:
+      return todos;
+  }
 }
+// function sortTodos(todos) {
+//   // Separate todos into categories
+//   const pinnedTodos = todos.filter(todo => todo.pinned);
+//   const incompleteTodos = todos.filter(todo => !todo.pinned && !todo.done);
+//   const completedTodos = todos.filter(todo => !todo.pinned && todo.done);
+
+//   // Helper function to sort a group of todos
+//   const sortGroup = (todoGroup) => {
+//     switch (currentSortMode) {
+//       case "date-newest":
+//         return [...todoGroup].sort((a, b) => b.createdAt - a.createdAt);
+
+//       case "date-oldest":
+//         return [...todoGroup].sort((a, b) => a.createdAt - b.createdAt);
+
+//       case "group":
+//         return [...todoGroup].sort((a, b) => {
+//           // Define priority order for grouping (without pinned since we handle that separately)
+//           const getPriorityOrder = (todo) => {
+//             switch (todo.priority) {
+//               case "high": return 1;
+//               case "medium": return 2;
+//               case "low": return 3;
+//               case null: return 4;
+//               default: return 4;
+//             }
+//           };
+
+//           const aOrder = getPriorityOrder(a);
+//           const bOrder = getPriorityOrder(b);
+
+//           if (aOrder !== bOrder) {
+//             return aOrder - bOrder;
+//           }
+
+//           // Within same group, sort by creation date (newest first)
+//           return b.createdAt - a.createdAt;
+//         });
+
+//       case "due-date":
+//         return [...todoGroup].sort((a, b) => {
+//           // Handle due dates: overdue first, then by due date, then no due date last
+//           if (a.dueDate && b.dueDate) {
+//             return a.dueDate - b.dueDate; // Earlier due dates first
+//           }
+//           if (a.dueDate && !b.dueDate) return -1; // Items with due dates before items without
+//           if (!a.dueDate && b.dueDate) return 1;
+
+//           // If both have no due date, sort by creation date (newest first)
+//           return b.createdAt - a.createdAt;
+//         });
+
+//       case "completion":
+//         // For completion sorting, we still sort by creation date within each group
+//         return [...todoGroup].sort((a, b) => b.createdAt - a.createdAt);
+
+//       case "time-estimate":
+//         return [...todoGroup].sort((a, b) => {
+//           // Parse time estimates
+//           const aTime = parseTimeEstimate(a.timeEstimate);
+//           const bTime = parseTimeEstimate(b.timeEstimate);
+
+//           // Sort: tasks with estimates first (shorter first), then tasks without estimates
+//           if (aTime > 0 && bTime > 0) {
+//             return aTime - bTime; // Shorter tasks first
+//           }
+//           if (aTime > 0 && bTime === 0) return -1; // Tasks with estimates before tasks without
+//           if (aTime === 0 && bTime > 0) return 1;
+
+//           // If both have no time estimate, sort by creation date (newest first)
+//           return b.createdAt - a.createdAt;
+//         });
+
+//       default:
+//         return todoGroup;
+//     }
+//   };
+
+//   // Sort each group independently
+//   const sortedPinned = sortGroup(pinnedTodos);
+//   const sortedIncomplete = sortGroup(incompleteTodos);
+//   const sortedCompleted = sortGroup(completedTodos);
+
+//   // Combine: pinned first, then incomplete, then completed
+//   return [...sortedPinned, ...sortedIncomplete, ...sortedCompleted];
+// }
 // === Get grouped todos for group mode ===
 function getGroupedTodos(sortedTodos) {
   if (currentSortMode !== "group" && currentSortMode !== "due-date" && currentSortMode !== "completion" && currentSortMode !== "time-estimate") {
@@ -582,9 +582,11 @@ function getGroupedTodos(sortedTodos) {
 
       if (todo.pinned) {
         groupTitle = "Important";
-      } else if (todo.done) {
-        groupTitle = "Completed";
-      } else {
+      } 
+      // else if (todo.done) {
+      //   groupTitle = "Completed";
+      // } 
+      else {
         switch (todo.priority) {
           case "high":
             groupTitle = "High Priority";
