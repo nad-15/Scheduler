@@ -14,6 +14,22 @@ const filterDropdown = document.querySelector(".todo-filter-dropdown");
 
 
 let filterMode = (appSettings["todo-filter-mode"] || DEFAULT_SETTINGS["todo-filter-mode"]);
+function initializeFilterButtons() {
+
+  // Remove active from all buttons
+  document.querySelectorAll(".todo-filter-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+  
+  // Add active to current filter
+  const activeButton = document.querySelector(`[data-filter="${filterMode}"]`);
+  if (activeButton) {
+    activeButton.classList.add("active");
+  }
+}
+
+// CALL this when page loads
+document.addEventListener('DOMContentLoaded', initializeFilterButtons);
 function filterTodosByMode(todos, mode) {
   switch (mode) {
     case "all":
@@ -25,10 +41,14 @@ function filterTodosByMode(todos, mode) {
     case "done":
       return todos.filter(t => t.done && !t.isArchive);
     case "in-progress":
+      return todos.filter(t => !t.done && !t.isArchive);
+    case "starred":
+      return todos.filter(t => t.pinned && !t.isArchive);
     default:
       return todos.filter(t => !t.done && !t.isArchive);
   }
 }
+
 
 // === Cycle through priority levels ===// js/to-do.js
 // function migrateTodos() {
@@ -290,8 +310,8 @@ function sortTodos(todos) {
     case "date-newest":
       return [...todos].sort((a, b) => {
         // Pinned items always on top
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
+        // if (a.pinned && !b.pinned) return -1;
+        // if (!a.pinned && b.pinned) return 1;
         // Then by date (newest first)
         return b.createdAt - a.createdAt;
       });
@@ -299,8 +319,8 @@ function sortTodos(todos) {
     case "date-oldest":
       return [...todos].sort((a, b) => {
         // Pinned items always on top
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
+        // if (a.pinned && !b.pinned) return -1;
+        // if (!a.pinned && b.pinned) return 1;
         // Then by date (oldest first)
         return a.createdAt - b.createdAt;
       });
@@ -309,7 +329,7 @@ function sortTodos(todos) {
       return [...todos].sort((a, b) => {
         // Define priority order for grouping
         const getPriorityOrder = (todo) => {
-          if (todo.pinned) return 0; // Important
+          // if (todo.pinned) return 0; // Important
           // if (todo.done) return 5; // Completed
           switch (todo.priority) {
             case "high": return 1;
@@ -334,8 +354,8 @@ function sortTodos(todos) {
     case "due-date":
       return [...todos].sort((a, b) => {
         // Pinned items always on top
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
+        // if (a.pinned && !b.pinned) return -1;
+        // if (!a.pinned && b.pinned) return 1;
 
         // Handle due dates: overdue first, then by due date, then no due date last
         if (a.dueDate && b.dueDate) {
@@ -351,8 +371,8 @@ function sortTodos(todos) {
     case "completion":
       return [...todos].sort((a, b) => {
         // Pinned items always on top (regardless of completion)
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
+        // if (a.pinned && !b.pinned) return -1;
+        // if (!a.pinned && b.pinned) return 1;
 
         // Then sort by completion status
         if (a.done !== b.done) {
@@ -366,8 +386,8 @@ function sortTodos(todos) {
     case "time-estimate":
       return [...todos].sort((a, b) => {
         // Pinned items always on top
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
+        // if (a.pinned && !b.pinned) return -1;
+        // if (!a.pinned && b.pinned) return 1;
 
         // Parse time estimates
         const aTime = parseTimeEstimate(a.timeEstimate);
@@ -1625,6 +1645,8 @@ document.querySelectorAll(".todo-filter-btn").forEach(btn => {
     // applyTodoFilter(mode);
     renderTodos();
     closeFilterPopup();
+      initializeFilterButtons();
+
   });
 });
 
