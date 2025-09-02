@@ -497,6 +497,14 @@ body {
   pointer-events: none;
 }
 
+
+.todo-item.uncompleting {
+  opacity: 0;
+  transform: translateY(-60px) scale(1.05);
+  pointer-events: none;
+}
+
+
 .todo-group-header {
     display: flex;
     justify-content: flex-end;

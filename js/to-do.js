@@ -20,7 +20,7 @@ function initializeFilterButtons() {
   document.querySelectorAll(".todo-filter-btn").forEach(btn => {
     btn.classList.remove("active");
   });
-  
+
   // Add active to current filter
   const activeButton = document.querySelector(`[data-filter="${filterMode}"]`);
   if (activeButton) {
@@ -511,7 +511,7 @@ function getGroupedTodos(sortedTodos) {
       // if (todo.pinned) {
       //   groupTitle = "Important";
       // } else 
-        if (todo.dueDate) {
+      if (todo.dueDate) {
         const today = new Date(todayVertView);
         today.setHours(0, 0, 0, 0);
         const dueDate = new Date(todo.dueDate);
@@ -550,8 +550,8 @@ function getGroupedTodos(sortedTodos) {
       // if (todo.pinned) {
       //   groupTitle = "Important";
       // } else 
-        
-        if (todo.done) {
+
+      if (todo.done) {
         groupTitle = "Completed";
       } else {
         groupTitle = "To do";
@@ -573,23 +573,23 @@ function getGroupedTodos(sortedTodos) {
       //   groupTitle = "Important";
       // } 
       // else {
-        const timeMinutes = parseTimeEstimate(todo.timeEstimate);
+      const timeMinutes = parseTimeEstimate(todo.timeEstimate);
 
-        if (timeMinutes === 0) {
-          groupTitle = "No Estimate";
-        } else if (timeMinutes <= 15) {
-          groupTitle = "Quick (≤15m)";
-        } else if (timeMinutes <= 30) {
-          groupTitle = "Short (16-30m)";
-        } else if (timeMinutes <= 60) {
-          groupTitle = "Medium (31-60m)";
-        } else if (timeMinutes <= 120) {
-          groupTitle = "Long (1-2h)";
-        } else if (timeMinutes <= 480) {
-          groupTitle = "Extended (2-8h)";
-        } else {
-          groupTitle = "Major (8+h)";
-        }
+      if (timeMinutes === 0) {
+        groupTitle = "No Estimate";
+      } else if (timeMinutes <= 15) {
+        groupTitle = "Quick (≤15m)";
+      } else if (timeMinutes <= 30) {
+        groupTitle = "Short (16-30m)";
+      } else if (timeMinutes <= 60) {
+        groupTitle = "Medium (31-60m)";
+      } else if (timeMinutes <= 120) {
+        groupTitle = "Long (1-2h)";
+      } else if (timeMinutes <= 480) {
+        groupTitle = "Extended (2-8h)";
+      } else {
+        groupTitle = "Major (8+h)";
+      }
       // }
 
       if (!currentGroup || currentGroup.title !== groupTitle) {
@@ -611,21 +611,21 @@ function getGroupedTodos(sortedTodos) {
       //   groupTitle = "Completed";
       // } 
       // else {
-        switch (todo.priority) {
-          case "high":
-            groupTitle = "High Priority";
-            break;
-          case "medium":
-            groupTitle = "Medium Priority";
-            break;
-          case "low":
-            groupTitle = "Low Priority";
-            break;
-          case null:
-          default:
-            groupTitle = "No Priority";
-            break;
-        }
+      switch (todo.priority) {
+        case "high":
+          groupTitle = "High Priority";
+          break;
+        case "medium":
+          groupTitle = "Medium Priority";
+          break;
+        case "low":
+          groupTitle = "Low Priority";
+          break;
+        case null:
+        default:
+          groupTitle = "No Priority";
+          break;
+      }
       // }
 
       if (!currentGroup || currentGroup.title !== groupTitle) {
@@ -794,22 +794,24 @@ function renderTodos() {
 
       // === Event Listeners ===
       item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
-  todo.done = e.target.checked;
-  
-  // Only animate if we're in completion sort mode AND item is being marked as done
-  if (todo.done && currentSortMode === "completion") {
-    // Add CSS class for animation
-    item.classList.add("completing");
-    
-    // Wait for animation, then save and re-render
-    setTimeout(() => {
-      todoSaveAndRender();
-    }, 500);
-  } else {
-    // No animation needed, just save and re-render immediately
-    todoSaveAndRender();
-  }
-});
+        todo.done = e.target.checked;
+
+        if (currentSortMode === "completion") {
+          if (todo.done) {
+            // Completing - fade and shrink
+            item.classList.add("completing");
+          } else {
+            // Uncompleting - fly up
+            item.classList.add("uncompleting");
+          }
+
+          setTimeout(() => {
+            todoSaveAndRender();
+          }, 500);
+        } else {
+          todoSaveAndRender();
+        }
+      });
 
       item.querySelectorAll(".todo-subtask-checkbox").forEach((checkbox) => {
         checkbox.addEventListener("change", (e) => {
@@ -1224,28 +1226,28 @@ function todoOpenEditModal(todo = null) {
   const subtasksContainer = modal.querySelector("#todo-subtasks-container");
 
   function autoResize(textarea) {
-  textarea.style.height = "auto";
-  textarea.style.height = textarea.scrollHeight + "px";
-}
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+  }
 
-function setupTextareaAutoResize(textarea) {
-  autoResize(textarea);
-  textarea.addEventListener("input", () => autoResize(textarea));
-}
+  function setupTextareaAutoResize(textarea) {
+    autoResize(textarea);
+    textarea.addEventListener("input", () => autoResize(textarea));
+  }
 
-// attach to all auto-expanding textareas
-// REPLACE your existing textarea setup with this
-modal.querySelectorAll("textarea").forEach(textarea => {
-  setupTextareaAutoResize(textarea);
-});
-// Show sections if they have content (for edit mode)
-if (todo?.description) {
-  descriptionSection.style.display = "block";
-  descriptionBtn.classList.add("active");
+  // attach to all auto-expanding textareas
+  // REPLACE your existing textarea setup with this
+  modal.querySelectorAll("textarea").forEach(textarea => {
+    setupTextareaAutoResize(textarea);
+  });
+  // Show sections if they have content (for edit mode)
+  if (todo?.description) {
+    descriptionSection.style.display = "block";
+    descriptionBtn.classList.add("active");
 
-  const textarea = descriptionSection.querySelector("#todo-task-description");
-  autoResize(textarea); // <-- resize for prefilled text
-}
+    const textarea = descriptionSection.querySelector("#todo-task-description");
+    autoResize(textarea); // <-- resize for prefilled text
+  }
 
   if (todo?.dueDate) {
     dateSection.style.display = "block";
@@ -1255,29 +1257,29 @@ if (todo?.description) {
     timeSection.style.display = "block";
     timeBtn.classList.add("active");
   }
-if (todo?.subtasks && todo.subtasks.length > 0) {
-  subtasksSection.style.display = "block";
-  subtaskBtn.classList.add("active");
-  
-  // ADD THIS - same pattern as description
-  const subtaskTextareas = subtasksContainer.querySelectorAll('textarea');
-  subtaskTextareas.forEach(textarea => {
-    autoResize(textarea);
-  });
-}
+  if (todo?.subtasks && todo.subtasks.length > 0) {
+    subtasksSection.style.display = "block";
+    subtaskBtn.classList.add("active");
 
-// Toggle description
-descriptionBtn.addEventListener("click", () => {
-  const isVisible = descriptionSection.style.display !== "none";
-  descriptionSection.style.display = isVisible ? "none" : "block";
-  descriptionBtn.classList.toggle("active");
-
-  if (!isVisible) {
-    const textarea = modal.querySelector("#todo-task-description");
-    autoResize(textarea);   // <-- fix prefilled size
-    textarea.focus();
+    // ADD THIS - same pattern as description
+    const subtaskTextareas = subtasksContainer.querySelectorAll('textarea');
+    subtaskTextareas.forEach(textarea => {
+      autoResize(textarea);
+    });
   }
-});
+
+  // Toggle description
+  descriptionBtn.addEventListener("click", () => {
+    const isVisible = descriptionSection.style.display !== "none";
+    descriptionSection.style.display = isVisible ? "none" : "block";
+    descriptionBtn.classList.toggle("active");
+
+    if (!isVisible) {
+      const textarea = modal.querySelector("#todo-task-description");
+      autoResize(textarea);   // <-- fix prefilled size
+      textarea.focus();
+    }
+  });
 
 
   // Toggle date - open picker immediately
@@ -1325,11 +1327,11 @@ descriptionBtn.addEventListener("click", () => {
     `;
     subtasksContainer.appendChild(subtaskDiv);
     // ADD this line after appendChild
-const newTextarea = subtaskDiv.querySelector('textarea');
-setupTextareaAutoResize(newTextarea);
+    const newTextarea = subtaskDiv.querySelector('textarea');
+    setupTextareaAutoResize(newTextarea);
 
     // Focus on the new subtask input
-subtaskDiv.querySelector('textarea').focus();
+    subtaskDiv.querySelector('textarea').focus();
   });
 
   // Remove subtask functionality
@@ -1363,7 +1365,7 @@ subtaskDiv.querySelector('textarea').focus();
     const subtaskInputs = modal.querySelectorAll(".todo-subtask-input");
     const subtasks = Array.from(subtaskInputs)
       .map((subtaskDiv) => {
-const textInput = subtaskDiv.querySelector('textarea');
+        const textInput = subtaskDiv.querySelector('textarea');
         const checkbox = subtaskDiv.querySelector('input[type="checkbox"]');
         const title = textInput.value.trim();
         return title ? { title, done: checkbox.checked } : null;
@@ -1662,7 +1664,7 @@ document.querySelectorAll(".todo-filter-btn").forEach(btn => {
     // applyTodoFilter(mode);
     renderTodos();
     closeFilterPopup();
-      initializeFilterButtons();
+    initializeFilterButtons();
 
   });
 });
