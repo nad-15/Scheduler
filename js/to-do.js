@@ -508,9 +508,10 @@ function getGroupedTodos(sortedTodos) {
     sortedTodos.forEach(todo => {
       let groupTitle;
 
-      if (todo.pinned) {
-        groupTitle = "Important";
-      } else if (todo.dueDate) {
+      // if (todo.pinned) {
+      //   groupTitle = "Important";
+      // } else 
+        if (todo.dueDate) {
         const today = new Date(todayVertView);
         today.setHours(0, 0, 0, 0);
         const dueDate = new Date(todo.dueDate);
@@ -568,9 +569,10 @@ function getGroupedTodos(sortedTodos) {
     sortedTodos.forEach(todo => {
       let groupTitle;
 
-      if (todo.pinned) {
-        groupTitle = "Important";
-      } else {
+      // if (todo.pinned) {
+      //   groupTitle = "Important";
+      // } 
+      // else {
         const timeMinutes = parseTimeEstimate(todo.timeEstimate);
 
         if (timeMinutes === 0) {
@@ -588,7 +590,7 @@ function getGroupedTodos(sortedTodos) {
         } else {
           groupTitle = "Major (8+h)";
         }
-      }
+      // }
 
       if (!currentGroup || currentGroup.title !== groupTitle) {
         currentGroup = { title: groupTitle, todos: [] };
@@ -602,13 +604,13 @@ function getGroupedTodos(sortedTodos) {
     sortedTodos.forEach(todo => {
       let groupTitle;
 
-      if (todo.pinned) {
-        groupTitle = "Important";
-      }
+      // if (todo.pinned) {
+      //   groupTitle = "Important";
+      // }
       // else if (todo.done) {
       //   groupTitle = "Completed";
       // } 
-      else {
+      // else {
         switch (todo.priority) {
           case "high":
             groupTitle = "High Priority";
@@ -624,7 +626,7 @@ function getGroupedTodos(sortedTodos) {
             groupTitle = "No Priority";
             break;
         }
-      }
+      // }
 
       if (!currentGroup || currentGroup.title !== groupTitle) {
         currentGroup = { title: groupTitle, todos: [] };
