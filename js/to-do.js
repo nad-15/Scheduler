@@ -1086,7 +1086,7 @@ function todoOpenEditModal(todo = null) {
       (subtask, index) => `
     <div class="todo-subtask-input">
       <input type="checkbox" ${subtask.done ? 'checked' : ''}>
-      <input type="text" value="${subtask.title}" placeholder="Subtask">
+      <textarea placeholder="Subtask" rows="1">${subtask.title}</textarea>
       <button type="button" class="todo-remove-subtask">
         <span class="material-symbols-outlined">close</span>
       </button>
@@ -1191,12 +1191,16 @@ function todoOpenEditModal(todo = null) {
   textarea.style.height = textarea.scrollHeight + "px";
 }
 
+function setupTextareaAutoResize(textarea) {
+  autoResize(textarea);
+  textarea.addEventListener("input", () => autoResize(textarea));
+}
+
 // attach to all auto-expanding textareas
-modal.querySelectorAll("#todo-task-title, #todo-task-description")
-  .forEach(el => {
-    autoResize(el); 
-    el.addEventListener("input", () => autoResize(el));
-  });
+// REPLACE your existing textarea setup with this
+modal.querySelectorAll("textarea").forEach(textarea => {
+  setupTextareaAutoResize(textarea);
+});
 // Show sections if they have content (for edit mode)
 if (todo?.description) {
   descriptionSection.style.display = "block";
@@ -1214,10 +1218,16 @@ if (todo?.description) {
     timeSection.style.display = "block";
     timeBtn.classList.add("active");
   }
-  if (todo?.subtasks && todo.subtasks.length > 0) {
-    subtasksSection.style.display = "block";
-    subtaskBtn.classList.add("active");
-  }
+if (todo?.subtasks && todo.subtasks.length > 0) {
+  subtasksSection.style.display = "block";
+  subtaskBtn.classList.add("active");
+  
+  // ADD THIS - same pattern as description
+  const subtaskTextareas = subtasksContainer.querySelectorAll('textarea');
+  subtaskTextareas.forEach(textarea => {
+    autoResize(textarea);
+  });
+}
 
 // Toggle description
 descriptionBtn.addEventListener("click", () => {
@@ -1271,15 +1281,18 @@ descriptionBtn.addEventListener("click", () => {
     subtaskDiv.className = "todo-subtask-input";
     subtaskDiv.innerHTML = `
       <input type="checkbox">
-      <input type="text" placeholder="Subtask">
+      <textarea placeholder="Subtask" rows="1"></textarea>
       <button type="button" class="todo-remove-subtask">
         <span class="material-symbols-outlined">close</span>
       </button>
     `;
     subtasksContainer.appendChild(subtaskDiv);
+    // ADD this line after appendChild
+const newTextarea = subtaskDiv.querySelector('textarea');
+setupTextareaAutoResize(newTextarea);
 
     // Focus on the new subtask input
-    subtaskDiv.querySelector('input[type="text"]').focus();
+subtaskDiv.querySelector('textarea').focus();
   });
 
   // Remove subtask functionality
@@ -1313,7 +1326,7 @@ descriptionBtn.addEventListener("click", () => {
     const subtaskInputs = modal.querySelectorAll(".todo-subtask-input");
     const subtasks = Array.from(subtaskInputs)
       .map((subtaskDiv) => {
-        const textInput = subtaskDiv.querySelector('input[type="text"]');
+const textInput = subtaskDiv.querySelector('textarea');
         const checkbox = subtaskDiv.querySelector('input[type="checkbox"]');
         const title = textInput.value.trim();
         return title ? { title, done: checkbox.checked } : null;
