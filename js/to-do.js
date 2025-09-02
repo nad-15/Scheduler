@@ -546,9 +546,11 @@ function getGroupedTodos(sortedTodos) {
     sortedTodos.forEach(todo => {
       let groupTitle;
 
-      if (todo.pinned) {
-        groupTitle = "Important";
-      } else if (todo.done) {
+      // if (todo.pinned) {
+      //   groupTitle = "Important";
+      // } else 
+        
+        if (todo.done) {
         groupTitle = "Completed";
       } else {
         groupTitle = "To do";
@@ -790,9 +792,22 @@ function renderTodos() {
 
       // === Event Listeners ===
       item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
-        todo.done = e.target.checked;
-        todoSaveAndRender();
-      });
+  todo.done = e.target.checked;
+  
+  // Only animate if we're in completion sort mode AND item is being marked as done
+  if (todo.done && currentSortMode === "completion") {
+    // Add CSS class for animation
+    item.classList.add("completing");
+    
+    // Wait for animation, then save and re-render
+    setTimeout(() => {
+      todoSaveAndRender();
+    }, 500);
+  } else {
+    // No animation needed, just save and re-render immediately
+    todoSaveAndRender();
+  }
+});
 
       item.querySelectorAll(".todo-subtask-checkbox").forEach((checkbox) => {
         checkbox.addEventListener("change", (e) => {
