@@ -5,7 +5,7 @@ const DEFAULT_SETTINGS = {
   "todo-sort-mode": "date-newest",
   "clamp-expanded": true,
   "todo-collapsed": false,
-  "todo-filter-mode": "all" // new key
+  "todo-filter-mode": "not-archived" // new key
 };
 
 

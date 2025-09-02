@@ -812,12 +812,22 @@ function renderTodos() {
           todoSaveAndRender();
         }
       });
-
+      // In the subtask checkbox event listener, just save without re-rendering
       item.querySelectorAll(".todo-subtask-checkbox").forEach((checkbox) => {
         checkbox.addEventListener("change", (e) => {
           const index = parseInt(e.target.getAttribute("data-index"));
           todo.subtasks[index].done = e.target.checked;
-          todoSaveAndRender();
+
+          // Just save, don't re-render
+          localStorage.setItem("todos", JSON.stringify(todos));
+
+          // Update just this subtask's visual state
+          const subtaskText = e.target.nextElementSibling;
+          if (e.target.checked) {
+            subtaskText.classList.add("done");
+          } else {
+            subtaskText.classList.remove("done");
+          }
         });
       });
 
