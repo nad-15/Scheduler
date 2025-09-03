@@ -42,13 +42,13 @@
                     <div class="appname-sort-container">
                         <!-- <div class="todo-greet">Good Day, Khaye!</div> -->
                         <div class="todo-appname">What’s Next?</div>
-                       
                     </div>
 
                 </div>
                 <div>
 
                 </div>
+
                 <div style="display: flex; gap: 6px;">
                     <div class="todo-actions-container" style="position: relative;">
                         <button class="todo-actions-btn">
@@ -69,11 +69,30 @@
                         <span class="material-icons todo-close-icon">close</span>
                     </button>
                 </div>
-
-
-
-
             </div>
+
+            <div class="todo-header-container-middle">
+                <div class="sort-buttons-toggle">
+                    <label class="sort-label">
+                        Sort by
+                        <span class="material-symbols-outlined sort-icon">arrow_drop_down</span>
+                    </label>
+                    <div class="todo-sort-controls">
+                        <div class="todo-sort-buttons">
+                            <button class="todo-sort-btn" data-sort="date-newest">Newest First</button>
+                            <button class="todo-sort-btn" data-sort="date-oldest">Oldest First</button>
+                            <button class="todo-sort-btn" data-sort="group">Priority</button>
+                            <button class="todo-sort-btn" data-sort="due-date">Due Date</button>
+                            <button class="todo-sort-btn" data-sort="completion">Completion</button>
+                            <button class="todo-sort-btn" data-sort="time-estimate">Time Estimate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
             <div class="todo-header-container-bottom">
                 <div class="todo-folder-container">
                     <button class="todo-filter-btn" data-filter="starred">Starred</button>
@@ -83,24 +102,6 @@
                     <button class="todo-filter-btn" data-filter="archive">Archive</button>
                     <button class="todo-filter-btn" data-filter="all">All</button>
                 </div>
-                 <div style="display: flex;">
-                            <div class="sort-buttons-toggle">
-                                <label class="sort-label">
-                                    <!-- Sort by -->
-                                    <span class="material-symbols-outlined sort-icon">swap_vert</span>
-                                </label>
-                                <div class="todo-sort-controls">
-                                    <div class="todo-sort-buttons">
-                                        <button class="todo-sort-btn" data-sort="date-newest">Newest First</button>
-                                        <button class="todo-sort-btn" data-sort="date-oldest">Oldest First</button>
-                                        <button class="todo-sort-btn" data-sort="group">Priority</button>
-                                        <button class="todo-sort-btn" data-sort="due-date">Due Date</button>
-                                        <button class="todo-sort-btn" data-sort="completion">Completion</button>
-                                        <button class="todo-sort-btn" data-sort="time-estimate">Time Estimate</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
             </div>
 
         </div>
