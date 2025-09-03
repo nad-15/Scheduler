@@ -265,11 +265,15 @@ body {
 }
 
 .material-symbols-outlined.sort-icon {
-    /* padding: 3px; */
-    padding: 0;
-    margin: 0;
-
+  font-size: 16px;       
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+  display: inline-flex;   
+  align-items: center;
 }
+
 
 
 .todo-title-header {
@@ -301,7 +305,7 @@ body {
     color: #333;
     font-weight: 600;
     margin: 0;
-    margin-left: 5px;
+    /* margin-left: 5px; */
     padding: 0;
     line-height: 1;
     /* remove extra vertical spacing */
@@ -389,6 +393,12 @@ body {
   /* transform: translateY(4px); */
 
 }
+
+
+.sort-label{
+    height: min-content;
+}
+
 
 .sort-label,
 .collapse-toggle-btn,
