@@ -1083,24 +1083,58 @@ body {
   background: transparent;
   padding: 2px 0;
   box-sizing: border-box; 
-  /* border: 2px solid red; */
+  
 }
 
 .todo-date-section input {
-    /* width: 100%; */
-    border: none;
-    outline: none;
-    font-size: 14px;
-    padding: 8px 0;
-    background: transparent;
-    /* border: 1px solid #666; */
-    border-radius: 3px;
+    display: none;
 }
+
+.todo-date-section {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;   /* keeps items vertically centered */
+  justify-content: space-between;
+  gap: 6px;              /* space between text and X */
+  padding: 6px 10px;
+  width: fit-content;    /* shrink to content */
+  background: #f9f9f9;     /* clean light background */
+  transition: background 0.2s ease;
+}
+
+
+#todo-due-date {
+  display: none; /* hidden date input */
+}
+
+#formatted-date {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(102, 102, 102);
+  white-space: nowrap;
+  cursor: pointer; /* makes it obvious it's clickable */
+}
+
+.material-icons.todo-clear-date {
+  font-size: 18px;
+  color: #888;
+  cursor: pointer;
+}
+
+.material-icons.todo-clear-date:hover {
+  color: #333;
+}
+
+
 
 
 
 .todo-time-section {
-    padding: 8px 0;
+    /* padding: 8px 0; */
+  /* border: 2px solid green; */
+
 }
 
 .time-input-group {

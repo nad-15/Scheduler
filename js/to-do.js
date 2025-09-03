@@ -1174,9 +1174,15 @@ function todoOpenEditModal(todo = null) {
       <!-- Date Section (Initially Hidden) -->
       <div class="todo-date-section" style="display: none;">
        <!-- <label>Due: </label> -->
-        <input type="date" id="todo-due-date" 
-              value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split("T")[0] : ""}">
+            <input type="date" id="todo-due-date" 
+                    value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : ''}" 
+                    style="display:none;">
+
+              <span id="formatted-date"></span>
+              <span class="material-icons todo-clear-date" id="clear-date">close</span>
       </div>
+
+      
       
       <!-- Time Estimate Section (Initially Hidden) -->
       <div class="todo-time-section" style="display: none;">
@@ -1216,6 +1222,40 @@ function todoOpenEditModal(todo = null) {
     </div>
   `;
 
+  const dateInput = modal.querySelector("#todo-due-date");
+  const formattedSpan = modal.querySelector("#formatted-date");
+  const todoClearDateBtn = modal.querySelector("#clear-date");
+
+  function updateFormattedDate() {
+    if (dateInput.value) {
+      formattedSpan.textContent = new Date(dateInput.value).toLocaleDateString("en-US", {
+        weekday: "short", // 👈 adds "Wed"
+        month: "short",   // "Sep"
+        day: "numeric",   // "3"
+      });
+    } else {
+      formattedSpan.textContent = "Add due date";
+    }
+
+  }
+
+  updateFormattedDate();
+
+  // Clicking the span will open the hidden date picker
+  formattedSpan.addEventListener("click", () => {
+    dateInput.showPicker?.(); // modern browsers
+    dateInput.click();        // fallback
+  });
+
+  // Update text when user picks new date
+  dateInput.addEventListener("change", updateFormattedDate);
+
+
+  // Clear when X clicked
+  todoClearDateBtn.addEventListener("click", () => {
+    dateInput.value = "";
+dateInput.dispatchEvent(new Event("change"));
+  });
 
   document.body.appendChild(modal);
 
@@ -1260,7 +1300,7 @@ function todoOpenEditModal(todo = null) {
   }
 
   if (todo?.dueDate) {
-    dateSection.style.display = "block";
+    dateSection.style.display = "flex";
     dateBtn.classList.add("active");
   }
   if (todo?.timeEstimate) {
@@ -1302,7 +1342,7 @@ function todoOpenEditModal(todo = null) {
   modal.querySelector("#todo-due-date").addEventListener("change", (e) => {
     if (e.target.value) {
       // Date selected - show the section
-      dateSection.style.display = "block";
+      dateSection.style.display = "flex";
       dateBtn.classList.add("active");
     } else {
       // Date cleared - hide the section
