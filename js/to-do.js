@@ -408,92 +408,7 @@ function sortTodos(todos) {
       return todos;
   }
 }
-// function sortTodos(todos) {
-//   // Separate todos into categories
-//   const pinnedTodos = todos.filter(todo => todo.pinned);
-//   const incompleteTodos = todos.filter(todo => !todo.pinned && !todo.done);
-//   const completedTodos = todos.filter(todo => !todo.pinned && todo.done);
 
-//   // Helper function to sort a group of todos
-//   const sortGroup = (todoGroup) => {
-//     switch (currentSortMode) {
-//       case "date-newest":
-//         return [...todoGroup].sort((a, b) => b.createdAt - a.createdAt);
-
-//       case "date-oldest":
-//         return [...todoGroup].sort((a, b) => a.createdAt - b.createdAt);
-
-//       case "group":
-//         return [...todoGroup].sort((a, b) => {
-//           // Define priority order for grouping (without pinned since we handle that separately)
-//           const getPriorityOrder = (todo) => {
-//             switch (todo.priority) {
-//               case "high": return 1;
-//               case "medium": return 2;
-//               case "low": return 3;
-//               case null: return 4;
-//               default: return 4;
-//             }
-//           };
-
-//           const aOrder = getPriorityOrder(a);
-//           const bOrder = getPriorityOrder(b);
-
-//           if (aOrder !== bOrder) {
-//             return aOrder - bOrder;
-//           }
-
-//           // Within same group, sort by creation date (newest first)
-//           return b.createdAt - a.createdAt;
-//         });
-
-//       case "due-date":
-//         return [...todoGroup].sort((a, b) => {
-//           // Handle due dates: overdue first, then by due date, then no due date last
-//           if (a.dueDate && b.dueDate) {
-//             return a.dueDate - b.dueDate; // Earlier due dates first
-//           }
-//           if (a.dueDate && !b.dueDate) return -1; // Items with due dates before items without
-//           if (!a.dueDate && b.dueDate) return 1;
-
-//           // If both have no due date, sort by creation date (newest first)
-//           return b.createdAt - a.createdAt;
-//         });
-
-//       case "completion":
-//         // For completion sorting, we still sort by creation date within each group
-//         return [...todoGroup].sort((a, b) => b.createdAt - a.createdAt);
-
-//       case "time-estimate":
-//         return [...todoGroup].sort((a, b) => {
-//           // Parse time estimates
-//           const aTime = parseTimeEstimate(a.timeEstimate);
-//           const bTime = parseTimeEstimate(b.timeEstimate);
-
-//           // Sort: tasks with estimates first (shorter first), then tasks without estimates
-//           if (aTime > 0 && bTime > 0) {
-//             return aTime - bTime; // Shorter tasks first
-//           }
-//           if (aTime > 0 && bTime === 0) return -1; // Tasks with estimates before tasks without
-//           if (aTime === 0 && bTime > 0) return 1;
-
-//           // If both have no time estimate, sort by creation date (newest first)
-//           return b.createdAt - a.createdAt;
-//         });
-
-//       default:
-//         return todoGroup;
-//     }
-//   };
-
-//   // Sort each group independently
-//   const sortedPinned = sortGroup(pinnedTodos);
-//   const sortedIncomplete = sortGroup(incompleteTodos);
-//   const sortedCompleted = sortGroup(completedTodos);
-
-//   // Combine: pinned first, then incomplete, then completed
-//   return [...sortedPinned, ...sortedIncomplete, ...sortedCompleted];
-// }
 // === Get grouped todos for group mode ===
 function getGroupedTodos(sortedTodos) {
   if (currentSortMode !== "group" && currentSortMode !== "due-date" && currentSortMode !== "completion" && currentSortMode !== "time-estimate") {
@@ -972,149 +887,6 @@ function formatTimeEstimate(hours, minutes) {
   return timeString || '0m';
 }
 
-// // === Edit/Create Modal ===
-// function todoOpenEditModal(todo = null) {
-//   const isEdit = todo !== null;
-
-//   const modal = document.createElement("div");
-//   modal.className = "todo-modal-overlay";
-
-//   console.log(todo?.timeEstimate);
-
-//   const { hours, minutes } = parseTimeEstimateToSaveInLocal(todo?.timeEstimate || "");
-
-//   console.log(hours, minutes);
-
-//   const subtasksHTML = (todo?.subtasks || [])
-//     .map(
-//       (subtask, index) => `
-//     <div class="todo-subtask-input">
-//       <input type="text" value="${subtask.title}" placeholder="Subtask">
-//       <button type="button" class="todo-remove-subtask">❌</button>
-//     </div>
-//   `
-//     )
-//     .join("");
-
-//   modal.innerHTML = `
-//                   <div class="todo-modal-content">
-//                     <h3>${isEdit ? "Edit Task" : "New Task"}</h3>
-
-//                     <input type="text" id="todo-task-title" placeholder="Task title" 
-//                           value="${todo?.text || ""}" required>
-
-//                     <textarea id="todo-task-description" placeholder="Description (optional)" 
-//                               rows="3">${todo?.description || ""}</textarea>
-
-//                     <div class="todo-subtasks-section">
-//                       <label>Subtasks:</label>
-//                       <div id="todo-subtasks-container">
-//                         ${subtasksHTML}
-//                       </div>
-//                       <button type="button" id="todo-add-subtask">➕ Add Subtask</button>
-//                     </div>
-
-//                     <div class="todo-modal-row">
-//                       <div>
-//                         <label>Due Date:</label>
-//                         <input type="date" id="todo-due-date" 
-//                               value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split("T")[0] : ""}">
-//                       </div>
-//                       <fieldset class="time-estimate-box">
-//                         <legend>Time Estimate</legend>
-//                         <div class="time-input-group">
-//                           <div class="time-input-field">
-//                             <label>Hours</label>
-//                             <input type="number" id="hoursInput" min="0" max="23" placeholder="0" value="${hours || ""}">
-//                           </div>
-//                           <div class="time-input-field">
-//                             <label>Minutes</label>
-//                             <input type="number" id="minutesInput" min="0" max="59" placeholder="0" value="${minutes || ""}">
-//                           </div>
-//                         </div>
-//                       </fieldset>
-//                     </div>
-//                     <div class="todo-modal-actions">
-//                       <button type="button" id="todo-save-task">${isEdit ? "Save" : "Create"}</button>
-//                       <button type="button" id="todo-cancel-task">Cancel</button>
-//                     </div>
-//                   </div>
-//                 `;
-
-
-//   document.body.appendChild(modal);
-
-//   // subtask add/remove
-//   const addSubtaskBtn = modal.querySelector("#todo-add-subtask");
-//   const subtasksContainer = modal.querySelector("#todo-subtasks-container");
-
-//   addSubtaskBtn.addEventListener("click", () => {
-//     const subtaskDiv = document.createElement("div");
-//     subtaskDiv.className = "todo-subtask-input";
-//     subtaskDiv.innerHTML = `
-//       <input type="text" placeholder="Subtask">
-//       <button type="button" class="todo-remove-subtask">❌</button>
-//     `;
-//     subtasksContainer.appendChild(subtaskDiv);
-//   });
-
-//   subtasksContainer.addEventListener("click", (e) => {
-//     if (e.target.classList.contains("todo-remove-subtask")) {
-//       e.target.parentElement.remove();
-//     }
-//   });
-
-//   // save
-//   modal.querySelector("#todo-save-task").addEventListener("click", () => {
-//     const title = modal.querySelector("#todo-task-title").value.trim();
-//     if (!title) {
-//       alert("Task title is required!");
-//       return;
-//     }
-
-//     const description = modal.querySelector("#todo-task-description").value.trim();
-//     const dueDate = modal.querySelector("#todo-due-date").value || null;
-
-//     const hoursInput = document.getElementById('hoursInput');
-//     const minutesInput = document.getElementById('minutesInput');
-//     const timeEstimate = formatTimeEstimate(hoursInput.value, minutesInput.value);
-
-//     // const timeEstimate = modal.querySelector("#todo-time-estimate").value.trim();
-
-//     const subtaskInputs = modal.querySelectorAll(".todo-subtask-input input");
-//     const subtasks = Array.from(subtaskInputs)
-//       .map((input) => input.value.trim())
-//       .filter((text) => text)
-//       .map((title) => ({ title, done: false }));
-
-//     if (isEdit) {
-//       todo.text = title;
-//       todo.description = description;
-//       todo.dueDate = dueDate ? new Date(dueDate).getTime() : null;
-//       todo.timeEstimate = timeEstimate;
-//       todo.subtasks = subtasks;
-//     } else {
-//       todoCreate(title, {
-//         description,
-//         dueDate: dueDate ? new Date(dueDate).getTime() : null,
-//         timeEstimate,
-//         subtasks,
-//       });
-//     }
-//     document.body.removeChild(modal);
-//     todoSaveAndRender();
-//   });
-
-//   modal.querySelector("#todo-cancel-task").addEventListener("click", () => {
-//     document.body.removeChild(modal);
-//   });
-
-//   modal.addEventListener("click", (e) => {
-//     if (e.target === modal) {
-//       document.body.removeChild(modal);
-//     }
-//   });
-// }
 
 // === Edit/Create Modal ===
 function todoOpenEditModal(todo = null) {
@@ -1168,37 +940,34 @@ function todoOpenEditModal(todo = null) {
       </div>
       
       <!-- TIME and Date Section (Initially Hidden) -->
-      <div class="todo-time-date-section" style="display: flex; border: none; gap: 4px; align-items: center; ">
+      <div class="todo-time-date-section">
+            <!-- Date Section (Initially Hidden) -->
+            <div class="todo-date-section" style="display: none;">
+                <label>Due Date:</label>
+                      <div class="date-input-group"> 
+                        <input type="date" id="todo-due-date" 
+                                value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : ''}" >
 
+                          <span id="formatted-date"></span>
+                          <span class="material-icons todo-clear-date" id="clear-date">close</span>
+                      </div>
+            </div>
 
-      <!-- Date Section (Initially Hidden) -->
-      <div class="todo-date-section" style="display: none;">
-       <!-- <label>Due: </label> -->
-            <input type="date" id="todo-due-date" 
-                    value="${todo?.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : ''}" 
-                    style="display:none;">
-
-              <span id="formatted-date"></span>
-              <span class="material-icons todo-clear-date" id="clear-date">close</span>
-      </div>
-
-      
-      
-      <!-- Time Estimate Section (Initially Hidden) -->
-      <div class="todo-time-section" style="display: none;">
-        
-        <div class="time-input-group">
-        <label>Duration:</label>
-          <div class="time-input-field">
-           <!-- <label>Hours</label>-->
-            <input type="number" id="hoursInput" min="0" max="23" placeholder="hrs" value="${hours || ""}">
-          </div>
-          <div class="time-input-field">
-            <!--<label>Minutes</label>-->
-            <input type="number" id="minutesInput" min="0" max="59" placeholder="mins" value="${minutes || ""}">
-          </div>
-        </div>
-      </div>
+            <!-- Time Estimate Section (Initially Hidden) -->
+            <div class="todo-time-section" style="display: none;">
+              <label>Duration:</label>
+              <div class="time-input-group">
+                <div class="time-input-field">
+                    <input type="number" id="hoursInput" min="0" max="23" placeholder="0" value="${hours || ""}">
+                    <label>h, </label>
+                </div>
+                <div class="time-input-field">
+                    <input type="number" id="minutesInput" min="0" max="59" placeholder="0" value="${minutes || ""}">
+                    <label>m</label>
+                </div>
+                <span class="material-icons todo-clear-time" id="clear-date">close</span>
+              </div>
+            </div>
       </div>
 
       <!-- Action Icons and Save Button -->
@@ -1254,7 +1023,7 @@ function todoOpenEditModal(todo = null) {
   // Clear when X clicked
   todoClearDateBtn.addEventListener("click", () => {
     dateInput.value = "";
-dateInput.dispatchEvent(new Event("change"));
+    dateInput.dispatchEvent(new Event("change"));
   });
 
   document.body.appendChild(modal);
@@ -1304,9 +1073,22 @@ dateInput.dispatchEvent(new Event("change"));
     dateBtn.classList.add("active");
   }
   if (todo?.timeEstimate) {
-    timeSection.style.display = "block";
-    timeBtn.classList.add("active");
+    // you already parsed todo.timeEstimate into hours + minutes here
+
+    if ((hours && hours > 0) || (minutes && minutes > 0)) {
+      timeSection.style.display = "flex";
+      timeBtn.classList.add("active");
+    } else {
+      timeSection.style.display = "none";
+      timeBtn.classList.remove("active");
+    }
+  } else {
+    // make sure it's hidden if the key doesn't exist at all
+    timeSection.style.display = "none";
+    timeBtn.classList.remove("active");
   }
+
+
   if (todo?.subtasks && todo.subtasks.length > 0) {
     subtasksSection.style.display = "block";
     subtaskBtn.classList.add("active");
@@ -1351,12 +1133,34 @@ dateInput.dispatchEvent(new Event("change"));
     }
   });
 
+  const hoursInput = modal.querySelector("#hoursInput");
+  const minutesInput = modal.querySelector("#minutesInput");
+  const clearTimeBtn = modal.querySelector(".todo-clear-time");
+
+  // Clear + hide time section
+  clearTimeBtn.addEventListener("click", () => {
+    hoursInput.value = "";
+    minutesInput.value = "";
+    timeSection.style.display = "none";
+    timeBtn.classList.remove("active"); // remove highlight
+  });
+
+
+  // Toggle time estimate
   // Toggle time estimate
   timeBtn.addEventListener("click", () => {
     const isVisible = timeSection.style.display !== "none";
-    timeSection.style.display = isVisible ? "none" : "block";
-    timeBtn.classList.toggle("active");
-    if (!isVisible) {
+
+    if (isVisible) {
+      // Hiding → reset values
+      modal.querySelector("#hoursInput").value = "";
+      modal.querySelector("#minutesInput").value = "";
+      timeSection.style.display = "none";
+      timeBtn.classList.remove("active");
+    } else {
+      // Showing
+      timeSection.style.display = "flex";
+      timeBtn.classList.add("active");
       modal.querySelector("#hoursInput").focus();
     }
   });
@@ -1410,6 +1214,7 @@ dateInput.dispatchEvent(new Event("change"));
 
     const hoursInput = document.getElementById('hoursInput');
     const minutesInput = document.getElementById('minutesInput');
+
     const timeEstimate = formatTimeEstimate(hoursInput.value, minutesInput.value);
 
     const subtaskInputs = modal.querySelectorAll(".todo-subtask-input");
