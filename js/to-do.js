@@ -6,6 +6,7 @@ const deleteBtn = document.querySelector(".todo-actions-btn");
 const deleteDropdown = document.querySelector(".todo-actions-dropdown");
 const deleteAllBtn = document.querySelector(".delete-all-btn");
 const deleteCompletedBtn = document.querySelector(".delete-completed-btn");
+const deleteArchivedBtn = document.querySelector(".delete-archived-btn");
 const archiveCompletedBtn = document.querySelector(".archive-completed-btn");
 
 
@@ -1447,6 +1448,16 @@ archiveCompletedBtn.addEventListener("click", () => {
   }
   deleteDropdown.style.display = "none";
 });
+
+deleteArchivedBtn.addEventListener("click", () => {
+  if (confirm("Are you sure you want to delete all archived tasks?")) {
+    todos = todos.filter(todo => !todo.isArchive); // keep only tasks that are NOT archived
+    localStorage.setItem("todos", JSON.stringify(todos));
+    todoSaveAndRender();
+  }
+  deleteDropdown.style.display = "none";
+});
+
 
 
 // filterToggleBtn.addEventListener("click", (e) => {
