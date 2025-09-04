@@ -16,19 +16,23 @@ const filterDropdown = document.querySelector(".todo-filter-dropdown");
 
 let filterMode = (appSettings["todo-filter-mode"] || DEFAULT_SETTINGS["todo-filter-mode"]);
 function initializeFilterButtons() {
-
-  // Remove active from all buttons
   document.querySelectorAll(".todo-filter-btn").forEach(btn => {
     btn.classList.remove("active");
   });
 
-  // Add active to current filter
   const activeButton = document.querySelector(`[data-filter="${filterMode}"]`);
   if (activeButton) {
     activeButton.classList.add("active");
+    
+    // Add this line to scroll active button into center on page load
+    activeButton.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'nearest', 
+      inline: 'center' 
+    });
   }
-
-  updateFilterButtonCounts();
+  
+  updateFilterButtonCounts(); // your existing line
 }
 
 // CALL this when page loads
@@ -53,37 +57,7 @@ function filterTodosByMode(todos, mode) {
 }
 
 
-// === Cycle through priority levels ===// js/to-do.js
-// function migrateTodos() {
-//   let changed = false;
 
-//   todos.forEach(todo => {
-//     if (todo.priority === undefined) {
-//       todo.priority = null;
-//       changed = true;
-//     }
-//     if (todo.subtasks === undefined) {
-//       todo.subtasks = [];
-//       changed = true;
-//     }
-//     if (todo.description === undefined) {
-//       todo.description = "";
-//       changed = true;
-//     }
-//     if (todo.dueDate === undefined) {
-//       todo.dueDate = null;
-//       changed = true;
-//     }
-//     if (todo.timeEstimate === undefined) {
-//       todo.timeEstimate = "";
-//       changed = true;
-//     }
-//   });
-
-//   if (changed) {
-//     localStorage.setItem("todos", JSON.stringify(todos));
-//   }
-// }
 
 function migrateTodos() {
   let changed = false;
@@ -1558,16 +1532,63 @@ document.querySelectorAll(".todo-filter-btn").forEach(btn => {
     appSettings["todo-filter-mode"] = selectedFilter;
     localStorage.setItem("appSettings", JSON.stringify(appSettings));
 
-    // now this works because mode was declared with let
     filterMode = selectedFilter;
 
-    // applyTodoFilter(mode);
     renderTodos();
     closeFilterPopup();
     initializeFilterButtons();
 
+    // Add this new line to scroll the button into view
+    btn.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'nearest', 
+      inline: 'center' 
+    });
   });
 });
+
+
+// Touch/swipe functionality for filter buttons
+let todoTouchStartX = 0;
+let todoTouchEndX = 0;
+
+
+todoContainer.addEventListener('touchstart', (e) => {
+  todoTouchStartX = e.changedTouches[0].screenX;
+});
+
+todoContainer.addEventListener('touchend', (e) => {
+  todoTouchEndX = e.changedTouches[0].screenX;
+  todoHandleSwipe();
+});
+
+function todoHandleSwipe() {
+  const swipeThreshold = 50; // minimum distance for swipe
+  const swipeDistance = todoTouchEndX - todoTouchStartX;
+  
+  if (Math.abs(swipeDistance) < swipeThreshold) return;
+  
+  const filterButtons = Array.from(document.querySelectorAll('.todo-filter-btn'));
+  const currentIndex = filterButtons.findIndex(btn => btn.dataset.filter === filterMode);
+  
+  let newIndex;
+  
+  if (swipeDistance > 0) {
+    // Swiped right - go to previous filter
+    newIndex = currentIndex - 1;
+  } else {
+    // Swiped left - go to next filter
+    newIndex = currentIndex + 1;
+  }
+  
+  // Don't go beyond boundaries
+  if (newIndex < 0 || newIndex >= filterButtons.length) return;
+  
+  // Trigger the new filter
+  filterButtons[newIndex].click();
+}
+
+
 
 function closeFilterPopup() {
   filterDropdown.classList.remove("show");
