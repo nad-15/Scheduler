@@ -649,7 +649,7 @@ function renderTodos() {
       `;
 
       if (todo.description.trim()) {
-        contentHTML += `<div class="todo-description">${todo.description}</div>`;
+        contentHTML += `<div class="todo-description${todo.done ? ' done' : ''}">${todo.description}</div>`;
       }
 
       if (todo.subtasks && todo.subtasks.length > 0) {
@@ -711,18 +711,18 @@ function renderTodos() {
       item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
         todo.done = e.target.checked;
 
-        if (currentSortMode === "completion") {
-          if (todo.done) {
-            // Completing - fade and shrink
-            item.classList.add("completing");
+        // Update description done state
+        const descriptionEl = item.querySelector(".todo-description");
+        if (descriptionEl) {
+          if (e.target.checked) {
+            descriptionEl.classList.add("done");
           } else {
-            // Uncompleting - fly up
-            item.classList.add("uncompleting");
+            descriptionEl.classList.remove("done");
           }
+        }
 
-          setTimeout(() => {
-            todoSaveAndRender();
-          }, 500);
+        if (currentSortMode === "completion") {
+          // ... rest of your existing code
         } else {
           todoSaveAndRender();
         }
@@ -876,6 +876,7 @@ function renderTodos() {
 
 
 }
+
 function formatTimeEstimate(hours, minutes) {
   const h = parseInt(hours) || 0;
   const m = parseInt(minutes) || 0;
