@@ -2154,6 +2154,7 @@ function showCalHorView(m, y) {
     // Make sure both elements exist
     const main = document.getElementById('main-container');
     const vert = document.getElementById('calendar-container-vert-view');
+    daysGridVertView.innerHTML = "";
     main.style.display = 'block';
     vert.style.display = 'none'; // Assuming your flex styles are defined in CSS
     if (!main || !vert) {
@@ -2197,8 +2198,9 @@ function showCalVertView(month, year) {
     }
     createCalendarGrid();
     updateCalendarWithTasks(month, year);
+    // main.innerHTML = "";
     main.style.display = 'none';
-    vert.style.display = 'flex'; // Assuming your flex styles are defined in CSS
+    vert.style.display = 'flex';
 
     const todayElement = document.querySelector(`.grid-cell[data-full-date="${popUpDate}"]`);
     if (todayElement) todayElement.classList.add('is-active');
@@ -2207,23 +2209,23 @@ function showCalVertView(month, year) {
 
 function updateVertViewCalendarFromMonthYear(currentMonth, currentYear) {
     cleanupSelectedDivs();
-    console.log("FIND ERROR the current now is:");
-    console.log(currentMonth);
-    console.log(currentYear);
+    // console.log("FIND ERROR the current now is:");
+    // console.log(currentMonth);
+    // console.log(currentYear);
 
-    // 🔵 Current Month
+    // Current Month
     currentDate = new Date(currentYear, currentMonth, 1);
     const currentDateMonth = currentDate.getMonth();
     const currentDateYear = currentDate.getFullYear();
     const currentDateLastDate = new Date(currentDateYear, currentDateMonth + 1, 0).getDate();
 
-    // 🔴 Next Month
+    // Next Month
     nextDate = new Date(currentDateYear, currentDateMonth + 1, 1);
     const nextDateMonth = nextDate.getMonth();
     const nextDateYear = nextDate.getFullYear();
     const nextDateLastDate = new Date(nextDateYear, nextDateMonth + 1, 0).getDate();
 
-    // 🟢 Previous Month
+    // Previous Month
     prevDate = new Date(currentDateYear, currentDateMonth - 1, 1);
     const prevDateMonth = prevDate.getMonth();
     const prevDateYear = prevDate.getFullYear();
@@ -2273,3 +2275,28 @@ function updateVertViewCalendarFromMonthYear(currentMonth, currentYear) {
 }
 
 
+const fabHome = document.querySelector(".fab-home");
+let idleTimer;
+
+function setIdle() {
+    fabHome.classList.add("idle");
+}
+
+function resetIdle() {
+    fabHome.classList.remove("idle");
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(setIdle, 2000); // 2s idle time
+}
+
+window.addEventListener("scroll", resetIdle);
+window.addEventListener("mousemove", resetIdle);
+window.addEventListener("touchstart", resetIdle);
+
+// Initialize
+resetIdle();
+
+
+fabHome.addEventListener("click", () => {
+    showHorViewBtn.click();
+    todoCloseBtn.click();
+});
