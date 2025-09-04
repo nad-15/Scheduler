@@ -7,6 +7,7 @@
     --calendar-header-bg: #f9fcff;
     --calendar-day-bg: #f9fcff;
     --muted-text: #999;
+    --todo-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
 }
 
@@ -49,6 +50,12 @@ body {
     background: #666;
     border: none;
     color: white;
+
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 
@@ -105,7 +112,7 @@ body {
     height: 100vh;
     width: 100vw;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--todo-font);
     color: #333;
     line-height: 1.6;
     overflow-y: auto;
@@ -150,35 +157,22 @@ body {
 .todo-header-container-top {
     box-sizing: border-box;
     display: flex;
-    /* height: 5rem; */
-    /* background: linear-gradient(135deg,
-            rgba(173, 216, 230, 0.85),
-            rgba(187, 222, 214, 0.85),
-            rgba(255, 204, 213, 0.85),
-            rgba(218, 187, 255, 0.85),
-            rgba(255, 229, 180, 0.85));
-    background-size: 400% 400%;
-    animation: aurora 18s ease infinite; */
-    /* border-bottom-right-radius: 8px;
-       border-bottom-left-radius: 8px; */
     background: white;
     justify-content: space-between;
     align-items: flex-start;
     padding: 0px 20px 0px 20px;
-    /* increased padding for thickness */
     width: 100%;
-    /* margin-bottom: 2px; */
+    /* border: 2px solid lime; */
 
-    /* New additions for “thicker” feel */
-    /* border-bottom: 2px solid #ccc; */
-    /* subtle bottom border */
-    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
-    /* soft shadow for depth */
+}
+
+.todo-header-container-top.todo-header-container-top>* {
+    /* border: 2px solid black; */
+
 }
 
 .todo-header-container-middle {
     margin-left: 20px;
-    /* border: 2px solid red; */
 }
 
 .todo-header-container-bottom {
@@ -222,7 +216,7 @@ body {
     border: none;
     background: none;
     cursor: pointer;
-    font-family: inherit;
+    font-family: var(--todo-font);
     font-size: 16px;
 
     /* ADD THESE LINES */
@@ -246,11 +240,7 @@ body {
     transform: scaleX(1);
 }
 
-/* 
-.todo-filter-btn:hover::after {
-  transform: scaleX(0.5);
-  background: rgba(0, 123, 255, 0.5);
-} */
+
 
 
 .sort-icon {
@@ -265,13 +255,13 @@ body {
 }
 
 .material-symbols-outlined.sort-icon {
-  font-size: 16px;       
-  line-height: 1;
-  margin: 0;
-  padding: 0;
-  vertical-align: middle;
-  display: inline-flex;   
-  align-items: center;
+    font-size: 16px;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
 }
 
 
@@ -339,7 +329,7 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: background 0.3s, transform 0.2s, color 0.2s ease;
-    font-family: inherit;
+    font-family: var(--todo-font);
 }
 
 .todo-actions-dropdown {
@@ -355,7 +345,7 @@ body {
     min-width: 130px;
     z-index: 10000;
     word-wrap: break-word;
-    font-family: inherit;
+    font-family: var(--todo-font);
 }
 
 
@@ -371,9 +361,11 @@ body {
     padding: 4px 8px;
     background: none;
     cursor: pointer;
-    font-family: inherit;
+    font-family: var(--todo-font);
     font-size: 14px;
+
 }
+
 /* * {
     border: 2px solid violet;
 } */
@@ -390,12 +382,12 @@ body {
 .sort-buttons-toggle {
     position: relative;
     font-size: 12px;
-  /* transform: translateY(4px); */
+    /* transform: translateY(4px); */
 
 }
 
 
-.sort-label{
+.sort-label {
     height: min-content;
 }
 
@@ -409,6 +401,7 @@ body {
 
 }
 
+.material-icons.todo-actions-icon,
 .material-icons.todo-collapse-icon,
 .material-symbols-outlined.todo-delete-icon,
 .material-icons.todo-close-icon {
@@ -455,7 +448,7 @@ body {
     cursor: pointer;
     transition: all 0.2s;
     text-align: left;
-    font-family: inherit;
+    font-family: var(--todo-font);
     font-size: 14px;
     /* aligns text to the left */
     /* border: 2px solid red; */
@@ -792,7 +785,7 @@ body {
     border: none;
     background: none;
     cursor: pointer;
-    font-family: inherit;
+    font-family: var(--todo-font);
     font-size: 14px;
 }
 
@@ -850,16 +843,24 @@ body {
     line-height: 1.5;
 }
 
+.todo-description.done {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
 .todo-subtasks {
-    margin: 8px 0 8px 56px;
+    margin: 8px 24px 8px 56px;
+
 }
 
 .todo-subtask-item {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 8px;
     margin: 4px 0;
     padding: 4px 0;
+
 }
 
 .todo-subtask-checkbox {
@@ -867,6 +868,8 @@ body {
     height: 16px;
     border-radius: 3px;
     cursor: pointer;
+    align-self: flex-start;
+    flex-shrink: 0;
 }
 
 
@@ -1017,8 +1020,8 @@ body {
 
 .todo-menu-dropdown {
     position: absolute;
-    bottom: -80px;
-    right: 36px;
+    bottom: -125px;
+    right: 10px;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -1039,7 +1042,7 @@ body {
     cursor: pointer;
     font-size: 14px;
     transition: background 0.2s ease;
-    font-family: inherit;
+    font-family: var(--todo-font);
     /* font-size: 14px; */
 }
 
@@ -1092,7 +1095,7 @@ body {
     border: none;
     outline: none;
     font-size: 16px;
-    font-family: inherit;
+    font-family: var(--todo-font);
     line-height: 1.4;
     resize: none;
     overflow: hidden;
@@ -1106,7 +1109,7 @@ body {
     border: none;
     outline: none;
     font-size: 14px;
-    font-family: inherit;
+    font-family: var(--todo-font);
     line-height: 1.4;
     resize: none;
     overflow: hidden;
@@ -1137,7 +1140,7 @@ body {
     font-size: 8px;
     margin: 0;
     color: rgb(102, 102, 102);
-    font-family: inherit;
+    font-family: var(--todo-font);
     font-weight: 600;
 }
 
@@ -1166,7 +1169,7 @@ body {
 }
 
 #formatted-date {
-    font-family: inherit;
+    font-family: var(--todo-font);
     font-size: 14px;
     font-weight: 500;
     color: rgb(102, 102, 102);
@@ -1200,7 +1203,7 @@ body {
 .time-input-field input {
     border: none;
     background-color: white;
-    font-family: inherit;
+    font-family: var(--todo-font);
     font-size: 14px;
     font-weight: 500;
     color: rgb(102, 102, 102);
@@ -1221,8 +1224,10 @@ body {
 
 /* SUBTASKS SECTION */
 .todo-subtasks-section {
-    padding: 8px 0;
+    padding: 8px 0 8px 12px;
+    font-family: var(--todo-font);
 }
+
 
 .todo-subtask-input {
     display: flex;
@@ -1234,29 +1239,24 @@ body {
 .todo-subtask-input input[type="checkbox"] {
     width: 18px;
     height: 18px;
+    align-self: flex-start;
 }
 
-.todo-subtask-input input[type="text"] {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: 14px;
-    padding: 8px 0;
-    background: transparent;
-}
+
 
 .todo-subtask-input textarea {
     flex: 1;
     border: none;
     outline: none;
     font-size: 14px;
-    font-family: inherit;
+    font-family: var(--todo-font);
     line-height: 1.4;
     resize: none;
     overflow: hidden;
     background: transparent;
     padding: 2px 4px;
     box-sizing: border-box;
+
 }
 
 .todo-remove-subtask {
@@ -1269,6 +1269,8 @@ body {
     color: #666;
 }
 
+/* MODAL ACTION BUTTONS */
+
 .todo-modal-actions {
     display: flex;
     justify-content: space-between;
@@ -1276,6 +1278,7 @@ body {
     padding-top: 8px;
     border-top: 1px solid #eee;
     margin-top: 8px;
+    font-family: var(--todo-font);
 }
 
 .todo-action-icons {
@@ -1315,15 +1318,24 @@ body {
     padding: 8px 16px;
     border-radius: 4px;
     transition: background-color 0.2s;
+    font-family: var(--todo-font);
+
+
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .todo-save-btn:hover {
     background-color: #e3f2fd;
 }
 
+/* 
 .material-symbols-outlined {
     font-size: 20px;
-}
+} */
 
 /* END OF MODAL */
 #main-container {
