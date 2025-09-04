@@ -27,6 +27,8 @@ function initializeFilterButtons() {
   if (activeButton) {
     activeButton.classList.add("active");
   }
+
+  updateFilterButtonCounts();
 }
 
 // CALL this when page loads
@@ -874,8 +876,39 @@ function renderTodos() {
     });
   });
 
+updateFilterButtonCounts();
 
+}
 
+function updateFilterButtonCounts() {
+  const counts = getFilterCounts();
+  
+  const buttonTexts = {
+    starred: 'Starred',
+    'not-archived': 'Active List', 
+    'in-progress': 'To Do',
+    done: 'Completed',
+    archive: 'Archive',
+    all: 'All'
+  };
+  
+document.querySelectorAll(".todo-filter-btn").forEach(btn => {
+  const filter = btn.dataset.filter;
+  const baseText = buttonTexts[filter];
+  const count = counts[filter] || 0;
+  btn.innerHTML = `${baseText} <span class="filter-count">${count}</span>`;
+});
+}
+
+function getFilterCounts() {
+  return {
+    starred: todos.filter(t => t.pinned && !t.isArchive).length,
+    'not-archived': todos.filter(t => !t.isArchive).length,
+    'in-progress': todos.filter(t => !t.done && !t.isArchive).length,
+    done: todos.filter(t => t.done && !t.isArchive).length,
+    archive: todos.filter(t => t.isArchive).length,
+    all: todos.length
+  };
 }
 
 function formatTimeEstimate(hours, minutes) {

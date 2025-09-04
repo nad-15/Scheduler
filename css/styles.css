@@ -218,11 +218,12 @@ body {
     cursor: pointer;
     font-family: var(--todo-font);
     font-size: 16px;
-
-    /* ADD THESE LINES */
+    font-weight: 400;
     position: relative;
     transition: color 0.3s ease;
 }
+
+
 
 .todo-filter-btn::after {
     content: '';
@@ -241,7 +242,21 @@ body {
 }
 
 
-
+.filter-count {
+    border-radius: 50%;
+    background-color: rgba(59, 130, 246, 0.1);
+    height: fit-content;
+    aspect-ratio: 1/1;
+    padding: 2px;
+    font-size: 12px;
+    /* smaller than button text */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    font-family: var(--todo-font);
+    font-weight: 700;
+}
 
 .sort-icon {
     transform: rotate(-90deg);
@@ -1241,6 +1256,7 @@ body {
     height: 18px;
     align-self: flex-start;
     margin-top: 6px;
+    flex-shrink: 0;
 }
 
 
@@ -1268,6 +1284,7 @@ body {
     display: flex;
     align-items: center;
     color: #666;
+    flex-shrink: 0;
 }
 
 /* MODAL ACTION BUTTONS */
