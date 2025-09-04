@@ -218,9 +218,11 @@ body {
     cursor: pointer;
     font-family: var(--todo-font);
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 500;
     position: relative;
     transition: color 0.3s ease;
+    color: #666;
+
 }
 
 
@@ -1103,7 +1105,7 @@ body {
     /* gap: 12px; */
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
 }
-
+/* 
 .todo-title-section input {
     width: 100%;
     border: none;
@@ -1111,11 +1113,11 @@ body {
     font-size: 16px;
     padding: 12px 0;
     padding-top: 8px;
-    /* padding-bottom: 12px; */
+    padding-bottom: 12px;
     background: transparent;
     font-weight: 500;
-    /* border:1px solid red; */
-}
+    border:1px solid red;
+} */
 
 #todo-task-title {
     width: 100%;
@@ -1129,6 +1131,7 @@ body {
     background: transparent;
     padding: 2px 0;
     box-sizing: border-box;
+    font-weight: 600;
 }
 
 .todo-description-section textarea {
