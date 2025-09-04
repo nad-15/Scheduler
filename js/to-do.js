@@ -1553,11 +1553,13 @@ let todoTouchStartX = 0;
 let todoTouchEndX = 0;
 
 
-todoContainer.addEventListener('touchstart', (e) => {
+const todoList = document.querySelector(".todo-list");
+
+todoList.addEventListener('touchstart', (e) => {
   todoTouchStartX = e.changedTouches[0].screenX;
 });
 
-todoContainer.addEventListener('touchend', (e) => {
+todoList.addEventListener('touchend', (e) => {
   todoTouchEndX = e.changedTouches[0].screenX;
   todoHandleSwipe();
 });
