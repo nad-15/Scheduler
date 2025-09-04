@@ -1233,13 +1233,14 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    /* margin-bottom: 8px; */
+    /* border: 1px solid green; */
 }
 
 .todo-subtask-input input[type="checkbox"] {
     width: 18px;
     height: 18px;
     align-self: flex-start;
+    margin-top: 8px;
 }
 
 
