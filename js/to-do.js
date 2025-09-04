@@ -14,8 +14,8 @@ const deleteArchivedBtn = document.querySelector(".delete-archived-btn");
 const archiveCompletedBtn = document.querySelector(".archive-completed-btn");
 
 
-const filterToggleBtn = document.querySelector(".todo-filter-mode-btn");
-const filterDropdown = document.querySelector(".todo-filter-dropdown");
+// const filterToggleBtn = document.querySelector(".todo-filter-mode-btn");
+// const filterDropdown = document.querySelector(".todo-filter-dropdown");
 
 
 let filterMode = (appSettings["todo-filter-mode"] || DEFAULT_SETTINGS["todo-filter-mode"]);
@@ -1532,11 +1532,11 @@ if (typeof toggleLabel !== "undefined" && typeof controls !== "undefined") {
     }
   }
   // --- close filter dropdown if clicked outside
-  if (typeof filterDropdown !== "undefined" && typeof filterToggleBtn !== "undefined") {
-    if (!filterDropdown.contains(e.target) && !filterToggleBtn.contains(e.target)) {
-      filterDropdown.classList.remove("show");
-    }
-  }
+  // if (typeof filterDropdown !== "undefined" && typeof filterToggleBtn !== "undefined") {
+  //   if (!filterDropdown.contains(e.target) && !filterToggleBtn.contains(e.target)) {
+  //     filterDropdown.classList.remove("show");
+  //   }
+  // }
 
 });
 
@@ -1548,7 +1548,7 @@ function closeAllDropdowns() {
       menu.classList.remove("show");
     });
 
-  filterDropdown.classList.remove("show");
+  // filterDropdown.classList.remove("show");
 
   const controls = document.querySelector(".todo-sort-controls");
   const sortIcon = document.querySelector(".sort-icon");
@@ -1568,7 +1568,7 @@ document.querySelectorAll(".todo-filter-btn").forEach(btn => {
     filterMode = selectedFilter;
 
     renderTodos();
-    closeFilterPopup();
+    // closeFilterPopup();
     initializeFilterButtons();
 
     // Add this new line to scroll the button into view
@@ -1625,6 +1625,6 @@ function todoHandleSwipe() {
 
 
 
-function closeFilterPopup() {
-  filterDropdown.classList.remove("show");
-}
+// function closeFilterPopup() {
+//   filterDropdown.classList.remove("show");
+// }

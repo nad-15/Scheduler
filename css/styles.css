@@ -72,6 +72,7 @@ body {
     font-size: 30px;
 }
 
+/* 
 .todo-filter-mode-btn {
     display: flex;
     justify-content: center;
@@ -88,12 +89,12 @@ body {
     background-color: rgba(204, 204, 204, 0.8);
     background-color: rgb(0, 0, 0, 0.2);
     color: #666;
-}
-
+} */
+/* 
 .material-symbols-outlined.todo-filter-mode-icon {
     font-weight: bolder;
     border: none;
-}
+} */
 
 
 /* === TODO CONTAINER === */
@@ -166,9 +167,9 @@ body {
 
 }
 
-.todo-header-container-top.todo-header-container-top>* {
-    /* border: 2px solid black; */
-
+.todo-header-buttons-container {
+    display: flex;
+    gap: 6px;
 }
 
 .todo-header-container-middle {
@@ -211,8 +212,7 @@ body {
     flex: 0 0 auto;
     display: inline-block;
     text-align: left;
-    padding: 12px 12px;
-    padding-top: 0px;
+    padding: 6px 12px;
     border: none;
     background: none;
     cursor: pointer;
@@ -257,11 +257,13 @@ body {
     font-family: var(--todo-font);
     font-weight: 700;
 }
+
 .sort-mode-text-indicator {
     font-family: var(--todo-font);
     font-size: 10px;
     font-style: italic;
-    text-transform: lowercase; /* optional: forces all letters to be lowercase */
+    text-transform: lowercase;
+    /* optional: forces all letters to be lowercase */
     color: #666;
     text-decoration: underline;
 }
@@ -337,6 +339,7 @@ body {
 .collapse-toggle-btn,
 .todo-actions-btn {
     background: rgba(0, 0, 0, 0.15);
+        background-color: #e3f2fd;
     border: none;
     color: #666;
     /* slightly dark text/icon */
