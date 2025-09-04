@@ -2297,6 +2297,6 @@ resetIdle();
 
 
 fabHome.addEventListener("click", () => {
-    showHorViewBtn.click();
+    // showHorViewBtn.click();
     todoCloseBtn.click();
 });
