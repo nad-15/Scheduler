@@ -257,6 +257,15 @@ body {
     font-family: var(--todo-font);
     font-weight: 700;
 }
+.sort-mode-text-indicator {
+    font-family: var(--todo-font);
+    font-size: 10px;
+    font-style: italic;
+    text-transform: lowercase; /* optional: forces all letters to be lowercase */
+    color: #666;
+    text-decoration: underline;
+}
+
 
 .sort-icon {
     transform: rotate(-90deg);

@@ -1,6 +1,10 @@
 const toggleLabel = document.querySelector(".sort-label");
 const controls = document.querySelector(".todo-sort-controls");
 const sortIcon = document.querySelector(".sort-icon");
+const sortIndicator = document.querySelector('.sort-mode-text-indicator');
+
+
+
 
 const deleteBtn = document.querySelector(".todo-actions-btn");
 const deleteDropdown = document.querySelector(".todo-actions-dropdown");
@@ -98,8 +102,7 @@ function migrateTodos() {
 let todos = JSON.parse(localStorage.getItem("todos")) || [];
 migrateTodos();
 
-// === Sort settings ===
-// let currentSortMode = localStorage.getItem("todoSortMode") || "date-newest"; // "date-newest", "date-oldest", "group", "due-date", "completion", "time-estimate"
+
 let currentSortMode = appSettings["todo-sort-mode"];
 
 
@@ -110,6 +113,29 @@ const TODO_PRIORITY_COLORS = {
   low: "#4caf50",
   null: "#cccccc",
 };
+
+
+const SORT_MODE_LABELS = {
+  'date-newest': 'Newest First',
+  'date-oldest': 'Oldest First', 
+  'group': 'Priority',
+  'due-date': 'Due Date',
+  'completion': 'Completion',
+  'time-estimate': 'Time Estimate'
+};
+
+
+function updateSortModeIndicator() {
+  const indicator = document.querySelector('.sort-mode-text-indicator');
+  if (indicator) {
+    indicator.textContent = SORT_MODE_LABELS[currentSortMode] || currentSortMode;
+  }
+}
+
+updateSortModeIndicator();
+
+
+
 
 // === Helper function to ensure 6-digit hex color ===
 function todoNormalizeColor(color) {
@@ -536,7 +562,8 @@ function getGroupedTodos(sortedTodos) {
 function changeSortMode(newMode) {
   currentSortMode = newMode;
   appSettings["todo-sort-mode"] = newMode;
-  localStorage.setItem("appSettings", JSON.stringify(appSettings)); // save to localStorage
+  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+  updateSortModeIndicator(); // Add this line
   renderTodos();
 }
 
@@ -1383,6 +1410,8 @@ document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
 
 
 toggleLabel.addEventListener("click", () => {
+    console.log("passed from indicator clicked");
+
   controls.classList.toggle("show");
   sortIcon.classList.toggle("rotated");
 });
@@ -1401,13 +1430,13 @@ controls.addEventListener("click", (e) => {
 
   }
 });
-// Close popup if clicking outside
-// document.addEventListener("click", (e) => {
-//   if (!toggleLabel.contains(e.target) && !controls.contains(e.target)) {
-//     controls.classList.remove("show");
-//     sortIcon.classList.remove("rotated");
-//   }
-// });
+
+  sortIndicator.addEventListener("click", ()=>{
+    console.log("indidcator clicked");
+    toggleLabel.click();
+  });
+
+
 
 // Toggle dropdown
 deleteBtn.addEventListener("click", (e) => {
@@ -1486,10 +1515,14 @@ document.addEventListener("click", (e) => {
 
   // --- close sort controls if clicked outside
   if (typeof toggleLabel !== "undefined" && typeof controls !== "undefined") {
-    if (!toggleLabel.contains(e.target) && !controls.contains(e.target)) {
+if (typeof toggleLabel !== "undefined" && typeof controls !== "undefined") {
+    if (!toggleLabel.contains(e.target) && 
+        !controls.contains(e.target) && 
+        !sortIndicator.contains(e.target)) { // Add this line
       controls.classList.remove("show");
       sortIcon.classList.remove("rotated");
     }
+  }
   }
 
   // --- close delete dropdown if clicked outside
