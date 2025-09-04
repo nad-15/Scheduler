@@ -132,6 +132,9 @@
             <button class="hide-all-buttons">© 2025 skhayeduler</button>
 
             <div class="task-toolbar-container">
+                <button class="todo-button">
+                    <span class="material-symbols-outlined todo-button-icon">checklist</span>
+                </button>
                 <button class="clear-button" id="clear-button">
                     <span class="material-icons">delete</span>
                 </button>
@@ -697,8 +700,14 @@
 
     <div id="calendar-pop-up">
         <div class="popup-header">
-            <span class="popup-date" id="popup-date">May 21, 2025</span>
+            <div class="popup-date-copy-container ">
+                <span class="popup-date" id="popup-date">May 21, 2025</span>
+            </div>
             <div class="edit-close-container">
+                <!-- Copy -->
+                <button class="copy-tasks-button" title="Copy Tasks" id="copy-tasks-btn">
+                    <span class="material-symbols-outlined copy-task-icon">content_copy</span>
+                </button>
                 <button class="close-popup" id="closePopupBtn">
                     <!-- <span class="material-icons close-button-menu-icon">close</span> -->
                     <div class="gif-cropper">
@@ -750,6 +759,15 @@
                 </div>
             </button>
             <!-- Normal Mode -->
+
+            <!-- To do -->
+            <button class="calendar-icon-button normal-mode todo-popup-btn" title="Todo">
+                <div class="calendar-icon-wrapper to-do">
+                    <span class="material-symbols-outlined popup-todo">checklist</span>
+                    <span class="calendar-icon-label to-do-label">To-do</span>
+                </div>
+            </button>
+
             <!-- Month View -->
             <button class="calendar-icon-button normal-mode" title="Month View">
                 <div class="calendar-icon-wrapper">
@@ -776,13 +794,6 @@
                 </div>
             </button>
 
-            <!-- Copy -->
-            <button class="calendar-icon-button normal-mode" title="Copy Tasks" id="copy-tasks-btn">
-                <div class="calendar-icon-wrapper">
-                    <span class="material-symbols-outlined">content_copy</span>
-                    <span class="calendar-icon-label">Copy</span>
-                </div>
-            </button>
 
             <!-- Edit -->
             <button class="calendar-icon-button" title="Edit Tasks" id="toggle-edit">
@@ -914,6 +925,17 @@
                             </label>
                         </div>
 
+                    </li>
+
+                    <li data-setting="todo-floating-btn" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">add_circle</span>
+                            <span class="menu-text">Show To-Do Floating Button</span>
+                            <label class="switch">
+                                <input type="checkbox" id="todo-floating-btn-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </li>
 
                 </ul>

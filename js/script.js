@@ -21,10 +21,18 @@ const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
 const allColorsIcon = document.getElementById("recentcolors-icon");
+const todoButton = document.querySelector(".todo-button");
+
+
 
 const paletteBtn = document.getElementById("showRecentColors");
 const dropdown = document.getElementById("color-mode-dropdown");
 const colorPicker = document.getElementById("colorPicker");
+
+todoButton.addEventListener("click", () => {
+    todoContainer.classList.add("active");
+    renderTodos();
+});
 
 paletteBtn.addEventListener("click", () => {
     dropdown.classList.toggle("hidden");
@@ -304,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleIcon = document.getElementById('toggleIcon');
 
     // expanded = localStorage.getItem('clampExpanded') === 'true';
-  // true/false
+    // true/false
 
     document.querySelectorAll('.clamp-text').forEach(span => {
         span.classList.toggle('expanded', expanded);

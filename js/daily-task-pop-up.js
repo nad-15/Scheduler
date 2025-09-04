@@ -999,6 +999,13 @@ function hidePopup() {
 
 // });
 
+const todoBtnPopup = document.querySelector(".todo-popup-btn");
+
+todoBtnPopup.addEventListener("click", ()=>{
+  todoMenuItem.click();
+});
+
+
 
 document.getElementById("copy-tasks-btn").addEventListener("click", () => {
   copyTasksForDate(popUpDate);
@@ -1074,8 +1081,8 @@ function moveColorOptionsToPopup() {
 
   const popup = document.getElementById("calendar-pop-up");
   const nav = popup.querySelector(".pop-up-calview-navi");
-  nav.style.border = "0";
-  nav.style.paddingTop = "4px";
+  nav.style.border = "none";
+  nav.style.paddingTop = "0px";
 
 
   if (nav) {
@@ -1222,6 +1229,11 @@ function runStartupFeatures() {
   if (settings["startup-popup"]) {
     showDayTasks(popUpDate);
     console.log("pop up shown");
+  }
+
+  const todoBtn = document.querySelector(".todo-button");
+  if (todoBtn) {
+    todoBtn.style.display = settings["todo-floating-btn"] ? "flex" : "none";
   }
 }
 

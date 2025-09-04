@@ -59,6 +59,7 @@ body {
 }
 
 
+
 .todo-fab:hover {
     transform: scale(1.1);
     box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
@@ -70,6 +71,18 @@ body {
 
 .material-symbols-outlined.todo-fab-icon {
     font-size: 30px;
+}
+
+.calendar-icon-button.todo-popup-btn {
+    background: linear-gradient(135deg,
+            rgba(173, 216, 230, 0.85),
+            rgba(187, 222, 214, 0.85),
+            rgba(255, 204, 213, 0.85),
+            rgba(218, 187, 255, 0.85),
+            rgba(255, 229, 180, 0.85));
+    background-size: 400% 400%;
+    animation: aurora 18s ease infinite;
+    /* border-radius: 50%; */
 }
 
 /* 
@@ -329,8 +342,6 @@ body {
     /* remove extra vertical spacing */
 }
 
-
-
 .appname-sort-container {
     display: flex;
     flex-direction: column;
@@ -341,7 +352,7 @@ body {
 .collapse-toggle-btn,
 .todo-actions-btn {
     background: rgba(0, 0, 0, 0.15);
-        background-color: #e3f2fd;
+    background-color: #e3f2fd;
     border: none;
     color: #666;
     /* slightly dark text/icon */
@@ -1105,6 +1116,7 @@ body {
     /* gap: 12px; */
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
 }
+
 /* 
 .todo-title-section input {
     width: 100%;
@@ -1677,6 +1689,27 @@ h2 {
 
 }
 
+.todo-button {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(170, 166, 166, 0.8);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 50px;
+    height: 50px;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 30px;
+    z-index: 1000;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    /* color: #666; */
+}
+
+
+
 .template-task-btn {
     display: flex;
     justify-content: center;
@@ -1770,6 +1803,12 @@ h2 {
     gap: 5px;
 
     /* border: 2px solid red; */
+}
+
+.todo-button:active {
+    background-color: #e3f2fd;
+    ;
+    color: rgba(102, 102, 102, 0.8);
 }
 
 
@@ -4302,7 +4341,7 @@ input[type="radio"]:checked::after {
 
 
 /* MAPLE FALLING BG */
-.leaf-container {
+/* .leaf-container {
     position: absolute;
     inset: 0;
     overflow: hidden;
@@ -4315,7 +4354,6 @@ input[type="radio"]:checked::after {
     top: -40px;
     animation: fall linear forwards;
     opacity: 0.5;
-    /* filter: blur(1.5px);  */
 
     pointer-events: none;
 }
@@ -4326,7 +4364,7 @@ input[type="radio"]:checked::after {
         opacity: 0;
     }
 }
-
+ */
 
 
 
@@ -4360,7 +4398,33 @@ input[type="radio"]:checked::after {
     padding-bottom: 0px;
 }
 
+.popup-date-copy-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 3px;
+}
 
+.copy-tasks-button {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    /* background: rgba(255, 192, 203, 0.6); */
+    /* background-color: none;
+    background: none; */
+    border: none;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+
+.material-symbols-outlined.copy-task-icon {
+    font-weight: 200;
+    font-size: 20px;
+    color: #2c2b2b;
+}
 
 
 #popup-date {
@@ -4370,7 +4434,8 @@ input[type="radio"]:checked::after {
     font-weight: bold;
     display: inline-block;
     color: black;
-    /* border: 2px solid green; */
+
+
 }
 
 .select-all-container {
@@ -4412,8 +4477,11 @@ input[type="radio"]:checked::after {
     display: flex;
     justify-content: center;
     align-items: center;
-
+    gap: 6px;
 }
+
+
+
 
 .edit-dailytask-popup {
     display: none;
@@ -4450,9 +4518,6 @@ input[type="radio"]:checked::after {
     /* color: transparent; */
 }
 
-/* *{
-    border:2px solid green;
-} */
 .popup-content-scroll {
     box-sizing: border-box;
     overflow-y: auto;
@@ -4636,9 +4701,6 @@ ic {
         );
 }
 
-/* *{
-    border: 2px solid green;
-} */
 
 .arrow-up-dayTask,
 .arrow-down-dayTask {
@@ -4731,15 +4793,14 @@ ic {
     display: flex;
     z-index: 10;
     /* padding: 0; */
-    padding: 8px 0;
+    /* padding: 8px 0; */
 
-    /* background-color: red; */
-    background-color: white;
-
-
+    /* background-color: blue; */
+    /* background-color: white; */
 }
 
 .calendar-icon-button {
+    padding: 8px 0;
     flex: 1;
     background: none;
     border: none;
@@ -4750,7 +4811,8 @@ ic {
     align-items: center;
     cursor: pointer;
     /* border: 2px solid red; */
-    padding: 0;
+    /* padding: 0; */
+    font-weight: 300 !important;
 }
 
 .calendar-icon-wrapper {

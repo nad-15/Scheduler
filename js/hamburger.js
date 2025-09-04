@@ -5,7 +5,8 @@ const DEFAULT_SETTINGS = {
   "todo-sort-mode": "date-newest",
   "clamp-expanded": true,
   "todo-collapsed": false,
-  "todo-filter-mode": "not-archived" // new key
+  "todo-filter-mode": "not-archived", 
+  "todo-floating-btn": false         
 };
 
 
@@ -68,6 +69,18 @@ todoCloseBtn.addEventListener("click", () => {
   todoContainer.classList.remove("active");
 });
 
+
+// ===== Hook Settings Toggles =====
+document.getElementById("todo-floating-btn-toggle").addEventListener("change", (e) => {
+  const settings = loadSettings();
+  settings["todo-floating-btn"] = e.target.checked;
+  saveSettings(settings);
+
+  const todoBtn = document.querySelector(".todo-button");
+  if (todoBtn) {
+    todoBtn.style.display = e.target.checked ? "flex" : "none";
+  }
+});
 
 
 
@@ -291,64 +304,3 @@ document.getElementById("uploadBackup").addEventListener("change", (e) => {
   e.target.value = "";
 });
 
-
-
-
-
-
-
-// // Toggle the theme list visibility when "Theme" item is clicked
-// theme.addEventListener('click', () => {
-//     themeList.classList.toggle('show'); // Toggle the theme list visibility
-// });
-
-// // Change theme when a theme is clicked
-// themeList.addEventListener('click', (event) => {
-//     const theme = event.target.dataset.theme;
-//     if (theme && colorThemes[theme]) {
-//         // Update the selected theme
-//         selectedTheme = theme;
-//         localStorage.setItem('theme', theme); // Save to localStorage
-//         // applyTheme(theme);
-//         themeList.classList.remove('show'); // Hide the theme list after selection
-//         window.location.reload();
-//     }
-// });
-
-// Select the 'Size' menu toggle
-// const size = document.querySelector('.size');
-
-// // Select the size submenu
-// const sizeSubmenu = document.querySelector('.size-submenu');
-
-// // Add a click event to toggle the visibility of the size submenu
-// size.addEventListener('click', () => {
-//   // Toggle the class to show or hide the submenu
-//   sizeSubmenu.classList.toggle('show');
-// });
-
-
-// Select all size list items
-// const sizeItems = document.querySelectorAll('.size-submenu li');
-
-// Select the .day-container
-// const dayContainer = document.querySelector('.day-container');
-
-// Add click event listeners to each size item
-// sizeItems.forEach(item => {
-//   item.addEventListener('click', () => {
-//     // // Get the new height from the clicked item's data-size attribute
-//     // const newHeight = item.getAttribute('data-size');
-
-//     // // Change the height of .day-container
-//     // dayContainer.style.height = newHeight;
-//     alert(`oppppp,... not working yet`);
-//   });
-// });
-
-
-
-// Add event listener for the "About" list item
-// document.querySelector('.about').addEventListener('click', function() {
-//     alert("All about you...");
-//   });
