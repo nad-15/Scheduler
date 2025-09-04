@@ -726,11 +726,23 @@ function renderTodos() {
         }
 
         if (currentSortMode === "completion") {
-          // ... rest of your existing code
+          if (todo.done) {
+            // Completing - fade and shrink
+            item.classList.add("completing");
+          } else {
+            // Uncompleting - fly up
+            item.classList.add("uncompleting");
+          }
+
+          setTimeout(() => {
+            todoSaveAndRender();
+          }, 500);
         } else {
           todoSaveAndRender();
         }
       });
+
+
       // In the subtask checkbox event listener, just save without re-rendering
       item.querySelectorAll(".todo-subtask-checkbox").forEach((checkbox) => {
         checkbox.addEventListener("change", (e) => {
