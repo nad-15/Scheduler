@@ -1,5 +1,25 @@
+function clearLockStates() {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith("lockState-")) {
+      localStorage.removeItem(key);
+      // Because removing shifts indexes, restart loop
+      i = -1;
+    }
+  }
+}
+
+
+clearLockStates();
+// console.log("Success");
+
+
+
+//log on mobile the keys
+//add backup downloadable and uploadable the localstorage keys
 
 // migrateTaskDataToArrayFormat();
+
 // function migrateTaskDataToArrayFormat() {
 //     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
 //     const migratedData = {};
@@ -27,10 +47,6 @@
 //             }
 //         });
 //     }
-
 //     localStorage.setItem("tasks", JSON.stringify(migratedData));
-//     console.log("✅ Task data migrated to array-of-objects format.");
+//     // console.log("✅ Task data migrated to array-of-objects format.");
 // }
-
-
-//revert here again

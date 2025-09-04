@@ -1,6 +1,5 @@
 const jumPingText = document.querySelector(".jumping-text");
 const taskInput = document.getElementById('taskTitle');
-const exitFullscreenBtn = document.getElementById(`exit-flscreen-button`);
 const clearButton = document.getElementById('clear-button');
 const floatingAddBtn = document.getElementById('floatingAddBtn');
 const slidingInputView = document.getElementById('slidingInputView');
@@ -21,6 +20,283 @@ const taskToolbar = document.querySelector(`.task-toolbar-container`);
 const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
+const allColorsIcon = document.getElementById("recentcolors-icon");
+const todoButton = document.querySelector(".todo-button");
+
+
+
+const paletteBtn = document.getElementById("showRecentColors");
+const dropdown = document.getElementById("color-mode-dropdown");
+const colorPicker = document.getElementById("colorPicker");
+
+todoButton.addEventListener("click", () => {
+    todoContainer.classList.add("active");
+    renderTodos();
+});
+
+paletteBtn.addEventListener("click", () => {
+    dropdown.classList.toggle("hidden");
+});
+
+
+// Close dropdown when clicking outside
+document.addEventListener("click", (e) => {
+    const isClickInsideDropdown = dropdown.contains(e.target);
+
+    if (!paletteBtn.closest(".palette-wrapper").contains(e.target) || isClickInsideDropdown) {
+        dropdown.classList.add("hidden");
+    }
+});
+
+
+document.querySelector('.dropdown-option[data-mode="all"]').addEventListener('click', () => {
+
+    allColorsIcon.textContent = "palette";
+    const originalHTML = document.getElementById("colorPicker").dataset.originalHtml;
+    document.getElementById("colorPicker").innerHTML = originalHTML;
+
+
+
+    // ✅ NOW select the first new button (within colorPicker)
+    const firstButton = colorPicker.querySelector('.color-option');
+    if (firstButton) {
+        chosenColor = firstButton.getAttribute('data-color');
+
+        colorPicker.querySelectorAll('.color-option').forEach(btn =>
+            btn.classList.remove('selected-color')
+        );
+        firstButton.classList.add('selected-color');
+
+        flower.style.color = chosenColor;
+    }
+});
+
+
+document.querySelector('.dropdown-option[data-mode="recent"]').addEventListener('click', () => {
+    allColorsIcon.textContent = "star";
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+    const colorFrequency = {};
+
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    const dates = Object.keys(tasks)
+        .filter(date => new Date(date) >= oneYearAgo)
+        .sort((a, b) => new Date(b) - new Date(a)); // Sort: newest to oldest
+
+    let colorChecks = 0;
+    const maxChecks = 1000;
+
+    for (const date of dates) {
+        const dayData = tasks[date];
+        for (const period in dayData) {
+            for (const entry of dayData[period]) {
+                if (colorChecks >= maxChecks) break;
+
+                let color = entry.color;
+                if (color) {
+                    // Convert RGB to HEX if necessary
+                    if (color.startsWith("rgb")) {
+                        const rgb = color.match(/\d+/g);
+                        color = "#" + rgb.map(x => (+x).toString(16).padStart(2, '0')).join("");
+                    }
+
+                    color = color.toLowerCase();
+                    colorFrequency[color] = (colorFrequency[color] || 0) + 1;
+                    colorChecks++;
+                }
+            }
+            if (colorChecks >= maxChecks) break;
+        }
+        if (colorChecks >= maxChecks) break;
+    }
+
+    const topColors = Object.entries(colorFrequency)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 13)
+        .map(([color]) => color);
+
+    const colorPicker = document.getElementById("colorPicker");
+    colorPicker.innerHTML = "";
+
+    topColors.forEach(color => {
+        const container = document.createElement("div");
+        container.className = "color-option-container";
+
+        const btn = document.createElement("button");
+        btn.className = "color-option";
+        btn.dataset.color = color;
+        btn.style.backgroundColor = color;
+
+        container.appendChild(btn);
+        colorPicker.appendChild(container);
+    });
+
+
+    // ✅ NOW select the first new button (within colorPicker)
+    const firstButton = colorPicker.querySelector('.color-option');
+    if (firstButton) {
+        chosenColor = firstButton.getAttribute('data-color');
+
+        colorPicker.querySelectorAll('.color-option').forEach(btn =>
+            btn.classList.remove('selected-color')
+        );
+        firstButton.classList.add('selected-color');
+
+        flower.style.color = chosenColor;
+    }
+});
+
+const shadesBtn = document.querySelector('[data-mode="shades"]');
+const shadeSubmenu = document.getElementById('shadeSubmenu');
+
+// Toggle the submenu when "Shades" is clicked
+shadesBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent global dropdown closing
+    shadeSubmenu.classList.toggle('hidden');
+});
+// Listener: When user clicks a shade color button (e.g. Red, Blue, etc.)
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".shade-color-btn");
+    if (!btn) return;
+
+    const baseColor = btn.dataset.color;
+    if (!baseColor) return;
+
+    generateShadesFor(baseColor);
+});
+
+// Generate 13 shades for a named base color (like "red", "blue", etc.)
+function generateShadesFor(colorName) {
+
+    allColorsIcon.textContent = "opacity";
+    const baseColors = {
+        red: "#e53935",
+        orange: "#fb8c00",
+        yellow: "#fdd835",
+        green: "#43a047",
+        blue: "#1e88e5",
+        purple: "#8e24aa",
+        pink: "#d81b60",
+        teal: "#009688",
+        peach: "#ffb88c",
+        coral: "#ff6f61",
+        lavender: "#b39ddb",
+        brown: "#6d4c41",
+        grey: "#998c80"
+    };
+
+    const baseHex = baseColors[colorName];
+    if (!baseHex) return;
+
+    const shades = generateShadesForPicker(baseHex, 13);
+    renderColorOptions(shades);
+}
+
+// Generate lighter/darker shades from a base hex color
+function generateShadesForPicker(hex, count) {
+    const shades = [];
+    const [r, g, b] = colorPickerHexToRgb(hex);
+
+    for (let i = 0; i < count; i++) {
+        const factor = 1 - (i - count / 2) * 0.08; // range from darker to lighter
+        const shade = colorPickerRgbToHex(
+            Math.min(255, Math.max(0, r * factor)),
+            Math.min(255, Math.max(0, g * factor)),
+            Math.min(255, Math.max(0, b * factor))
+        );
+        shades.push(shade);
+    }
+
+    return shades.reverse();
+}
+
+// Convert HEX to RGB
+function colorPickerHexToRgb(hex) {
+    const cleanHex = hex.replace("#", "");
+    return [
+        parseInt(cleanHex.substring(0, 2), 16),
+        parseInt(cleanHex.substring(2, 4), 16),
+        parseInt(cleanHex.substring(4, 6), 16)
+    ];
+}
+
+// Convert RGB to HEX
+function colorPickerRgbToHex(r, g, b) {
+    return "#" + [r, g, b].map(x =>
+        Math.round(x).toString(16).padStart(2, '0')
+    ).join("");
+}
+
+// Render color buttons into #colorPicker
+function renderColorOptions(colors) {
+    const colorPicker = document.getElementById("colorPicker");
+    colorPicker.innerHTML = "";
+
+    colors.forEach(color => {
+        const container = document.createElement("div");
+        container.className = "color-option-container";
+
+        const btn = document.createElement("button");
+        btn.className = "color-option";
+        btn.dataset.color = color;
+        btn.style.backgroundColor = color;
+
+        container.appendChild(btn);
+        colorPicker.appendChild(container);
+    });
+
+    // Auto-select the first button
+    const first = colorPicker.querySelector(".color-option");
+    if (first) {
+        chosenColor = first.dataset.color;
+
+        document.querySelectorAll('.color-option').forEach(btn =>
+            btn.classList.remove('selected-color')
+        );
+        first.classList.add('selected-color');
+
+        flower.style.color = chosenColor;
+    }
+}
+
+// Hide submenu when clicking outside
+document.addEventListener('click', (e) => {
+    const isInside = document.querySelector('.shades-wrapper')?.contains(e.target);
+    if (!isInside) {
+        const shadeSubmenu = document.querySelector('#shade-submenu');
+        if (shadeSubmenu) shadeSubmenu.classList.add('hidden');
+    }
+});
+
+
+// Hide submenu when clicking outside
+document.addEventListener('click', (e) => {
+    const isInside = document.querySelector('.shades-wrapper')?.contains(e.target);
+    if (!isInside) shadeSubmenu.classList.add('hidden');
+});
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const picker = document.getElementById("colorPicker");
+    picker.dataset.originalHtml = picker.innerHTML;
+
+    document.querySelector('.dropdown-option[data-mode="recent"]').click();
+
+});
+
+
+
+
+let selectedDivs = [];
+let hasSuggestionContent = false;
+
+const blankSuggestion = document.querySelector('.blank-suggestion');
+
+blankSuggestion.addEventListener('click', () => {
+    taskInput.value = '';
+});
 
 const showVertViewBtn = document.getElementById('calendar-icon-vertview');
 const showHorViewBtn = document.getElementById('calendar-icon-horview');
@@ -28,13 +304,50 @@ const showHorViewBtn = document.getElementById('calendar-icon-horview');
 
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
-    getWeather();
-    // createFallingLeaf();
+});
+
+let expanded = appSettings["clamp-expanded"] ?? true;
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('toggleClampBtn');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    // expanded = localStorage.getItem('clampExpanded') === 'true';
+    // true/false
+
+    document.querySelectorAll('.clamp-text').forEach(span => {
+        span.classList.toggle('expanded', expanded);
+    });
+
+    toggleIcon.textContent = expanded ? 'compress' : 'expand';
+
+    toggleBtn.addEventListener('click', () => {
+        expanded = !expanded;
+
+        document.querySelectorAll('.clamp-text').forEach(span => {
+            span.classList.toggle('expanded', expanded);
+        });
+
+        // Toggle icon
+        toggleIcon.textContent = expanded ? 'compress' : 'expand';
+
+        // localStorage.setItem('clampExpanded', expanded ? 'true' : 'false');
+        // update the value inside appSettings
+        appSettings["clamp-expanded"] = expanded;
+        // save the whole appSettings object back to localStorage
+        localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
+
+    });
+
 });
 
 
+
 showVertViewBtn.addEventListener('click', () => {
+
     hidePopup();
+    currentMonthVertView = currentMonthValue;
+    currentYearVertView = currentYearValue;
     showCalVertView(currentMonthValue, currentYearValue);
 });
 
@@ -43,80 +356,6 @@ showHorViewBtn.addEventListener('click', () => {
     hidePopup();
     showCalHorView(currentMonthValue, currentYearValue);
 });
-
-
-const calendarPopup = document.getElementById('calendar-pop-up');
-
-calendarPopup.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-});
-
-calendarPopup.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    const diffX = touchEndX - touchStartX;
-
-    if (Math.abs(diffX) > 50) {
-        if (diffX < 0) {
-            goToNextDay(); // swipe left → next
-        } else {
-            goToPreviousDay(); // swipe right → previous
-        }
-    }
-});
-
-function goToNextDay() {
-    const dateObj = safeDateFromPopUpDate(popUpDate);
-    dateObj.setDate(dateObj.getDate() + 1);
-    const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
-    //   console.log("POPUPDATE IS:", popUpDate);
-    showDayTasks(fixedDate);
-}
-
-function goToPreviousDay() {
-    const dateObj = safeDateFromPopUpDate(popUpDate);
-    dateObj.setDate(dateObj.getDate() - 1);
-    const fixedDate = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
-    //   console.log("POPUPDATE IS:", popUpDate);
-    showDayTasks(fixedDate);
-}
-
-function safeDateFromPopUpDate(str) {
-    const [year, month, day] = str.split('-').map(Number);
-    return new Date(year, month, day);
-}
-
-// console.log("Success");
-migrateTaskDataToArrayFormat();
-function migrateTaskDataToArrayFormat() {
-    const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
-    const migratedData = {};
-
-    for (const date in storedData) {
-        migratedData[date] = {};
-
-        ["morning", "afternoon", "evening"].forEach(period => {
-            const value = storedData[date][period];
-
-            // If it's NOT an array already AND it has task/color keys
-            if (value && typeof value === "object" && !Array.isArray(value)) {
-                const { task = "", color = "" } = value;
-                migratedData[date][period] = [{ task, color }];
-            }
-
-            // If it's already in correct format (array of objects), keep as-is
-            else if (Array.isArray(value)) {
-                migratedData[date][period] = value;
-            }
-
-            // If missing or invalid, default to empty array
-            else {
-                migratedData[date][period] = [];
-            }
-        });
-    }
-    localStorage.setItem("tasks", JSON.stringify(migratedData));
-    // console.log("✅ Task data migrated to array-of-objects format.");
-}
 
 
 addTaskBtn.addEventListener('click', () => {
@@ -222,60 +461,6 @@ addTaskBtn.addEventListener('click', () => {
 });
 
 
-function createFallingLeaf() {
-    const leafContainer = document.getElementById("leafContainer");
-
-    // Create multiple flakes at once for denser snowfall
-    const flakesCount = Math.floor(Math.random() * 2) + 2; // 2 to 3 snowflakes per call
-
-    for (let i = 0; i < flakesCount; i++) {
-        const leaf = document.createElement("div");
-        leaf.className = "falling-leaf";
-
-        // ❄ Random snowflake shape
-        const snowShapes = ["❅", "❆", "✼", "✻"];
-        leaf.textContent = snowShapes[Math.floor(Math.random() * snowShapes.length)];
-
-        // 🎯 Random horizontal position
-        leaf.style.left = Math.random() * 100 + "vw";
-
-        // 📏 Random size (16–40px)
-        const size = 16 + Math.random() * 24;
-        leaf.style.fontSize = `${size}px`;
-
-        // ⏳ Slower fall
-        const duration = 8 + Math.random() * 7; // 8 to 15 seconds
-        const delay = Math.random() * 2;
-        leaf.style.animationDuration = `${duration}s`;
-        leaf.style.animationDelay = `${delay}s`;
-
-        // 🎨 Random icy blue color
-        const blues = ["#cceeff", "#bbddff", "#aaddff", "#b3e0f2"];
-
-        leaf.style.color = blues[Math.floor(Math.random() * blues.length)];
-
-        leafContainer.appendChild(leaf);
-
-        // 🧹 Cleanup
-        setTimeout(() => leaf.remove(), (duration + delay) * 1000);
-    }
-}
-
-
-function clearFallingLeaves() {
-    const leafContainer = document.getElementById("leafContainer");
-    leafContainer.innerHTML = ""; // removes all .falling-leaf divs
-}
-
-// Generate leaves every 0.5–1.5 seconds randomly
-// setInterval(() => {
-//     if (document.getElementById("calendar-pop-up").style.display === "block") {
-//         createFallingLeaf();
-//     }
-// }, 1000);
-
-
-
 // The 8px offset from the right
 const offset = 8;
 
@@ -306,41 +491,23 @@ templateTaskBtn.addEventListener('click', () => {
 // submitTaskBtn.disabled = true;
 // console.log(submitTaskBtn.disabled);
 
-let isHidden = false;
-hideAllButtons.addEventListener(`click`, () => {
+hideAllButtons.addEventListener('click', () => {
+    const extrasToolbar = document.querySelector(".extras-toolbar");
 
+    extrasToolbar.style.display = extrasToolbar.style.display === 'none' ? 'flex' : 'none';
     todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
     hideWidgetBtn.style.display = hideWidgetBtn.style.display === 'none' ? 'flex' : 'none';
-    menuButton.style.display = menuButton.style.display === 'none' ? 'flex' : 'none';
-    // clearButton.style.display = clearButton.style.display === 'none' ? 'flex' : 'none';
     taskToolbar.style.display = taskToolbar.style.display === 'none' ? 'flex' : 'none';
-    // floatingAddBtn.style.display = floatingAddBtn.style.display === 'none' ? '' : 'none';
     slidingInputView.style.display = slidingInputView.style.display !== 'none' ? 'none' : 'flex';
 
-    const isFullScreen = !!document.fullscreenElement;
-
-    if (!isHidden) {
-        // console.log(isFullScreen);
-        if (isFullScreen) {
-
-            exitFullscreenBtn.style.display = `none`;
-        } else {
-            fullScreenButton.style.display = `none`;
-        }
-        isHidden = true;
-    } else {
-        if (isFullScreen) {
-            exitFullscreenBtn.style.display = `flex`;
-        } else {
-            fullScreenButton.style.display = `flex`;
-        }
-        isHidden = false;
-    }
-
+    // const isFullScreen = !!document.fullscreenElement;
+    // fullscreenIcon.textContent = isFullScreen ? 'fullscreen_exit' : 'fullscreen';
 });
 
-const yearContainer = document.getElementById('year-container');
+
+// const yearContainer = document.getElementById('year-container');
 const fullScreenButton = document.getElementById(`fullscreen-button`);
+const fullscreenIcon = document.getElementById('fullscreen-icon');
 
 
 
@@ -416,7 +583,17 @@ addDays("initPrev", prevDateMonth, 1, prevDate.getDay(), prevDateLastDate, "", "
 // Handle scroll event
 yearContainer.addEventListener('scroll', handleYearContainerScroll);
 
+
+function cleanupSelectedDivs() {
+    selectedDivs = selectedDivs.filter(el => document.body.contains(el));
+    updateUICounters();
+}
+
+
 function handleYearContainerScroll() {
+
+    cleanupSelectedDivs();
+
     const scrollTop = yearContainer.scrollTop;
     const scrollHeight = yearContainer.scrollHeight;
     const clientHeight = yearContainer.clientHeight;
@@ -468,31 +645,6 @@ function handleYearContainerScroll() {
 }
 
 
-// todayScroll();
-// function todayScroll() {
-//     const nowTodayElement = new Date();
-
-//     const yearTodayElement = nowTodayElement.getFullYear();
-//     const monthTodayElement = nowTodayElement.getMonth();
-//     const dayTodayElement = nowTodayElement.getDate();
-
-//     const todayDate = `${yearTodayElement}-${monthTodayElement}-${dayTodayElement}`;
-
-//     console.log('Built todayDate:', todayDate);
-
-//     const todayElement = document.querySelector(`.date[data-full-date="${todayDate}"]`);
-//     console.log('Found todayElement:', todayElement);
-
-//     if (todayElement) {
-//       console.log("ENTERED todayElement");
-//       todayElement.scrollIntoView({
-//         behavior: "smooth",
-//         block: "center"
-//       });
-//     // showDayTasks(todayElement);
-//     }
-//   }
-
 
 
 
@@ -524,6 +676,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 
     monthLetterContainer.addEventListener('click', () => {
+        popUpDate = null;
         swapToGridView(monthName, yearDate);
     });
 
@@ -561,6 +714,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     });
 
     yearLetterContainer.addEventListener('click', () => {
+        popUpDate = null;
         swapToGridView(monthName, yearDate);
     });
 
@@ -586,6 +740,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 
     toGridCalBtn.addEventListener('click', () => {
+        popUpDate = null;
         swapToGridView(monthName, yearDate);
     });
 
@@ -666,8 +821,11 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         // Make Sunday and Saturday different colors and bigger
 
         if (dayName === 'Sun' || dayName === 'Sat') {
-            dayDiv.style.fontSize = "12px";
-            dayDiv.style.fontWeight = "bold";
+
+            dayDiv.classList.add("weekends");
+
+            // dayDiv.style.fontSize = "12px";
+            // dayDiv.style.fontWeight = "bold";
             dayDiv.style.borderColor = ""; // Make the font larger
 
             if (dayName === 'Sun') {
@@ -723,7 +881,25 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             taskData.morning.forEach(({ task, color }) => {
                 const taskDiv = document.createElement('div');
                 taskDiv.classList.add('morningTaskSub');
-                taskDiv.textContent = task;
+
+                // taskDiv.textContent = task;
+
+                //webkit
+                if (task.trim()) {
+                    const span = document.createElement('span');
+                    span.className = 'clamp-text';
+
+                    if (expanded) {
+                        span.classList.add('expanded');
+                    }
+
+                    span.textContent = task;
+                    taskDiv.innerHTML = ''; // clear existing content
+                    taskDiv.appendChild(span);
+                } else {
+                    taskDiv.textContent = ''; // or some fallback if empty
+                }
+
                 // taskDiv.style.backgroundColor = color;
                 // morningTaskDiv.appendChild(taskDiv);
                 if (color) {
@@ -749,7 +925,26 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             taskData.afternoon.forEach(({ task, color }) => {
                 const taskDiv = document.createElement('div');
                 taskDiv.classList.add('afternoonTaskSub');
-                taskDiv.textContent = task;
+
+                // taskDiv.textContent = task;
+
+                //webkit
+                if (task.trim()) {
+                    const span = document.createElement('span');
+                    span.className = 'clamp-text';
+
+                    if (expanded) {
+                        span.classList.add('expanded');
+                    }
+
+                    span.textContent = task;
+                    taskDiv.innerHTML = ''; // clear existing content
+                    taskDiv.appendChild(span);
+                } else {
+                    taskDiv.textContent = ''; // or some fallback if empty
+                }
+
+
                 // taskDiv.style.backgroundColor = color;
                 // afternoonTaskDiv.appendChild(taskDiv);
                 if (color) {
@@ -775,7 +970,25 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
             taskData.evening.forEach(({ task, color }) => {
                 const taskDiv = document.createElement('div');
                 taskDiv.classList.add('eveningTaskSub');
-                taskDiv.textContent = task;
+
+                // taskDiv.textContent = task;
+
+                //webkit
+                if (task.trim()) {
+                    const span = document.createElement('span');
+                    span.className = 'clamp-text';
+
+                    if (expanded) {
+                        span.classList.add('expanded');
+                    }
+
+                    span.textContent = task;
+                    taskDiv.innerHTML = ''; // clear existing content
+                    taskDiv.appendChild(span);
+                } else {
+                    taskDiv.textContent = ''; // or some fallback if empty
+                }
+
                 // taskDiv.style.backgroundColor = color;
                 // eveningTaskDiv.appendChild(taskDiv);
                 if (color) {
@@ -874,81 +1087,110 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
 
 
 
-fullScreenButton.addEventListener(`click`, enterFullScreen);
-exitFullscreenBtn.addEventListener("click", exitFullscreen);
+// fullScreenButton.addEventListener(`click`, enterFullScreen);
+fullScreenButton.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+        enterFullScreen();
+    } else {
+        exitFullScreen();
+    }
+});
+// exitFullscreenBtn.addEventListener("click", exitFullscreen);
 
 
 function enterFullScreen() {
     const docElement = document.documentElement;
     if (docElement.requestFullscreen) {
         docElement.requestFullscreen();
-
     } else if (docElement.webkitRequestFullscreen) {
         docElement.webkitRequestFullscreen(); // Safari
     } else if (docElement.msRequestFullscreen) {
         docElement.msRequestFullscreen(); // IE/Edge
     }
-    fullScreenButton.style.display = 'none';
-    exitFullscreenBtn.style.display = `flex`;
-
-    // slidingInputView.classList.toggle("show");
-    // Reset button position and rotation
-    // floatingAddBtn.style.transform = 'rotate(0)';
-    // Reset button color to green
-    // floatingAddBtn.style.backgroundColor = '#4CAF50'; 
-    // floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)';
-
-    // floatingAddBtn.style.bottom = `${20}px`;
-    // clearButton.style.bottom = `${80}px`;
-    // isPopupOpen = true;
 }
 // Exit fullscreen function
-function exitFullscreen() {
-    // if (document.fullscreenElement) { // Check if fullscreen is active
-    //     document.exitFullscreen()
-    //         .then(() => console.log("Exited fullscreen"))
-    //         .catch(err => console.error("Error exiting fullscreen:", err));
-    // } else {
-    //     console.log("Fullscreen mode is not active");
-    // }
-
-    document.exitFullscreen();
-    exitFullscreenBtn.style.display = `none`;
-    fullScreenButton.style.display = 'flex';
+function exitFullScreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
 }
 
 
 
 document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-        if (!isHidden) {
-            exitFullscreenBtn.style.display = `none`;
-            fullScreenButton.style.display = 'flex';
-        }
-    } else {
-        if (!isHidden) {
-            exitFullscreenBtn.style.display = `flex`;
-            fullScreenButton.style.display = 'none';
-        }
-    }
+    const isFullScreen = !!document.fullscreenElement;
+    fullscreenIcon.textContent = isFullScreen ? 'fullscreen_exit' : 'fullscreen';
 });
 
-let selectedDivs = [];
-let chosenColor = '#6a5044';
+
+
+
 let currentTask = '';
 
 
-//add click listener to colors for task
-document.querySelectorAll('.color-option').forEach(button => {
-    button.addEventListener('click', () => {
-        // Get the selected color
-        chosenColor = button.getAttribute('data-color');
-        // Highlight the selected button
-        document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected-color'));
-        button.classList.add('selected-color');
-        flower.style.color = chosenColor;
-    });
+// //add click listener to colors for task
+// document.querySelectorAll('.color-option').forEach(button => {
+//     button.addEventListener('click', () => {
+//         // Get the selected color
+//         chosenColor = button.getAttribute('data-color');
+//         // Highlight the selected button
+//         document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected-color'));
+//         button.classList.add('selected-color');
+//         flower.style.color = chosenColor;
+
+
+//     });
+// });
+document.getElementById('colorPicker').addEventListener('click', (e) => {
+    const button = e.target.closest('.color-option');
+    if (!button) return; // Clicked outside a button
+
+    // Get the selected color
+    chosenColor = button.getAttribute('data-color');
+
+    // Highlight the selected button
+    document.querySelectorAll('.color-option').forEach(btn =>
+        btn.classList.remove('selected-color')
+    );
+    button.classList.add('selected-color');
+
+    // Update flower color
+    flower.style.color = chosenColor;
+
+    // Additional: if editing mode, update selected tasks border color
+    if (isEditing) {
+        // Save undo state just once after updating all selected tasks
+
+        const selectedTasks = document.querySelectorAll('.selected-task-popup');
+
+        if (selectedTasks.length === 0) return;
+        const currentState = saveTaskOrderToTemp();
+        undoStack.push(currentState);
+        redoStack.length = 0; // clear redo stack because new action happened
+        selectedTasks.forEach(eventDiv => {
+            const content = eventDiv.querySelector('.event-content');
+            if (content) {
+                content.style.borderLeft = `5px solid ${chosenColor}`;
+            }
+        });
+    }
 });
+
+
+
+// ✅ NOW select the first new button (within colorPicker)
+const firstButton = colorPicker.querySelector('.color-option');
+if (firstButton) {
+    chosenColor = firstButton.getAttribute('data-color');
+
+    colorPicker.querySelectorAll('.color-option').forEach(btn =>
+        btn.classList.remove('selected-color')
+    );
+    firstButton.classList.add('selected-color');
+
+    flower.style.color = chosenColor;
+}
+
 
 //add click listeners to task(morning, afternoon, evening) divs
 yearContainer.addEventListener('click', (event) => {
@@ -958,20 +1200,40 @@ yearContainer.addEventListener('click', (event) => {
 
     if (subTaskElement) {
         handleSubtaskClick(subTaskElement); // Handle child click
+
+        // taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
+        updateSuggestionFromSelected();
         updateUICounters();
-        taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
 
 
         const lastDiv = selectedDivs[selectedDivs.length - 1];
         if (lastDiv) {
+
             const computedStyle = getComputedStyle(lastDiv);
             const rgbColor = computedStyle.borderLeftColor;
             const hexColor = rgbToHex(rgbColor);
 
             if (hexColor) {
                 const colorBtn = document.querySelector(`button.color-option[data-color="${hexColor}"]`);
-                if (colorBtn) colorBtn.click();
+                if (colorBtn) {
+                    colorBtn.click();
+
+                    const scrollContainer = document.querySelector('.color-picker'); // scrollable container
+
+                    // Center the button horizontally inside the scroll container
+                    const containerRect = scrollContainer.getBoundingClientRect();
+                    const targetRect = colorBtn.getBoundingClientRect();
+
+                    const offset = targetRect.left - containerRect.left;
+                    const centerOffset = offset - (scrollContainer.clientWidth / 2) + (colorBtn.clientWidth / 2);
+
+                    scrollContainer.scrollTo({
+                        left: scrollContainer.scrollLeft + centerOffset,
+                        behavior: 'smooth'
+                    });
+                }
             }
+
         }
 
 
@@ -980,7 +1242,9 @@ yearContainer.addEventListener('click', (event) => {
 
     if (mainTaskElement) {
         handleParentClick(mainTaskElement); // Handle parent click
-        taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
+        updateSuggestionFromSelected();
+        updateUICounters();
+        // taskInput.value = selectedDivs[selectedDivs.length - 1]?.textContent || '';
 
 
         const lastDiv = selectedDivs[selectedDivs.length - 1];
@@ -995,12 +1259,82 @@ yearContainer.addEventListener('click', (event) => {
             }
         }
 
-
-        updateUICounters(); // Update the UI counters
     }
 
 
 });
+
+
+function addToSuggestionText(text) {
+    const suggestionContainer = document.querySelector('.suggestion-text');
+    const existingButtons = Array.from(suggestionContainer.querySelectorAll('.paste-button'));
+
+    // Check if the text already exists
+    const alreadyExists = existingButtons.some(btn => btn.textContent === text);
+    if (alreadyExists) return;
+
+    // Create a new paste button
+    const button = document.createElement('div');
+    button.classList.add('paste-button');
+    button.textContent = text;
+
+    // When clicked, send the text to the taskInput
+    button.addEventListener('click', () => {
+        taskInput.value = text;
+    });
+
+    const blankBtn = suggestionContainer.querySelector('.blank-suggestion');
+    if (blankBtn && blankBtn.nextSibling) {
+        suggestionContainer.insertBefore(button, blankBtn.nextSibling);
+    } else {
+        suggestionContainer.appendChild(button);
+    }
+}
+
+
+function updateSuggestionFromSelected() {
+    const suggestionContainer = document.querySelector('.suggestion-text');
+    suggestionContainer.innerHTML = '';
+
+    const added = new Set();
+    hasSuggestionContent = false;
+
+    // Insert the last selected first
+    const lastDiv = selectedDivs[selectedDivs.length - 1];
+    if (lastDiv) {
+        const lastText = lastDiv.textContent?.trim();
+        if (lastText && !added.has(lastText)) {
+            added.add(lastText);
+            const button = document.createElement('div');
+            button.classList.add('paste-button');
+            button.textContent = lastText;
+            button.addEventListener('click', () => {
+                taskInput.value = lastText;
+            });
+            suggestionContainer.appendChild(button);
+            hasSuggestionContent = true;
+        }
+    }
+
+    // Add the rest (excluding last)
+    for (let i = 0; i < selectedDivs.length - 1; i++) {
+        const text = selectedDivs[i].textContent?.trim();
+        if (!text || added.has(text)) continue;
+        added.add(text);
+
+        const button = document.createElement('div');
+        button.classList.add('paste-button');
+        button.textContent = text;
+        button.addEventListener('click', () => {
+            taskInput.value = text;
+        });
+        suggestionContainer.appendChild(button);
+        hasSuggestionContent = true;
+    }
+}
+
+
+
 
 
 // Handle selection/deselection for the subtask (child)
@@ -1103,12 +1437,34 @@ function handleSubtaskGroupToggle(event) {
 
 const counterObserver = new MutationObserver(() => {
     if (parseInt(selectedTaskCounter.textContent) > 0) {
+
+        if (hasSuggestionContent) {
+            const suggestionWrapper = document.querySelector('.suggestion-wrapper');
+            const jumpingTextBox = document.querySelector(".jumping-text-box");
+            jumpingTextBox.style.display = "none";
+            suggestionWrapper.style.display = "flex";
+        } else {
+            const suggestionWrapper = document.querySelector('.suggestion-wrapper');
+            const jumpingTextBox = document.querySelector(".jumping-text-box");
+            jumpingTextBox.style.display = "flex";
+            suggestionWrapper.style.display = "none";
+        }
+
         submitTaskBtn.classList.remove('disabled-btn'); // Remove disabled styling
         addTaskBtn.classList.remove('disabled-btn'); // Remove 
         selectedTaskCounter.classList.add(`selection-true`);
         // submitTaskBtn.disabled = false;
         // selectedTaskCounter.classList.remove('shake-btn'); // Remove shake effect when counter is > 0
     } else {
+
+        const suggestionWrapper = document.querySelector('.suggestion-wrapper');
+        const jumpingTextBox = document.querySelector(".jumping-text-box");
+        jumpingTextBox.style.display = "flex";
+        suggestionWrapper.style.display = "none";
+
+
+        // taskInput.value = "";
+
         submitTaskBtn.classList.add('disabled-btn'); // Add 
         addTaskBtn.classList.add('disabled-btn'); // Remove 
         // disabled styling
@@ -1133,7 +1489,21 @@ function submitTask() {
 
             // Use existing text if none is typed in
             if (taskTitle !== '') {
-                div.textContent = taskTitle;
+                // div.textContent = taskTitle;
+
+                //webkit
+                const span = document.createElement('span');
+                span.className = 'clamp-text';
+
+                if (expanded) {
+                    span.classList.add('expanded');
+                }
+
+                span.textContent = taskTitle;
+
+                div.innerHTML = '';       // Clear any existing content
+                div.appendChild(span);    // Add styled span
+
             } else {
                 taskTitle = div.textContent;
             }
@@ -1254,11 +1624,45 @@ function submitTemplate(item) {
     const taskText = item.textContent;
     const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
 
+    if (taskColor) {
+        const colorBtn = document.querySelector(`button.color-option[data-color="${taskColor}"]`);
+        if (colorBtn) {
+            colorBtn.click();
+
+            const scrollContainer = document.querySelector('.color-picker'); // scrollable container
+
+            // Center the button horizontally inside the scroll container
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const targetRect = colorBtn.getBoundingClientRect();
+
+            const offset = targetRect.left - containerRect.left;
+            const centerOffset = offset - (scrollContainer.clientWidth / 2) + (colorBtn.clientWidth / 2);
+
+            scrollContainer.scrollTo({
+                left: scrollContainer.scrollLeft + centerOffset,
+                behavior: 'smooth'
+            });
+        }
+    }
+
     if (selectedDivs.length > 0) {
         const storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
         selectedDivs.forEach(div => {
-            div.textContent = taskText;
+            // div.textContent = taskText;
+
+            //webkit
+            const span = document.createElement('span');
+            span.className = 'clamp-text';
+
+            if (expanded) {
+                span.classList.add('expanded');
+            }
+
+            span.textContent = taskText;
+            div.innerHTML = '';       // Clear any existing content
+            div.appendChild(span);    // Add styled span
+
             // div.style.backgroundColor = taskColor;
             div.style.borderLeft = `4px solid ${taskColor}`;
             div.style.backgroundColor = fadeColor(taskColor);
@@ -1281,6 +1685,8 @@ function submitTemplate(item) {
         });
 
         [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+        //color here
+
     } else {
         triggerShakeEffect();
     }
@@ -1408,7 +1814,7 @@ function clearSelection() {
     // deselectTemplateBtn.textContent = `${selectedDivs.length}`;
 
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-    taskInput.value = "";
+    // taskInput.value = "";
     console.log(`selection cleared`);
 }
 
@@ -1489,26 +1895,15 @@ floatingAddBtn.addEventListener('click', () => {
         slidingInputView.classList.toggle("show");
 
         floatingAddBtn.style.transform = 'rotate(225deg)'; //rotate button
-        // floatingAddBtn.style.backgroundColor = '#f44336'; 
-        // Change button color to red
+
         floatingAddBtn.style.backgroundColor = 'rgba(244, 67, 54, 0.9)';
 
-        // Adjust the button positions based on the sliding input view
-        // const slidingInputHeight = 33 * window.innerHeight / 100;
-
-        //repositioning
-        // floatingAddBtn.style.bottom = `${130 + 10}px`;
-        // clearButton.style.bottom = `${130 + 70}px`;
         taskToolbar.style.bottom = `${130 + 10}px`;
     } else {
         slidingInputView.classList.toggle("show");
 
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
         floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
-
-        // const slidingInputHeight = -(33 * window.innerHeight / 100);
-        // floatingAddBtn.style.bottom = `${20}px`;
-        // clearButton.style.bottom = `${80}px`;
         taskToolbar.style.bottom = `${20}px`;
     }
 });
@@ -1531,6 +1926,11 @@ clonedSlidingInputView.classList.add('cloned-sliding-view');
 const selectedTask = clonedSlidingInputView.querySelector('.selected-task');
 if (selectedTask) {
     selectedTask.remove();  // Remove the selected-task button
+}
+
+const cloneColorMenu = clonedSlidingInputView.querySelector(".palette-button");
+if (cloneColorMenu) {
+    cloneColorMenu.remove();
 }
 
 
@@ -1740,6 +2140,7 @@ function fadeColor(color, alpha = 0.6) {
 }
 
 monthLabelVertView.addEventListener('click', () => {
+    popUpDate = null;
     showCalHorView(currentMonthVertView, currentYearVertView);
 });
 calIconVertView.addEventListener('click', () => {
@@ -1749,7 +2150,7 @@ calIconVertView.addEventListener('click', () => {
 
 function showCalHorView(m, y) {
 
-
+    cleanupSelectedDivs();
     // Make sure both elements exist
     const main = document.getElementById('main-container');
     const vert = document.getElementById('calendar-container-vert-view');
@@ -1765,21 +2166,26 @@ function showCalHorView(m, y) {
         yearContainer.removeChild(yearContainer.firstChild);
     }
     updateVertViewCalendarFromMonthYear(m, y);
+
     requestAnimationFrame(() => {
         currentMonthContainer.scrollIntoView({
             block: "start",
-            behavior: "smooth"
+            // behavior: "smooth"
+            behavior: "auto"
         });
 
         // Delay listener until after scroll finishes
         requestAnimationFrame(() => {
             yearContainer.addEventListener('scroll', handleYearContainerScroll);
         });
+        currentDayScroll(popUpDate);
     });
 }
 
 function showCalVertView(month, year) {
-    console.log("Vert View Showing");
+
+    cleanupSelectedDivs();
+    // console.log("Vert View Showing");
 
     // Make sure both elements exist
     const main = document.getElementById('main-container');
@@ -1793,10 +2199,14 @@ function showCalVertView(month, year) {
     updateCalendarWithTasks(month, year);
     main.style.display = 'none';
     vert.style.display = 'flex'; // Assuming your flex styles are defined in CSS
+
+    const todayElement = document.querySelector(`.grid-cell[data-full-date="${popUpDate}"]`);
+    if (todayElement) todayElement.classList.add('is-active');
 }
 
 
 function updateVertViewCalendarFromMonthYear(currentMonth, currentYear) {
+    cleanupSelectedDivs();
     console.log("FIND ERROR the current now is:");
     console.log(currentMonth);
     console.log(currentYear);

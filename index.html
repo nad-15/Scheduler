@@ -10,8 +10,9 @@
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" /> -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1" rel="stylesheet" />
 </head>
 
 <body>
@@ -20,31 +21,110 @@
         Please use a mobile device, press <kbd>F12</kbd>, or resize the window to view the mobile design.
     </div>
 
+    <div id="todo-container" class="todos">
+        <div class="todo-header-container">
+            <div class="todo-header-container-top">
+                <div class="todo-title-header">
+                    <!-- Filter -->
+                    <!-- <div class="todo-filter-container">
+                        <button class="todo-filter-mode-btn" style="display: none;">
+                            <span class="material-symbols-outlined todo-filter-mode-icon">sort</span>
+                        </button>
+                        <div class="todo-filter-dropdown">
+                            <button class="todo-filter-btn" data-filter="all">All</button>
+                            <button class="todo-filter-btn" data-filter="in-progress">In Progress</button>
+                            <button class="todo-filter-btn" data-filter="done">Completed</button>
+                            <button class="todo-filter-btn" data-filter="archive">Archive</button>
+                            <button class="todo-filter-btn" data-filter="not-archived">Active</button>
+                        </div>
+                    </div> -->
+
+                    <div class="appname-sort-container">
+                        <!-- <div class="todo-greet">Good Day, Username!</div> -->
+                        <div class="todo-appname">What’s Next?</div>
+                        <div class="sort-buttons-toggle">
+                            <label class="sort-label">
+                                Sort by
+                                <span class="material-symbols-outlined sort-icon">arrow_drop_down</span>
+                            </label>
+                            <span class="sort-mode-text-indicator"></span>
+                            <div class="todo-sort-controls">
+                                <div class="todo-sort-buttons">
+                                    <button class="todo-sort-btn" data-sort="date-newest">Newest First</button>
+                                    <button class="todo-sort-btn" data-sort="date-oldest">Oldest First</button>
+                                    <button class="todo-sort-btn" data-sort="group">Priority</button>
+                                    <button class="todo-sort-btn" data-sort="due-date">Due Date</button>
+                                    <button class="todo-sort-btn" data-sort="completion">Completion</button>
+                                    <button class="todo-sort-btn" data-sort="time-estimate">Time Estimate</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div>
+
+                </div>
+
+                <div class="todo-header-buttons-container">
+                    <div class="todo-actions-container" style="position: relative; line-height: 1;">
+                        <button class="todo-actions-btn">
+                            <span class="material-icons todo-actions-icon">playlist_remove</span>
+                        </button>
+
+                        <div class="todo-actions-dropdown">
+                            <button class="archive-completed-btn">Archive Completed Tasks</button>
+                            <button class="delete-completed-btn">Delete Completed Tasks</button>
+                            <button class="delete-archived-btn">Delete Archived Tasks</button>
+                            <button class="delete-all-btn">Delete All Tasks</button>
+                        </div>
+                    </div>
+
+                    <button class="collapse-toggle-btn">
+                        <span class="material-icons todo-collapse-icon">compress</span>
+                    </button>
+                    <button class="todo-close-btn">
+                        <span class="material-icons todo-close-icon">close</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- <div class="todo-header-container-middle">
+            </div> -->
+            <div class="todo-header-container-bottom">
+                <div class="todo-folder-container">
+                    <button class="todo-filter-btn" data-filter="starred">
+                        <span class="material-symbols-outlined todo-star-folder">star</span>
+                        <!-- count will be injected/updated here by JS -->
+                    </button>
+
+                    <button class="todo-filter-btn" data-filter="not-archived">Active List</button>
+                    <button class="todo-filter-btn" data-filter="in-progress">To Do</button>
+                    <button class="todo-filter-btn" data-filter="done">Completed</button>
+                    <button class="todo-filter-btn" data-filter="archive">Archive</button>
+                    <button class="todo-filter-btn" data-filter="all">All</button>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="todo-list">
+            <!-- insert todos here -->
+        </div>
+
+        <!-- Floating Add Button -->
+        <button class="todo-fab">
+            <span class="material-symbols-outlined todo-fab-icon">
+                add
+            </span>
+        </button>
+    </div>
+
+
     <div class="container" id="main-container">
 
         <div id="today-name">
-            <!-- <button class="hide-widget"><span class="material-icons doublearrow-right">keyboard_double_arrow_right</span>
-                </button>
-
-                <div class="time-container">
-                    <div id="today-location">Kitchener, CA</div>
-                    <div id="today-date">...</div>
-                    <div id="today-time">
-                        <span id="today-hour-minute">...</span>
-                    </div>
-                    <span id="today-seconds">...</span>
-                    <span id="today-ampm">...</span>
-                </div>
-
-
-                <div class="weather-container">
-                    <div id="today-icon">
-                        <img src="#" alt="Weather icon">
-                    </div>
-                    <div id="today-temp">...</div>
-                    <div id="today-weather">...</div> 
-                </div> -->
-
+            <!-- widget dynacmically inserted  -->
         </div>
 
         <div class="container" id="year-container">
@@ -56,8 +136,10 @@
 
             <button class="hide-all-buttons">© 2025 skhayeduler</button>
 
-
             <div class="task-toolbar-container">
+                <button class="todo-button">
+                    <span class="material-symbols-outlined todo-button-icon">checklist</span>
+                </button>
                 <button class="clear-button" id="clear-button">
                     <span class="material-icons">delete</span>
                 </button>
@@ -67,17 +149,18 @@
                 <button class="floating-add-btn" id="floatingAddBtn">
                     <span class="material-icons add-btn template-btn">add</span>
                 </button>
-
             </div>
 
 
-
-
-            <button class="exit-flscreen-button screen-size-change" id="exit-flscreen-button">
-                <span class="material-icons screen-size">fullscreen_exit</span></button>
-            <button class="fullscreen-btn buttons screen-size-change" id="fullscreen-button"><i
-                    class="material-icons screen-size">fullscreen</i></button>
-
+            <div class="extras-toolbar">
+                <button class="menu-button"><span class="material-icons menu-icon">menu</span></button>
+                <button class="fullscreen-toggle-btn screen-size-change" id="fullscreen-button">
+                    <span class="material-icons screen-size" id="fullscreen-icon">fullscreen</span>
+                </button>
+                <button id="toggleClampBtn" class="clamp-toggle-btn">
+                    <span id="toggleIcon" class="material-symbols-outlined">compress</span>
+                </button>
+            </div>
             <div id="overlay" class="overlay"></div>
 
             <button class="hide-widget"><span
@@ -86,50 +169,6 @@
 
             <button class="drag-button">Drag<br>OFF
             </button>
-
-            <!-- menu slider  -->
-            <button class="menu-button"><span class="material-icons menu-icon">menu</span></button>
-
-            <div class="menu-slider">
-                <button class="close-button-menu">
-                    <span class="material-icons close-button-menu-icon">close</span>
-                </button>
-
-
-                <h2>Do the impossible...</h2>
-
-                <ul>
-
-                    <li>
-                        <span class="theme">Theme</span>
-                        <ul class="theme-list submenu theme-submenu">
-                            <!-- The theme list will be populated here -->
-                        </ul>
-                    </li>
-
-                    <li>
-                        <span class="size">Size</span>
-                        <ul class="submenu size-submenu">
-                            <li data-size="20px">Extra Small</li>
-                            <li data-size="25px">Small</li>
-                            <li data-size="28px">Medium</li>
-                            <li data-size="31px">Large</li>
-                            <li data-size="35px">Extra Large</li>
-                        </ul>
-                    </li>
-
-
-                    <li>
-                        <span class="about">About</span>
-                    </li>
-
-                </ul>
-            </div>
-
-            <div class="overlay-menu"></div> <!-- Make sure this exists for the overlay to work -->
-
-
-
             <!-- Sliding Input View -->
             <div class="sliding-input-view" id="slidingInputView">
                 <div class="taskinput-color-container">
@@ -137,6 +176,16 @@
                         <!-- <button class="task-template-button"><i class="material-icons template-list">list_alt</i></button> -->
 
                         <button class="selected-task">0</button>
+
+
+                        <!-- <div class="counter-icon-container">
+                            <div class="icon-with-number-container">
+                                <span class="material-symbols-outlined" id="gfont-counter-icon">ad_group</span>
+                                <span class="calendar-number">0</span>
+                            </div>
+                        </div> -->
+
+
 
                         <div class="title-submit-container">
                             <!-- <div class="template-task-btn1 "> -->
@@ -147,218 +196,429 @@
 
                             <!-- </div> -->
                             <div class="flower-container"><i class="material-icons flower">spa</i></div>
-                            <input class="input-task-template" type="text" id="taskTitle" autocomplete="off"
-                                inputmode="text" placeholder="Enter task title.">
+                            <textarea class="input-task-template" id="taskTitle" autocomplete="off" name="task"
+                                autocorrect="off" spellcheck="false" inputmode="text"
+                                placeholder="Enter task title."></textarea>
+
                             <button class="buttons disabled-btn" id="submitTask">
                                 <i class="material-icons arrow-upward">arrow_upward</i></button>
                         </div>
                     </div>
-                    <!-- Color Picker  -->
-                    <div class="color-picker" id="colorPicker">
-                        <!-- <div class="color-option-container">
-        <button class="color-option selected-color" data-color="" style="background-color: #e5f5e0;" autofocus></button>
-    </div> -->
-                        <!-- <div class="color-option-container">
-                            <button class="color-option selected-color" data-color="#a48374"
-                                style="background-color: #a48374;"></button>
-                        </div> -->
 
-                        <div class="color-option-container">
-                            <button class="color-option selected-color" data-color="#6a5044"
-                                style="background-color: #6a5044;"></button>
-                        </div>
+                    <div class="color-button-options">
+                        <div class="palette-wrapper">
+                            <button id="showRecentColors" class="palette-button" title="Show Recently Used Colors">
+                                <span class="material-symbols-outlined" id="recentcolors-icon">palette</span>
+                            </button>
 
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#998c80"
-                                style="background-color: #998c80;"></button>
-                        </div>
-                        <!--<div class="color-option-container">
-                            <button class="color-option" data-color="#b3a99d"
-                                style="background-color: #b3a99d;"></button>
-                        </div> -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#d1c7bd"
-                                style="background-color: #d1c7bd;"></button>
-                        </div>
-                        <!--<div class="color-option-container">
-                            <button class="color-option" data-color="#ebe3db"
-                                style="background-color: #ebe3db;"></button>
-                        </div> -->
+                            <!-- Dropdown menu -->
+                            <div id="color-mode-dropdown" class="color-mode-dropdown hidden">
+                                <button data-mode="all" class="dropdown-option">All</button>
+                                <button data-mode="recent" class="dropdown-option">Favorites</button>
 
-                        <!-- 
-                        <div class="color-option-container">
-                            <button class="color-option selected-color" data-color="#7f6d5f"
-                                style="background-color: #7f6d5f;"></button>
-                        </div> -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#e27396"
-                                style="background-color: #e27396;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#ffc09f"
-                                style="background-color: #ffc09f;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#4caf50"
-                                style="background-color: #4caf50;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#3388cc"
-                                style="background-color: #3388cc;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#ffee93"
-                                style="background-color: #ffee93;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#dfb2f4"
-                                style="background-color: #dfb2f4;"></button>
-                        </div>
-                        <!-- New colors added -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#ff6f61"
-                                style="background-color: #ff6f61;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#68b3c8"
-                                style="background-color: #68b3c8;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#f5a623"
-                                style="background-color: #f5a623;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#9b59b6"
-                                style="background-color: #9b59b6;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#2ecc71"
-                                style="background-color: #2ecc71;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#ff8c00"
-                                style="background-color: #ff8c00;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#b39ddb"
-                                style="background-color: #b39ddb;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#9c27b0"
-                                style="background-color: #9c27b0;"></button>
-                        </div>
+                                <!-- Wrap "Shades" with submenu -->
+                                <div class="dropdown-option-wrapper shades-wrapper">
+                                    <button data-mode="shades" class="dropdown-option">Shades</button>
 
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#3a2d28"
-                                style="background-color: #3a2d28;"></button>
+                                    <!-- Submenu for Shades -->
+                                    <div id="shadeSubmenu" class="shade-submenu hidden">
+                                        <button class="shade-color-btn" data-color="red">Red</button>
+                                        <button class="shade-color-btn" data-color="orange">Orange</button>
+                                        <button class="shade-color-btn" data-color="yellow">Yellow</button>
+                                        <button class="shade-color-btn" data-color="green">Green</button>
+                                        <button class="shade-color-btn" data-color="blue">Blue</button>
+                                        <button class="shade-color-btn" data-color="purple">Purple</button>
+                                        <button class="shade-color-btn" data-color="pink">Pink</button>
+                                        <button class="shade-color-btn" data-color="teal">Teal</button>
+                                        <button class="shade-color-btn" data-color="peach">Peach</button>
+                                        <button class="shade-color-btn" data-color="coral">Coral</button>
+                                        <button class="shade-color-btn" data-color="lavender">Lavender</button>
+                                        <button class="shade-color-btn" data-color="grey">Grey</button>
+                                        <button class="shade-color-btn" data-color="brown">Brown</button>
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
 
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#ffeb3b"
-                                style="background-color: #ffeb3b;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#00bcd4"
-                                style="background-color: #00bcd4;"></button>
-                        </div>
+                        <!-- Color Picker  -->
+                        <div class="color-picker" id="colorPicker">
+                            <!-- <div class="color-option-container">
+                                <button class="color-option selected-color" data-color="" style="background-color: #e5f5e0;" autofocus></button>
+                            </div> -->
+                            <!-- <div class="color-option-container">
+                                <button class="color-option selected-color" data-color="#a48374" style="background-color: #a48374;"></button>
+                            </div> -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#6a5044"
+                                    style="background-color: #6a5044;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#998c80"
+                                    style="background-color: #998c80;"></button>
+                            </div>
+                            <!-- <div class="color-option-container">
+                                <button class="color-option" data-color="#b3a99d" style="background-color: #b3a99d;"></button>
+                            </div> -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#d1c7bd"
+                                    style="background-color: #d1c7bd;"></button>
+                            </div>
+                            <!-- <div class="color-option-container">
+                                <button class="color-option" data-color="#ebe3db" style="background-color: #ebe3db;"></button>
+                            </div> -->
+                            <!-- <div class="color-option-container">
+                                <button class="color-option selected-color" data-color="#7f6d5f" style="background-color: #7f6d5f;"></button>
+                            </div> -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#e27396"
+                                    style="background-color: #e27396;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#ffc09f"
+                                    style="background-color: #ffc09f;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#4caf50"
+                                    style="background-color: #4caf50;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#3388cc"
+                                    style="background-color: #3388cc;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#ffee93"
+                                    style="background-color: #ffee93;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#dfb2f4"
+                                    style="background-color: #dfb2f4;"></button>
+                            </div>
+                            <!-- New colors added -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#ff6f61"
+                                    style="background-color: #ff6f61;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#68b3c8"
+                                    style="background-color: #68b3c8;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#f5a623"
+                                    style="background-color: #f5a623;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#9b59b6"
+                                    style="background-color: #9b59b6;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#2ecc71"
+                                    style="background-color: #2ecc71;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#ff8c00"
+                                    style="background-color: #ff8c00;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#b39ddb"
+                                    style="background-color: #b39ddb;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#9c27b0"
+                                    style="background-color: #9c27b0;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#3a2d28"
+                                    style="background-color: #3a2d28;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#ffeb3b"
+                                    style="background-color: #ffeb3b;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#00bcd4"
+                                    style="background-color: #00bcd4;"></button>
+                            </div>
 
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#7e57c2"
-                                style="background-color: #7e57c2;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#43a047"
-                                style="background-color: #43a047;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#f44336"
-                                style="background-color: #f44336;"></button>
-                        </div>
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#00bfae"
-                                style="background-color: #00bfae;"></button>
-                        </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#7e57c2"
+                                    style="background-color: #7e57c2;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#43a047"
+                                    style="background-color: #43a047;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#f44336"
+                                    style="background-color: #f44336;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#00bfae"
+                                    style="background-color: #00bfae;"></button>
+                            </div>
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#c2185b"
+                                    style="background-color: #c2185b;"></button>
+                            </div>
+                            <!-- 🔴 Red Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#5c1a1a"
+                                    style="background-color:#5c1a1a;" title="Deep Red"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#a83232"
+                                    style="background-color:#a83232;" title="Rich Red"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#d44d5c"
+                                    style="background-color:#d44d5c;" title="Blush Red"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#f06b72"
+                                    style="background-color:#f06b72;" title="Warm Red"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#ffb3b4"
+                                    style="background-color:#ffb3b4;" title="Light Red"></button></div> <!-- tweaked -->
 
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#c2185b"
-                                style="background-color: #c2185b;"></button>
+                            <!-- 🟠 Orange Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#a04500"
+                                    style="background-color:#a04500;" title="Burnt Orange"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#cc6600"
+                                    style="background-color:#cc6600;" title="Dark Orange"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#ff8d01"
+                                    style="background-color:#ff8d01;" title="Bright Orange"></button></div>
+                            <!-- tweaked -->
+                            <div class="color-option-container"><button class="color-option" data-color="#ffae42"
+                                    style="background-color:#ffae42;" title="Golden Orange"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#ffd8a9"
+                                    style="background-color:#ffd8a9;" title="Soft Orange"></button></div>
+                            <!-- tweaked -->
+
+                            <!-- 🟡 Yellow Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#bfa500"
+                                    style="background-color:#bfa500;" title="Deep Yellow"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#e6c200"
+                                    style="background-color:#e6c200;" title="Honey Yellow"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#ffeb3c"
+                                    style="background-color:#ffeb3c;" title="Lemon Yellow"></button></div>
+                            <!-- tweaked -->
+                            <div class="color-option-container"><button class="color-option" data-color="#ffee94"
+                                    style="background-color:#ffee94;" title="Light Yellow"></button></div>
+                            <!-- tweaked -->
+                            <div class="color-option-container"><button class="color-option" data-color="#fff9cd"
+                                    style="background-color:#fff9cd;" title="Pale Yellow"></button></div>
+                            <!-- tweaked -->
+
+                            <!-- 🟢 Green Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#145a32"
+                                    style="background-color:#145a32;" title="Forest Green"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#2ecc71"
+                                    style="background-color:#2ecc71;" title="Bright Green"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#43a047"
+                                    style="background-color:#43a047;" title="Mid Green"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#6fcf98"
+                                    style="background-color:#6fcf98;" title="Light Mint Green"></button></div>
+                            <!-- tweaked -->
+                            <div class="color-option-container"><button class="color-option" data-color="#d5f5e4"
+                                    style="background-color:#d5f5e4;" title="Faint Green"></button></div>
+                            <!-- tweaked -->
+
+                            <!-- 🔵 Blue Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#0b3c5d"
+                                    style="background-color:#0b3c5d;" title="Navy Blue"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#3388cc"
+                                    style="background-color:#3388cc;" title="Sky Blue"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#00bcd4"
+                                    style="background-color:#00bcd4;" title="Cyan Blue"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#68b3c9"
+                                    style="background-color:#68b3c9;" title="Soft Blue"></button></div> <!-- tweaked -->
+                            <div class="color-option-container"><button class="color-option" data-color="#d0f0fe"
+                                    style="background-color:#d0f0fe;" title="Ice Blue"></button></div> <!-- tweaked -->
+
+                            <!-- 🟣 Purple Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#4b0082"
+                                    style="background-color:#4b0082;" title="Indigo"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#7e57c2"
+                                    style="background-color:#7e57c2;" title="Mid Purple"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#9c27b1"
+                                    style="background-color:#9c27b1;" title="Bright Purple"></button></div>
+                            <!-- tweaked -->
+                            <div class="color-option-container"><button class="color-option" data-color="#b39dde"
+                                    style="background-color:#b39dde;" title="Soft Lavender"></button></div>
+                            <!-- tweaked -->
+                            <div class="color-option-container"><button class="color-option" data-color="#dfb2f5"
+                                    style="background-color:#dfb2f5;" title="Pale Purple"></button></div>
+                            <!-- tweaked -->
+
+                            <!-- 🟤 Brown Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#3a2d28"
+                                    style="background-color:#3a2d28;" title="Dark Brown"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#5c4033"
+                                    style="background-color:#5c4033;" title="Rich Brown"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#6a5044"
+                                    style="background-color:#6a5044;" title="Mocha"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#8d6e64"
+                                    style="background-color:#8d6e64;" title="Medium Brown"></button></div>
+                            <!-- tweaked -->
+                            <div class="color-option-container"><button class="color-option" data-color="#d1c7be"
+                                    style="background-color:#d1c7be;" title="Light Taupe"></button></div>
+                            <!-- tweaked -->
+
+
+                            <!-- 🌈 Custom Shades from Original Colors -->
+
+                            <!-- 🍑 Peach Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#cc7a50"
+                                    style="background-color:#cc7a50;" title="Dark Peach"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#e89c73"
+                                    style="background-color:#e89c73;" title="Peach"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#ffb89f"
+                                    style="background-color:#ffb89f;" title="Peach*"></button></div>
+                            <!-- adjusted from #ffc09f -->
+                            <div class="color-option-container"><button class="color-option" data-color="#ffd9ba"
+                                    style="background-color:#ffd9ba;" title="Light Peach"></button></div>
+
+                            <!-- 🟥 Vivid Red Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#b71c1c"
+                                    style="background-color:#b71c1c;" title="Dark Vivid Red"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#d32f2f"
+                                    style="background-color:#d32f2f;" title="Vivid Red"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#f55648"
+                                    style="background-color:#f55648;" title="Bright Red*"></button></div>
+                            <!-- adjusted from #f44336 -->
+                            <div class="color-option-container"><button class="color-option" data-color="#ffd0d5"
+                                    style="background-color:#ffd0d5;" title="Soft Red"></button></div>
+
+                            <!-- 🧡 Coral Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#cc574c"
+                                    style="background-color:#cc574c;" title="Dark Coral"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#ff7567"
+                                    style="background-color:#ff7567;" title="Coral*"></button></div>
+                            <!-- adjusted from #ff6f61 -->
+                            <div class="color-option-container"><button class="color-option" data-color="#ffaaa1"
+                                    style="background-color:#ffaaa1;" title="Light Coral"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#ffdbd6"
+                                    style="background-color:#ffdbd6;" title="Pale Coral"></button></div>
+
+                            <!-- 🩵 Teal Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#00675b"
+                                    style="background-color:#00675b;" title="Dark Teal"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#009688"
+                                    style="background-color:#009688;" title="Teal"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#00c6b6"
+                                    style="background-color:#00c6b6;" title="Bright Teal*"></button></div>
+                            <!-- adjusted from #00bfae -->
+                            <div class="color-option-container"><button class="color-option" data-color="#85e8de"
+                                    style="background-color:#85e8de;" title="Light Teal"></button></div>
+
+                            <!-- 💗 Deep Pink Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#880e4f"
+                                    style="background-color:#880e4f;" title="Dark Pink"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#c2185b"
+                                    style="background-color:#c2185b;" title="Deep Pink"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#ed4c84"
+                                    style="background-color:#ed4c84;" title="Bright Pink"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#f9c1d5"
+                                    style="background-color:#f9c1d5;" title="Light Pink"></button></div>
+
+                            <!-- 💜 Medium Purple Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#6a1b9a"
+                                    style="background-color:#6a1b9a;" title="Dark Purple"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#8e44ad"
+                                    style="background-color:#8e44ad;" title="Medium Purple"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#a062c2"
+                                    style="background-color:#a062c2;" title="Bright Purple*"></button></div>
+                            <!-- adjusted from #9b59b6 -->
+                            <div class="color-option-container"><button class="color-option" data-color="#dac1e7"
+                                    style="background-color:#dac1e7;" title="Soft Purple"></button></div>
+
+                            <!-- 🟣 Lavender Shades -->
+                            <div class="color-option-container"><button class="color-option" data-color="#9575cd"
+                                    style="background-color:#9575cd;" title="Lavender"></button></div>
+                            <div class="color-option-container"><button class="color-option" data-color="#b49ddb"
+                                    style="background-color:#b49ddb;" title="Soft Lavender*"></button></div>
+                            <!-- adjusted from #b39ddb -->
+                            <div class="color-option-container"><button class="color-option" data-color="#d3c6eb"
+                                    style="background-color:#d3c6eb;" title="Light Lavender"></button></div>
+
+                            <!-- 🪵 Earth Tone -->
+                            <div class="color-option-container"><button class="color-option" data-color="#9b9085"
+                                    style="background-color:#9b9085;" title="Neutral Taupe*"></button></div>
+                            <!-- adjusted from #998c80 -->
+                            <!-- Rustic (odd) -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#5c4033" style="background-color: #5c4033;"
+                                    title="Rustic"></button>
+                            </div>
+                            <!-- Mocha (odd) -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#5d4037" style="background-color: #5d4037;"
+                                    title="Mocha"></button>
+                            </div>
+
+                            <!-- Cocoa (odd) -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#6d4c41" style="background-color: #6d4c41;"
+                                    title="Cocoa"></button>
+                            </div>
+
+                            <!-- Almond (odd) -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#6f4e37" style="background-color: #6f4e37;"
+                                    title="Almond"></button>
+                            </div>
+
+                            <!-- Tan (odd) -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#795548" style="background-color: #795548;"
+                                    title="Tan"></button>
+                            </div>
+
+                            <!-- Earthy (odd) -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#8d6e63" style="background-color: #8d6e63;"
+                                    title="Earthy"></button>
+                            </div>
+
+                            <!-- Latte (odd) -->
+                            <div class="color-option-container">
+                                <button class="color-option" data-color="#8b5e3c" style="background-color: #8b5e3c;"
+                                    title="Latte"></button>
+                            </div>
                         </div>
-
-
-                        <!-- Rustic (odd) -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#5c4033"
-                                style="background-color: #5c4033;"></button>
-                        </div>
-
-                        <!-- Almond (odd) -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#6f4e37"
-                                style="background-color: #6f4e37;"></button>
-                        </div>
-
-                        <!-- Mocha (odd) -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#5d4037"
-                                style="background-color: #5d4037;"></button>
-                        </div>
-
-                        <!-- Cocoa (odd) -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#6d4c41"
-                                style="background-color: #6d4c41;"></button>
-                        </div>
-
-                        <!-- Tan (odd) -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#795548"
-                                style="background-color: #795548;"></button>
-                        </div>
-
-                        <!-- Latte (odd) -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#8b5e3c"
-                                style="background-color: #8b5e3c;"></button>
-                        </div>
-
-                        <!-- Earthy (odd) -->
-                        <div class="color-option-container">
-                            <button class="color-option" data-color="#8d6e63"
-                                style="background-color: #8d6e63;"></button>
-                        </div>
-
-
-
                     </div>
-                    <div class="jumping-text-container">
-                        <div class="jumping-text">
-                            <span>.</span>
-                            <span>.</span>
-                            <span>.</span>
-                            <span>s</span>
-                            <span>K</span>
-                            <span>H</span>
-                            <span>A</span>
-                            <span>Y</span>
-                            <span>E</span>
-                            <span>d</span>
-                            <span>u</span>
-                            <span>l</span>
-                            <span>e</span>
-                            <span>r</span>
-                            <span>.</span>
-                            <span>.</span>
-                            <span>.</span>
 
+                    <div class="jumping-text-box">
+                        <div class="jumping-text-container">
+                            <div class="jumping-text">
+                                <span>.</span>
+                                <span>.</span>
+                                <span>.</span>
+                                <span>s</span>
+                                <span>K</span>
+                                <span>H</span>
+                                <span>A</span>
+                                <span>Y</span>
+                                <span>E</span>
+                                <span>d</span>
+                                <span>u</span>
+                                <span>l</span>
+                                <span>e</span>
+                                <span>r</span>
+                                <span>.</span>
+                                <span>.</span>
+                                <span>.</span>
+
+                            </div>
                         </div>
                     </div>
+
+                    <div class="suggestion-wrapper">
+                        <div class="blank-suggestion paste-button"><span class="material-symbols-outlined"
+                                id="eraser-icon">
+                                ink_eraser
+                            </span></div> <!-- NOT inside .suggestion-text -->
+                        <div class="suggestion-text">
+                            <!-- Paste buttons go here -->
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
-
-
-
-
 
             <div class="movable-template" id="movable-template">
 
@@ -383,29 +643,24 @@
                     <button class="btn-clear button-template template-btn clear-btn">0</button>
                 </div>
             </div>
-
-
-
     </div>
 
 
 
     <!-- ===========DAYTASK SINGLE DIV -->
-
-
     <!-- vertical view calendar -->
-
     <!-- Button to Toggle Calendar Visibility -->
     <!-- <button id="show-vert-calendar-btn" class="show-vert-calendar-btn">Show Calendar</button> -->
-
     <!-- Calendar Container -->
     <div class="calendar-container-vert-view" id="calendar-container-vert-view">
         <div class="calendar-header-vert-view">
-            <div style="display: flex; gap: 0.4rem;">
+            <div class="month-view-header">
+                <button class="menu-button hamburger-month-view"><span
+                        class="material-icons menu-icon-month-view">menu</span></button>
+                <div class="month-label-vert-view" id="month-label-vert-view">May 2025</div>
                 <span class="material-symbols-outlined header-icon-vert-view" id="icon-month-label-vert-view">
                     event_note
                 </span>
-                <div class="month-label-vert-view" id="month-label-vert-view">May 2025</div>
             </div>
 
             <div class="navigation-vertview-container">
@@ -448,30 +703,25 @@
 
 
 
-
-
-
-
     <div id="calendar-pop-up">
-
-        <div class="leaf-container" id="leafContainer"></div>
-
         <div class="popup-header">
-            <span class="popup-date" id="popup-date">May 21, 2025</span>
+            <div class="popup-date-copy-container ">
+                <span class="popup-date" id="popup-date">May 21, 2025</span>
+            </div>
             <div class="edit-close-container">
-                <button class="edit-dailytask-popup" id="edit-btn-dailytask">
-                    <span class="material-symbols-outlined">
-                        note_alt
-                    </span>
-                    <button class="close-popup" id="closePopupBtn">
-                        <!-- <span class="material-icons close-button-menu-icon">close</span> -->
-                        <div class="gif-cropper">
-                            <video autoplay loop muted playsinline class="coffee-video">
-                                <source src="images/coffee.webm" type="video/webm" />
-                            </video>
-                        </div>
-                    </button>
+                <!-- Copy -->
+                <button class="copy-tasks-button" title="Copy Tasks" id="copy-tasks-btn">
+                    <span class="material-symbols-outlined copy-task-icon">content_copy</span>
                 </button>
+                <button class="close-popup" id="closePopupBtn">
+                    <!-- <span class="material-icons close-button-menu-icon">close</span> -->
+                    <div class="gif-cropper">
+                        <video autoplay loop muted playsinline class="coffee-video">
+                            <source src="images/coffee.webm" type="video/webm" />
+                        </video>
+                    </div>
+                </button>
+                <!-- </button> -->
             </div>
         </div>
 
@@ -482,93 +732,292 @@
         </div>
 
         <!-- navigation button at calendar pop up -->
+
         <div class="pop-up-calview-navi">
-            <button class="calendar-icon-button" title="Month View">
+            <!-- Edit Mode -->
+            <button class="calendar-icon-button edit-mode hidden" title="Undo" id="undo-btn-popup">
                 <div class="calendar-icon-wrapper">
-                    <span class="material-symbols-outlined" id="calendar-icon-vertview">
-                        calendar_month
-                    </span>
+                    <span class="material-symbols-outlined">undo</span>
+                    <span class="calendar-icon-label">Undo</span>
+                </div>
+            </button>
+
+            <button class="calendar-icon-button edit-mode hidden" title="Redo" id="redo-btn-popup">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined">redo</span>
+                    <span class="calendar-icon-label">Redo</span>
+                </div>
+            </button>
+
+
+            <button class="calendar-icon-button edit-mode hidden" title="Delete Selected" id="delete-btn-popup">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined">delete</span>
+                    <span class="calendar-icon-label">Delete</span>
+                </div>
+            </button>
+
+            <button class="calendar-icon-button edit-mode hidden" title="Cancel Edit" id="cancel-btn-popup">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined">close</span>
+                    <span class="calendar-icon-label">Cancel</span>
+                </div>
+            </button>
+            <!-- Normal Mode -->
+
+            <!-- To do -->
+            <button class="calendar-icon-button normal-mode todo-popup-btn" title="Todo">
+                <div class="calendar-icon-wrapper to-do">
+                    <span class="material-symbols-outlined popup-todo">checklist</span>
+                    <span class="calendar-icon-label to-do-label">To-do</span>
+                </div>
+            </button>
+
+            <!-- Month View -->
+            <button class="calendar-icon-button normal-mode" title="Month View">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined" id="calendar-icon-vertview">calendar_month</span>
                     <span class="calendar-icon-label">Month View</span>
                 </div>
             </button>
-            <button class="calendar-icon-button" title="List View">
+
+            <!-- List View -->
+            <button class="calendar-icon-button normal-mode" title="List View">
                 <div class="calendar-icon-wrapper">
-                    <span class="material-symbols-outlined" id="calendar-icon-horview">
-                        event_note
-                    </span>
+                    <span class="material-symbols-outlined" id="calendar-icon-horview">event_note</span>
                     <span class="calendar-icon-label">List View</span>
                 </div>
             </button>
+
+
+
+            <!-- Today -->
+            <button class="calendar-icon-button normal-mode" title="Today" id="go-to-today">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined" id="calendar-icon-today">today</span>
+                    <span class="calendar-icon-label">Today</span>
+                </div>
+            </button>
+
+
+            <!-- Edit -->
+            <button class="calendar-icon-button" title="Edit Tasks" id="toggle-edit">
+                <div class="calendar-icon-wrapper">
+                    <span class="material-symbols-outlined" id="calendar-icon-superedit">edit_note</span>
+                    <span class="calendar-icon-label">Edit</span>
+                </div>
+            </button>
+
         </div>
-        <!-- navigation button at calendar pop up END -->
-
-        <!-- <div class="bunny-scale-wrapper">
-            <div class="bunny-main-container">
-                <div class="bunny-container">
-                    <div class="text"></div>
-                    <div class="grass"></div>
-                    <div class="bunny">
-                        <div class="bunny__ears">
-                            <div class="bunny__ear bunny__ear--left"></div>
-                            <div class="bunny__ear bunny__ear--right"></div>
-                        </div>
-                        <div class="bunny__feet">
-                            <div class="bunny__foot bunny__foot--left"></div>
-                            <div class="bunny__foot bunny__foot--right"></div>
-                        </div>
-                        <div class="bunny__tail"></div>
-                        <div class="bunny__paw"></div>
-                        <div class="bunny__body">
-                            <div class="bunny__eyes"></div>
-                            <div class="bunny__nose"></div>
-                            <div class="bunny__cheeks"></div>
-                            <div class="bunny__mouth"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bubbles">
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                    <div class="bubble"></div>
-                </div>
-            </div>
-        </div> -->
 
     </div>
 
+
+
+    <!-- MENU SIDE SLIDER -->
+    <div class="menu-slider">
+        <!-- Close Button -->
+        <button class="close-button-menu">
+            <span class="material-icons close-button-menu-icon">close</span>
+        </button>
+
+        <!-- Header -->
+        <div class="side-menu-header-container">
+            <div class="slider-menu-header-logo-container">
+                <span class="material-symbols-outlined" id="slider-menu-header-logo">acute</span>
+            </div>
+            <div class="slider-menu-header-title">
+                S<span class="aurora-for-app-name">khaye</span>duler
+            </div>
+
+            <div class="slider-menu-tagline">"The official tracker of your sleepless days."</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Main Menu -->
+        <ul class="menu-list">
+            <!-- To-Do (leaf) -->
+            <li data-section="todo" id="to-do" class="menu-item">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">checklist</span>
+                    <span class="menu-text">To-Do</span>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <li class="divider" role="separator"></li>
+
+            <!-- Settings (submenu) -->
+            <li data-section="settings" class="menu-item has-submenu">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="menu-text">Settings</span>
+                    <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
+                </div>
+                <ul class="submenu">
+                    <li data-setting="theme" class="menu-item has-submenu">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">routine</span>
+                            <span class="menu-text">Color Theme</span>
+                            <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
+                        </div>
+                        <ul class="sub-submenu theme-submenu">
+                            <!-- insert them here -->
+                        </ul>
+                    </li>
+                    <li data-setting="default-view" class="menu-item has-submenu">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">view_agenda</span>
+                            <span class="menu-text">Default View at Startup</span>
+                            <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
+                        </div>
+                        <ul class="sub-submenu">
+                            <li data-view="list" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">event_note</span>
+                                    <span class="menu-text">List View</span>
+                                    <label class="list-radio">
+                                        <input type="radio" name="view-mode" value="list">
+                                    </label>
+                                </div>
+
+                            </li>
+                            <li data-view="month" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">calendar_month</span>
+                                    <span class="menu-text">Month View</span>
+                                    <label class="month-radio">
+                                        <input type="radio" name="view-mode" value="month">
+                                    </label>
+                                </div>
+
+                            </li>
+
+                            <li data-view="todo" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">checklist</span>
+                                    <span class="menu-text">To-Do</span>
+                                    <label class="todo-radio">
+                                        <input type="radio" name="view-mode" value="todo">
+                                    </label>
+                                </div>
+                            </li>
+
+                        </ul>
+
+
+                    </li>
+                    <li data-setting="startup-popup" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">notifications</span>
+                            <span class="menu-text">Show Pop-up at Startup</span>
+                            <label class="switch">
+                                <input type="checkbox" id="startup-popup-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                    </li>
+
+                    <li data-setting="weather-widget" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">cloud</span>
+                            <span class="menu-text">Show Weather Widget at Startup</span>
+                            <label class="switch">
+                                <input type="checkbox" id="weather-widget-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                    </li>
+
+                    <li data-setting="todo-floating-btn" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">add_circle</span>
+                            <span class="menu-text">Show To-Do Floating Button</span>
+                            <label class="switch">
+                                <input type="checkbox" id="todo-floating-btn-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </li>
+
+                </ul>
+            </li>
+
+            <!-- Backups (submenu) -->
+            <li data-section="backups" class="menu-item has-submenu">
+                <input type="file" id="uploadBackup" accept=".json,application/json,text/plain,application/octet-stream"
+                    style="display:none">
+
+
+
+
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">backup</span>
+                    <span class="menu-text">Backups</span>
+                    <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
+                </div>
+                <ul class="submenu">
+                    <li data-backup="download" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">download</span>
+                            <span class="menu-text">Download Data</span>
+                        </div>
+                    </li>
+                    <li data-backup="upload" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">upload</span>
+                            <span class="menu-text">Upload Data</span>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- About (leaf) -->
+            <li data-section="about" class="menu-item">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">info</span>
+                    <span class="menu-text">About</span>
+                </div>
+            </li>
+
+            <li class="divider" role="separator"></li>
+
+            <!-- External Link -->
+            <li class="menu-item">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">calculate</span>
+                    <a class="menu-item" href="https://nad-15.github.io/BudgetCalculator/" target="_blank"
+                        class="menu-text">
+                        Budget KalKulator
+                    </a>
+                </div>
+            </li>
+        </ul>
+
+
+    </div>
+    <div class="overlay-menu"></div>
     <div id="backdrop" class="backdrop"></div>
-
-
-
-
+    <div id="toast">Toast message</div>
     <!-- ===========DAYTASK SINGLE DIV -->
-    <footer></footer>
+    <footer>
+
+    </footer>
     </main>
     </div>
     <script src="./js/data-migration.js"></script>
-    <script src="./js/colorThemes.js"></script>
-    <script src="./js/calVertView.js"></script>
+    <script src="./js/hamburger.js"></script>
+    <script src="./js/cal-month-view.js"></script>
     <script src="./js/script.js"></script>
     <script src="./js/job-template.js"></script>
     <script src="./js/weather.js"></script>
+    <script src="./js/to-do.js"></script>
     <script src="./js/daily-task-pop-up.js"></script>
     <script src="./js/drag-and-drop-task.js"></script>
+
 </body>
 
 </html>
