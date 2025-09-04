@@ -27,15 +27,15 @@ function initializeFilterButtons() {
   const activeButton = document.querySelector(`[data-filter="${filterMode}"]`);
   if (activeButton) {
     activeButton.classList.add("active");
-    
+
     // Add this line to scroll active button into center on page load
-    activeButton.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'nearest', 
-      inline: 'center' 
+    activeButton.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
     });
   }
-  
+
   updateFilterButtonCounts(); // your existing line
 }
 
@@ -117,7 +117,7 @@ const TODO_PRIORITY_COLORS = {
 
 const SORT_MODE_LABELS = {
   'date-newest': 'Newest First',
-  'date-oldest': 'Oldest First', 
+  'date-oldest': 'Oldest First',
   'group': 'Priority',
   'due-date': 'Due Date',
   'completion': 'Completion',
@@ -743,7 +743,6 @@ function renderTodos() {
       });
 
 
-      // In the subtask checkbox event listener, just save without re-rendering
       item.querySelectorAll(".todo-subtask-checkbox").forEach((checkbox) => {
         checkbox.addEventListener("change", (e) => {
           const index = parseInt(e.target.getAttribute("data-index"));
@@ -889,29 +888,34 @@ function renderTodos() {
     });
   });
 
-updateFilterButtonCounts();
+  updateFilterButtonCounts();
 
 }
-
 function updateFilterButtonCounts() {
   const counts = getFilterCounts();
-  
-  const buttonTexts = {
-    starred: 'Starred',
-    'not-archived': 'Active List', 
-    'in-progress': 'To Do',
-    done: 'Completed',
-    archive: 'Archive',
-    all: 'All'
-  };
-  
-document.querySelectorAll(".todo-filter-btn").forEach(btn => {
-  const filter = btn.dataset.filter;
-  const baseText = buttonTexts[filter];
-  const count = counts[filter] || 0;
-  btn.innerHTML = `${baseText} <span class="filter-count">${count}</span>`;
-});
+
+  document.querySelectorAll(".todo-filter-btn").forEach(btn => {
+    const filter = btn.dataset.filter;
+    const count = counts[filter] || 0;
+
+    // Special case: starred (icon only)
+    if (filter === "starred") {
+      let countSpan = btn.querySelector(".filter-count");
+      if (!countSpan) {
+        countSpan = document.createElement("span");
+        countSpan.className = "filter-count";
+        btn.appendChild(countSpan);
+      }
+      countSpan.textContent = count;
+    } 
+    // Normal buttons (text labels)
+    else {
+      const baseText = btn.textContent.replace(/\d+$/, '').trim();
+      btn.innerHTML = `${baseText} <span class="filter-count">${count}</span>`;
+    }
+  });
 }
+
 
 function getFilterCounts() {
   return {
@@ -1422,7 +1426,7 @@ document.querySelector(".collapse-toggle-btn").addEventListener("click", () => {
 
 
 toggleLabel.addEventListener("click", () => {
-    console.log("passed from indicator clicked");
+  console.log("passed from indicator clicked");
 
   controls.classList.toggle("show");
   sortIcon.classList.toggle("rotated");
@@ -1443,10 +1447,10 @@ controls.addEventListener("click", (e) => {
   }
 });
 
-  sortIndicator.addEventListener("click", ()=>{
-    console.log("indidcator clicked");
-    toggleLabel.click();
-  });
+sortIndicator.addEventListener("click", () => {
+  console.log("indidcator clicked");
+  toggleLabel.click();
+});
 
 
 
@@ -1527,14 +1531,14 @@ document.addEventListener("click", (e) => {
 
   // --- close sort controls if clicked outside
   if (typeof toggleLabel !== "undefined" && typeof controls !== "undefined") {
-if (typeof toggleLabel !== "undefined" && typeof controls !== "undefined") {
-    if (!toggleLabel.contains(e.target) && 
-        !controls.contains(e.target) && 
+    if (typeof toggleLabel !== "undefined" && typeof controls !== "undefined") {
+      if (!toggleLabel.contains(e.target) &&
+        !controls.contains(e.target) &&
         !sortIndicator.contains(e.target)) { // Add this line
-      controls.classList.remove("show");
-      sortIcon.classList.remove("rotated");
+        controls.classList.remove("show");
+        sortIcon.classList.remove("rotated");
+      }
     }
-  }
   }
 
   // --- close delete dropdown if clicked outside
@@ -1584,10 +1588,10 @@ document.querySelectorAll(".todo-filter-btn").forEach(btn => {
     initializeFilterButtons();
 
     // Add this new line to scroll the button into view
-    btn.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'nearest', 
-      inline: 'center' 
+    btn.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
     });
   });
 });
@@ -1612,14 +1616,14 @@ todoList.addEventListener('touchend', (e) => {
 function todoHandleSwipe() {
   const swipeThreshold = 50; // minimum distance for swipe
   const swipeDistance = todoTouchEndX - todoTouchStartX;
-  
+
   if (Math.abs(swipeDistance) < swipeThreshold) return;
-  
+
   const filterButtons = Array.from(document.querySelectorAll('.todo-filter-btn'));
   const currentIndex = filterButtons.findIndex(btn => btn.dataset.filter === filterMode);
-  
+
   let newIndex;
-  
+
   if (swipeDistance > 0) {
     // Swiped right - go to previous filter
     newIndex = currentIndex - 1;
@@ -1627,10 +1631,10 @@ function todoHandleSwipe() {
     // Swiped left - go to next filter
     newIndex = currentIndex + 1;
   }
-  
+
   // Don't go beyond boundaries
   if (newIndex < 0 || newIndex >= filterButtons.length) return;
-  
+
   // Trigger the new filter
   filterButtons[newIndex].click();
 }

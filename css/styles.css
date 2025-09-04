@@ -203,6 +203,11 @@ body {
 
 .todo-folder-container> :first-child {
     padding-left: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
 }
 
 
@@ -217,11 +222,17 @@ body {
     justify-content: space-around;
     scrollbar-width: none;
     /* border: 2px solid green; */
+}
 
-
+.material-symbols-outlined.todo-star-folder {
+    /* border: 2px solid red; */
+    font-variation-settings: 'FILL' 1;
+    color: orange;
+    font-size: 20px;
 }
 
 .todo-filter-btn {
+
     flex: 0 0 auto;
     display: inline-block;
     text-align: left;
@@ -235,6 +246,7 @@ body {
     position: relative;
     transition: color 0.3s ease;
     color: #666;
+    /* border: 2px solid red; */
 
 }
 
@@ -1419,6 +1431,7 @@ body {
 h1 {
     margin: 0;
 }
+
 /* 
 .aurora-for-app-name {
     background: linear-gradient(135deg,
@@ -1705,7 +1718,7 @@ h2 {
     user-select: none;
     /* color: #666; */
     /* background-color: #ec4899; */
-    
+
 }
 
 
