@@ -47,6 +47,12 @@ body {
     transition: all 0.2s ease;
     z-index: 9999;
     opacity: 0.4; /* base visible */
+
+        user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .fab-home:hover {
