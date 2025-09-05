@@ -8,8 +8,16 @@
     --calendar-day-bg: #f9fcff;
     --muted-text: #999;
     --todo-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
 }
+
+.no-select {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
 
 body {
     box-sizing: border-box;
