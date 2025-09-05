@@ -1602,42 +1602,53 @@ document.querySelectorAll(".todo-filter-btn").forEach(btn => {
 });
 
 
+
+
 // Touch/swipe functionality for filter buttons
 let todoTouchStartX = 0;
+let todoTouchStartY = 0;
 let todoTouchEndX = 0;
-
+let todoTouchEndY = 0;
 
 const todoList = document.querySelector(".todo-list");
 
-todoList.addEventListener('touchstart', (e) => {
+todoList.addEventListener("touchstart", (e) => {
   todoTouchStartX = e.changedTouches[0].screenX;
+  todoTouchStartY = e.changedTouches[0].screenY;
 });
 
-todoList.addEventListener('touchend', (e) => {
+todoList.addEventListener("touchend", (e) => {
   todoTouchEndX = e.changedTouches[0].screenX;
+  todoTouchEndY = e.changedTouches[0].screenY;
   todoHandleSwipe();
 });
 
 function todoHandleSwipe() {
-  const swipeThreshold = 50; // minimum distance for swipe
-  const swipeDistance = todoTouchEndX - todoTouchStartX;
+  const dx = todoTouchEndX - todoTouchStartX;
+  const dy = todoTouchEndY - todoTouchStartY;
 
-  if (Math.abs(swipeDistance) < swipeThreshold) return;
+  const minSwipeDistance = 50;
+  if (Math.abs(dx) < minSwipeDistance) return; // too short
 
-  const filterButtons = Array.from(document.querySelectorAll('.todo-filter-btn'));
-  const currentIndex = filterButtons.findIndex(btn => btn.dataset.filter === filterMode);
+  const slope = Math.abs(dy / dx);
+  const maxAllowedSlope = Math.tan(30 * Math.PI / 180); // ~0.577
+  if (slope > maxAllowedSlope) return; // too vertical, ignore
+
+  const filterButtons = Array.from(document.querySelectorAll(".todo-filter-btn"));
+  const currentIndex = filterButtons.findIndex(
+    (btn) => btn.dataset.filter === filterMode
+  );
 
   let newIndex;
-
-  if (swipeDistance > 0) {
-    // Swiped right - go to previous filter
-    newIndex = currentIndex - 1;
-  } else {
-    // Swiped left - go to next filter
+  if (dx < 0) {
+    // Swipe left → next filter
     newIndex = currentIndex + 1;
+  } else {
+    // Swipe right → previous filter
+    newIndex = currentIndex - 1;
   }
 
-  // Don't go beyond boundaries
+  // Bounds check
   if (newIndex < 0 || newIndex >= filterButtons.length) return;
 
   // Trigger the new filter
