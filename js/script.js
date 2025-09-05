@@ -2273,30 +2273,30 @@ function updateVertViewCalendarFromMonthYear(currentMonth, currentYear) {
 
 
 }
-
-
 const fabHome = document.querySelector(".fab-home");
+let isAwake = false;
 let idleTimer;
 
-function setIdle() {
-    fabHome.classList.add("idle");
-}
-
-function resetIdle() {
-    fabHome.classList.remove("idle");
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(setIdle, 2000); // 2s idle time
-}
-
-window.addEventListener("scroll", resetIdle);
-window.addEventListener("mousemove", resetIdle);
-window.addEventListener("touchstart", resetIdle);
-
-// Initialize
-resetIdle();
-
-
 fabHome.addEventListener("click", () => {
-    // showHorViewBtn.click();
+  if (!isAwake) {
+    // Wake up
+    fabHome.classList.remove("idle");
+    isAwake = true;
+
+    // Auto-reset after 3s if no second click
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      fabHome.classList.add("idle");
+      isAwake = false;
+    }, 3000);
+
+  } else {
+    // Run the actual action
     todoCloseBtn.click();
+
+    // Reset immediately
+    clearTimeout(idleTimer);
+    fabHome.classList.add("idle");
+    isAwake = false;
+  }
 });

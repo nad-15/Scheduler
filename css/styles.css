@@ -28,7 +28,6 @@ body {
 #alert-for-desktop {
     display: none;
 }
-
 .fab-home {
     position: fixed;
     bottom: 16px;
@@ -47,7 +46,7 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     z-index: 9999;
-    opacity: 0.4;
+    opacity: 0.4; /* base visible */
 }
 
 .fab-home:hover {
@@ -62,9 +61,10 @@ body {
 
 .fab-home.idle {
     opacity: 0.15;
-    pointer-events: none;
+    pointer-events: auto; /* let it wake up on click */
     transform: translateX(-50%) scale(0.92);
 }
+
 
 .todo-fab {
     z-index: 9000;
