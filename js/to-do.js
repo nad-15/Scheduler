@@ -712,40 +712,53 @@ function renderTodos() {
       }
 
       // === Event Listeners ===
-      item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
-        todo.done = e.target.checked;
+item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
+  const wasDone = todo.done; // track old state
+  todo.done = e.target.checked;
 
-        // Update description done state
-        const descriptionEl = item.querySelector(".todo-description");
-        if (descriptionEl) {
-          if (e.target.checked) {
-            descriptionEl.classList.add("done");
-          } else {
-            descriptionEl.classList.remove("done");
-          }
-        }
+  // Update description done state
+  const descriptionEl = item.querySelector(".todo-description");
+  if (descriptionEl) {
+    descriptionEl.classList.toggle("done", e.target.checked);
+  }
 
-        // Confetti effect when completing task
-        if (e.target.checked) {
-          createConfetti(e.target);
-          item.classList.add('celebrate');
-          setTimeout(() => item.classList.remove('celebrate'), 600);
-        }
+  // Confetti effect when completing task
+  if (e.target.checked) {
+    createConfetti(e.target);
+    item.classList.add("celebrate");
+    setTimeout(() => item.classList.remove("celebrate"), 600);
+  }
 
-        if (currentSortMode === "completion") {
-          if (todo.done) {
-            item.classList.add("completing");
-          } else {
-            item.classList.add("uncompleting");
-          }
+  if (currentSortMode === "completion") {
+    if (todo.done) {
+      item.classList.add("completing");
+    } else {
+      item.classList.add("uncompleting");
+    }
+    setTimeout(() => {
+      todoSaveAndRender();
+    }, 500);
+  } 
+  // Special case: completing in "in-progress"
+  else if (filterMode === "in-progress" && wasDone === false && todo.done === true) {
+    item.classList.add("completing");
+    setTimeout(() => {
+      todoSaveAndRender();
+    }, 400);
+  } 
+  // Special case: uncompleting in "done"
+  else if (filterMode === "done" && wasDone === true && todo.done === false) {
+    item.classList.add("uncompleting");
+    setTimeout(() => {
+      todoSaveAndRender();
+    }, 400);
+  } 
+  else {
+    todoSaveAndRender();
+  }
+});
 
-          setTimeout(() => {
-            todoSaveAndRender();
-          }, 500);
-        } else {
-          todoSaveAndRender();
-        }
-      });
+
 
 
       item.querySelectorAll(".todo-subtask-checkbox").forEach((checkbox) => {
@@ -1710,7 +1723,7 @@ function createConfetti(sourceElement) {
 
     // Random scatter direction
     const angle = Math.random() * 2 * Math.PI; // 0 → 360 degrees
-    const distance = Math.random() * 120 + 60; // how far they fly
+    const distance = Math.random() * 100 + 60; // how far they fly
     const dx = Math.cos(angle) * distance;
     const dy = Math.sin(angle) * distance;
 
