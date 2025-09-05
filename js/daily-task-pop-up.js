@@ -14,6 +14,41 @@ adjustCalendarHeight();
 window.addEventListener('resize', adjustCalendarHeight);
 
 
+// const calendarPopup = document.getElementById('calendar-pop-up');
+
+// calendarPopup.addEventListener('touchstart', (e) => {
+//   touchStartX = e.changedTouches[0].screenX;
+//   touchStartY = e.changedTouches[0].screenY;
+// });
+
+// calendarPopup.addEventListener('touchend', (e) => {
+//   if (!swipeEnabledPopUp) return;
+
+//   const touchEndX = e.changedTouches[0].screenX;
+//   const touchEndY = e.changedTouches[0].screenY;
+
+//   const dx = touchEndX - touchStartX;
+//   const dy = touchEndY - touchStartY;
+
+//   const minSwipeDistance = 50;
+//   if (Math.abs(dx) < minSwipeDistance) return; // too short
+
+//   const slope = Math.abs(dy / dx);
+//   const maxAllowedSlope = Math.tan(30 * Math.PI / 180); // ~0.7
+
+//   if (slope > maxAllowedSlope) return; // too vertical
+
+//   if (dx < 0) {
+//     // Swipe left → next day
+//     goToNextDay();
+//   } else {
+//     // Swipe right → previous day
+//     goToPreviousDay();
+
+//   }
+
+// });
+
 const calendarPopup = document.getElementById('calendar-pop-up');
 
 calendarPopup.addEventListener('touchstart', (e) => {
@@ -21,33 +56,59 @@ calendarPopup.addEventListener('touchstart', (e) => {
   touchStartY = e.changedTouches[0].screenY;
 });
 
+
 calendarPopup.addEventListener('touchend', (e) => {
   if (!swipeEnabledPopUp) return;
 
   const touchEndX = e.changedTouches[0].screenX;
   const touchEndY = e.changedTouches[0].screenY;
-
   const dx = touchEndX - touchStartX;
   const dy = touchEndY - touchStartY;
-
   const minSwipeDistance = 50;
-  if (Math.abs(dx) < minSwipeDistance) return; // too short
 
+  if (Math.abs(dx) < minSwipeDistance) return; // too short
   const slope = Math.abs(dy / dx);
   const maxAllowedSlope = Math.tan(30 * Math.PI / 180); // ~0.7
-
   if (slope > maxAllowedSlope) return; // too vertical
 
-  if (dx < 0) {
-    // Swipe left → next day
-    goToNextDay();
-  } else {
-    // Swipe right → previous day
-    goToPreviousDay();
+  // --- Create ghost ---
+  const rect = calendarPopup.getBoundingClientRect();
+  const ghost = calendarPopup.cloneNode(true);
+  ghost.style.position = 'fixed';
+  ghost.style.top = rect.top + 'px';
+  ghost.style.left = rect.left + 'px';
+  ghost.style.width = rect.width + 'px';
+  ghost.style.height = rect.height + 'px';
+  ghost.style.margin = 0;
+  ghost.style.transform = 'none';
+  ghost.style.transition = 'transform 0.35s ease, opacity 0.35s ease';
+  ghost.style.zIndex = 9999;
+  ghost.style.pointerEvents = 'none';
+  ghost.style.opacity = '0.7'; // slightly ethereal
+  document.body.appendChild(ghost);
 
+  // Animate ghost
+  const distance = window.innerWidth * 1.2; // slide off screen
+  if (dx > 0) {
+    // Swiped right → move ghost RIGHT
+    ghost.style.transform = `translateX(${distance}px)`;
+  } else {
+    // Swiped left → move ghost LEFT
+    ghost.style.transform = `translateX(-${distance}px)`;
   }
 
+  ghost.style.opacity = '0'; // fade out while moving
+
+  // Remove ghost after animation
+  setTimeout(() => {
+    if (ghost.parentNode) ghost.parentNode.removeChild(ghost);
+  }, 400);
+
+  // Update actual popup
+  if (dx > 0) goToPreviousDay();
+  else goToNextDay();
 });
+
 
 function goToNextDay() {
   const dateObj = safeDateFromPopUpDate(popUpDate);
