@@ -940,7 +940,7 @@ function renderTodos() {
         const wasArchived = todo.isArchive; // Store the current state
 
         // If we're archiving from a non-archive view, or unarchiving from archive view
-        if ((!wasArchived && filterMode !== "archived") || (wasArchived && filterMode === "archived")) {
+        if ((!wasArchived && filterMode !== "archive") || (wasArchived && filterMode === "archive")) {
           // Add the completing animation class
           item.classList.add("completing");
 
