@@ -712,35 +712,40 @@ function renderTodos() {
       }
 
       // === Event Listeners ===
-      item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
-        todo.done = e.target.checked;
+item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
+  todo.done = e.target.checked;
 
-        // Update description done state
-        const descriptionEl = item.querySelector(".todo-description");
-        if (descriptionEl) {
-          if (e.target.checked) {
-            descriptionEl.classList.add("done");
-          } else {
-            descriptionEl.classList.remove("done");
-          }
-        }
+  // Update description done state
+  const descriptionEl = item.querySelector(".todo-description");
+  if (descriptionEl) {
+    if (e.target.checked) {
+      descriptionEl.classList.add("done");
+    } else {
+      descriptionEl.classList.remove("done");
+    }
+  }
 
-        if (currentSortMode === "completion") {
-          if (todo.done) {
-            // Completing - fade and shrink
-            item.classList.add("completing");
-          } else {
-            // Uncompleting - fly up
-            item.classList.add("uncompleting");
-          }
+  // Confetti effect when completing task
+  if (e.target.checked) {
+    createConfetti(e.target);
+    item.classList.add('celebrate');
+    setTimeout(() => item.classList.remove('celebrate'), 600);
+  }
 
-          setTimeout(() => {
-            todoSaveAndRender();
-          }, 500);
-        } else {
-          todoSaveAndRender();
-        }
-      });
+  if (currentSortMode === "completion") {
+    if (todo.done) {
+      item.classList.add("completing");
+    } else {
+      item.classList.add("uncompleting");
+    }
+
+    setTimeout(() => {
+      todoSaveAndRender();
+    }, 500);
+  } else {
+    todoSaveAndRender();
+  }
+});
 
 
       item.querySelectorAll(".todo-subtask-checkbox").forEach((checkbox) => {
@@ -1644,3 +1649,54 @@ function todoHandleSwipe() {
 // function closeFilterPopup() {
 //   filterDropdown.classList.remove("show");
 // }
+function createConfetti(sourceElement) {
+  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fd79a8', '#fdcb6e'];
+  const confettiContainer = document.createElement('div');
+  confettiContainer.className = 'confetti-container';
+  document.body.appendChild(confettiContainer);
+
+  // Get checkbox center position
+  const rect = sourceElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  // Create confetti pieces
+  for (let i = 0; i < 30; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti-piece';
+
+    // Random color
+    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+    // Random size
+    const size = Math.random() * 4 + 3;
+    confetti.style.width = size + 'px';
+    confetti.style.height = size + 'px';
+
+    // Start at checkbox center
+    confetti.style.left = centerX + 'px';
+    confetti.style.top = centerY + 'px';
+
+    // Random scatter direction
+    const angle = Math.random() * 2 * Math.PI; // 0 → 360 degrees
+    const distance = Math.random() * 120 + 60; // how far they fly
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance;
+
+    confetti.style.setProperty('--dx', dx + 'px');
+    confetti.style.setProperty('--dy', dy + 'px');
+
+    // Random duration
+    confetti.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's';
+
+    confettiContainer.appendChild(confetti);
+  }
+
+  // Clean up
+  setTimeout(() => {
+    if (confettiContainer.parentNode) {
+      document.body.removeChild(confettiContainer);
+    }
+  }, 2000);
+}
+
