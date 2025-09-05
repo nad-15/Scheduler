@@ -599,8 +599,8 @@ function renderTodos() {
         emptyIcon = "task_alt";
         break;
       case "in-progress":
-        emptyMessage = "No tasks in progress";
-        emptyIcon = "pending";
+        emptyMessage = "Nothing to do";
+        emptyIcon = "check_circle";
         break;
       case "starred":
         emptyMessage = "No starred tasks";
@@ -611,8 +611,9 @@ function renderTodos() {
         emptyIcon = "archive";
         break;
       default:
-        emptyMessage = "Nothing to do";
-        emptyIcon = "check_circle";
+        emptyMessage = "No tasks in progress";
+        emptyIcon = "pending";
+
     }
 
     emptyState.innerHTML = `
