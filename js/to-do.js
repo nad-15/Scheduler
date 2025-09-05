@@ -577,6 +577,65 @@ function renderTodos() {
   const sortedTodos = sortTodos(visibleTodos);
   const groupedTodos = getGroupedTodos(sortedTodos);
 
+
+  // Add this after: const groupedTodos = getGroupedTodos(sortedTodos);
+
+  // Check if there are no visible todos
+  const hasVisibleTodos = groupedTodos.some(group => group.todos.length > 0);
+
+  if (!hasVisibleTodos) {
+    console.log("Entered empty state");
+    // Create empty state element
+    const emptyState = document.createElement("div");
+    emptyState.className = "todo-empty-state";
+
+    // Different messages based on filter mode
+    let emptyMessage = "";
+    let emptyIcon = "";
+
+    switch (filterMode) {
+      case "done":
+        emptyMessage = "No completed tasks yet";
+        emptyIcon = "task_alt";
+        break;
+      case "in-progress":
+        emptyMessage = "No tasks in progress";
+        emptyIcon = "pending";
+        break;
+      case "starred":
+        emptyMessage = "No starred tasks";
+        emptyIcon = "star";
+        break;
+      case "archive":
+        emptyMessage = "No archived tasks";
+        emptyIcon = "archive";
+        break;
+      default:
+        emptyMessage = "Nothing to do";
+        emptyIcon = "check_circle";
+    }
+
+    emptyState.innerHTML = `
+    <div class="empty-state-content">
+      <span class="material-symbols-outlined empty-state-icon">${emptyIcon}</span>
+      <h3 class="empty-state-title">${emptyMessage}</h3>
+      <p class="empty-state-subtitle">
+        ${filterMode === "all" || filterMode === "in-progress"
+        ? "Add a new task to get started!"
+        : "Tasks will appear here when available"}
+      </p>
+    </div>
+  `;
+
+    list.appendChild(emptyState);
+
+    updateFilterButtonCounts();
+    return; // Exit early, no need to process groups
+  }
+
+
+
+
   groupedTodos.forEach(group => {
     // Add group title if in group mode and group has todos
     if (group.title && group.todos.length > 0) {
@@ -712,51 +771,51 @@ function renderTodos() {
       }
 
       // === Event Listeners ===
-item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
-  const wasDone = todo.done; // track old state
-  todo.done = e.target.checked;
+      item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
+        const wasDone = todo.done; // track old state
+        todo.done = e.target.checked;
 
-  // Update description done state
-  const descriptionEl = item.querySelector(".todo-description");
-  if (descriptionEl) {
-    descriptionEl.classList.toggle("done", e.target.checked);
-  }
+        // Update description done state
+        const descriptionEl = item.querySelector(".todo-description");
+        if (descriptionEl) {
+          descriptionEl.classList.toggle("done", e.target.checked);
+        }
 
-  // Confetti effect when completing task
-  if (e.target.checked) {
-    createConfetti(e.target);
-    item.classList.add("celebrate");
-    setTimeout(() => item.classList.remove("celebrate"), 600);
-  }
+        // Confetti effect when completing task
+        if (e.target.checked) {
+          createConfetti(e.target);
+          item.classList.add("celebrate");
+          setTimeout(() => item.classList.remove("celebrate"), 600);
+        }
 
-  if (currentSortMode === "completion") {
-    if (todo.done) {
-      item.classList.add("completing");
-    } else {
-      item.classList.add("uncompleting");
-    }
-    setTimeout(() => {
-      todoSaveAndRender();
-    }, 500);
-  } 
-  // Special case: completing in "in-progress"
-  else if (filterMode === "in-progress" && wasDone === false && todo.done === true) {
-    item.classList.add("completing");
-    setTimeout(() => {
-      todoSaveAndRender();
-    }, 400);
-  } 
-  // Special case: uncompleting in "done"
-  else if (filterMode === "done" && wasDone === true && todo.done === false) {
-    item.classList.add("uncompleting");
-    setTimeout(() => {
-      todoSaveAndRender();
-    }, 400);
-  } 
-  else {
-    todoSaveAndRender();
-  }
-});
+        if (currentSortMode === "completion") {
+          if (todo.done) {
+            item.classList.add("completing");
+          } else {
+            item.classList.add("uncompleting");
+          }
+          setTimeout(() => {
+            todoSaveAndRender();
+          }, 500);
+        }
+        // Special case: completing in "in-progress"
+        else if (filterMode === "in-progress" && wasDone === false && todo.done === true) {
+          item.classList.add("completing");
+          setTimeout(() => {
+            todoSaveAndRender();
+          }, 400);
+        }
+        // Special case: uncompleting in "done"
+        else if (filterMode === "done" && wasDone === true && todo.done === false) {
+          item.classList.add("uncompleting");
+          setTimeout(() => {
+            todoSaveAndRender();
+          }, 400);
+        }
+        else {
+          todoSaveAndRender();
+        }
+      });
 
 
 
@@ -869,66 +928,71 @@ item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
   //   });
   // });
 
+  // Only run collapse/expand logic if there are visible todos
+  if (hasVisibleTodos) {
+    if (appSettings["todo-collapsed"]) {
+      document.querySelectorAll(".todo-item").forEach(item => {
+        const hasDescription = !!item.querySelector(".todo-description");
+        const hasSubtasks = !!item.querySelector(".todo-subtasks");
+        const seeMore = item.querySelector(".todo-seemore");
 
-  if (appSettings["todo-collapsed"]) {
-    document.querySelectorAll(".todo-item").forEach(item => {
-      const hasDescription = !!item.querySelector(".todo-description");
-      const hasSubtasks = !!item.querySelector(".todo-subtasks");
-      const seeMore = item.querySelector(".todo-seemore");
+        // only collapse and show arrow if it has something to hide
+        if (hasDescription || hasSubtasks) {
+          item.classList.add("collapsed");
+          seeMore?.classList.remove("hidden");
+        } else {
+          // no description/subtasks -> keep expanded & no arrow
+          item.classList.remove("collapsed");
+          seeMore?.classList.add("hidden");
+        }
+      });
 
-      // only collapse and show arrow if it has something to hide
-      if (hasDescription || hasSubtasks) {
-        item.classList.add("collapsed");
-        seeMore?.classList.remove("hidden");
-      } else {
-        // no description/subtasks -> keep expanded & no arrow
+      const icon = document.querySelector(".collapse-toggle-btn .material-icons");
+      if (icon) icon.textContent = "expand";
+
+    } else {
+      document.querySelectorAll(".todo-item").forEach(item => {
+        const hasDescription = !!item.querySelector(".todo-description");
+        const hasSubtasks = !!item.querySelector(".todo-subtasks");
+        const seeMore = item.querySelector(".todo-seemore");
+
+        // expand all
         item.classList.remove("collapsed");
-        seeMore?.classList.add("hidden");
-      }
+        // arrow only if it actually has description/subtasks
+        if (hasDescription || hasSubtasks) {
+          seeMore?.classList.add("hidden");
+        } else {
+          seeMore?.classList.add("hidden"); // stays hidden anyway
+        }
+      });
+
+      const icon = document.querySelector(".collapse-toggle-btn .material-icons");
+      if (icon) icon.textContent = "compress";
+    }
+
+
+    document.querySelectorAll(".todo-seemore").forEach(seemore => {
+      seemore.addEventListener("click", () => {
+        console.log("todo seemore clicked");
+
+        const todoItem = seemore.closest(".todo-item");
+        const todoTitle = todoItem.querySelector(".todo-title");
+
+        // toggle collapsed state on parent
+        todoItem.classList.toggle("collapsed");
+
+        // rotate arrow
+        todoTitle.classList.toggle("expanded");
+      });
     });
 
-    const icon = document.querySelector(".collapse-toggle-btn .material-icons");
-    if (icon) icon.textContent = "expand";
-
-  } else {
-    document.querySelectorAll(".todo-item").forEach(item => {
-      const hasDescription = !!item.querySelector(".todo-description");
-      const hasSubtasks = !!item.querySelector(".todo-subtasks");
-      const seeMore = item.querySelector(".todo-seemore");
-
-      // expand all
-      item.classList.remove("collapsed");
-      // arrow only if it actually has description/subtasks
-      if (hasDescription || hasSubtasks) {
-        seeMore?.classList.add("hidden");
-      } else {
-        seeMore?.classList.add("hidden"); // stays hidden anyway
-      }
-    });
-
-    const icon = document.querySelector(".collapse-toggle-btn .material-icons");
-    if (icon) icon.textContent = "compress";
   }
-
-
-  document.querySelectorAll(".todo-seemore").forEach(seemore => {
-    seemore.addEventListener("click", () => {
-      console.log("todo seemore clicked");
-
-      const todoItem = seemore.closest(".todo-item");
-      const todoTitle = todoItem.querySelector(".todo-title");
-
-      // toggle collapsed state on parent
-      todoItem.classList.toggle("collapsed");
-
-      // rotate arrow
-      todoTitle.classList.toggle("expanded");
-    });
-  });
 
   updateFilterButtonCounts();
 
 }
+
+
 function updateFilterButtonCounts() {
   const counts = getFilterCounts();
 

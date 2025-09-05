@@ -573,6 +573,58 @@ body {
     background: #0056b3;
 }
 
+/* EMPTY TODOS */
+/* Empty State Styles */
+.todo-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  width: 100%;
+}
+
+.empty-state-content {
+  text-align: center;
+  color: var(--text-secondary, #666);
+  opacity: 0.8;
+}
+
+.empty-state-icon {
+  font-size: 4rem !important;
+  color: var(--text-tertiary, #999);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary, #333);
+}
+
+.empty-state-subtitle {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.7;
+}
+
+/* Optional: Add a subtle animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.todo-empty-state {
+  animation: fadeInUp 0.3s ease-out;
+}
+
 /* === TODO LIST === */
 .todo-list {
     box-sizing: border-box;
@@ -709,6 +761,12 @@ body {
     background: #4CAF50;
     border: none;
 }
+/* 
+.todo-done-checkbox:not(:checked) {
+  background: #fff;
+  border: 2px solid #ccc;
+} */
+
 
 .todo-done-checkbox:checked::after {
     content: '✓';
