@@ -712,40 +712,40 @@ function renderTodos() {
       }
 
       // === Event Listeners ===
-item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
-  todo.done = e.target.checked;
+      item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
+        todo.done = e.target.checked;
 
-  // Update description done state
-  const descriptionEl = item.querySelector(".todo-description");
-  if (descriptionEl) {
-    if (e.target.checked) {
-      descriptionEl.classList.add("done");
-    } else {
-      descriptionEl.classList.remove("done");
-    }
-  }
+        // Update description done state
+        const descriptionEl = item.querySelector(".todo-description");
+        if (descriptionEl) {
+          if (e.target.checked) {
+            descriptionEl.classList.add("done");
+          } else {
+            descriptionEl.classList.remove("done");
+          }
+        }
 
-  // Confetti effect when completing task
-  if (e.target.checked) {
-    createConfetti(e.target);
-    item.classList.add('celebrate');
-    setTimeout(() => item.classList.remove('celebrate'), 600);
-  }
+        // Confetti effect when completing task
+        if (e.target.checked) {
+          createConfetti(e.target);
+          item.classList.add('celebrate');
+          setTimeout(() => item.classList.remove('celebrate'), 600);
+        }
 
-  if (currentSortMode === "completion") {
-    if (todo.done) {
-      item.classList.add("completing");
-    } else {
-      item.classList.add("uncompleting");
-    }
+        if (currentSortMode === "completion") {
+          if (todo.done) {
+            item.classList.add("completing");
+          } else {
+            item.classList.add("uncompleting");
+          }
 
-    setTimeout(() => {
-      todoSaveAndRender();
-    }, 500);
-  } else {
-    todoSaveAndRender();
-  }
-});
+          setTimeout(() => {
+            todoSaveAndRender();
+          }, 500);
+        } else {
+          todoSaveAndRender();
+        }
+      });
 
 
       item.querySelectorAll(".todo-subtask-checkbox").forEach((checkbox) => {
@@ -789,9 +789,29 @@ item.querySelector(".todo-done-checkbox").addEventListener("change", (e) => {
         });
       });
 
+      // item.querySelector(".todo-pin-btn").addEventListener("click", () => {
+      //   todo.pinned = !todo.pinned;
+      //   todoSaveAndRender();
+      // });
+
       item.querySelector(".todo-pin-btn").addEventListener("click", () => {
-        todo.pinned = !todo.pinned;
-        todoSaveAndRender();
+        const wasPin = todo.pinned; // Store the current state
+
+        // If we're unpinning and currently in starred filter mode
+        if (wasPin && filterMode === "starred") {
+          // Add the completing animation class
+          item.classList.add("completing");
+
+          // Wait for animation to complete, then update state and re-render
+          setTimeout(() => {
+            todo.pinned = !todo.pinned;
+            todoSaveAndRender();
+          }, 300); // Adjust timing to match your CSS transition duration
+        } else {
+          // Normal behavior for other cases
+          todo.pinned = !todo.pinned;
+          todoSaveAndRender();
+        }
       });
 
       const menuBtn = item.querySelector(".todo-menu-btn");
@@ -912,7 +932,7 @@ function updateFilterButtonCounts() {
         btn.appendChild(countSpan);
       }
       countSpan.textContent = count;
-    } 
+    }
     // Normal buttons (text labels)
     else {
       const baseText = btn.textContent.replace(/\d+$/, '').trim();
