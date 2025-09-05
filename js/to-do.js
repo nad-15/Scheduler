@@ -636,6 +636,10 @@ function renderTodos() {
 
 
 
+
+
+
+
   groupedTodos.forEach(group => {
     // Add group title if in group mode and group has todos
     if (group.title && group.todos.length > 0) {
@@ -803,7 +807,7 @@ function renderTodos() {
           item.classList.add("completing");
           setTimeout(() => {
             todoSaveAndRender();
-          }, 400);
+          }, 500);
         }
         // Special case: uncompleting in "done"
         else if (filterMode === "done" && wasDone === true && todo.done === false) {
@@ -903,18 +907,53 @@ function renderTodos() {
         todoOpenEditModal(todo);
         menuDropdown.style.display = "none";
       });
+      // here
+      // item.querySelector(".todo-menu-delete").addEventListener("click", () => {
+      //   if (confirm("Delete this task?")) {
+      //     todos = todos.filter((t) => t.id !== todo.id);
+      //     todoSaveAndRender();
+      //   }
+      //   menuDropdown.style.display = "none";
+      // });
 
       item.querySelector(".todo-menu-delete").addEventListener("click", () => {
         if (confirm("Delete this task?")) {
-          todos = todos.filter((t) => t.id !== todo.id);
-          todoSaveAndRender();
+          // Add the completing animation class
+          item.classList.add("completing");
+
+          // Wait for animation to complete, then delete and re-render
+          setTimeout(() => {
+            todos = todos.filter((t) => t.id !== todo.id);
+            todoSaveAndRender();
+          }, 300); // Adjust timing to match your CSS transition duration
         }
         menuDropdown.style.display = "none";
       });
 
+      // item.querySelector(".todo-menu-archive").addEventListener("click", () => {
+      //   todo.isArchive = !todo.isArchive;
+      //   todoSaveAndRender();
+      //   menuDropdown.style.display = "none";
+      // });
       item.querySelector(".todo-menu-archive").addEventListener("click", () => {
-        todo.isArchive = !todo.isArchive;
-        todoSaveAndRender();
+        const wasArchived = todo.isArchive; // Store the current state
+
+        // If we're archiving from a non-archive view, or unarchiving from archive view
+        if ((!wasArchived && filterMode !== "archived") || (wasArchived && filterMode === "archived")) {
+          // Add the completing animation class
+          item.classList.add("completing");
+
+          // Wait for animation to complete, then update state and re-render
+          setTimeout(() => {
+            todo.isArchive = !todo.isArchive;
+            todoSaveAndRender();
+          }, 300); // Adjust timing to match your CSS transition duration
+        } else {
+          // Normal behavior for other cases (no animation needed)
+          todo.isArchive = !todo.isArchive;
+          todoSaveAndRender();
+        }
+
         menuDropdown.style.display = "none";
       });
 
