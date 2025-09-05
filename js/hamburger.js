@@ -62,6 +62,19 @@ const todoCloseBtn = todoContainer.querySelector(".todo-close-btn");
 todoMenuItem.addEventListener("click", () => {
   todoContainer.classList.add("active");
   renderTodos();
+  
+const activeButton = document.querySelector(`[data-filter="${filterMode}"]`);
+  if (activeButton) {
+    activeButton.classList.add("active");
+
+    // Add this line to scroll active button into center on page load
+    activeButton.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    });
+  }
+
 });
 
 // Close when clicking ×

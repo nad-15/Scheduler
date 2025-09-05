@@ -30,8 +30,7 @@ const dropdown = document.getElementById("color-mode-dropdown");
 const colorPicker = document.getElementById("colorPicker");
 
 todoButton.addEventListener("click", () => {
-    todoContainer.classList.add("active");
-    renderTodos();
+    todoMenuItem.click();
 });
 
 paletteBtn.addEventListener("click", () => {
