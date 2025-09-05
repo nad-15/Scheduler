@@ -659,25 +659,39 @@
     <!-- Calendar Container -->
     <div class="calendar-container-vert-view" id="calendar-container-vert-view">
         <div class="calendar-header-vert-view">
+
             <div class="month-view-header">
+
                 <button class="menu-button hamburger-month-view"><span
                         class="material-icons menu-icon-month-view">menu</span></button>
                 <div class="month-label-vert-view" id="month-label-vert-view">May 2025</div>
-                <span class="material-symbols-outlined header-icon-vert-view" id="icon-month-label-vert-view">
-                    event_note
-                </span>
+
             </div>
 
-            <div class="navigation-vertview-container">
-                <button id="prev-month-vert-view" class="nav-button-vert-view"><span
-                        class="material-symbols-outlined navi-span-vertview">
-                        chevron_left
-                    </span></button>
-                <button id="next-month-vert-view" class="nav-button-vert-view"><span
-                        class="material-symbols-outlined navi-span-vertview">
-                        chevron_right
-                    </span></button>
+            <div class="month-view-actions">
+                <button class="month-view__goto-list-view-btn">
+                    <span class="material-symbols-outlined header-icon-vert-view " id="icon-month-label-vert-view">
+                        event_note
+                    </span>
+                </button>
+
+                <button class="month-view-todo-btn">
+                    <span class="material-symbols-outlined month-view-todo-icon">checklist</span>
+                </button>
+
+                <div class="navigation-vertview-container" style="display: none;">
+                    <button id="prev-month-vert-view" class="nav-button-vert-view"><span
+                            class="material-symbols-outlined navi-span-vertview">
+                            chevron_left
+                        </span></button>
+                    <button id="next-month-vert-view" class="nav-button-vert-view"><span
+                            class="material-symbols-outlined navi-span-vertview">
+                            chevron_right
+                        </span></button>
+                </div>
             </div>
+
+
 
         </div>
 

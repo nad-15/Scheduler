@@ -416,26 +416,26 @@ body {
 .todo-close-btn,
 .collapse-toggle-btn,
 .todo-actions-btn {
-  background: rgba(0, 0, 0, 0.15);
-  background-color: #e3f2fd;
-  border: none;
-  color: #666;
-  font-size: 2rem;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.25s ease, color 0.25s ease;
-  font-family: var(--todo-font);
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+    background: rgba(0, 0, 0, 0.15);
+    background-color: #e3f2fd;
+    border: none;
+    color: #666;
+    font-size: 2rem;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.25s ease, color 0.25s ease;
+    font-family: var(--todo-font);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 
@@ -444,10 +444,11 @@ body {
 .todo-close-btn:active,
 .collapse-toggle-btn:active,
 .todo-actions-btn:active {
-  transform: scale(0.9);
-  background-color: #bbdefb;
-  color: #222;
-  transition: none; /* prevent flicker while holding */
+    transform: scale(0.9);
+    background-color: #bbdefb;
+    color: #222;
+    transition: none;
+    /* prevent flicker while holding */
 }
 
 
@@ -4133,9 +4134,62 @@ input[type="radio"]:checked::after {
     transform: scale(0.9);
 }
 
-.material-symbols-outlined.header-icon-vert-view {
-    font-size: 1.4rem;
+
+.month-view-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: space-around;
+    /* border: 2px solid red; */
 }
+
+.month-view-todo-btn,
+.month-view__goto-list-view-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #cfe4fb;
+    border: none;
+    font-size: 2rem;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease,
+        transform 0.25s ease,
+        color 0.25s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+
+
+}
+
+.material-symbols-outlined.header-icon-vert-view,
+.material-symbols-outlined.month-view-todo-icon {
+    font-weight: 500;
+    font-size: 1.2rem;
+    color: #666;
+    background-color: transparent;
+}
+
+
+.month-view-todo-btn:active,
+.month-view__goto-list-view-btn:active {
+    transform: scale(0.9);
+    background-color: #bbdefb;
+    color: #222;
+    transition: none;
+    /* prevent flicker while holding */
+}
+
+
+
+
+
 
 .month-label-vert-view {
     font-family: 'Roboto', sans-serif;
