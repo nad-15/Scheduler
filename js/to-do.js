@@ -2,10 +2,6 @@ const toggleLabel = document.querySelector(".sort-label");
 const controls = document.querySelector(".todo-sort-controls");
 const sortIcon = document.querySelector(".sort-icon");
 const sortIndicator = document.querySelector('.sort-mode-text-indicator');
-
-
-
-
 const deleteBtn = document.querySelector(".todo-actions-btn");
 const deleteDropdown = document.querySelector(".todo-actions-dropdown");
 const deleteAllBtn = document.querySelector(".delete-all-btn");
@@ -801,14 +797,14 @@ function renderTodos() {
           }
           setTimeout(() => {
             todoSaveAndRender();
-          }, 500);
+          }, 400);
         }
         // Special case: completing in "in-progress"
         else if (filterMode === "in-progress" && wasDone === false && todo.done === true) {
           item.classList.add("completing");
           setTimeout(() => {
             todoSaveAndRender();
-          }, 500);
+          }, 400);
         }
         // Special case: uncompleting in "done"
         else if (filterMode === "done" && wasDone === true && todo.done === false) {
@@ -883,7 +879,7 @@ function renderTodos() {
           setTimeout(() => {
             todo.pinned = !todo.pinned;
             todoSaveAndRender();
-          }, 300); // Adjust timing to match your CSS transition duration
+          }, 400); // Adjust timing to match your CSS transition duration
         } else {
           // Normal behavior for other cases
           todo.pinned = !todo.pinned;
@@ -926,7 +922,7 @@ function renderTodos() {
           setTimeout(() => {
             todos = todos.filter((t) => t.id !== todo.id);
             todoSaveAndRender();
-          }, 300); // Adjust timing to match your CSS transition duration
+          }, 400); // Adjust timing to match your CSS transition duration
         }
         menuDropdown.style.display = "none";
       });
@@ -948,7 +944,7 @@ function renderTodos() {
           setTimeout(() => {
             todo.isArchive = !todo.isArchive;
             todoSaveAndRender();
-          }, 300); // Adjust timing to match your CSS transition duration
+          }, 400); // Adjust timing to match your CSS transition duration
         } else {
           // Normal behavior for other cases (no animation needed)
           todo.isArchive = !todo.isArchive;
