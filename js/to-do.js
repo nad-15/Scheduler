@@ -854,13 +854,65 @@ function renderTodos() {
       });
 
       // handle selection
+      // priorityDropdown.querySelectorAll("button").forEach((btn) => {
+      //   btn.addEventListener("click", () => {
+      //     const selected = btn.getAttribute("data-priority");
+
+
+      //     todo.priority = selected === "null" ? null : selected;
+      //     todoSaveAndRender();
+      //   });
+      // });
+
+
+      // handle selection
       priorityDropdown.querySelectorAll("button").forEach((btn) => {
         btn.addEventListener("click", () => {
           const selected = btn.getAttribute("data-priority");
-          todo.priority = selected === "null" ? null : selected;
-          todoSaveAndRender();
+          const newPriority = selected === "null" ? null : selected;
+
+          const oldPriority = todo.priority;
+          const oldOrder = getPriorityOrder(oldPriority);
+          const newOrder = getPriorityOrder(newPriority);
+
+              // Close dropdown right away
+    priorityDropdown.style.display = "none";
+
+          // Assign new priority
+          todo.priority = newPriority;
+
+          // Only animate when in "group" sort mode
+          if (
+            currentSortMode === "group" &&
+            oldPriority !== undefined &&
+            oldPriority !== newPriority
+          ) {
+            if (newOrder < oldOrder) {
+              // Moving UP (higher priority)
+              item.classList.add("uncompleting");
+            } else if (newOrder > oldOrder) {
+              // Moving DOWN (lower priority)
+              item.classList.add("completing");
+            }
+
+            setTimeout(() => {
+              todoSaveAndRender();
+            }, 400);
+          } else {
+            // No animation, just save & render
+            todoSaveAndRender();
+          }
         });
       });
+      function getPriorityOrder(priority) {
+        switch (priority) {
+          case "high": return 1;
+          case "medium": return 2;
+          case "low": return 3;
+          case null: return 4;
+          default: return 4;
+        }
+      }
 
       // item.querySelector(".todo-pin-btn").addEventListener("click", () => {
       //   todo.pinned = !todo.pinned;
