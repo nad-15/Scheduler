@@ -9,7 +9,7 @@ const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 const monthViewTodoBtn = document.querySelector(".month-view-todo-btn");
 
 
-monthViewTodoBtn.addEventListener("click", ()=>{
+monthViewTodoBtn.addEventListener("click", () => {
   todoMenuItem.click();
 });
 
@@ -850,7 +850,7 @@ function undo() {
   const previousState = undoStack.pop();
 
   dayTasksForEdit = deepClone(previousState);
-  
+
   showDayTasksEditable(popUpDate);  // re-render your UI with restored state
   selectAllBtnUpdate();
   document.querySelectorAll(".event-content").forEach(el => {
@@ -922,6 +922,10 @@ function saveTaskOrderToLocalStorage(popUpDate) {
       // Handle fake task label like "No Title"
       if (task === "No Title" || task === "No tasks for this period.") {
         task = "";
+      }
+
+      if (task) {
+        addTemplate(task, rgbToHex(color));
       }
 
       return { task, color: rgbToHex(color) };
