@@ -29,6 +29,45 @@ const paletteBtn = document.getElementById("showRecentColors");
 const dropdown = document.getElementById("color-mode-dropdown");
 const colorPicker = document.getElementById("colorPicker");
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    const month = today.getMonth(); // 0 = Jan
+    const day = today.getDate();
+
+    console.log(month);
+    console.log(day);
+
+    // February is month 1
+    const isSpecialDate = (month === 1 && day >= 1 && day <= 15);
+
+    if (isSpecialDate) {
+
+        const container = document.getElementById("editCloseContainer");
+        container.querySelector(".copy-tasks-button").style.display = "none";
+
+        const giftBtn = document.createElement("button");
+        giftBtn.className = "gift-button";
+        giftBtn.title = "Special Gift";
+
+        const img = document.createElement("img");
+        img.src = "images/gift-ic.gif";
+        img.alt = "Gift";
+        img.style.width = "40px";
+
+        giftBtn.appendChild(img);
+
+        // Insert as FIRST element
+        container.prepend(giftBtn);
+
+        // Optional click action
+        giftBtn.addEventListener("click", () => {
+            alert("🎁 Surprise!");
+            window.location.href = "./special/special.html";
+        });
+    }
+
+});
+
 todoButton.addEventListener("click", () => {
     todoMenuItem.click();
 });
@@ -2277,25 +2316,25 @@ let isAwake = false;
 let idleTimer;
 
 fabHome.addEventListener("click", () => {
-  if (!isAwake) {
-    // Wake up
-    fabHome.classList.remove("idle");
-    isAwake = true;
+    if (!isAwake) {
+        // Wake up
+        fabHome.classList.remove("idle");
+        isAwake = true;
 
-    // Auto-reset after 3s if no second click
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-      fabHome.classList.add("idle");
-      isAwake = false;
-    }, 3000);
+        // Auto-reset after 3s if no second click
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+            fabHome.classList.add("idle");
+            isAwake = false;
+        }, 3000);
 
-  } else {
-    // Run the actual action
-    todoCloseBtn.click();
+    } else {
+        // Run the actual action
+        todoCloseBtn.click();
 
-    // Reset immediately
-    clearTimeout(idleTimer);
-    fabHome.classList.add("idle");
-    isAwake = false;
-  }
+        // Reset immediately
+        clearTimeout(idleTimer);
+        fabHome.classList.add("idle");
+        isAwake = false;
+    }
 });
