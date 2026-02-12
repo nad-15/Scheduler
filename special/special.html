@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎉 Interactive Birthday Celebration</title>
+    <title>🎉 Happy Birthday!!!</title>
     <style>
         * {
             margin: 0;
@@ -19,33 +19,51 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
-            background: #1a1a1a;
-            transition: background 3s ease;
-            /* DRAMATIC SLOW TRANSITION */
+            background: #000;
+            position: relative;
         }
 
-        body.lights-on {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* Starry night overlay */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(2px 2px at 10% 20%, #fff 80%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 70% 40%, #fff 80%, transparent 100%),
+                radial-gradient(2px 2px at 30% 70%, #fff 80%, transparent 100%),
+                radial-gradient(1px 1px at 80% 80%, #fff 80%, transparent 100%),
+                linear-gradient(to bottom, #0a0a1a, #0d0d2a 70%, #0f0f3a 100%);
+            background-repeat: repeat;
+            opacity: 0;
+            transition: opacity 8s ease;
+            z-index: -1;
+        }
+
+        body.lights-on::before {
+            opacity: 1;
         }
 
         /* Button Styles */
         .btn {
             position: fixed;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 24px;
-            padding: 20px 50px;
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            font-weight: bold;
+            font-size: 15px;
+            padding: 14px 40px;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 500;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             display: none;
             z-index: 100;
+            backdrop-filter: blur(10px);
+            text-transform: none;
         }
 
         .btn.show {
@@ -58,7 +76,6 @@
                 opacity: 0;
                 transform: translateX(-50%) translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateX(-50%) translateY(0);
@@ -66,29 +83,31 @@
         }
 
         .btn:hover {
-            transform: translateX(-50%) translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            transform: translateX(-50%) translateY(-3px);
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         .btn:active {
-            transform: translateX(-50%) translateY(-2px) scale(1.02);
+            transform: translateX(-50%) translateY(-1px);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         /* Bulbs */
         .bulbs-container {
             position: fixed;
-            top: 0;
+            top: 2vh;
             left: 0;
             width: 100%;
-            height: 100px;
+            height: 8vh;
             display: none;
             justify-content: space-around;
-            align-items: flex-start;
-            padding: 20px;
+            align-items: center;
+            padding: 0 20px;
             z-index: 10;
             opacity: 0;
             transition: opacity 2s ease;
-            /* DRAMATIC FADE IN */
         }
 
         .bulbs-container.show {
@@ -143,33 +162,27 @@
         }
 
         @keyframes swing {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: rotate(-5deg);
             }
-
             50% {
                 transform: rotate(5deg);
             }
         }
 
         @keyframes bulbGlow {
-
-            0%,
-            100% {
+            0%, 100% {
                 filter: brightness(1);
             }
-
             50% {
                 filter: brightness(1.3);
             }
         }
 
-        /* Banner - Colorful Triangular Bunting */
+        /* Banner */
         .banner-container {
             position: fixed;
-            top: 100px;
+            top: 12vh;
             left: 0;
             width: 100%;
             display: none;
@@ -185,13 +198,20 @@
 
         .bunting {
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1vh;
+            margin-bottom: 0;
+        }
+
+        .bunting-row {
+            display: flex;
             justify-content: center;
             gap: 5px;
-            margin-bottom: 20px;
         }
 
         .flag {
-            width: 0;
+            width: 60px;
             height: 0;
             border-left: 30px solid transparent;
             border-right: 30px solid transparent;
@@ -201,133 +221,48 @@
             opacity: 0;
         }
 
+        .flag::before {
+            content: attr(data-letter);
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
         @keyframes flagAppear {
             to {
                 opacity: 1;
             }
         }
 
-        .flag::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: -30px;
-            width: 60px;
-            height: 50px;
-            background: inherit;
-        }
-
-        .flag:nth-child(1) {
-            border-top-color: #ff6b6b;
-            animation-delay: 0s;
-        }
-
-        .flag:nth-child(2) {
-            border-top-color: #4ecdc4;
-            animation-delay: 0.1s;
-        }
-
-        .flag:nth-child(3) {
-            border-top-color: #ffe66d;
-            animation-delay: 0.2s;
-        }
-
-        .flag:nth-child(4) {
-            border-top-color: #a8e6cf;
-            animation-delay: 0.3s;
-        }
-
-        .flag:nth-child(5) {
-            border-top-color: #ff8b94;
-            animation-delay: 0.4s;
-        }
-
-        .flag:nth-child(6) {
-            border-top-color: #95e1d3;
-            animation-delay: 0.5s;
-        }
-
-        .flag:nth-child(7) {
-            border-top-color: #f38181;
-            animation-delay: 0.6s;
-        }
-
-        .flag:nth-child(8) {
-            border-top-color: #aa96da;
-            animation-delay: 0.7s;
-        }
-
-        .flag:nth-child(9) {
-            border-top-color: #fcbad3;
-            animation-delay: 0.8s;
-        }
-
-        .flag:nth-child(10) {
-            border-top-color: #a8d8ea;
-            animation-delay: 0.9s;
-        }
-
-        .flag:nth-child(11) {
-            border-top-color: #ffaaa5;
-            animation-delay: 1.0s;
-        }
-
-        .flag:nth-child(12) {
-            border-top-color: #ffd3b6;
-            animation-delay: 1.1s;
-        }
-
-        .flag:nth-child(13) {
-            border-top-color: #dcedc1;
-            animation-delay: 1.2s;
-        }
-
-        .flag:nth-child(14) {
-            border-top-color: #a8e6cf;
-            animation-delay: 1.3s;
-        }
+        .flag:nth-child(1) { border-top-color: #ff6b6b; animation-delay: 0s; }
+        .flag:nth-child(2) { border-top-color: #4ecdc4; animation-delay: 0.1s; }
+        .flag:nth-child(3) { border-top-color: #ffe66d; animation-delay: 0.2s; }
+        .flag:nth-child(4) { border-top-color: #a8e6cf; animation-delay: 0.3s; }
+        .flag:nth-child(5) { border-top-color: #ff8b94; animation-delay: 0.4s; }
+        .flag:nth-child(6) { border-top-color: #95e1d3; animation-delay: 0.5s; }
+        .flag:nth-child(7) { border-top-color: #f38181; animation-delay: 0.6s; }
+        .flag:nth-child(8) { border-top-color: #ff6b6b; animation-delay: 0.7s; }
+        .flag:nth-child(9) { border-top-color: #4ecdc4; animation-delay: 0.8s; }
+        .flag:nth-child(10) { border-top-color: #ffe66d; animation-delay: 0.9s; }
+        .flag:nth-child(11) { border-top-color: #a8e6cf; animation-delay: 1.0s; }
+        .flag:nth-child(12) { border-top-color: #ff8b94; animation-delay: 1.1s; }
+        .flag:nth-child(13) { border-top-color: #95e1d3; animation-delay: 1.2s; }
 
         @keyframes flag-wave {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateY(0);
             }
-
             50% {
                 transform: translateY(-5px);
             }
         }
 
-        .banner-text {
-            text-align: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-            background: linear-gradient(45deg, #f093fb, #f5576c, #4facfe, #00f2fe);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient-shift 3s ease infinite;
-            letter-spacing: 8px;
-        }
-
-        @keyframes gradient-shift {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        /* Balloons - 9 total, floating with letters */
+        /* Balloons */
         .balloons-container {
             position: fixed;
             top: 0;
@@ -340,18 +275,18 @@
 
         .balloon {
             position: absolute;
-            width: 100px;
-            height: 130px;
+            width: 4rem;
+            height: 6rem;
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 42px;
+            font-size: 48px;
             font-weight: bold;
             color: #fff;
-            text-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
             opacity: 0;
-            transition: all 1s ease;
+            transition: all 1.5s ease;
         }
 
         .balloon::after {
@@ -367,39 +302,77 @@
 
         .balloon.visible {
             opacity: 1;
+        }
+
+        .balloon.floating {
             animation: gentleFloat 4s ease-in-out infinite;
         }
 
-        .balloon.fly-away {
-            opacity: 0 !important;
-            transform: translateY(-200vh) !important;
-            transition: all 2s ease-in !important;
+        /* Balloon name arrangement positioning */
+        .balloon.arranged {
+            position: fixed !important;
         }
 
         @keyframes gentleFloat {
-
-            0%,
-            100% {
-                transform: translateY(0);
+            0%, 100% { 
+                transform: translateY(0) translateX(0) rotate(0deg);
             }
-
-            50% {
-                transform: translateY(-20px);
+            25% { 
+                transform: translateY(-30px) translateX(15px) rotate(5deg);
+            }
+            50% { 
+                transform: translateY(-50px) translateX(-10px) rotate(-3deg);
+            }
+            75% { 
+                transform: translateY(-35px) translateX(20px) rotate(7deg);
             }
         }
 
-        /* Cake - Beautiful Emoji */
-        .cake-container {
+        /* Flying balloons */
+        .flying-balloon {
             position: fixed;
-            bottom: -400px;
+            width: 2.5rem;
+            height: 4rem;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            bottom: -100px;
+            animation: flyUp 4s ease-out forwards;
+            z-index: 30;
+        }
+
+        .flying-balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
             left: 50%;
             transform: translateX(-50%);
-            transition: bottom 2s ease;
+            width: 1px;
+            height: 30px;
+            background: #333;
+        }
+
+        @keyframes flyUp {
+            0% {
+                bottom: -100px;
+                opacity: 1;
+            }
+            100% {
+                bottom: 120vh;
+                opacity: 0;
+            }
+        }
+
+        /* Cake */
+        .cake-container {
+            position: fixed;
+            top: 120vh;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: top 2s ease;
             z-index: 60;
         }
 
         .cake-container.show {
-            bottom: 150px;
+            top: 58vh;
         }
 
         .cake {
@@ -407,15 +380,13 @@
             text-align: center;
             filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
             animation: cakeGlow 2s ease-in-out infinite;
+            background: white;
         }
 
         @keyframes cakeGlow {
-
-            0%,
-            100% {
+            0%, 100% {
                 filter: drop-shadow(0 10px 30px rgba(255, 200, 50, 0.3));
             }
-
             50% {
                 filter: drop-shadow(0 10px 40px rgba(255, 200, 50, 0.6));
             }
@@ -423,57 +394,116 @@
 
         .candles {
             position: absolute;
-            top: -40px;
+            top: -80px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 40px;
             display: flex;
             gap: 15px;
         }
 
+        .candle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .candle-flame {
             opacity: 0;
-            transition: opacity 0.5s ease;
-            animation: flicker 0.3s ease-in-out infinite;
+            font-size: 30px;
+            transition: opacity 1s ease;
         }
 
         .candle-flame.lit {
             opacity: 1;
+            animation: flicker 0.3s ease-in-out infinite;
+        }
+
+        .candle-flame.blow-out {
+            animation: blowOut 2s ease-out forwards;
         }
 
         @keyframes flicker {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1) translateY(0);
                 filter: brightness(1);
             }
-
             50% {
                 transform: scale(1.15) translateY(-3px);
                 filter: brightness(1.3);
             }
         }
 
-        /* Message Display */
-        .message-display {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 32px;
-            color: #fff;
-            text-align: center;
-            max-width: 80%;
-            padding: 25px 50px;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 20px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            z-index: 80;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+        @keyframes blowOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.7) translateX(30px);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) translateX(50px);
+            }
         }
+
+        .candle-wick {
+            width: 2px;
+            height: 15px;
+            background: #333;
+            margin-bottom: -5px;
+        }
+
+        .candle-body {
+            width: 15px;
+            height: 60px;
+            background: linear-gradient(to right, #ff6b9d, #ffc371);
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .candle-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+            border-radius: 3px 3px 0 0;
+        }
+/* Message Display - Subtitle Style */
+.message-display {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    color: #fff;
+    text-align: center;
+    max-width: 90%;
+    padding: 10px 20px;
+    background: none;
+    border-radius: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 80;
+    text-shadow: 
+        3px 3px 6px rgba(0, 0, 0, 1),
+        -2px -2px 4px rgba(0, 0, 0, 0.9),
+        0 0 10px rgba(0, 0, 0, 0.8);
+    border: none;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+    max-height: 120px;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
         .message-display.show {
             opacity: 1;
@@ -486,42 +516,189 @@
             height: 10px;
             z-index: 5;
         }
+
+        /* Side Confetti */
+        .side-confetti {
+            position: fixed;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .side-confetti.dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .side-confetti.line {
+            width: 3px;
+            height: 20px;
+            border-radius: 2px;
+        }
+
+        .side-confetti.long-line {
+            width: 2px;
+            height: 35px;
+            border-radius: 2px;
+        }
+
+        @keyframes shootFromLeft {
+            0% {
+                left: -50px;
+                opacity: 1;
+                transform: translateX(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                left: 50%;
+                opacity: 0;
+                transform: translateX(-50px) rotate(720deg);
+            }
+        }
+
+        @keyframes shootFromRight {
+            0% {
+                right: -50px;
+                opacity: 1;
+                transform: translateX(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                right: 50%;
+                opacity: 0;
+                transform: translateX(50px) rotate(-720deg);
+            }
+        }
+
+        /* Responsive Layout */
+        @media (max-height: 800px), (max-width: 768px) {
+            .bulbs-container {
+                top: 2vh;
+                height: 7vh;
+                padding: 0 10px;
+            }
+            
+            .bulb {
+                width: 25px;
+                height: 40px;
+            }
+            
+            .banner-container {
+                top: 11vh;
+            }
+            
+            .bunting {
+                gap: 0.5vh;
+            }
+            
+            .flag {
+                width: 40px;
+                border-left: 20px solid transparent;
+                border-right: 20px solid transparent;
+                border-top: 35px solid #ff6b6b;
+            }
+
+            .flag::before {
+                font-size: 16px;
+                top: -28px;
+            }
+
+            .bunting-row {
+                gap: 3px;
+            }
+            
+            .cake-container.show {
+                top: 60vh;
+            }
+            
+            .cake {
+                font-size: 120px;
+            }
+            
+            .cake img {
+                width: 120px !important;
+            }
+            
+            .candles {
+                top: -50px;
+                gap: 8px;
+            }
+            
+            .candle-flame {
+                font-size: 20px;
+            }
+            
+            .candle-body {
+                width: 10px;
+                height: 40px;
+            }
+            
+            .balloon {
+                width: 3rem;
+                height: 4.5rem;
+                font-size: 32px;
+            }
+            
+.message-display {
+    font-size: 16px;
+    padding: 8px 15px;
+    max-width: 92%;
+    bottom: 70px;
+    max-height: 100px;
+    line-height: 1.2;
+}
+            
+            .btn {
+                font-size: 13px;
+                padding: 12px 30px;
+                bottom: 15px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <!-- Buttons -->
-    <button class="btn show" id="lightsBtn">💡 Turn on the Lights</button>
-    <button class="btn" id="musicBtn">🎵 Play Music</button>
-    <button class="btn" id="decorateBtn">🎨 Let's Decorate</button>
-    <button class="btn" id="balloonsBtn">🎈 Fly the Balloons</button>
-    <button class="btn" id="cakeBtn">🎂 Bring out the Cake</button>
-    <button class="btn" id="candleBtn">🕯️ Light the Candle</button>
-    <button class="btn" id="nameBtn">🎉 Happy Birthday!</button>
+    <button class="btn show" id="lightsBtn">Buksan mo muna ilaw...</button>
+    <button class="btn" id="musicBtn">Syempre dapat may music...</button>
+    <button class="btn" id="decorateBtn">Hmmm... kulang ng decoration...</button>
+    <button class="btn" id="balloonsBtn">..at may pa balloons si Lolo mo...</button>
+    <button class="btn" id="cakeBtn">yong cake mo! i prepared the best cake ever!!!</button>
+    <button class="btn" id="wrongCakeBtn">oww its the wrong cake!</button>
+    <button class="btn" id="candleBtn">Sindihan ko na birthday candles mo...</button>
+    <button class="btn" id="nameBtn">Happy Birthday!</button>
+    <button class="btn" id="prayerBtn">close your eyes, then make a birthday prayer!!! pikit!</button>
+    <button class="btn" id="blowBtn">Blow! Blow! Blow the candles!!</button>
 
     <!-- Bulbs -->
     <div class="bulbs-container" id="bulbsContainer"></div>
 
-    <!-- Banner - Triangular Bunting -->
+    <!-- Banner -->
     <div class="banner-container" id="bannerContainer">
         <div class="bunting">
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
-            <div class="flag"></div>
+            <div class="bunting-row">
+                <div class="flag" data-letter="H"></div>
+                <div class="flag" data-letter="A"></div>
+                <div class="flag" data-letter="P"></div>
+                <div class="flag" data-letter="P"></div>
+                <div class="flag" data-letter="Y"></div>
+            </div>
+            <div class="bunting-row">
+                <div class="flag" data-letter="B"></div>
+                <div class="flag" data-letter="I"></div>
+                <div class="flag" data-letter="R"></div>
+                <div class="flag" data-letter="T"></div>
+                <div class="flag" data-letter="H"></div>
+                <div class="flag" data-letter="D"></div>
+                <div class="flag" data-letter="A"></div>
+                <div class="flag" data-letter="Y"></div>
+            </div>
         </div>
-        <div class="banner-text">HAPPY BIRTHDAY</div>
     </div>
 
     <!-- Balloons Container -->
@@ -530,19 +707,32 @@
     <!-- Cake -->
     <div class="cake-container" id="cakeContainer">
         <div class="candles">
-            <span class="candle-flame" id="flame1">🔥</span>
-            <span class="candle-flame" id="flame2">🔥</span>
-            <span class="candle-flame" id="flame3">🔥</span>
+            <div class="candle">
+                <span class="candle-flame" id="flame1">🔥</span>
+                <div class="candle-wick"></div>
+                <div class="candle-body"></div>
+            </div>
+            <div class="candle">
+                <span class="candle-flame" id="flame2">🔥</span>
+                <div class="candle-wick"></div>
+                <div class="candle-body"></div>
+            </div>
+            <div class="candle">
+                <span class="candle-flame" id="flame3">🔥</span>
+                <div class="candle-wick"></div>
+                <div class="candle-body"></div>
+            </div>
         </div>
-        <div class="cake">🎂</div>
+        <div class="cake" id="cakeDisplay">
+            CAKE
+        </div>
     </div>
 
     <!-- Message Display -->
     <div class="message-display" id="messageDisplay"></div>
 
     <script>
-        // Configuration - CHANGE THIS TO YOUR FRIEND'S NAME (9 LETTERS)
-        const NAME = "ALEXANDER"; // Must be exactly 9 letters! Change to your friend's name
+        const NAME = "KKAARTEEN";
         const MESSAGES = [
             "🎉 Today is YOUR special day!",
             "✨ May all your dreams come true!",
@@ -554,36 +744,34 @@
             "🥳 Celebrate big, you've earned it!",
         ];
 
-        // Elements
         const lightsBtn = document.getElementById('lightsBtn');
         const musicBtn = document.getElementById('musicBtn');
         const decorateBtn = document.getElementById('decorateBtn');
         const balloonsBtn = document.getElementById('balloonsBtn');
         const cakeBtn = document.getElementById('cakeBtn');
+        const wrongCakeBtn = document.getElementById('wrongCakeBtn');
         const candleBtn = document.getElementById('candleBtn');
         const nameBtn = document.getElementById('nameBtn');
+        const prayerBtn = document.getElementById('prayerBtn');
+        const blowBtn = document.getElementById('blowBtn');
         const bulbsContainer = document.getElementById('bulbsContainer');
         const bannerContainer = document.getElementById('bannerContainer');
         const balloonsContainer = document.getElementById('balloonsContainer');
         const cakeContainer = document.getElementById('cakeContainer');
+        const cakeDisplay = document.getElementById('cakeDisplay');
         const flame1 = document.getElementById('flame1');
         const flame2 = document.getElementById('flame2');
         const flame3 = document.getElementById('flame3');
         const messageDisplay = document.getElementById('messageDisplay');
         const body = document.body;
 
-        let audioContext;
-        let currentMessageIndex = 0;
-        let messageInterval;
         let balloons = [];
 
-        // Step 1: Turn on the lights - DRAMATIC SLOW TRANSITION
         lightsBtn.addEventListener('click', function () {
             body.classList.add('lights-on');
 
-            // Create bulbs with delay
             setTimeout(() => {
-                for (let i = 0; i < 15; i++) {
+                for (let i = 0; i < 7; i++) {
                     const bulb = document.createElement('div');
                     bulb.className = `bulb color-${(i % 5) + 1}`;
                     bulb.style.animationDelay = `${i * 0.1}s`;
@@ -596,7 +784,6 @@
             setTimeout(() => musicBtn.classList.add('show'), 3000);
         });
 
-        // Step 2: Play Music
         musicBtn.addEventListener('click', function () {
             playExtendedHappyBirthday();
             startBulbColorChange();
@@ -605,7 +792,6 @@
             setTimeout(() => decorateBtn.classList.add('show'), 1000);
         });
 
-        // Step 3: Decorate
         decorateBtn.addEventListener('click', function () {
             bannerContainer.classList.add('show');
             createConfetti();
@@ -614,55 +800,100 @@
             setTimeout(() => balloonsBtn.classList.add('show'), 1500);
         });
 
-        // Step 4: Fly Balloons - 9 balloons with letters
         balloonsBtn.addEventListener('click', function () {
             this.classList.remove('show');
             createBalloons();
-            setTimeout(() => cakeBtn.classList.add('show'), 3000);
+            setTimeout(() => cakeBtn.classList.add('show'), 5500);
         });
 
         function createBalloons() {
             const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94', '#95e1d3', '#f38181', '#aa96da', '#fcbad3'];
-            const positions = [
-                { left: '10%', top: '30%' },
-                { left: '20%', top: '45%' },
-                { left: '30%', top: '25%' },
-                { left: '40%', top: '40%' },
-                { left: '50%', top: '30%' },
-                { left: '60%', top: '45%' },
-                { left: '70%', top: '25%' },
-                { left: '80%', top: '35%' },
-                { left: '90%', top: '40%' }
-            ];
-
-            for (let i = 0; i < 9; i++) {
+            
+            // Flying balloons that disappear
+            const flyingBalloonCount = 50;
+            for (let i = 0; i < flyingBalloonCount; i++) {
                 setTimeout(() => {
-                    const balloon = document.createElement('div');
-                    balloon.className = 'balloon';
-                    balloon.textContent = NAME[i];
-                    balloon.dataset.letter = NAME[i];
-                    balloon.dataset.index = i;
-                    balloon.style.left = positions[i].left;
-                    balloon.style.top = positions[i].top;
-                    balloon.style.background = `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), ${colors[i]})`;
-                    balloon.style.animationDelay = `${i * 0.2}s`;
-                    balloonsContainer.appendChild(balloon);
-                    balloons.push(balloon);
-
-                    setTimeout(() => balloon.classList.add('visible'), 100);
-                }, i * 300);
+                    const flyingBalloon = document.createElement('div');
+                    flyingBalloon.className = 'flying-balloon';
+                    flyingBalloon.style.left = Math.random() * 100 + '%';
+                    flyingBalloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    flyingBalloon.style.animationDelay = (Math.random() * 1) + 's';
+                    flyingBalloon.style.animationDuration = (3 + Math.random() * 2) + 's';
+                    document.body.appendChild(flyingBalloon);
+                    
+                    setTimeout(() => flyingBalloon.remove(), 6000);
+                }, i * 50);
             }
+            
+            // Special 9 balloons
+            setTimeout(() => {
+                const startPositions = [
+                    { left: '10%', top: '120%' },
+                    { left: '20%', top: '120%' },
+                    { left: '30%', top: '120%' },
+                    { left: '40%', top: '120%' },
+                    { left: '50%', top: '120%' },
+                    { left: '60%', top: '120%' },
+                    { left: '70%', top: '120%' },
+                    { left: '80%', top: '120%' },
+                    { left: '90%', top: '120%' }
+                ];
+                
+                const floatPositions = [
+                    { left: '10%', top: '30%' },
+                    { left: '20%', top: '45%' },
+                    { left: '30%', top: '25%' },
+                    { left: '40%', top: '40%' },
+                    { left: '50%', top: '30%' },
+                    { left: '60%', top: '45%' },
+                    { left: '70%', top: '25%' },
+                    { left: '80%', top: '35%' },
+                    { left: '90%', top: '40%' }
+                ];
+
+                for (let i = 0; i < 9; i++) {
+                    setTimeout(() => {
+                        const balloon = document.createElement('div');
+                        balloon.className = 'balloon';
+                        balloon.textContent = '';
+                        balloon.dataset.letter = NAME[i];
+                        balloon.dataset.index = i;
+                        balloon.style.left = startPositions[i].left;
+                        balloon.style.top = startPositions[i].top;
+                        balloon.style.background = `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), ${colors[i]})`;
+                        balloonsContainer.appendChild(balloon);
+                        balloons.push(balloon);
+
+                        setTimeout(() => {
+                            balloon.classList.add('visible');
+                            balloon.style.left = floatPositions[i].left;
+                            balloon.style.top = floatPositions[i].top;
+                            
+                            setTimeout(() => {
+                                balloon.classList.add('floating');
+                                balloon.style.animationDelay = `${Math.random() * 2}s`;
+                            }, 1500);
+                        }, 100);
+                    }, i * 300);
+                }
+            }, 2500);
         }
 
-        // Step 5: Bring Cake
         cakeBtn.addEventListener('click', function () {
             cakeContainer.classList.add('show');
 
             this.classList.remove('show');
-            setTimeout(() => candleBtn.classList.add('show'), 2000);
+            setTimeout(() => wrongCakeBtn.classList.add('show'), 2000);
         });
 
-        // Step 6: Light Candle
+        wrongCakeBtn.addEventListener('click', function () {
+            // Replace text with actual cake image
+            cakeDisplay.innerHTML = '<img src="cheesecake.webp" alt="Cheesecake" style="width:180px; height:auto;">';
+            
+            this.classList.remove('show');
+            setTimeout(() => candleBtn.classList.add('show'), 1500);
+        });
+
         candleBtn.addEventListener('click', function () {
             flame1.classList.add('lit');
             setTimeout(() => flame2.classList.add('lit'), 200);
@@ -674,56 +905,95 @@
             }, 1500);
         });
 
-        // Step 7: Happy Birthday - Rearrange balloons
         nameBtn.addEventListener('click', function () {
             this.classList.remove('show');
             rearrangeBalloons();
         });
 
         function rearrangeBalloons() {
-            // Calculate center positions for name balloons
             const centerPositions = [
-                { left: '20%', top: '40%' },
-                { left: '27%', top: '40%' },
-                { left: '34%', top: '40%' },
-                { left: '41%', top: '40%' },
-                { left: '48%', top: '40%' },
-                { left: '55%', top: '40%' },
-                { left: '62%', top: '40%' },
-                { left: '69%', top: '40%' },
-                { left: '76%', top: '40%' }
+                { left: '10%', top: '35vh' },
+                { left: '17%', top: '35vh' },
+                { left: '24%', top: '35vh' },
+                { left: '31%', top: '35vh' },
+                { left: '38%', top: '35vh' },
+                { left: '45%', top: '35vh' },
+                { left: '52%', top: '35vh' },
+                { left: '59%', top: '35vh' },
+                { left: '66%', top: '35vh' }
             ];
 
-            // Animate balloons to center positions in order
             balloons.forEach((balloon, index) => {
                 setTimeout(() => {
+                    balloon.classList.remove('floating');
+                    balloon.classList.add('arranged');
+                    balloon.style.animation = 'none';
+
+                    // Alternate up/down spacing
+                    const verticalOffset = (index % 2 === 0) ? -1.5 : 1.5; // vh units
                     balloon.style.left = centerPositions[index].left;
-                    balloon.style.top = centerPositions[index].top;
+                    balloon.style.top = `calc(${centerPositions[index].top} + ${verticalOffset}vh)`;
                     balloon.style.transition = 'all 1.5s ease';
-                }, index * 150);
+
+                    setTimeout(() => {
+                        balloon.textContent = balloon.dataset.letter;
+                        balloon.style.transform = 'scale(1.3)';
+                        setTimeout(() => {
+                            balloon.style.transform = 'scale(1)';
+                        }, 400);
+                    }, 1600);
+                }, index * 250);
             });
 
-            // Start messages after balloons arrange
             setTimeout(() => {
-                showNextMessage();
-                messageInterval = setInterval(showNextMessage, 4000);
-            }, 3000);
+                showAllMessages();
+            }, (balloons.length * 250) + 2500);
         }
+
+        prayerBtn.addEventListener('click', function () {
+            this.classList.remove('show');
+            messageDisplay.textContent = "🙏 Close your eyes, make a wish, and blow the candles...";
+            messageDisplay.classList.add('show');
+            
+            setTimeout(() => {
+                messageDisplay.classList.remove('show');
+                setTimeout(() => {
+                    blowBtn.classList.add('show');
+                }, 500);
+            }, 3000);
+        });
+
+        blowBtn.addEventListener('click', function () {
+            this.classList.remove('show');
+            
+            // Blow out candles gradually
+            flame1.classList.remove('lit');
+            flame1.classList.add('blow-out');
+            
+            setTimeout(() => {
+                flame2.classList.remove('lit');
+                flame2.classList.add('blow-out');
+            }, 700);
+            
+            setTimeout(() => {
+                flame3.classList.remove('lit');
+                flame3.classList.add('blow-out');
+            }, 1400);
+
+            setTimeout(() => {
+                messageDisplay.textContent = "🎊 Happy Birthday! May all your wishes come true! 🎊";
+                messageDisplay.classList.add('show');
+            }, 3000);
+        });
 
         function playExtendedHappyBirthday() {
-            // 1. Create the audio object (replace with your file path)
             const audio = new Audio('./hbd.mp3');
-
-            // 2. Play the audio
+            audio.loop = true;
             audio.play()
-                .then(() => {
-                    console.log("Audio started playing successfully!");
-                })
-                .catch(error => {
-                    // Browsers often block audio unless the user clicks something first
-                    console.error("Playback failed. Make sure you clicked the button first!", error);
-                });
+                .then(() => console.log("Audio started!"))
+                .catch(error => console.error("Playback failed:", error));
         }
+
         function startBulbColorChange() {
             const bulbs = document.querySelectorAll('.bulb');
             const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
@@ -749,6 +1019,52 @@
                     setTimeout(() => confetti.remove(), 5000);
                 }, i * 25);
             }
+            
+            // Start side confetti celebration
+            startSideConfetti();
+        }
+
+        function startSideConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94', '#95e1d3', '#f38181', '#ffd93d', '#6bcf7f'];
+            const types = ['dot', 'line', 'long-line'];
+            
+            function createBurst() {
+                // Left side burst
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        const type = types[Math.floor(Math.random() * types.length)];
+                        confetti.className = `side-confetti ${type}`;
+                        confetti.style.top = Math.random() * 100 + '%';
+                        confetti.style.left = '-50px';
+                        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.animation = `shootFromLeft ${1.5 + Math.random()}s ease-out`;
+                        document.body.appendChild(confetti);
+                        
+                        setTimeout(() => confetti.remove(), 2500);
+                    }, i * 50);
+                }
+                
+                // Right side burst
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        const type = types[Math.floor(Math.random() * types.length)];
+                        confetti.className = `side-confetti ${type}`;
+                        confetti.style.top = Math.random() * 100 + '%';
+                        confetti.style.right = '-50px';
+                        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.animation = `shootFromRight ${1.5 + Math.random()}s ease-out`;
+                        document.body.appendChild(confetti);
+                        
+                        setTimeout(() => confetti.remove(), 2500);
+                    }, i * 50);
+                }
+            }
+            
+            // Create bursts repeatedly
+            createBurst();
+            setInterval(createBurst, 3000);
         }
 
         const style = document.createElement('style');
@@ -762,15 +1078,33 @@
         `;
         document.head.appendChild(style);
 
-        function showNextMessage() {
-            messageDisplay.textContent = MESSAGES[currentMessageIndex];
-            messageDisplay.classList.add('show');
+        function showAllMessages() {
+            let messageIndex = 0;
+            
+            function displayMessage() {
+                if (messageIndex < MESSAGES.length) {
+                    messageDisplay.textContent = MESSAGES[messageIndex];
+                    messageDisplay.classList.add('show');
 
-            setTimeout(() => {
-                messageDisplay.classList.remove('show');
-            }, 3500);
-
-            currentMessageIndex = (currentMessageIndex + 1) % MESSAGES.length;
+                    setTimeout(() => {
+                        messageDisplay.classList.remove('show');
+                        messageIndex++;
+                        
+                        if (messageIndex < MESSAGES.length) {
+                            setTimeout(() => {
+                                displayMessage();
+                            }, 800);
+                        } else {
+                            // All messages shown, show prayer button
+                            setTimeout(() => {
+                                prayerBtn.classList.add('show');
+                            }, 1000);
+                        }
+                    }, 3500);
+                }
+            }
+            
+            displayMessage();
         }
     </script>
 </body>
