@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log(day);
 
     // February is month 1
-    const isSpecialDate = (month === 1 && day >= 12 && day <= 15);
+    const isSpecialDate = (month === 1 && day >= 13 && day <= 15);
 
     if (isSpecialDate) {
 
