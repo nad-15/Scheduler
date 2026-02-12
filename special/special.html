@@ -76,6 +76,7 @@
                 opacity: 0;
                 transform: translateX(-50%) translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(-50%) translateY(0);
@@ -162,18 +163,24 @@
         }
 
         @keyframes swing {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: rotate(-5deg);
             }
+
             50% {
                 transform: rotate(5deg);
             }
         }
 
         @keyframes bulbGlow {
-            0%, 100% {
+
+            0%,
+            100% {
                 filter: brightness(1);
             }
+
             50% {
                 filter: brightness(1.3);
             }
@@ -239,24 +246,78 @@
             }
         }
 
-        .flag:nth-child(1) { border-top-color: #ff6b6b; animation-delay: 0s; }
-        .flag:nth-child(2) { border-top-color: #4ecdc4; animation-delay: 0.1s; }
-        .flag:nth-child(3) { border-top-color: #ffe66d; animation-delay: 0.2s; }
-        .flag:nth-child(4) { border-top-color: #a8e6cf; animation-delay: 0.3s; }
-        .flag:nth-child(5) { border-top-color: #ff8b94; animation-delay: 0.4s; }
-        .flag:nth-child(6) { border-top-color: #95e1d3; animation-delay: 0.5s; }
-        .flag:nth-child(7) { border-top-color: #f38181; animation-delay: 0.6s; }
-        .flag:nth-child(8) { border-top-color: #ff6b6b; animation-delay: 0.7s; }
-        .flag:nth-child(9) { border-top-color: #4ecdc4; animation-delay: 0.8s; }
-        .flag:nth-child(10) { border-top-color: #ffe66d; animation-delay: 0.9s; }
-        .flag:nth-child(11) { border-top-color: #a8e6cf; animation-delay: 1.0s; }
-        .flag:nth-child(12) { border-top-color: #ff8b94; animation-delay: 1.1s; }
-        .flag:nth-child(13) { border-top-color: #95e1d3; animation-delay: 1.2s; }
+        .flag:nth-child(1) {
+            border-top-color: #ff6b6b;
+            animation-delay: 0s;
+        }
+
+        .flag:nth-child(2) {
+            border-top-color: #4ecdc4;
+            animation-delay: 0.1s;
+        }
+
+        .flag:nth-child(3) {
+            border-top-color: #ffe66d;
+            animation-delay: 0.2s;
+        }
+
+        .flag:nth-child(4) {
+            border-top-color: #a8e6cf;
+            animation-delay: 0.3s;
+        }
+
+        .flag:nth-child(5) {
+            border-top-color: #ff8b94;
+            animation-delay: 0.4s;
+        }
+
+        .flag:nth-child(6) {
+            border-top-color: #95e1d3;
+            animation-delay: 0.5s;
+        }
+
+        .flag:nth-child(7) {
+            border-top-color: #f38181;
+            animation-delay: 0.6s;
+        }
+
+        .flag:nth-child(8) {
+            border-top-color: #ff6b6b;
+            animation-delay: 0.7s;
+        }
+
+        .flag:nth-child(9) {
+            border-top-color: #4ecdc4;
+            animation-delay: 0.8s;
+        }
+
+        .flag:nth-child(10) {
+            border-top-color: #ffe66d;
+            animation-delay: 0.9s;
+        }
+
+        .flag:nth-child(11) {
+            border-top-color: #a8e6cf;
+            animation-delay: 1.0s;
+        }
+
+        .flag:nth-child(12) {
+            border-top-color: #ff8b94;
+            animation-delay: 1.1s;
+        }
+
+        .flag:nth-child(13) {
+            border-top-color: #95e1d3;
+            animation-delay: 1.2s;
+        }
 
         @keyframes flag-wave {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0);
             }
+
             50% {
                 transform: translateY(-5px);
             }
@@ -314,16 +375,21 @@
         }
 
         @keyframes gentleFloat {
-            0%, 100% { 
+
+            0%,
+            100% {
                 transform: translateY(0) translateX(0) rotate(0deg);
             }
-            25% { 
+
+            25% {
                 transform: translateY(-30px) translateX(15px) rotate(5deg);
             }
-            50% { 
+
+            50% {
                 transform: translateY(-50px) translateX(-10px) rotate(-3deg);
             }
-            75% { 
+
+            75% {
                 transform: translateY(-35px) translateX(20px) rotate(7deg);
             }
         }
@@ -355,6 +421,7 @@
                 bottom: -100px;
                 opacity: 1;
             }
+
             100% {
                 bottom: 120vh;
                 opacity: 0;
@@ -376,17 +443,20 @@
         }
 
         .cake {
-            font-size: 180px;
+            font-size: 500px;
             text-align: center;
             filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
             animation: cakeGlow 2s ease-in-out infinite;
-            background: white;
+            background: transparent;
         }
 
         @keyframes cakeGlow {
-            0%, 100% {
+
+            0%,
+            100% {
                 filter: drop-shadow(0 10px 30px rgba(255, 200, 50, 0.3));
             }
+
             50% {
                 filter: drop-shadow(0 10px 40px rgba(255, 200, 50, 0.6));
             }
@@ -423,10 +493,13 @@
         }
 
         @keyframes flicker {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1) translateY(0);
                 filter: brightness(1);
             }
+
             50% {
                 transform: scale(1.15) translateY(-3px);
                 filter: brightness(1.3);
@@ -438,10 +511,12 @@
                 opacity: 1;
                 transform: scale(1);
             }
+
             50% {
                 opacity: 0.5;
                 transform: scale(0.7) translateX(30px);
             }
+
             100% {
                 opacity: 0;
                 transform: scale(0) translateX(50px);
@@ -474,36 +549,37 @@
             background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
             border-radius: 3px 3px 0 0;
         }
-/* Message Display - Subtitle Style */
-.message-display {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
-    color: #fff;
-    text-align: center;
-    max-width: 90%;
-    padding: 10px 20px;
-    background: none;
-    border-radius: 0;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    z-index: 80;
-    text-shadow: 
-        3px 3px 6px rgba(0, 0, 0, 1),
-        -2px -2px 4px rgba(0, 0, 0, 0.9),
-        0 0 10px rgba(0, 0, 0, 0.8);
-    border: none;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    line-height: 1.3;
-    max-height: 120px;
-    overflow: visible;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+
+        /* Message Display - Subtitle Style */
+        .message-display {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #fff;
+            text-align: center;
+            max-width: 90%;
+            padding: 10px 20px;
+            background: none;
+            border-radius: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 80;
+            text-shadow:
+                3px 3px 6px rgba(0, 0, 0, 1),
+                -2px -2px 4px rgba(0, 0, 0, 0.9),
+                0 0 10px rgba(0, 0, 0, 0.8);
+            border: none;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+            max-height: 120px;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         .message-display.show {
             opacity: 1;
@@ -548,9 +624,11 @@
                 opacity: 1;
                 transform: translateX(0) rotate(0deg);
             }
+
             50% {
                 opacity: 1;
             }
+
             100% {
                 left: 50%;
                 opacity: 0;
@@ -564,9 +642,11 @@
                 opacity: 1;
                 transform: translateX(0) rotate(0deg);
             }
+
             50% {
                 opacity: 1;
             }
+
             100% {
                 right: 50%;
                 opacity: 0;
@@ -575,26 +655,27 @@
         }
 
         /* Responsive Layout */
-        @media (max-height: 800px), (max-width: 768px) {
+        @media (max-height: 800px),
+        (max-width: 768px) {
             .bulbs-container {
                 top: 2vh;
                 height: 7vh;
                 padding: 0 10px;
             }
-            
+
             .bulb {
                 width: 25px;
                 height: 40px;
             }
-            
+
             .banner-container {
                 top: 11vh;
             }
-            
+
             .bunting {
                 gap: 0.5vh;
             }
-            
+
             .flag {
                 width: 40px;
                 border-left: 20px solid transparent;
@@ -610,48 +691,48 @@
             .bunting-row {
                 gap: 3px;
             }
-            
+
             .cake-container.show {
                 top: 60vh;
             }
-            
+
             .cake {
                 font-size: 120px;
             }
-            
+
             .cake img {
-                width: 120px !important;
+                width: 250px !important;
             }
-            
+
             .candles {
                 top: -50px;
                 gap: 8px;
             }
-            
+
             .candle-flame {
                 font-size: 20px;
             }
-            
+
             .candle-body {
                 width: 10px;
                 height: 40px;
             }
-            
+
             .balloon {
                 width: 3rem;
                 height: 4.5rem;
                 font-size: 32px;
             }
-            
-.message-display {
-    font-size: 16px;
-    padding: 8px 15px;
-    max-width: 92%;
-    bottom: 70px;
-    max-height: 100px;
-    line-height: 1.2;
-}
-            
+
+            .message-display {
+                font-size: 16px;
+                padding: 8px 15px;
+                max-width: 92%;
+                bottom: 70px;
+                max-height: 100px;
+                line-height: 1.2;
+            }
+
             .btn {
                 font-size: 13px;
                 padding: 12px 30px;
@@ -664,16 +745,16 @@
 <body>
 
     <!-- Buttons -->
-    <button class="btn show" id="lightsBtn">Buksan mo muna ilaw...</button>
-    <button class="btn" id="musicBtn">Syempre dapat may music...</button>
-    <button class="btn" id="decorateBtn">Hmmm... kulang ng decoration...</button>
-    <button class="btn" id="balloonsBtn">..at may pa balloons si Lolo mo...</button>
+    <button class="btn show" id="lightsBtn">Buksan mo muna ilaw...kaya mo na yan..</button>
+    <button class="btn" id="musicBtn">Syempre dapat may music...play it...</button>
+    <button class="btn" id="decorateBtn">Hmmm... kulang ng decoration...click here..</button>
+    <button class="btn" id="balloonsBtn">..nag prepare din ako balloons! fly them!...</button>
     <button class="btn" id="cakeBtn">yong cake mo! i prepared the best cake ever!!!</button>
-    <button class="btn" id="wrongCakeBtn">oww its the wrong cake!</button>
-    <button class="btn" id="candleBtn">Sindihan ko na birthday candles mo...</button>
-    <button class="btn" id="nameBtn">Happy Birthday!</button>
-    <button class="btn" id="prayerBtn">close your eyes, then make a birthday prayer!!! pikit!</button>
-    <button class="btn" id="blowBtn">Blow! Blow! Blow the candles!!</button>
+    <button class="btn" id="wrongCakeBtn">ay mali, mali ahaha! ulit!</button>
+    <button class="btn" id="candleBtn">let me light it up! birthday candles mo...</button>
+    <button class="btn" id="nameBtn">Happy Birthday Malagu! makgaga ku..!</button>
+    <button class="btn" id="prayerBtn">time for you birthday prayer!!! pikit! isa!</button>
+    <button class="btn" id="blowBtn">Blow! Blow! Blow the candles Ninang Khaye!!</button>
 
     <!-- Bulbs -->
     <div class="bulbs-container" id="bulbsContainer"></div>
@@ -734,14 +815,25 @@
     <script>
         const NAME = "KKAARTEEN";
         const MESSAGES = [
-            "🎉 Today is YOUR special day!",
-            "✨ May all your dreams come true!",
-            "🎂 Wishing you love, joy, and happiness!",
-            "🎈 Another year older, another year wiser!",
-            "🌟 You deserve all the best things in life!",
-            "💝 Thank you for being such an amazing person!",
-            "🎊 Here's to another fantastic year ahead!",
-            "🥳 Celebrate big, you've earned it!",
+            "Uiiiii.. bortdey niya! ganda ganda ikaw? ",
+            "Alam mo akala ko sa ihi lang ako kikiligin dati, pero sa urine pala..",
+            "...hahahhahh",
+            "Seryos na nga!",
+            " I am not  sure but this might be the last birthday message im able to send",
+            "..I want you to know that you are one of the most beautiful being created by God...",
+            "... that you are most caring, at sobra sobrang mapagmahal.. ",
+            "...and you are that one person that brings out the best in me..and others...",
+            "... you get tired I know.... but you keep pushing through...",
+            "... coz of that BIG HEART of YOURS!.. ",
+            "...all those sacrifices you make.. they are not left unseen.. i see them, your family see them, God see them...",
+            "... malungkot man lately,..dahil kay Jaoey..i pray na you still find reason to be happy today..",
+            "...i know you are still sad and have lots of sana hindi nalang...",
+            "... but you need to smile for her.. she wants to see you happy, she loves you, and appreciate everything you do for her",
+            "..i want to cheer you up today!!!...",
+            "..Happy birthday Karen Kate Lozano Cayanan...",
+            "..someone loves you very very very very much...",
+            "..and someone is praying for you everyday...",
+            "ENJOY YOUR DAY!!! KAYA MO NA YAN!!!! MALAGU KA NAMAN!!! "
         ];
 
         const lightsBtn = document.getElementById('lightsBtn');
@@ -771,19 +863,28 @@
             body.classList.add('lights-on');
 
             setTimeout(() => {
-                for (let i = 0; i < 7; i++) {
-                    const bulb = document.createElement('div');
-                    bulb.className = `bulb color-${(i % 5) + 1}`;
-                    bulb.style.animationDelay = `${i * 0.1}s`;
-                    bulbsContainer.appendChild(bulb);
-                }
                 bulbsContainer.classList.add('show');
+
+                // Create bulbs one by one with gradual lighting effect
+                for (let i = 0; i < 7; i++) {
+                    setTimeout(() => {
+                        const bulb = document.createElement('div');
+                        bulb.className = `bulb color-${(i % 5) + 1}`;
+                        bulb.style.opacity = '0';
+                        bulb.style.transition = 'opacity 1.5s ease';
+                        bulbsContainer.appendChild(bulb);
+
+                        // Fade in each bulb
+                        setTimeout(() => {
+                            bulb.style.opacity = '1';
+                        }, 100);
+                    }, i * 600); // Each bulb appears 600ms after the previous one
+                }
             }, 1000);
 
             this.classList.remove('show');
-            setTimeout(() => musicBtn.classList.add('show'), 3000);
+            setTimeout(() => musicBtn.classList.add('show'), 6000); // Increased delay to wait for all bulbs
         });
-
         musicBtn.addEventListener('click', function () {
             playExtendedHappyBirthday();
             startBulbColorChange();
@@ -808,7 +909,7 @@
 
         function createBalloons() {
             const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94', '#95e1d3', '#f38181', '#aa96da', '#fcbad3'];
-            
+
             // Flying balloons that disappear
             const flyingBalloonCount = 50;
             for (let i = 0; i < flyingBalloonCount; i++) {
@@ -820,11 +921,11 @@
                     flyingBalloon.style.animationDelay = (Math.random() * 1) + 's';
                     flyingBalloon.style.animationDuration = (3 + Math.random() * 2) + 's';
                     document.body.appendChild(flyingBalloon);
-                    
+
                     setTimeout(() => flyingBalloon.remove(), 6000);
                 }, i * 50);
             }
-            
+
             // Special 9 balloons
             setTimeout(() => {
                 const startPositions = [
@@ -838,7 +939,7 @@
                     { left: '80%', top: '120%' },
                     { left: '90%', top: '120%' }
                 ];
-                
+
                 const floatPositions = [
                     { left: '10%', top: '30%' },
                     { left: '20%', top: '45%' },
@@ -868,7 +969,7 @@
                             balloon.classList.add('visible');
                             balloon.style.left = floatPositions[i].left;
                             balloon.style.top = floatPositions[i].top;
-                            
+
                             setTimeout(() => {
                                 balloon.classList.add('floating');
                                 balloon.style.animationDelay = `${Math.random() * 2}s`;
@@ -888,8 +989,8 @@
 
         wrongCakeBtn.addEventListener('click', function () {
             // Replace text with actual cake image
-            cakeDisplay.innerHTML = '<img src="cheesecake.webp" alt="Cheesecake" style="width:180px; height:auto;">';
-            
+            cakeDisplay.innerHTML = '<img src="cheesecake.png" alt="Cheesecake" style="width:180px; height:auto;">';
+
             this.classList.remove('show');
             setTimeout(() => candleBtn.classList.add('show'), 1500);
         });
@@ -911,16 +1012,23 @@
         });
 
         function rearrangeBalloons() {
-            const centerPositions = [
-                { left: '10%', top: '35vh' },
-                { left: '17%', top: '35vh' },
-                { left: '24%', top: '35vh' },
-                { left: '31%', top: '35vh' },
-                { left: '38%', top: '35vh' },
-                { left: '45%', top: '35vh' },
-                { left: '52%', top: '35vh' },
-                { left: '59%', top: '35vh' },
-                { left: '66%', top: '35vh' }
+            // First row (odd indices: 0, 2, 4, 6, 8) - KKAREEN
+            // Second row (even indices: 1, 3, 5, 7) - ARTE
+
+            const firstRowPositions = [
+                { left: '20%', top: '32vh' },  // K (index 0)
+                { left: '30%', top: '32vh' },  // K (index 2)
+                { left: '40%', top: '32vh' },  // A (index 4)
+                { left: '50%', top: '32vh' },  // R (index 6)
+                { left: '60%', top: '32vh' },  // E (index 8)
+                { left: '70%', top: '32vh' }   // E (index 10, if exists)
+            ];
+
+            const secondRowPositions = [
+                { left: '27%', top: '42vh' }, // A (index 1)
+                { left: '37%', top: '42vh' }, // R (index 3)
+                { left: '47%', top: '42vh' }, // T (index 5)
+                { left: '57%', top: '42vh' }  // E (index 7)
             ];
 
             balloons.forEach((balloon, index) => {
@@ -929,10 +1037,18 @@
                     balloon.classList.add('arranged');
                     balloon.style.animation = 'none';
 
-                    // Alternate up/down spacing
-                    const verticalOffset = (index % 2 === 0) ? -1.5 : 1.5; // vh units
-                    balloon.style.left = centerPositions[index].left;
-                    balloon.style.top = `calc(${centerPositions[index].top} + ${verticalOffset}vh)`;
+                    // Determine which row this balloon belongs to
+                    let position;
+                    if (index % 2 === 0) {
+                        // Even indices go to first row
+                        position = firstRowPositions[Math.floor(index / 2)];
+                    } else {
+                        // Odd indices go to second row
+                        position = secondRowPositions[Math.floor(index / 2)];
+                    }
+
+                    balloon.style.left = position.left;
+                    balloon.style.top = position.top;
                     balloon.style.transition = 'all 1.5s ease';
 
                     setTimeout(() => {
@@ -949,12 +1065,11 @@
                 showAllMessages();
             }, (balloons.length * 250) + 2500);
         }
-
         prayerBtn.addEventListener('click', function () {
             this.classList.remove('show');
-            messageDisplay.textContent = "🙏 Close your eyes, make a wish, and blow the candles...";
+            messageDisplay.textContent = "Close your eyes, pray and blow the candles...";
             messageDisplay.classList.add('show');
-            
+
             setTimeout(() => {
                 messageDisplay.classList.remove('show');
                 setTimeout(() => {
@@ -965,23 +1080,23 @@
 
         blowBtn.addEventListener('click', function () {
             this.classList.remove('show');
-            
+
             // Blow out candles gradually
             flame1.classList.remove('lit');
             flame1.classList.add('blow-out');
-            
+
             setTimeout(() => {
                 flame2.classList.remove('lit');
                 flame2.classList.add('blow-out');
             }, 700);
-            
+
             setTimeout(() => {
                 flame3.classList.remove('lit');
                 flame3.classList.add('blow-out');
             }, 1400);
 
             setTimeout(() => {
-                messageDisplay.textContent = "🎊 Happy Birthday! May all your wishes come true! 🎊";
+                messageDisplay.textContent = "Happy Birthday ulit ng paulit ulit!!!  -end of presentation ";
                 messageDisplay.classList.add('show');
             }, 3000);
         });
@@ -1019,7 +1134,7 @@
                     setTimeout(() => confetti.remove(), 5000);
                 }, i * 25);
             }
-            
+
             // Start side confetti celebration
             startSideConfetti();
         }
@@ -1027,7 +1142,7 @@
         function startSideConfetti() {
             const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94', '#95e1d3', '#f38181', '#ffd93d', '#6bcf7f'];
             const types = ['dot', 'line', 'long-line'];
-            
+
             function createBurst() {
                 // Left side burst
                 for (let i = 0; i < 15; i++) {
@@ -1040,11 +1155,11 @@
                         confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
                         confetti.style.animation = `shootFromLeft ${1.5 + Math.random()}s ease-out`;
                         document.body.appendChild(confetti);
-                        
+
                         setTimeout(() => confetti.remove(), 2500);
                     }, i * 50);
                 }
-                
+
                 // Right side burst
                 for (let i = 0; i < 15; i++) {
                     setTimeout(() => {
@@ -1056,12 +1171,12 @@
                         confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
                         confetti.style.animation = `shootFromRight ${1.5 + Math.random()}s ease-out`;
                         document.body.appendChild(confetti);
-                        
+
                         setTimeout(() => confetti.remove(), 2500);
                     }, i * 50);
                 }
             }
-            
+
             // Create bursts repeatedly
             createBurst();
             setInterval(createBurst, 3000);
@@ -1080,7 +1195,7 @@
 
         function showAllMessages() {
             let messageIndex = 0;
-            
+
             function displayMessage() {
                 if (messageIndex < MESSAGES.length) {
                     messageDisplay.textContent = MESSAGES[messageIndex];
@@ -1089,11 +1204,11 @@
                     setTimeout(() => {
                         messageDisplay.classList.remove('show');
                         messageIndex++;
-                        
+
                         if (messageIndex < MESSAGES.length) {
                             setTimeout(() => {
                                 displayMessage();
-                            }, 800);
+                            }, 1000);
                         } else {
                             // All messages shown, show prayer button
                             setTimeout(() => {
@@ -1103,7 +1218,7 @@
                     }, 3500);
                 }
             }
-            
+
             displayMessage();
         }
     </script>
