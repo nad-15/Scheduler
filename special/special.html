@@ -1078,34 +1078,38 @@
             }, 3000);
         });
 
-        blowBtn.addEventListener('click', function () {
-            this.classList.remove('show');
+blowBtn.addEventListener('click', function () {
+    this.classList.remove('show');
 
-            // Blow out candles gradually
-            flame1.classList.remove('lit');
-            flame1.classList.add('blow-out');
+    // Blow out candles gradually
+    flame1.classList.remove('lit');
+    flame1.classList.add('blow-out');
 
+    setTimeout(() => {
+        flame2.classList.remove('lit');
+        flame2.classList.add('blow-out');
+    }, 700);
+
+    setTimeout(() => {
+        flame3.classList.remove('lit');
+        flame3.classList.add('blow-out');
+    }, 1400);
+
+    setTimeout(() => {
+        messageDisplay.textContent = "Happy Birthday ulit ng paulit ulit!!!";
+        messageDisplay.classList.add('show');
+        
+        // Hide first message then show second
+        setTimeout(() => {
+            messageDisplay.classList.remove('show');
+            
             setTimeout(() => {
-                flame2.classList.remove('lit');
-                flame2.classList.add('blow-out');
-            }, 700);
-
-            setTimeout(() => {
-                flame3.classList.remove('lit');
-                flame3.classList.add('blow-out');
-            }, 1400);
-
-            setTimeout(() => {
-                messageDisplay.textContent = "Happy Birthday ulit ng paulit ulit!!!";
-                messageDisplay.classList.add('show');
-            }, 3000);
-
-                        setTimeout(() => {
                 messageDisplay.textContent = "...sana this digital celebration brings joy to your heart....You are very very special  -end of presentation ";
                 messageDisplay.classList.add('show');
-            }, 4500);
-        });
-
+            }, 800);
+        }, 3500);
+    }, 3000);
+});
         function playExtendedHappyBirthday() {
             const audio = new Audio('./hbd.mp3');
             audio.loop = true;
