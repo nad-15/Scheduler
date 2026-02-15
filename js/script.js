@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Optional click action
         giftBtn.addEventListener("click", () => {
             alert("🎁 Surprise!");
-            window.location.href = "./special/special.html";
+            window.location.href = "./special/26.html";
         });
     }
 
