@@ -227,6 +227,31 @@ body {
   z-index: 3;
 }
 
+.profile-picture-box {
+    border: 2px solid #333;
+    padding: 10px;
+    background-color: #000;
+    display: inline-block;
+    overflow: hidden;
+    width: 350px;                    /* Match original image width */
+    height: 350px;                   /* Match original image height */
+    position: relative;
+}
+
+.profile-picture {
+    font-family: monospace;
+    font-size: 2px;                  /* Small font to fit ASCII art */
+    line-height: 2px;
+    color: white;
+    margin: 0;
+    white-space: pre;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: center center;
+}
+
 /* Media Queries */
 @media screen and (max-height: 1000px) {
   .six .hat {

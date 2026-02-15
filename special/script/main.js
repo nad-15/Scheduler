@@ -18,6 +18,14 @@ window.addEventListener('load', () => {
     });
 });
 
+// Load ASCII art from kk.txt
+fetch('./img/kk.txt')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('asciiArt').textContent = data;
+    })
+    .catch(error => console.error('Error loading ASCII art:', error));
+
 
 // animation timeline
 const animationTimeline = () => {
@@ -187,17 +195,17 @@ const animationTimeline = () => {
         },
         0.2
     )
-    .from(
-        ".profile-picture",
-        0.5, {
-            scale: 3.5,
-            opacity: 0,
-            x: 25,
-            y: -25,
-            rotationZ: -45,
-        },
-        "-=2"
-    )
+.from(
+    ".profile-picture-box",    // Changed from .profile-picture
+    0.5, {
+        scale: 1.2,
+        opacity: 0,
+        x: 25,
+        y: -25,
+        rotationZ: 0,
+    },
+    "-=2"
+)
     .from(".hat", 0.5, {
         x: -100,
         y: 350,
