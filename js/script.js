@@ -2096,7 +2096,6 @@ const jumpingThemes = [
     { id: 'origami-flip', name: '3D Letter Flip' },
     { id: 'elastic-stretch', name: 'Jelly Stretch' },
     { id: 'domino-topple', name: 'Domino Wave' },
-    { id: 'glitch-matrix', name: 'Cyber Glitch' },
     { id: 'stadium-wave', name: 'Stadium Wave' },
     { id: 'floating-magnet', name: 'Zero Gravity' },
     { id: 'gradient-wave', name: 'Fluid Wave' },
@@ -2108,23 +2107,29 @@ const jumpingThemes = [
 
 const jumpingTextContainer = document.querySelector('.jumping-text-container');
 
-function applyJumpingTheme(themeId) {
+function applyJumpingTheme(themeId, log = true) {
     if (!jumpingTextContainer) return;
-    const theme = jumpingThemes.find(t => t.id === themeId) || jumpingThemes[0];
+    const index = jumpingThemes.findIndex(t => t.id === themeId);
+    const theme = index !== -1 ? jumpingThemes[index] : jumpingThemes[0];
+    const themeIndex = index !== -1 ? index : 0;
     jumpingTextContainer.setAttribute('data-jumping-theme', theme.id);
+    
+    if (log) {
+        console.log(`%c[Style ${themeIndex + 1}/${jumpingThemes.length}]: ${theme.name} (id: "${theme.id}")`, "color: #0078ff; font-weight: bold; font-size: 13px; padding: 2px 4px;");
+    }
 }
 
 function cycleJumpingTheme() {
     const currentId = jumpingTextContainer ? jumpingTextContainer.getAttribute('data-jumping-theme') : 'classic';
     const currentIndex = jumpingThemes.findIndex(t => t.id === currentId);
     const nextIndex = (currentIndex + 1) % jumpingThemes.length;
-    applyJumpingTheme(jumpingThemes[nextIndex].id);
+    applyJumpingTheme(jumpingThemes[nextIndex].id, true);
 }
 
 // Randomize theme on every open / refresh
 function randomizeJumpingTheme() {
     const randomIndex = Math.floor(Math.random() * jumpingThemes.length);
-    applyJumpingTheme(jumpingThemes[randomIndex].id);
+    applyJumpingTheme(jumpingThemes[randomIndex].id, true);
 }
 
 // Pick a random style on load
@@ -2136,7 +2141,7 @@ window.cycleJumpingTheme = cycleJumpingTheme;
 window.randomizeJumpingTheme = randomizeJumpingTheme;
 window.jumpingThemes = jumpingThemes;
 
-// Clicking / tapping on the text silently cycles through styles, wiggles, and clears task input
+// Clicking / tapping on the text cycles through styles, wiggles, and clears task input
 jumPingText.addEventListener("click", () => {
     cycleJumpingTheme();
 
@@ -2145,7 +2150,6 @@ jumPingText.addEventListener("click", () => {
         jumPingText.classList.remove("wiggle");
     }, 600);
 
-    console.log("jumping text clicked -> changed style");
     taskInput.value = '';
 });
 

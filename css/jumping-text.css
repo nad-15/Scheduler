@@ -253,57 +253,6 @@
 }
 
 
-/* ==========================================================================
-   THEME 5: CYBER GLITCH (RGB Split jitter & matrix glitch, plain bg)
-   ========================================================================== */
-.jumping-text-container[data-jumping-theme="glitch-matrix"] .jumping-text {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-family: monospace;
-    font-weight: 900;
-    font-size: 13px;
-}
-
-.jumping-text-container[data-jumping-theme="glitch-matrix"] .jumping-text span {
-    color: #0891b2;
-    animation: cyber-glitch 1.6s steps(2, start) infinite !important;
-    display: inline-block;
-    text-shadow: -1.5px 0 #e11d48, 1.5px 0 #0284c7;
-}
-
-.jumping-text-container[data-jumping-theme="glitch-matrix"] .jumping-text span:nth-child(odd) {
-    animation-delay: 0.15s !important;
-}
-
-.jumping-text-container[data-jumping-theme="glitch-matrix"] .jumping-text span:nth-child(even) {
-    animation-delay: 0.35s !important;
-    color: #e11d48;
-    text-shadow: 1.5px 0 #0891b2, -1.5px 0 #7c3aed;
-}
-
-@keyframes cyber-glitch {
-    0%, 100% {
-        transform: translate(0, 0) skew(0deg);
-        opacity: 1;
-    }
-    20% {
-        transform: translate(-2px, 1px) skew(-8deg);
-        opacity: 0.9;
-    }
-    40% {
-        transform: translate(2px, -2px) skew(8deg);
-        opacity: 0.8;
-    }
-    60% {
-        transform: translate(-1px, 2px) skew(-4deg);
-        opacity: 1;
-    }
-    80% {
-        transform: translate(1px, -1px) skew(4deg);
-        opacity: 0.9;
-    }
-}
 
 
 /* ==========================================================================
