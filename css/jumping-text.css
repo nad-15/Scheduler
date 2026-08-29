@@ -1,0 +1,570 @@
+/* ==========================================================================
+   SKHAYEDULER JUMPING TEXT - THEME ENGINE & STYLES (PLAIN BACKGROUNDS)
+   ========================================================================== */
+
+/* Base container adjustments - Plain & transparent by default */
+.jumping-text-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    background: transparent !important;
+}
+
+.jumping-text-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    height: auto;
+}
+
+/* Common span behavior */
+.jumping-text span {
+    display: inline-block;
+    transition: transform 0.2s ease, color 0.3s ease;
+    min-width: 7px;
+    text-align: center;
+}
+
+
+/* ==========================================================================
+   THEME 1: CLASSIC (Original look preserved 100%)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="classic"],
+.jumping-text-container.theme-classic {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: monospace;
+    width: max-content;
+    font-weight: bold;
+    height: .5px !important;
+    border: .5px solid red !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    align-self: center;
+}
+
+.jumping-text-container[data-jumping-theme="classic"] .jumping-text,
+.theme-classic .jumping-text {
+    display: block;
+    letter-spacing: normal;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.jumping-text-container[data-jumping-theme="classic"] .jumping-text span,
+.theme-classic .jumping-text span {
+    font-size: 12px;
+    font-weight: bold;
+    font-family: monospace;
+    color: inherit;
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    text-shadow: none !important;
+    animation: jump-classic 1.5s ease-in-out infinite !important;
+}
+
+.jumping-text-container[data-jumping-theme="classic"] .jumping-text span:nth-child(odd),
+.theme-classic .jumping-text span:nth-child(odd) {
+    animation-delay: 0.2s !important;
+}
+
+.jumping-text-container[data-jumping-theme="classic"] .jumping-text span:nth-child(even),
+.theme-classic .jumping-text span:nth-child(even) {
+    animation-delay: 0.4s !important;
+}
+
+@keyframes jump-classic {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+
+/* ==========================================================================
+   THEME 2: 3D LETTER FLIP (Letters flip & roll on 3D X-axis, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="origami-flip"] {
+    perspective: 600px;
+}
+
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-weight: 800;
+    font-size: 13px;
+    transform-style: preserve-3d;
+}
+
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span {
+    color: #e03157;
+    animation: flip-3d 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite !important;
+    transform-origin: center center;
+    display: inline-block;
+}
+
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(1)  { animation-delay: 0.00s !important; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(2)  { animation-delay: 0.10s !important; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(3)  { animation-delay: 0.20s !important; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(4)  { animation-delay: 0.30s !important; color: #1890ff; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(5)  { animation-delay: 0.40s !important; color: #1890ff; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(6)  { animation-delay: 0.50s !important; color: #10b981; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(7)  { animation-delay: 0.60s !important; color: #10b981; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(8)  { animation-delay: 0.70s !important; color: #f59e0b; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(9)  { animation-delay: 0.80s !important; color: #f59e0b; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(10) { animation-delay: 0.90s !important; color: #ea580c; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(11) { animation-delay: 1.00s !important; color: #ea580c; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(12) { animation-delay: 1.10s !important; color: #8b5cf6; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(13) { animation-delay: 1.20s !important; color: #8b5cf6; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(14) { animation-delay: 1.30s !important; color: #e03157; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(15) { animation-delay: 1.40s !important; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(16) { animation-delay: 1.50s !important; }
+.jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text span:nth-child(17) { animation-delay: 1.60s !important; }
+
+@keyframes flip-3d {
+    0%, 100% {
+        transform: rotateX(0deg);
+        filter: brightness(1);
+    }
+    50% {
+        transform: rotateX(360deg);
+        filter: brightness(1.2);
+    }
+}
+
+
+/* ==========================================================================
+   THEME 3: JELLY STRETCH (Elastic squish & stretch rubber physics, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span {
+    color: #ff4d4f;
+    animation: jelly-stretch 1.5s ease-in-out infinite !important;
+    transform-origin: bottom center;
+    display: inline-block;
+}
+
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(1)  { animation-delay: 0.00s !important; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(2)  { animation-delay: 0.08s !important; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(3)  { animation-delay: 0.16s !important; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(4)  { animation-delay: 0.24s !important; color: #08979c; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(5)  { animation-delay: 0.32s !important; color: #08979c; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(6)  { animation-delay: 0.40s !important; color: #08979c; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(7)  { animation-delay: 0.48s !important; color: #d4380d; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(8)  { animation-delay: 0.56s !important; color: #d4380d; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(9)  { animation-delay: 0.64s !important; color: #fa8c16; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(10) { animation-delay: 0.72s !important; color: #fa8c16; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(11) { animation-delay: 0.80s !important; color: #722ed1; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(12) { animation-delay: 0.88s !important; color: #722ed1; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(13) { animation-delay: 0.96s !important; color: #389e0d; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(14) { animation-delay: 1.04s !important; color: #389e0d; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(15) { animation-delay: 1.12s !important; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(16) { animation-delay: 1.20s !important; }
+.jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text span:nth-child(17) { animation-delay: 1.28s !important; }
+
+@keyframes jelly-stretch {
+    0%, 100% {
+        transform: scale(1, 1) translateY(0);
+    }
+    30% {
+        transform: scale(1.3, 0.7) translateY(0);
+    }
+    45% {
+        transform: scale(0.75, 1.4) translateY(-8px);
+    }
+    65% {
+        transform: scale(1.12, 0.9) translateY(0);
+    }
+    80% {
+        transform: scale(0.95, 1.05) translateY(-2px);
+    }
+}
+
+
+/* ==========================================================================
+   THEME 4: DOMINO TOPPLE (Letters tilt & topple like dominoes, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span {
+    color: #24292e;
+    animation: domino-tilt 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
+    transform-origin: bottom center;
+    display: inline-block;
+}
+
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(1)  { animation-delay: 0.00s !important; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(2)  { animation-delay: 0.09s !important; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(3)  { animation-delay: 0.18s !important; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(4)  { animation-delay: 0.27s !important; color: #0366d6; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(5)  { animation-delay: 0.36s !important; color: #0366d6; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(6)  { animation-delay: 0.45s !important; color: #d97706; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(7)  { animation-delay: 0.54s !important; color: #d97706; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(8)  { animation-delay: 0.63s !important; color: #6f42c1; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(9)  { animation-delay: 0.72s !important; color: #6f42c1; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(10) { animation-delay: 0.81s !important; color: #22863a; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(11) { animation-delay: 0.90s !important; color: #22863a; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(12) { animation-delay: 0.99s !important; color: #d73a49; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(13) { animation-delay: 1.08s !important; color: #d73a49; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(14) { animation-delay: 1.17s !important; color: #d73a49; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(15) { animation-delay: 1.26s !important; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(16) { animation-delay: 1.35s !important; }
+.jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text span:nth-child(17) { animation-delay: 1.44s !important; }
+
+@keyframes domino-tilt {
+    0%, 100% {
+        transform: rotate(0deg) translateY(0);
+    }
+    35% {
+        transform: rotate(26deg) translateY(-4px);
+    }
+    60% {
+        transform: rotate(-8deg) translateY(-1px);
+    }
+}
+
+
+/* ==========================================================================
+   THEME 5: CYBER GLITCH (RGB Split jitter & matrix glitch, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="glitch-matrix"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.jumping-text-container[data-jumping-theme="glitch-matrix"] .jumping-text span {
+    color: #0891b2;
+    animation: cyber-glitch 1.6s steps(2, start) infinite !important;
+    display: inline-block;
+    text-shadow: -1.5px 0 #e11d48, 1.5px 0 #0284c7;
+}
+
+.jumping-text-container[data-jumping-theme="glitch-matrix"] .jumping-text span:nth-child(odd) {
+    animation-delay: 0.15s !important;
+}
+
+.jumping-text-container[data-jumping-theme="glitch-matrix"] .jumping-text span:nth-child(even) {
+    animation-delay: 0.35s !important;
+    color: #e11d48;
+    text-shadow: 1.5px 0 #0891b2, -1.5px 0 #7c3aed;
+}
+
+@keyframes cyber-glitch {
+    0%, 100% {
+        transform: translate(0, 0) skew(0deg);
+        opacity: 1;
+    }
+    20% {
+        transform: translate(-2px, 1px) skew(-8deg);
+        opacity: 0.9;
+    }
+    40% {
+        transform: translate(2px, -2px) skew(8deg);
+        opacity: 0.8;
+    }
+    60% {
+        transform: translate(-1px, 2px) skew(-4deg);
+        opacity: 1;
+    }
+    80% {
+        transform: translate(1px, -1px) skew(4deg);
+        opacity: 0.9;
+    }
+}
+
+
+/* ==========================================================================
+   THEME 6: STADIUM WAVE (High energy Mexican stadium wave, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span {
+    color: #ea580c;
+    animation: stadium-jump 1.6s ease-in-out infinite !important;
+    display: inline-block;
+}
+
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(1)  { animation-delay: 0.00s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(2)  { animation-delay: 0.08s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(3)  { animation-delay: 0.16s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(4)  { animation-delay: 0.24s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(5)  { animation-delay: 0.32s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(6)  { animation-delay: 0.40s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(7)  { animation-delay: 0.48s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(8)  { animation-delay: 0.56s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(9)  { animation-delay: 0.64s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(10) { animation-delay: 0.72s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(11) { animation-delay: 0.80s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(12) { animation-delay: 0.88s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(13) { animation-delay: 0.96s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(14) { animation-delay: 1.04s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(15) { animation-delay: 1.12s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(16) { animation-delay: 1.20s !important; }
+.jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text span:nth-child(17) { animation-delay: 1.28s !important; }
+
+@keyframes stadium-jump {
+    0%, 100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        color: #ea580c;
+    }
+    40% {
+        transform: translateY(-10px) scale(1.35) rotate(-5deg);
+        color: #e11d48;
+        text-shadow: 0 4px 10px rgba(225, 29, 72, 0.35);
+    }
+    65% {
+        transform: translateY(-2px) scale(1.1) rotate(2deg);
+    }
+}
+
+
+/* ==========================================================================
+   THEME 7: ZERO GRAVITY (Cosmic levitation, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="floating-magnet"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.jumping-text-container[data-jumping-theme="floating-magnet"] .jumping-text span {
+    color: #6d28d9;
+    animation: zero-gravity 2.4s ease-in-out infinite !important;
+    display: inline-block;
+    text-shadow: 0 0 6px rgba(109, 40, 217, 0.4);
+}
+
+.jumping-text-container[data-jumping-theme="floating-magnet"] .jumping-text span:nth-child(3n+1) {
+    animation-delay: 0.0s !important;
+    color: #db2777;
+}
+
+.jumping-text-container[data-jumping-theme="floating-magnet"] .jumping-text span:nth-child(3n+2) {
+    animation-delay: 0.8s !important;
+    color: #0284c7;
+}
+
+.jumping-text-container[data-jumping-theme="floating-magnet"] .jumping-text span:nth-child(3n) {
+    animation-delay: 1.6s !important;
+    color: #7c3aed;
+}
+
+@keyframes zero-gravity {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg) scale(1);
+    }
+    33% {
+        transform: translateY(-6px) rotate(-4deg) scale(1.1);
+    }
+    66% {
+        transform: translateY(4px) rotate(3deg) scale(0.95);
+    }
+}
+
+
+/* ==========================================================================
+   THEME 8: GRADIENT WAVE (Fluid rainbow sine wave, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace, sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span {
+    background: linear-gradient(90deg, #ff416c, #ff4b2b, #f7b733, #4facfe, #00f2fe, #7f00ff, #ff416c);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: wave-bounce 1.6s ease-in-out infinite, gradient-shift 4s linear infinite !important;
+    display: inline-block;
+}
+
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(1)  { animation-delay: 0.00s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(2)  { animation-delay: 0.08s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(3)  { animation-delay: 0.16s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(4)  { animation-delay: 0.24s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(5)  { animation-delay: 0.32s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(6)  { animation-delay: 0.40s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(7)  { animation-delay: 0.48s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(8)  { animation-delay: 0.56s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(9)  { animation-delay: 0.64s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(10) { animation-delay: 0.72s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(11) { animation-delay: 0.80s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(12) { animation-delay: 0.88s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(13) { animation-delay: 0.96s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(14) { animation-delay: 1.04s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(15) { animation-delay: 1.12s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(16) { animation-delay: 1.20s, 0.0s !important; }
+.jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text span:nth-child(17) { animation-delay: 1.28s, 0.0s !important; }
+
+@keyframes wave-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.08); }
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+
+/* ==========================================================================
+   THEME 9: NEON GLOW (Electric glow on plain transparent bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="neon-glow"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.jumping-text-container[data-jumping-theme="neon-glow"] .jumping-text span {
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    color: #0284c7;
+    text-shadow: 0 0 4px rgba(2, 132, 199, 0.5), 0 0 10px rgba(2, 132, 199, 0.3);
+    animation: neon-jump 1.8s ease-in-out infinite !important;
+}
+
+.jumping-text-container[data-jumping-theme="neon-glow"] .jumping-text span:nth-child(odd) {
+    animation-delay: 0.15s !important;
+    color: #0284c7;
+}
+
+.jumping-text-container[data-jumping-theme="neon-glow"] .jumping-text span:nth-child(even) {
+    animation-delay: 0.35s !important;
+    color: #db2777;
+    text-shadow: 0 0 4px rgba(219, 39, 119, 0.5), 0 0 10px rgba(219, 39, 119, 0.3);
+}
+
+@keyframes neon-jump {
+    0%, 100% { transform: translateY(0); filter: brightness(1); }
+    50% { transform: translateY(-5px); filter: brightness(1.2); }
+}
+
+
+/* ==========================================================================
+   THEME 10: MINIMAL PILL (Clean modern float, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="minimal-pill"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.jumping-text-container[data-jumping-theme="minimal-pill"] .jumping-text span {
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    text-shadow: none !important;
+    color: #374151;
+    animation: minimal-float 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+}
+
+.jumping-text-container[data-jumping-theme="minimal-pill"] .jumping-text span:nth-child(3n+1) { animation-delay: 0.1s !important; }
+.jumping-text-container[data-jumping-theme="minimal-pill"] .jumping-text span:nth-child(3n+2) { animation-delay: 0.3s !important; }
+.jumping-text-container[data-jumping-theme="minimal-pill"] .jumping-text span:nth-child(3n)   { animation-delay: 0.5s !important; }
+
+@keyframes minimal-float {
+    0%, 100% { transform: translateY(0); opacity: 0.85; }
+    50% { transform: translateY(-4px); opacity: 1; color: #0078FF; }
+}
+
+
+/* ==========================================================================
+   THEME 11: RETRO TERMINAL (Green phosphor jumped text, plain bg)
+   ========================================================================== */
+.jumping-text-container[data-jumping-theme="retro-terminal"] .jumping-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.jumping-text-container[data-jumping-theme="retro-terminal"] .jumping-text span {
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    color: #16a34a;
+    text-shadow: 0 0 4px rgba(22, 163, 74, 0.6);
+    animation: terminal-jump 1.6s steps(4, end) infinite !important;
+}
+
+.jumping-text-container[data-jumping-theme="retro-terminal"] .jumping-text span:nth-child(odd)  { animation-delay: 0.2s !important; }
+.jumping-text-container[data-jumping-theme="retro-terminal"] .jumping-text span:nth-child(even) { animation-delay: 0.4s !important; }
+
+@keyframes terminal-jump {
+    0%, 100% { transform: translateY(0); opacity: 0.8; }
+    50% { transform: translateY(-6px); opacity: 1; }
+}
+
+
+/* ==========================================================================
+   SHARED CLICK ANIMATION (Wiggle / Shake)
+   ========================================================================== */
+.jumping-text.wiggle span {
+    display: inline-block;
+    animation: wiggle-effect 0.6s ease-in-out !important;
+}
+
+@keyframes wiggle-effect {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-8px) rotate(-3deg); }
+    40% { transform: translateX(8px) rotate(3deg); }
+    60% { transform: translateX(-4px) rotate(-1deg); }
+    80% { transform: translateX(4px) rotate(1deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}

@@ -2091,18 +2091,62 @@ deselectTemplateBtn.addEventListener('touchend', () => {
     handleTouchEnd(clearSelection);
 });
 
+// --- Skhayeduler Jumping Text Theme Controller ---
+const jumpingThemes = [
+    { id: 'origami-flip', name: '3D Letter Flip' },
+    { id: 'elastic-stretch', name: 'Jelly Stretch' },
+    { id: 'domino-topple', name: 'Domino Wave' },
+    { id: 'glitch-matrix', name: 'Cyber Glitch' },
+    { id: 'stadium-wave', name: 'Stadium Wave' },
+    { id: 'floating-magnet', name: 'Zero Gravity' },
+    { id: 'gradient-wave', name: 'Fluid Wave' },
+    { id: 'neon-glow', name: 'Neon Glow' },
+    { id: 'minimal-pill', name: 'Minimal Pill' },
+    { id: 'retro-terminal', name: 'Retro Terminal' },
+    { id: 'classic', name: 'Classic Original' }
+];
+
+const jumpingTextContainer = document.querySelector('.jumping-text-container');
+
+function applyJumpingTheme(themeId) {
+    if (!jumpingTextContainer) return;
+    const theme = jumpingThemes.find(t => t.id === themeId) || jumpingThemes[0];
+    jumpingTextContainer.setAttribute('data-jumping-theme', theme.id);
+}
+
+function cycleJumpingTheme() {
+    const currentId = jumpingTextContainer ? jumpingTextContainer.getAttribute('data-jumping-theme') : 'classic';
+    const currentIndex = jumpingThemes.findIndex(t => t.id === currentId);
+    const nextIndex = (currentIndex + 1) % jumpingThemes.length;
+    applyJumpingTheme(jumpingThemes[nextIndex].id);
+}
+
+// Randomize theme on every open / refresh
+function randomizeJumpingTheme() {
+    const randomIndex = Math.floor(Math.random() * jumpingThemes.length);
+    applyJumpingTheme(jumpingThemes[randomIndex].id);
+}
+
+// Pick a random style on load
+randomizeJumpingTheme();
+
+// Expose globally to window for dev console access
+window.applyJumpingTheme = applyJumpingTheme;
+window.cycleJumpingTheme = cycleJumpingTheme;
+window.randomizeJumpingTheme = randomizeJumpingTheme;
+window.jumpingThemes = jumpingThemes;
+
+// Clicking / tapping on the text silently cycles through styles, wiggles, and clears task input
 jumPingText.addEventListener("click", () => {
+    cycleJumpingTheme();
 
     jumPingText.classList.add("wiggle");
-
-    // Remove the class after animation ends so it can be triggered again
     setTimeout(() => {
         jumPingText.classList.remove("wiggle");
     }, 600);
-    console.log("jumping text is clicked");
+
+    console.log("jumping text clicked -> changed style");
     taskInput.value = '';
-
-
 });
 
 
