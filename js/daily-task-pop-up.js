@@ -184,21 +184,17 @@ function showDayTasks(d) {
   const storedTasks = JSON.parse(localStorage.getItem("tasks")) || {};
   const dayTasks = storedTasks[date];
 
-  // Split and pad manually
-  const [year, month, day] = date.split('-');
-  const paddedMonth = String(Number(month) + 1).padStart(2, '0');
-  const paddedDay = String(day).padStart(2, '0');
-  const fixedDate = `${year}-${paddedMonth}-${paddedDay}`;
-
-  const dateObj = new Date(fixedDate);
+  const [year, month, day] = date.split('-').map(Number);
+  const dateObj = new Date(year, month, day);
 
   currentMonthValue = dateObj.getMonth();
   currentYearValue = dateObj.getFullYear();
 
   const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
   const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-  const dayDiff = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24));
+  const dayDiff = Math.round((target - todayAtMidnight) / (1000 * 60 * 60 * 24));
 
   let label;
   let bottomLine;
