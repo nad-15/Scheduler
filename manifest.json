@@ -1,7 +1,7 @@
 {
   "id": "./index.html",
-  "name": "Scheduler",
-  "short_name": "Scheduler",
+  "name": "Skhayeduler",
+  "short_name": "Skhayeduler",
   "description": "Mobile Scheduler and Daily Task Planner Web App",
   "start_url": "./index.html",
   "scope": "./",

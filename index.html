@@ -14,7 +14,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Scheduler">
+    <meta name="apple-mobile-web-app-title" content="Skhayeduler">
 
     <!-- Icons & Favicons -->
     <link rel="icon" type="image/png" sizes="96x96" href="./images/favicon-96x96.png">
@@ -1160,7 +1160,7 @@
         pwaInstallItem.addEventListener('click', async () => {
           const isInstalled = pwaInstallItem.getAttribute('data-installed') === 'true';
           if (isInstalled) {
-            alert("Scheduler is already installed on this device!");
+            alert("Skhayeduler is already installed on this device!");
             if (typeof closeMenu === 'function') closeMenu();
             return;
           }
@@ -1177,7 +1177,7 @@
           } else if (isIos) {
             alert("To install on iOS:\n\n1. Tap the Share button (⬆) at the bottom of Safari.\n2. Scroll down and tap 'Add to Home Screen'.");
           } else {
-            alert("Ready to install!\n\nIf the 1-click prompt does not appear, you can install via the install icon in your browser's address bar or menu (⋮ -> Install Scheduler).");
+            alert("Ready to install!\n\nIf the 1-click prompt does not appear, you can install via the install icon in your browser's address bar or menu (⋮ -> Install Skhayeduler).");
           }
           if (typeof closeMenu === 'function') {
             closeMenu();
