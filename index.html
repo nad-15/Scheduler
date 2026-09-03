@@ -6,6 +6,23 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=3, user-scalable=yes">
     <title>Scheduler</title>
+    <meta name="description" content="Mobile Scheduler and Daily Task Planner Web App">
+
+    <!-- PWA & Mobile Configuration -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0078FF">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Scheduler">
+
+    <!-- Icons & Favicons -->
+    <link rel="icon" type="image/png" sizes="96x96" href="./images/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./images/web-app-manifest-192x192.png">
+    <link rel="icon" type="image/svg+xml" href="./images/favicon.svg">
+    <link rel="shortcut icon" href="./favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png">
+
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="./css/jumping-text.css">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
@@ -868,16 +885,16 @@
 
         <!-- Main Menu -->
         <ul class="menu-list">
-            <!-- To-Do (leaf) -->
-            <li data-section="todo" id="to-do" class="menu-item">
+            <!-- Install App -->
+            <li id="pwa-install-menu-item" class="menu-item">
                 <div class="menu-label">
-                    <span class="material-symbols-outlined">checklist</span>
-                    <span class="menu-text">To-Do</span>
+                    <span class="material-symbols-outlined" id="pwa-install-icon">install_mobile</span>
+                    <span class="menu-text" id="pwa-install-text">Install App</span>
                 </div>
             </li>
 
             <!-- Divider -->
-            <li class="divider" role="separator"></li>
+            <li id="pwa-install-divider" class="divider" role="separator"></li>
 
             <!-- Settings (submenu) -->
             <li data-section="settings" class="menu-item has-submenu">
@@ -1016,15 +1033,20 @@
 
             <li class="divider" role="separator"></li>
 
+            <!-- To-Do (leaf) -->
+            <li data-section="todo" id="to-do" class="menu-item">
+                <div class="menu-label">
+                    <span class="material-symbols-outlined">checklist</span>
+                    <span class="menu-text">To-Do</span>
+                </div>
+            </li>
+
             <!-- External Link -->
             <li class="menu-item">
-                <div class="menu-label">
+                <a href="https://nad-15.github.io/BudgetCalculator/" target="_blank" class="menu-label" style="text-decoration: none; color: inherit;">
                     <span class="material-symbols-outlined">calculate</span>
-                    <a class="menu-item" href="https://nad-15.github.io/BudgetCalculator/" target="_blank"
-                        class="menu-text">
-                        Budget KalKulator
-                    </a>
-                </div>
+                    <span class="menu-text">Budget KalKulator</span>
+                </a>
             </li>
         </ul>
 
@@ -1049,6 +1071,141 @@
     <script src="./js/daily-task-pop-up.js"></script>
     <script src="./js/drag-and-drop-task.js"></script>
 
+    <!-- PWA Service Worker & In-App Install Handler -->
+    <script>
+      let deferredPrompt = null;
+      const pwaInstallItem = document.getElementById('pwa-install-menu-item');
+      const pwaInstallDivider = document.getElementById('pwa-install-divider');
+      const pwaInstallIcon = document.getElementById('pwa-install-icon');
+      const pwaInstallText = document.getElementById('pwa-install-text');
+
+      // Update UI state between "Install App" and "Installed"
+      function setPwaInstalledState(isInstalled) {
+        if (!pwaInstallItem) return;
+        if (isInstalled) {
+          pwaInstallItem.setAttribute('data-installed', 'true');
+          if (pwaInstallIcon) {
+            pwaInstallIcon.textContent = 'check_circle';
+            pwaInstallIcon.style.color = '#4caf50';
+          }
+          if (pwaInstallText) {
+            pwaInstallText.textContent = 'Installed';
+          }
+        } else {
+          pwaInstallItem.removeAttribute('data-installed');
+          if (pwaInstallIcon) {
+            pwaInstallIcon.textContent = 'install_mobile';
+            pwaInstallIcon.style.color = '';
+          }
+          if (pwaInstallText) {
+            pwaInstallText.textContent = 'Install App';
+          }
+        }
+      }
+
+      // Check whether app is currently installed
+      async function checkIsAppInstalled() {
+        // 1. Standalone display mode (running inside installed app window)
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                             window.matchMedia('(display-mode: fullscreen)').matches ||
+                             window.matchMedia('(display-mode: minimal-ui)').matches ||
+                             window.navigator.standalone === true;
+        if (isStandalone) {
+          localStorage.setItem('pwa-installed', 'true');
+          return true;
+        }
+
+        // 2. Check if previously flagged as installed in this browser
+        if (localStorage.getItem('pwa-installed') === 'true') {
+          return true;
+        }
+
+        // 3. Query browser installed apps API (Chrome/Edge desktop & mobile)
+        if ('getInstalledRelatedApps' in navigator) {
+          try {
+            const relatedApps = await navigator.getInstalledRelatedApps();
+            if (relatedApps && relatedApps.length > 0) {
+              localStorage.setItem('pwa-installed', 'true');
+              return true;
+            }
+          } catch (e) {
+            console.debug('[PWA] getInstalledRelatedApps:', e);
+          }
+        }
+
+        return false;
+      }
+
+      // Initial installation check
+      checkIsAppInstalled().then((installed) => {
+        setPwaInstalledState(installed);
+      });
+
+      // 1. Prevent default browser Add-to-Home-Screen prompt / mini-infobar
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent default browser banner
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // If beforeinstallprompt fires, the app is not currently installed
+        localStorage.removeItem('pwa-installed');
+        setPwaInstalledState(false);
+      });
+
+      // 2. iOS Safari detection (where beforeinstallprompt is not supported)
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      // 3. User clicks Install App in the settings drawer
+      if (pwaInstallItem) {
+        pwaInstallItem.addEventListener('click', async () => {
+          const isInstalled = pwaInstallItem.getAttribute('data-installed') === 'true';
+          if (isInstalled) {
+            alert("Scheduler is already installed on this device!");
+            if (typeof closeMenu === 'function') closeMenu();
+            return;
+          }
+
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const choiceResult = await deferredPrompt.userChoice;
+            console.log('[PWA] User choice:', choiceResult.outcome);
+            if (choiceResult.outcome === 'accepted') {
+              localStorage.setItem('pwa-installed', 'true');
+              setPwaInstalledState(true);
+            }
+            deferredPrompt = null;
+          } else if (isIos) {
+            alert("To install on iOS:\n\n1. Tap the Share button (⬆) at the bottom of Safari.\n2. Scroll down and tap 'Add to Home Screen'.");
+          } else {
+            alert("Ready to install!\n\nIf the 1-click prompt does not appear, you can install via the install icon in your browser's address bar or menu (⋮ -> Install Scheduler).");
+          }
+          if (typeof closeMenu === 'function') {
+            closeMenu();
+          }
+        });
+      }
+
+      // 4. Update state when installed
+      window.addEventListener('appinstalled', () => {
+        console.log('[PWA] App successfully installed');
+        deferredPrompt = null;
+        localStorage.setItem('pwa-installed', 'true');
+        setPwaInstalledState(true);
+      });
+
+      // 5. Register Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then((registration) => {
+              console.log('PWA Service Worker active with scope:', registration.scope);
+            })
+            .catch((error) => {
+              console.warn('PWA Service Worker registration failed:', error);
+            });
+        });
+      }
+    </script>
 </body>
 
 </html>
