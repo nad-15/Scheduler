@@ -220,11 +220,21 @@
 
 
                         <div class="title-submit-container">
-                            <!-- <div class="template-task-btn1 "> -->
-                            <button class="buttons disabled-btn" id="addTask">
-                                <span class="material-icons add-btn">add</span></button>
-                            <!-- <span class="material-symbols-outlined arrow-left_selected arrows">chevron_left</span>
-                                <span class="material-symbols-outlined arrow_right_selected arrows">chevron_right</span> -->
+                            <div class="add-task-wrapper">
+                                <button class="buttons disabled-btn" id="addTask" title="Click to add at bottom, hold for options">
+                                    <span class="material-icons add-btn">add</span>
+                                </button>
+                                <div id="add-task-dropdown" class="add-task-dropdown hidden">
+                                    <button type="button" class="dropdown-option" id="addAboveOption">
+                                        <span class="material-symbols-outlined dropdown-option-icon">arrow_upward</span>
+                                        <span>Add Above</span>
+                                    </button>
+                                    <button type="button" class="dropdown-option" id="addBelowOption">
+                                        <span class="material-symbols-outlined dropdown-option-icon">arrow_downward</span>
+                                        <span>Add Below</span>
+                                    </button>
+                                </div>
+                            </div>
 
                             <!-- </div> -->
                             <div class="flower-container"><i class="material-icons flower">spa</i></div>

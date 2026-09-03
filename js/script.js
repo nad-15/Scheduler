@@ -20,6 +20,9 @@ const taskToolbar = document.querySelector(`.task-toolbar-container`);
 const arrowLeftSelectedTask = document.querySelector(`.arrow-left_selected`);
 const arrowRightSelectedTask = document.querySelector(`.arrow_right_selected`);
 const addTaskBtn = document.getElementById(`addTask`);
+const addTaskDropdown = document.getElementById('add-task-dropdown');
+const addAboveOption = document.getElementById('addAboveOption');
+const addBelowOption = document.getElementById('addBelowOption');
 const allColorsIcon = document.getElementById("recentcolors-icon");
 const todoButton = document.querySelector(".todo-button");
 
@@ -396,9 +399,36 @@ showHorViewBtn.addEventListener('click', () => {
 });
 
 
-addTaskBtn.addEventListener('click', () => {
-    console.log('add task btn is clicked');
+// === ADD TASK CONTROLLER (CLICK FOR DEFAULT BOTTOM, LONG-PRESS FOR ABOVE / BELOW) ===
+function closeAddTaskDropdown() {
+    if (addTaskDropdown) {
+        addTaskDropdown.classList.add('hidden');
+    }
+}
 
+function openAddTaskDropdown() {
+    if (addTaskDropdown && selectedDivs.length > 0 && !addTaskBtn.classList.contains('disabled-btn')) {
+        addTaskDropdown.classList.remove('hidden');
+    }
+}
+
+// Close dropdown when clicking outside or pressing Escape
+document.addEventListener('click', (e) => {
+    if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
+        if (!addTaskDropdown.contains(e.target) && !addTaskBtn.contains(e.target)) {
+            closeAddTaskDropdown();
+        }
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAddTaskDropdown();
+    }
+});
+
+// Default behavior: Appends task to the bottom of the selected container
+function executeDefaultAddTask() {
     if (selectedDivs.length === 0) return;
 
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
@@ -412,12 +442,14 @@ addTaskBtn.addEventListener('click', () => {
             ? selected.parentElement
             : selected;
 
-        uniqueParents.add(parent);
+        if (parent) uniqueParents.add(parent);
     });
 
     // 🔹 Clear selectedDivs
     selectedDivs.forEach(div => div.classList.remove('selected'));
     selectedDivs.length = 0;
+
+    const newlyCreated = [];
 
     uniqueParents.forEach(parent => {
         let taskType, taskKey;
@@ -436,6 +468,7 @@ addTaskBtn.addEventListener('click', () => {
         }
 
         const dayContainer = parent.closest('.day-container');
+        if (!dayContainer) return;
         const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
 
         if (!storedData[date]) storedData[date] = {};
@@ -450,52 +483,294 @@ addTaskBtn.addEventListener('click', () => {
 
         // 🔍 Find matching "empty" task object in storage
         const emptyIndex = storedData[date][taskKey].findIndex(t =>
-            t.task.trim() === '' && (!t.color || t.color.trim() === '')
+            (t.task || '').trim() === '' && (!t.color || (t.color || '').trim() === '')
         );
+
+        const currentActiveColor = chosenColor || '#ccc';
 
         if (taskDivToUse) {
             taskDivToUse.textContent = "";
-            taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
+            taskDivToUse.style.borderLeft = `4px solid ${currentActiveColor}`;
+            taskDivToUse.style.backgroundColor = fadeColor(currentActiveColor);
 
             if (emptyIndex !== -1) {
                 storedData[date][taskKey][emptyIndex] = {
-                    task: taskDivToUse.textContent,
-                    color: taskDivToUse.style.backgroundColor
+                    task: '',
+                    color: currentActiveColor
                 };
             } else {
                 storedData[date][taskKey].push({
-                    task: taskDivToUse.textContent,
-                    color: taskDivToUse.style.backgroundColor
+                    task: '',
+                    color: currentActiveColor
                 });
             }
+        } else {
+            taskDivToUse = document.createElement('div');
+            taskDivToUse.textContent = "";
+            taskDivToUse.classList.add(`${taskType}Sub`);
+            taskDivToUse.style.borderLeft = `4px solid ${currentActiveColor}`;
+            taskDivToUse.style.backgroundColor = fadeColor(currentActiveColor);
+            parent.appendChild(taskDivToUse);
 
-            taskDivToUse.style.borderLeft = `4px solid ${chosenColor}`;
-            taskDivToUse.style.backgroundColor = fadeColor(chosenColor);
+            storedData[date][taskKey].push({
+                task: '',
+                color: currentActiveColor
+            });
         }
-        taskDivToUse = document.createElement('div');
-        // taskDivToUse.textContent = taskInput.value;
-        taskDivToUse.textContent = "";
-        taskDivToUse.classList.add(`${taskType}Sub`);
-        taskDivToUse.style.backgroundColor = chosenColor || '#ccc';
-        parent.appendChild(taskDivToUse);
 
-        storedData[date][taskKey].push({
-            // task: taskInput.value,
-            task: taskDivToUse.textContent,
-            color: taskDivToUse.style.backgroundColor
-        });
-
-
-        taskDivToUse.style.borderLeft = `4px solid ${chosenColor}`;
-        taskDivToUse.style.backgroundColor = fadeColor(chosenColor);
-
-        // 🔹 Select only the newly added/updated task
         taskDivToUse.classList.add('selected');
-        selectedDivs.push(taskDivToUse);
+        newlyCreated.push(taskDivToUse);
     });
 
+    selectedDivs = newlyCreated;
     localStorage.setItem("tasks", JSON.stringify(storedData));
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+}
+
+// Dynamic insertion: Inserts "above" (topmost selected) or "below" (lowest selected)
+function insertTask(direction) {
+    if (selectedDivs.length === 0) return;
+    closeAddTaskDropdown();
+
+    const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
+    const selectedByParent = new Map();
+
+    // Group selected elements by parent container
+    selectedDivs.forEach(selected => {
+        const isSub = selected.classList.contains('morningTaskSub') ||
+                      selected.classList.contains('afternoonTaskSub') ||
+                      selected.classList.contains('eveningTaskSub');
+        const parent = isSub ? selected.parentElement : selected;
+        if (!parent) return;
+
+        if (!selectedByParent.has(parent)) {
+            selectedByParent.set(parent, []);
+        }
+        if (isSub) {
+            selectedByParent.get(parent).push(selected);
+        }
+    });
+
+    // Clear current selection highlight
+    selectedDivs.forEach(div => div.classList.remove('selected'));
+    selectedDivs.length = 0;
+
+    const newlyCreatedDivs = [];
+    const currentActiveColor = chosenColor || '#ccc';
+
+    selectedByParent.forEach((subTasks, parent) => {
+        let taskType, taskKey;
+        if (parent.classList.contains('morningTask')) {
+            taskType = 'morningTask';
+            taskKey = 'morning';
+        } else if (parent.classList.contains('afternoonTask')) {
+            taskType = 'afternoonTask';
+            taskKey = 'afternoon';
+        } else if (parent.classList.contains('eveningTask')) {
+            taskType = 'eveningTask';
+            taskKey = 'evening';
+        } else {
+            return;
+        }
+
+        const dayContainer = parent.closest('.day-container');
+        if (!dayContainer) return;
+        const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
+
+        if (!storedData[date]) storedData[date] = {};
+        if (!Array.isArray(storedData[date][taskKey])) storedData[date][taskKey] = [];
+
+        const children = Array.from(parent.children);
+
+        // Find selected indices in parent.children
+        const indices = subTasks
+            .map(task => children.indexOf(task))
+            .filter(idx => idx !== -1)
+            .sort((a, b) => a - b);
+
+        let targetDiv = null;
+        let insertIndex = 0;
+
+        if (indices.length === 0) {
+            // Whole parent was selected
+            if (direction === 'above') {
+                targetDiv = children[0] || null;
+                insertIndex = 0;
+            } else {
+                targetDiv = children[children.length - 1] || null;
+                insertIndex = children.length;
+            }
+        } else {
+            if (direction === 'above') {
+                // Topmost selected item (lowest index)
+                const topmostIndex = indices[0];
+                targetDiv = children[topmostIndex];
+                insertIndex = topmostIndex;
+            } else {
+                // Lowest / bottommost selected item (highest index)
+                const bottommostIndex = indices[indices.length - 1];
+                targetDiv = children[bottommostIndex];
+                insertIndex = bottommostIndex + 1;
+            }
+        }
+
+        // Check if targetDiv is the only child and is a blank placeholder (no text & no color)
+        const isTargetBlank = targetDiv &&
+            targetDiv.textContent.trim() === '' &&
+            (!targetDiv.style.backgroundColor || targetDiv.style.backgroundColor === 'transparent');
+
+        if (children.length === 1 && isTargetBlank) {
+            targetDiv.textContent = "";
+            targetDiv.style.borderLeft = `4px solid ${currentActiveColor}`;
+            targetDiv.style.backgroundColor = fadeColor(currentActiveColor);
+
+            const taskArray = storedData[date][taskKey];
+            const emptyIndex = taskArray.findIndex(t =>
+                (t.task || '').trim() === '' && (!t.color || (t.color || '').trim() === '')
+            );
+
+            if (emptyIndex !== -1) {
+                taskArray[emptyIndex] = { task: '', color: currentActiveColor };
+            } else if (taskArray.length === 0) {
+                taskArray.push({ task: '', color: currentActiveColor });
+            } else {
+                taskArray[0] = { task: '', color: currentActiveColor };
+            }
+
+            targetDiv.classList.add('selected');
+            newlyCreatedDivs.push(targetDiv);
+            return;
+        }
+
+        // Create new task DOM element
+        const newTaskDiv = document.createElement('div');
+        newTaskDiv.textContent = "";
+        newTaskDiv.classList.add(`${taskType}Sub`);
+        newTaskDiv.style.borderLeft = `4px solid ${currentActiveColor}`;
+        newTaskDiv.style.backgroundColor = fadeColor(currentActiveColor);
+
+        // Insert into DOM in the correct position
+        if (targetDiv) {
+            if (direction === 'above') {
+                targetDiv.before(newTaskDiv);
+            } else {
+                targetDiv.after(newTaskDiv);
+            }
+        } else {
+            parent.appendChild(newTaskDiv);
+        }
+
+        // Synchronize with localStorage array at exact matching index
+        const taskArray = storedData[date][taskKey];
+        const newTaskData = {
+            task: '',
+            color: currentActiveColor
+        };
+
+        if (insertIndex >= taskArray.length) {
+            taskArray.push(newTaskData);
+        } else {
+            taskArray.splice(insertIndex, 0, newTaskData);
+        }
+
+        newTaskDiv.classList.add('selected');
+        newlyCreatedDivs.push(newTaskDiv);
+    });
+
+    selectedDivs = newlyCreatedDivs;
+    localStorage.setItem("tasks", JSON.stringify(storedData));
+    [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+}
+
+// Option button event handlers
+if (addAboveOption) {
+    addAboveOption.addEventListener('click', (e) => {
+        e.stopPropagation();
+        insertTask('above');
+    });
+}
+
+if (addBelowOption) {
+    addBelowOption.addEventListener('click', (e) => {
+        e.stopPropagation();
+        insertTask('below');
+    });
+}
+
+// Long-press vs Short-click detection on addTaskBtn
+let longPressTimer = null;
+let isLongPressTriggered = false;
+let startCoords = { x: 0, y: 0 };
+
+function startLongPress(e) {
+    if (selectedDivs.length === 0 || addTaskBtn.classList.contains('disabled-btn')) {
+        return;
+    }
+    isLongPressTriggered = false;
+
+    if (e.type.startsWith('touch')) {
+        const touch = e.touches[0];
+        startCoords = { x: touch.clientX, y: touch.clientY };
+    } else {
+        startCoords = { x: e.clientX, y: e.clientY };
+    }
+
+    clearTimeout(longPressTimer);
+    longPressTimer = setTimeout(() => {
+        isLongPressTriggered = true;
+        openAddTaskDropdown();
+        if (navigator.vibrate) {
+            try { navigator.vibrate(50); } catch (_) {}
+        }
+    }, 500);
+}
+
+function cancelLongPress() {
+    clearTimeout(longPressTimer);
+}
+
+function handleTouchMove(e) {
+    if (!longPressTimer) return;
+    const touch = e.touches[0];
+    const dx = Math.abs(touch.clientX - startCoords.x);
+    const dy = Math.abs(touch.clientY - startCoords.y);
+    if (dx > 10 || dy > 10) {
+        cancelLongPress();
+    }
+}
+
+// Mouse events
+addTaskBtn.addEventListener('mousedown', (e) => {
+    if (e.button === 0) startLongPress(e);
+});
+addTaskBtn.addEventListener('mouseup', cancelLongPress);
+addTaskBtn.addEventListener('mouseleave', cancelLongPress);
+
+// Touch events
+addTaskBtn.addEventListener('touchstart', startLongPress, { passive: true });
+addTaskBtn.addEventListener('touchend', (e) => {
+    cancelLongPress();
+    if (isLongPressTriggered) {
+        e.preventDefault();
+    }
+});
+addTaskBtn.addEventListener('touchmove', handleTouchMove, { passive: true });
+addTaskBtn.addEventListener('touchcancel', cancelLongPress);
+
+// Click event
+addTaskBtn.addEventListener('click', (e) => {
+    if (isLongPressTriggered) {
+        isLongPressTriggered = false;
+        return;
+    }
+
+    // If dropdown was open, toggle/close it
+    if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
+        closeAddTaskDropdown();
+        return;
+    }
+
+    executeDefaultAddTask();
 });
 
 
@@ -1972,11 +2247,11 @@ if (cloneColorMenu) {
 }
 
 
-// Select both arrows
-// const arrows = clonedSlidingInputView.querySelector('.template-task-btn1 ');
-const arrows = clonedSlidingInputView.querySelector('#addTask ');
-//Remove arrow .arrow_right_selected and .arrow_left_selected conatiner
-arrows.remove();
+// Remove addTask wrapper / button from cloned template view
+const addTaskWrapperCloned = clonedSlidingInputView.querySelector('.add-task-wrapper') || clonedSlidingInputView.querySelector('#addTask');
+if (addTaskWrapperCloned) {
+    addTaskWrapperCloned.remove();
+}
 
 
 

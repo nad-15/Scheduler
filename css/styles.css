@@ -2702,7 +2702,8 @@ input[type="radio"]:checked::after {
     width: 100%;
     /* border-radius: 5px; */
     border-radius: 25px;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
     padding: 5px 10px;
     /* gap: 10px; */
 
@@ -3660,6 +3661,94 @@ input[type="radio"]:checked::after {
 
 .shade-color-btn:hover {
     background-color: #f0f0f0;
+}
+
+/* Add Task Dropdown (Long-press modal) */
+.add-task-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#addTask {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.add-task-dropdown {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    background: rgba(204, 230, 255, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 2100;
+    padding: 4px;
+    gap: 4px;
+    white-space: nowrap;
+    animation: fadeInTaskDropdown 0.15s ease-out;
+}
+
+.add-task-dropdown.hidden {
+    display: none;
+}
+
+.add-task-dropdown::before {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    left: 14px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(204, 230, 255, 0.95) transparent transparent transparent;
+}
+
+.add-task-dropdown .dropdown-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    user-select: none;
+}
+
+.add-task-dropdown .dropdown-option:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.add-task-dropdown .dropdown-option:active {
+    transform: scale(0.96);
+}
+
+.add-task-dropdown .dropdown-option-icon {
+    font-size: 16px !important;
+    vertical-align: middle;
+}
+
+@keyframes fadeInTaskDropdown {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 
