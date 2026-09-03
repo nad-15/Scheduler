@@ -39,7 +39,60 @@ const closeButtonMenu = document.querySelector('.close-button-menu');
 menuButton.addEventListener('click', () => {
   menuSlider.classList.toggle('open');
   overlayMenu.classList.add('show');
+  updateStorageUsage();
 });
+
+// Update LocalStorage usage display in settings drawer
+function updateStorageUsage() {
+  const el = document.getElementById('storage-usage-text');
+  if (!el) return;
+
+  try {
+    let totalChars = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        const val = localStorage.getItem(key) || '';
+        totalChars += key.length + val.length;
+      }
+    }
+
+    // Standard 5 MB browser quota = 5,242,880 characters
+    const quota = 5 * 1024 * 1024;
+    const pctNum = (totalChars / quota) * 100;
+    const percentage = pctNum.toFixed(1);
+
+    let formatted = '';
+    if (totalChars < 1024) {
+      formatted = `${totalChars} B`;
+    } else if (totalChars < 1024 * 1024) {
+      formatted = `${(totalChars / 1024).toFixed(1)} KB`;
+    } else {
+      formatted = `${(totalChars / (1024 * 1024)).toFixed(2)} MB`;
+    }
+
+    el.textContent = `${formatted} / 5 MB (${percentage}%)`;
+
+    // Dynamic color coding based on health status
+    if (pctNum >= 95) {
+      el.style.color = '#ff5252'; // Critical red (close to 5MB limit)
+    } else if (pctNum >= 80) {
+      el.style.color = '#ffa726'; // Warning amber
+    } else {
+      el.style.color = '#66bb6a'; // Healthy clear green
+    }
+  } catch (err) {
+    console.debug('Failed to calculate storage usage:', err);
+  }
+}
+
+// Initial calculation
+updateStorageUsage();
+
+const storageUsageItem = document.getElementById('storage-usage-menu-item');
+if (storageUsageItem) {
+  storageUsageItem.addEventListener('click', updateStorageUsage);
+}
 
 menuButtonMonthView.addEventListener("click", () => {
   menuButton.click();

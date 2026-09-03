@@ -2337,13 +2337,30 @@ input[type="radio"]:checked::after {
 }
 
 #slider-menu-header-logo {
-    font-size: 140px;
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
 }
 
 .slider-menu-tagline {
     text-align: center;
     font-style: italic;
     font-family: 'Kaushan Script', cursive;
+}
+
+/* LocalStorage Usage Row */
+.storage-usage-item {
+    cursor: default;
+    user-select: none;
+}
+
+#storage-usage-text {
+    font-size: 0.85rem;
+    color: #66bb6a;
+    font-weight: 500;
+    margin-left: 4px;
 }
 
 .divider {

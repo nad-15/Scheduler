@@ -31,7 +31,8 @@ const STATIC_ASSETS = [
     './images/favicon.svg',
     './images/favicon.ico',
     './images/coffee.webm',
-    './images/gift-ic.gif'
+    './images/gift-ic.gif',
+    './images/app_icon.png'
 ];
 
 // Install: pre-cache static assets and activate immediately
