@@ -73,32 +73,19 @@ function safeDateFromPopUpDate(str) {
 
 yearContainer.addEventListener('click', (e) => {
   const dateEl = e.target.closest('.date');
-  const dayEl = e.target.closest('.day');
-
-  let fullDate = null;
-  let clickedEl = null;
 
   if (dateEl) {
-    fullDate = dateEl.dataset.fullDate;
-    clickedEl = dateEl;
-  } else if (dayEl) {
-    // Find sibling .date (assumes .day and .date share a common parent)
-    const siblingDateEl = dayEl.parentElement.querySelector('.date');
-    if (siblingDateEl) {
-      fullDate = siblingDateEl.dataset.fullDate;
-      clickedEl = dayEl;
+    const fullDate = dateEl.dataset.fullDate;
+    if (fullDate) {
+      clearTimeout(popupTimeout);
+      lastClickedEl = dateEl;
+
+      popupTimeout = setTimeout(() => {
+        if (lastClickedEl === dateEl) {
+          showDayTasks(fullDate);
+        }
+      }, 60);
     }
-  }
-
-  if (fullDate) {
-    clearTimeout(popupTimeout);
-    lastClickedEl = clickedEl;
-
-    popupTimeout = setTimeout(() => {
-      if (lastClickedEl === clickedEl) {
-        showDayTasks(fullDate);
-      }
-    }, 60);
   }
 });
 
