@@ -988,10 +988,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     monthLetterContainer.classList.add('month-letter-container'); // Add a class for styling
 
 
-    monthLetterContainer.addEventListener('click', () => {
-        popUpDate = null;
-        swapToGridView(monthName, yearDate);
-    });
+
 
 
     letters.forEach(letter => {
@@ -1026,10 +1023,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         yearLetterContainer.appendChild(letterDiv);
     });
 
-    yearLetterContainer.addEventListener('click', () => {
-        popUpDate = null;
-        swapToGridView(monthName, yearDate);
-    });
+
 
     // yearLetterContainer.textContent = yearDate;
     monthNameContainer.appendChild(yearLetterContainer);

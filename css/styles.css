@@ -3195,8 +3195,10 @@ input[type="radio"]:checked::after {
     /* flex: 8; */
 }
 
-.year-letter-container:active,
-.month-letter-container:active,
+.grid-cal-btn {
+    cursor: pointer;
+}
+
 .grid-cal-btn:active {
     /* color: snow; */
     transform: scale(0.9);
