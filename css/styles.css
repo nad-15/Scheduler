@@ -2655,23 +2655,23 @@ input[type="radio"]:checked::after {
 
 @keyframes wiggle {
     0% {
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
     }
 
     25% {
-        transform: translateX(-10px);
+        transform: translate3d(-10px, 0, 0);
     }
 
     50% {
-        transform: translateX(10px);
+        transform: translate3d(10px, 0, 0);
     }
 
     75% {
-        transform: translateX(-6px);
+        transform: translate3d(-6px, 0, 0);
     }
 
     100% {
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
     }
 }
 
@@ -5317,12 +5317,11 @@ ic {
 
     0%,
     100% {
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0);
     }
 
     50% {
-        transform: translateY(-10px);
-        /* Jump upwards by 10px */
+        transform: translate3d(0, -10px, 0);
     }
 }
 
