@@ -6,7 +6,9 @@ const DEFAULT_SETTINGS = {
   "clamp-expanded": true,
   "todo-collapsed": false,
   "todo-filter-mode": "not-archived", 
-  "todo-floating-btn": false         
+  "todo-floating-btn": false,
+  "color-mode": "all",
+  "color-shade-name": "red"
 };
 
 

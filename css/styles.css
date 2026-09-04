@@ -3061,7 +3061,8 @@ input[type="radio"]:checked::after {
 .color-picker {
     box-sizing: border-box;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: flex-start;
     width: 100%;
     /* flex-wrap: wrap; */
     overflow: auto;
@@ -3612,6 +3613,12 @@ input[type="radio"]:checked::after {
     background-color: #f0f0f0;
 }
 
+.dropdown-option.active {
+    background-color: #0078FF;
+    color: white;
+    font-weight: 500;
+}
+
 .color-mode-dropdown::before {
     content: '';
     position: absolute;
@@ -3663,6 +3670,24 @@ input[type="radio"]:checked::after {
 
 .shade-color-btn:hover {
     background-color: #f0f0f0;
+}
+
+.shade-color-btn.active {
+    background-color: #e3f2fd;
+    color: #0078FF;
+    font-weight: 600;
+}
+
+.color-picker-empty-text {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #757575;
+    font-style: italic;
+    white-space: nowrap;
+    padding: 0 10px;
+    user-select: none;
+    letter-spacing: 0.2px;
 }
 
 /* Add Task Dropdown (Long-press modal) */
