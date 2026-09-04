@@ -435,7 +435,8 @@ function openAddTaskDropdown() {
 // Close dropdown when clicking outside or pressing Escape
 document.addEventListener('click', (e) => {
     if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
-        if (!addTaskDropdown.contains(e.target) && !addTaskBtn.contains(e.target)) {
+        const isColorOption = e.target.closest('.color-button-options');
+        if (!addTaskDropdown.contains(e.target) && !addTaskBtn.contains(e.target) && !isColorOption) {
             closeAddTaskDropdown();
         }
     }
