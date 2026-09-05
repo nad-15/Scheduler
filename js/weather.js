@@ -284,9 +284,11 @@ function getWmoDetails(code, isDay = true) {
 
 const weatherSvgCache = new Map();
 const weatherSvgPromises = new Map();
+let svgInstanceCounter = 0;
+const svgDomParser = new DOMParser();
 
 /**
- * Loads and caches SVG content text from URL
+ * Loads and caches SVG content text from URL, sharing pending promises across concurrent requests
  */
 async function loadWeatherSvg(url) {
     if (!url) return null;
@@ -313,7 +315,70 @@ async function loadWeatherSvg(url) {
 }
 
 /**
- * Preloads all unique weather SVGs in the forecast data into memory
+ * Safely parses an SVG string into a valid SVGSVGElement using DOMParser in image/svg+xml mode
+ */
+function parseSvgString(svgText) {
+    if (!svgText) return null;
+    try {
+        const doc = svgDomParser.parseFromString(svgText, 'image/svg+xml');
+        if (doc.querySelector('parsererror')) return null;
+        const svg = doc.documentElement;
+        if (!svg || svg.nodeName.toLowerCase() !== 'svg') return null;
+        return document.importNode(svg, true);
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Scopes internal IDs (linearGradient, clipPath, mask, filter) inside an SVG element
+ * to unique names, preventing document-wide collision across multiple inlined instances.
+ */
+function scopeSvgInternalIds(svgElem) {
+    if (!svgElem) return;
+    const elementsWithId = svgElem.querySelectorAll('[id]');
+    if (!elementsWithId.length) return;
+
+    const prefix = `wsvg_${++svgInstanceCounter}_`;
+    const idMap = new Map();
+
+    elementsWithId.forEach(el => {
+        const oldId = el.getAttribute('id');
+        if (oldId) {
+            const newId = `${prefix}${oldId}`;
+            idMap.set(oldId, newId);
+            el.setAttribute('id', newId);
+        }
+    });
+
+    if (!idMap.size) return;
+
+    const allDescendants = svgElem.querySelectorAll('*');
+    allDescendants.forEach(el => {
+        for (let i = 0; i < el.attributes.length; i++) {
+            const attr = el.attributes[i];
+            const val = attr.value;
+            if (val && val.includes('url(#')) {
+                let updated = val;
+                idMap.forEach((newId, oldId) => {
+                    const re = new RegExp(`url\\(#${oldId}\\)`, 'g');
+                    updated = updated.replace(re, `url(#${newId})`);
+                });
+                if (updated !== val) {
+                    attr.value = updated;
+                }
+            } else if (val && (attr.name === 'href' || attr.name === 'xlink:href') && val.startsWith('#')) {
+                const targetId = val.slice(1);
+                if (idMap.has(targetId)) {
+                    attr.value = `#${idMap.get(targetId)}`;
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Preloads unique weather SVGs in the forecast data into memory
  */
 function preloadWeatherSvgs(data) {
     if (!data || !data.daily || !data.hourly) return;
@@ -346,9 +411,8 @@ function preloadWeatherSvgs(data) {
 }
 
 /**
- * Automatically upgrades <img> tags for weather icons into living inline <svg> elements.
- * This guarantees SMIL animations run continuously on standalone mobile PWAs (where <img> SMIL is frozen)
- * and ensures 0ms render latency.
+ * Upgrades <img> tags for weather icons into living inline <svg> elements.
+ * Preserves classes, dimensions, styles, accessibility labels, and prevents ID collisions.
  */
 async function inlineWeatherSvgs(container) {
     if (!container) return;
@@ -361,18 +425,39 @@ async function inlineWeatherSvgs(container) {
         const svgText = await loadWeatherSvg(src);
         if (!svgText || !img.parentNode) return;
 
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = svgText;
-        const svgElem = tempDiv.querySelector('svg');
-        if (!svgElem) return;
+        const svgElem = parseSvgString(svgText);
+        if (!svgElem || !img.parentNode) return;
 
+        // Scope internal gradient/clipPath/mask IDs to avoid document-wide collisions
+        scopeSvgInternalIds(svgElem);
+
+        // Preserve presentation & accessibility attributes
         if (img.className) {
             svgElem.setAttribute('class', (svgElem.getAttribute('class') || '') + ' ' + img.className);
         }
         if (img.id) svgElem.id = img.id;
-        if (img.getAttribute('alt')) svgElem.setAttribute('aria-label', img.getAttribute('alt'));
-        svgElem.setAttribute('role', 'img');
+        if (img.style.cssText) {
+            svgElem.style.cssText = (svgElem.style.cssText ? svgElem.style.cssText + ';' : '') + img.style.cssText;
+        }
+        if (img.getAttribute('width')) svgElem.setAttribute('width', img.getAttribute('width'));
+        if (img.getAttribute('height')) svgElem.setAttribute('height', img.getAttribute('height'));
+
+        Array.from(img.attributes).forEach(attr => {
+            if (attr.name.startsWith('data-')) {
+                svgElem.setAttribute(attr.name, attr.value);
+            }
+        });
+
+        const alt = img.getAttribute('alt');
+        if (alt) {
+            svgElem.setAttribute('aria-label', alt);
+            svgElem.setAttribute('role', 'img');
+        } else {
+            svgElem.setAttribute('aria-hidden', 'true');
+        }
+
         svgElem.style.pointerEvents = 'none';
+        svgElem.setAttribute('data-weather-src', src);
 
         img.replaceWith(svgElem);
     }));
@@ -628,9 +713,13 @@ async function getWeather() {
                 if (tempEl) tempEl.textContent = `${tempVal}°`;
                 const weatherEl = todayName.querySelector('#today-weather');
                 if (weatherEl) weatherEl.textContent = weatherDescription;
-                const iconImg = todayName.querySelector('#today-icon img');
-                if (iconImg && iconImg.getAttribute('src') !== iconUrl) {
-                    iconImg.src = iconUrl;
+                const iconContainer = todayName.querySelector('#today-icon');
+                if (iconContainer) {
+                    const currentSrc = iconContainer.querySelector('img')?.getAttribute('src') ||
+                                       iconContainer.querySelector('svg')?.getAttribute('data-weather-src');
+                    if (currentSrc !== iconUrl) {
+                        iconContainer.innerHTML = `<img src="${iconUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">`;
+                    }
                 }
             }
             inlineWeatherSvgs(todayName);

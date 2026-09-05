@@ -1792,7 +1792,8 @@ h1 {
     margin: 1px 0 2px 0;
 }
 
-#today-icon img {
+#today-icon img,
+#today-icon svg {
     /* border: .5px solid white; */
     width: 34px;
     height: 34px;
