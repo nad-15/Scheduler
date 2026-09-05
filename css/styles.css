@@ -1800,6 +1800,181 @@ h1 {
     font-style: italic;
 }
 
+/* ==========================================================================
+   Weather Outlook Companion Card (Same width as current weather widget)
+   ========================================================================== */
+.weather-outlook-bar {
+    position: fixed;
+    right: 8px;
+    top: 118px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 7px 9px 7px 10px;
+    border-radius: 10px;
+    /* Companion Aurora: Harmonious with main widget, but shifted to deep twilight indigo-cyan-orchid with reverse motion */
+    background: linear-gradient(225deg,
+            rgba(6, 26, 75, 0.93),
+            rgba(12, 78, 165, 0.90),
+            rgba(0, 165, 145, 0.88),
+            rgba(125, 38, 140, 0.88),
+            rgba(35, 16, 85, 0.94));
+    background-size: 400% 400%;
+    animation: aurora 18s ease infinite reverse;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 10px rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    user-select: none;
+    box-sizing: border-box;
+    width: fit-content;
+    min-width: 170px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes outlookFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.weather-outlook-bar.has-rain {
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(56, 189, 248, 0.25);
+}
+
+.weather-outlook-bar.has-snow {
+    border-color: rgba(186, 230, 253, 0.55);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(224, 242, 254, 0.3);
+}
+
+.weather-outlook-bar.has-freeze {
+    border-color: rgba(165, 243, 252, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(165, 243, 252, 0.3);
+}
+
+.weather-outlook-bar.has-wind {
+    border-color: rgba(148, 163, 184, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(148, 163, 184, 0.25);
+}
+
+.weather-outlook-bar.has-fog {
+    border-color: rgba(203, 213, 225, 0.45);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(203, 213, 225, 0.2);
+}
+
+.weather-outlook-bar.dismissed {
+    transform: translateX(120%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.outlook-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 4px;
+}
+
+.outlook-main-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.outlook-icon {
+    font-size: 13px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.outlook-icon.pulse {
+    animation: outlookPulse 2s infinite ease-in-out;
+}
+
+@keyframes outlookPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.18);
+    }
+}
+
+.outlook-status {
+    font-size: 11.5px;
+    font-weight: bold;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.1px;
+}
+
+.outlook-sub-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 3px;
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.85);
+    gap: 6px;
+}
+
+.outlook-temps {
+    font-weight: bold;
+    color: #f8fafc;
+    letter-spacing: 0.2px;
+}
+
+.outlook-extra {
+    color: #cbd5e1;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.outlook-close-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.outlook-close-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.15);
+}
+
+.outlook-close-btn:active {
+    transform: scale(0.95);
+}
+
+
 /* .today-name-text-container {
     box-sizing: border-box;
     display: flex;
