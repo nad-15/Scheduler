@@ -1670,6 +1670,7 @@ h1 {
     justify-content: space-between;
     width: fit-content;
     min-width: 170px;
+    min-height: 104px;
     box-sizing: border-box;
     height: fit-content;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -1808,6 +1809,42 @@ h1 {
 #today-weather {
     font-size: 8px;
     font-style: italic;
+    white-space: nowrap;
+}
+
+/* Loading State for #today-name (Prevents Layout Shift) */
+.today-loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 154px;
+    min-height: 88px;
+    gap: 8px;
+    box-sizing: border-box;
+}
+
+.today-spinner {
+    width: 22px;
+    height: 22px;
+    border: 2.5px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: todaySpin 0.75s linear infinite;
+}
+
+@keyframes todaySpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.today-loading-text {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.3px;
     white-space: nowrap;
 }
 

@@ -467,6 +467,16 @@ async function fetchWeatherData(forceRefresh = false) {
  */
 async function getWeather() {
     try {
+        const todayName = document.getElementById('today-name');
+        if (todayName && !todayName.querySelector('.time-container') && !todayName.querySelector('.today-loading-state')) {
+            todayName.innerHTML = `
+                <div class="today-loading-state">
+                    <div class="today-spinner"></div>
+                    <span class="today-loading-text">Loading weather...</span>
+                </div>
+            `;
+        }
+
         const data = await fetchWeatherData();
         if (!data || !data.current) throw new Error('No weather data received');
 
@@ -480,7 +490,6 @@ async function getWeather() {
 
         const locationLabel = `${currentLocation.name}, ${currentLocation.admin || currentLocation.countryCode || currentLocation.country}`;
 
-        const todayName = document.getElementById('today-name');
         if (todayName) {
             // Render structure once if not already rendered
             if (!todayName.querySelector('.time-container')) {
