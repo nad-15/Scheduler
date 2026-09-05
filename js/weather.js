@@ -627,7 +627,7 @@ async function fetchWeatherData(forceRefresh = false, targetDays = 7) {
 
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
         `&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index` +
-        `&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,is_day,uv_index` +
+        `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,is_day,uv_index` +
         `&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,daylight_duration,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,uv_index_max,snowfall_sum` +
         `&timezone=${encodeURIComponent(timezone)}&forecast_days=${daysToFetch}`;
 
@@ -1331,13 +1331,28 @@ function buildDayForecastDetails(data, dayKey) {
         ? Math.round(data.current.apparent_temperature)
         : Math.round(data.daily.apparent_temperature_max[activeIndex]);
 
-    let feelsLikeSub = '';
+    // Calculate Humidity for Selected Day
+    let humidityVal = 0;
+    if (isTodayActive && data.current.relative_humidity_2m !== undefined) {
+        humidityVal = Math.round(data.current.relative_humidity_2m);
+    } else if (dayIndices.length > 0 && data.hourly && data.hourly.relative_humidity_2m) {
+        const dayHumidities = dayIndices.map(idx => data.hourly.relative_humidity_2m[idx]).filter(v => v !== undefined && v !== null);
+        if (dayHumidities.length > 0) {
+            humidityVal = Math.round(dayHumidities.reduce((a, b) => a + b, 0) / dayHumidities.length);
+        } else if (data.current && data.current.relative_humidity_2m !== undefined) {
+            humidityVal = Math.round(data.current.relative_humidity_2m);
+        }
+    } else if (data.current && data.current.relative_humidity_2m !== undefined) {
+        humidityVal = Math.round(data.current.relative_humidity_2m);
+    }
+
+    let humiditySub = '';
     if (isTodayActive) {
         const uv = data.current.uv_index !== undefined ? Math.round(data.current.uv_index) : (data.daily.uv_index_max ? Math.round(data.daily.uv_index_max[activeIndex]) : null);
-        feelsLikeSub = uv !== null ? `Humidity: ${data.current.relative_humidity_2m}% • UV: ${uv}` : `Humidity: ${data.current.relative_humidity_2m}%`;
+        humiditySub = uv !== null ? `Feels like ${feelsLikeVal}° • UV: ${uv}` : `Feels like ${feelsLikeVal}°`;
     } else {
         const maxUv = data.daily.uv_index_max ? Math.round(data.daily.uv_index_max[activeIndex]) : null;
-        feelsLikeSub = maxUv !== null ? `Low: ${Math.round(data.daily.apparent_temperature_min[activeIndex])}° • Max UV: ${maxUv}` : `Low Feels: ${Math.round(data.daily.apparent_temperature_min[activeIndex])}°`;
+        humiditySub = maxUv !== null ? `Feels like ${feelsLikeVal}° • Max UV: ${maxUv}` : `Feels like ${feelsLikeVal}°`;
     }
 
     const precipSubText = snowfallSum > 0
@@ -1395,11 +1410,11 @@ function buildDayForecastDetails(data, dayKey) {
         </div>
         <div class="gw-metric-card">
             <span class="gw-metric-header">
-                <span class="material-symbols-outlined gw-metric-icon">thermostat</span>
-                Feels Like
+                <span class="material-symbols-outlined gw-metric-icon">cool_to_dry</span>
+                Humidity
             </span>
-            <span class="gw-metric-val">${feelsLikeVal}°</span>
-            <span class="gw-metric-sub">${feelsLikeSub}</span>
+            <span class="gw-metric-val">${humidityVal}%</span>
+            <span class="gw-metric-sub">${humiditySub}</span>
         </div>
         <div class="gw-metric-card">
             <span class="gw-metric-header">
