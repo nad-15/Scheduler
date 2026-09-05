@@ -1163,19 +1163,32 @@ function initSettings() {
     });
   });
 
-  // Handle radio buttons (view selection)
-  document.querySelectorAll(".menu-item input[type='radio'][name='view-mode']").forEach(input => {
-    const settingName = "view-mode"; // one shared setting for radios
+  // Handle radio buttons (view selection, add task modal selection, etc.)
+  document.querySelectorAll(".menu-item input[type='radio']").forEach(input => {
+    const settingName = input.name;
 
     // Restore saved selection
     input.checked = settings[settingName] === input.value;
 
     input.addEventListener("change", () => {
       if (input.checked) {
-        settings[settingName] = input.value; // "list" or "month"
+        settings[settingName] = input.value;
         saveSettings(settings);
+        if (typeof appSettings !== "undefined") {
+          appSettings[settingName] = input.value;
+        }
       }
     });
+
+    const parentMenuItem = input.closest(".menu-item");
+    if (parentMenuItem) {
+      parentMenuItem.addEventListener("click", (e) => {
+        if (e.target !== input) {
+          input.checked = true;
+          input.dispatchEvent(new Event("change"));
+        }
+      });
+    }
   });
 }
 

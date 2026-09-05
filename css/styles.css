@@ -2158,7 +2158,8 @@ h2 {
 
 .month-radio,
 .list-radio,
-.todo-radio {
+.todo-radio,
+.add-task-radio {
     margin-left: auto;
 }
 

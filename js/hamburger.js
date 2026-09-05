@@ -8,7 +8,8 @@ const DEFAULT_SETTINGS = {
   "todo-filter-mode": "not-archived", 
   "todo-floating-btn": false,
   "color-mode": "all",
-  "color-shade-name": "red"
+  "color-shade-name": "red",
+  "add-task-modal": "long-press"
 };
 
 

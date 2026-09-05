@@ -727,6 +727,13 @@ function startLongPress(e) {
     if (selectedDivs.length === 0 || addTaskBtn.classList.contains('disabled-btn')) {
         return;
     }
+
+    const currentMode = (typeof appSettings !== 'undefined' && appSettings['add-task-modal']) || 'long-press';
+
+    if (currentMode === 'on-click') {
+        return;
+    }
+
     isLongPressTriggered = false;
 
     if (e.type.startsWith('touch')) {
@@ -785,6 +792,23 @@ addTaskBtn.addEventListener('click', (e) => {
         return;
     }
 
+    const currentMode = (typeof appSettings !== 'undefined' && appSettings['add-task-modal']) || 'long-press';
+
+    // If "on-click" mode is selected, bypass default bottom addition and toggle the modal
+    if (currentMode === 'on-click') {
+        if (selectedDivs.length === 0 || addTaskBtn.classList.contains('disabled-btn')) {
+            return;
+        }
+
+        if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
+            closeAddTaskDropdown();
+        } else {
+            openAddTaskDropdown();
+        }
+        return;
+    }
+
+    // Default "long-press" mode:
     // If dropdown was open, toggle/close it
     if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
         closeAddTaskDropdown();
