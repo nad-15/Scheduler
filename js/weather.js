@@ -338,6 +338,9 @@ function preloadWeatherSvgs(data) {
     urls.add('./images/weather/sleet.svg');
     urls.add('./images/weather/clear-day.svg');
     urls.add('./images/weather/clear-night.svg');
+    urls.add('./images/weather/thunderstorms-rain.svg');
+    urls.add('./images/weather/fog-day.svg');
+    urls.add('./images/weather/fog-night.svg');
 
     urls.forEach(url => loadWeatherSvg(url));
 }
@@ -862,6 +865,7 @@ function renderWeatherOutlook(data) {
     `;
 
     outlookBar.style.display = 'flex';
+    inlineWeatherSvgs(outlookBar);
 
     // Position dynamically directly below #today-name and lock exact width matching
     const alignPosition = () => {
