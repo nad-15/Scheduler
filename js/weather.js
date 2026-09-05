@@ -361,8 +361,10 @@ function scopeSvgInternalIds(svgElem) {
             if (val && val.includes('url(#')) {
                 let updated = val;
                 idMap.forEach((newId, oldId) => {
-                    const re = new RegExp(`url\\(#${oldId}\\)`, 'g');
-                    updated = updated.replace(re, `url(#${newId})`);
+                    const searchTarget = `url(#${oldId})`;
+                    if (updated.includes(searchTarget)) {
+                        updated = updated.split(searchTarget).join(`url(#${newId})`);
+                    }
                 });
                 if (updated !== val) {
                     attr.value = updated;

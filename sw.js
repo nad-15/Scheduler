@@ -2,7 +2,7 @@
 // Skhayeduler Service Worker - Network-First Strategy (Zero Stale Code)
 // ==========================================================================
 
-const CACHE_NAME = 'scheduler-pwa-v51';
+const CACHE_NAME = 'scheduler-pwa-v52';
 
 const STATIC_ASSETS = [
     './',
@@ -111,7 +111,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch Strategy:
-// 1. Static Images & SVGs -> CACHE-FIRST (Instant 0ms render from local disk)
+// 1. Static Images & SVGs -> CACHE-FIRST (Fast render from local cache)
 // 2. HTML, JS, CSS -> NETWORK-FIRST (Fresh updates from server with offline cache fallback)
 self.addEventListener('fetch', (event) => {
     // Only handle standard HTTP/HTTPS GET requests
@@ -128,7 +128,7 @@ self.addEventListener('fetch', (event) => {
 
     const isImage = event.request.destination === 'image' || event.request.url.match(/\.(svg|png|jpg|jpeg|gif|ico|webp|webm)$/i);
 
-    // CACHE-FIRST for Images & Weather SVGs (zero network latency)
+    // CACHE-FIRST for Images & Weather SVGs (cached locally to minimize network latency)
     if (isImage) {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
