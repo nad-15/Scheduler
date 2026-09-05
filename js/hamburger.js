@@ -310,21 +310,25 @@ function runMenuAction(item) {
         backupData[key] = localStorage.getItem(key);
       }
 
-      // Add signature & version
+      // Add signature, version & timestamp
       const wrappedBackup = {
         signature: "SkhayedulerBackup_v1",
+        version: 1,
+        createdAt: new Date().toISOString(),
         data: backupData
       };
 
-      const dataStr = "data:text/json;charset=utf-8," +
-        encodeURIComponent(JSON.stringify(wrappedBackup));
+      // Use Blob to handle any backup size reliably across all browsers
+      const blob = new Blob([JSON.stringify(wrappedBackup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
 
       const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "Skhayeduler_localStorage_backup.json");
+      downloadAnchor.href = url;
+      downloadAnchor.download = "Skhayeduler_localStorage_backup.json";
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
     if (backup === "upload") {
       // Trigger hidden file input
@@ -339,37 +343,50 @@ function runMenuAction(item) {
   }
 }
 
+const uploadInputEl = document.getElementById("uploadBackup");
+if (uploadInputEl) {
+  uploadInputEl.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-document.getElementById("uploadBackup").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      try {
+        const parsed = JSON.parse(event.target.result);
 
-  const reader = new FileReader();
-  reader.onload = function (event) {
-    try {
-      const parsed = JSON.parse(event.target.result);
+        let backupData = null;
 
-      // Check signature
-      if (!parsed.signature || parsed.signature !== "SkhayedulerBackup_v1") {
-        throw new Error("Invalid backup signature.");
+        // Standard Skhayeduler signed backup
+        if (parsed && typeof parsed === "object" && parsed.signature === "SkhayedulerBackup_v1" && parsed.data) {
+          backupData = parsed.data;
+        } else if (parsed && typeof parsed === "object" && !parsed.signature) {
+          // Direct key-value backup fallback
+          backupData = parsed;
+        } else {
+          throw new Error("Invalid backup format or unrecognized signature.");
+        }
+
+        let restoredCount = 0;
+        for (const key in backupData) {
+          if (Object.prototype.hasOwnProperty.call(backupData, key)) {
+            const val = backupData[key];
+            // Ensure value is properly formatted as string in localStorage
+            localStorage.setItem(key, typeof val === "string" ? val : JSON.stringify(val));
+            restoredCount++;
+          }
+        }
+
+        alert(`Backup restored successfully (${restoredCount} items)! Reloading...`);
+        setTimeout(() => location.reload(), 500);
+
+      } catch (err) {
+        alert("Invalid backup file: " + err.message);
       }
+    };
+    reader.readAsText(file);
 
-      const backupData = parsed.data;
-
-      for (const key in backupData) {
-        localStorage.setItem(key, backupData[key]);
-      }
-
-      alert("Backup restored successfully! Reloading...");
-      setTimeout(() => location.reload(), 500);
-
-    } catch (err) {
-      alert("Invalid backup file. " + err.message);
-    }
-  };
-  reader.readAsText(file);
-
-  // Reset input
-  e.target.value = "";
-});
+    // Reset input so selecting the same file again still fires change event
+    e.target.value = "";
+  });
+}
 
