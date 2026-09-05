@@ -1974,6 +1974,471 @@ h1 {
     transform: scale(0.95);
 }
 
+/* Make both weather widgets visibly interactive */
+#today-name:hover {
+    filter: brightness(1.05);
+}
+
+.weather-outlook-bar {
+    cursor: pointer;
+}
+
+.weather-outlook-bar:hover {
+    filter: brightness(1.06);
+}
+
+
+/* ==========================================================================
+   Weather Expanded Dashboard (Flyout Modal with 3-Hour Scroll & Tabs)
+   ========================================================================== */
+.weather-expanded-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 9, 24, 0.55);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 99998;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    overscroll-behavior: contain;
+}
+
+.weather-expanded-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.weather-expanded-panel {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    width: 375px;
+    max-width: calc(100vw - 28px);
+    max-height: calc(100vh - 28px);
+    z-index: 99999;
+    /* Living animated translucent aurora identical to #today-name widget */
+    background: linear-gradient(135deg,
+            rgba(5, 40, 100, 0.85),
+            rgba(20, 100, 200, 0.85),
+            rgba(0, 200, 100, 0.85),
+            rgba(200, 80, 150, 0.85),
+            rgba(100, 30, 180, 0.85));
+    background-size: 400% 400%;
+    animation: aurora 15s ease infinite;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 1.5px rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    user-select: none;
+    box-sizing: border-box;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    overscroll-behavior-x: contain;
+    touch-action: pan-y;
+    transform: translateY(-8px) scale(0.97) translateZ(0);
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.weather-expanded-panel.active {
+    transform: translateY(0) scale(1) translateZ(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Header & Segmented Tabs */
+.expanded-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.expanded-location-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.expanded-city-name {
+    font-size: 13px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 0.2px;
+}
+
+.expanded-day-badge {
+    font-size: 10.5px;
+    color: #cbd5e1;
+}
+
+.expanded-controls-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.expanded-panel-close {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.expanded-panel-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* ==========================================================================
+   Google Weather Design Layout & Components
+   ========================================================================== */
+
+/* Main Weather Card (Selected Day Overview & Hourly Strip) */
+.gw-main-card {
+    background: rgba(0, 0, 0, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 16px;
+    padding: 14px 14px 12px 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    overscroll-behavior-x: contain;
+}
+
+.gw-hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.gw-hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.gw-hero-day {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.gw-hero-temp-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.gw-hero-temp {
+    font-size: 40px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.gw-hero-icon {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+}
+
+.gw-hero-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.gw-hero-condition {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: right;
+}
+
+.gw-hero-sub {
+    font-size: 11px;
+    font-weight: 500;
+    color: #e2e8f0;
+    text-align: right;
+    margin-top: 2px;
+}
+
+/* Alert / Advisory Pill */
+.gw-alert-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #ffffff;
+    margin-top: 2px;
+}
+
+.gw-alert-pill.is-alert {
+    background: rgba(234, 67, 53, 0.22);
+    border-color: rgba(234, 67, 53, 0.45);
+    color: #fca5a5;
+}
+
+/* Google-Style Hourly Columns (Temp -> Pop -> Icon -> Hour) */
+.gw-hourly-scroll {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 12px 2px 8px 2px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    overscroll-behavior: contain;
+    touch-action: pan-x;
+}
+
+.gw-hourly-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.gw-hourly-col {
+    flex: 0 0 50px;
+    min-width: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.gw-hourly-temp {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 14px;
+    height: 14px;
+}
+
+.gw-hourly-pop {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: #6ee7b7;
+    height: 12px;
+    line-height: 12px;
+}
+
+.gw-hourly-pop.is-empty {
+    visibility: hidden;
+}
+
+.gw-hourly-icon {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    display: block;
+}
+
+.gw-hourly-time {
+    font-size: 10px;
+    font-weight: 600;
+    color: #e2e8f0;
+    line-height: 13px;
+    height: 13px;
+    white-space: nowrap;
+}
+
+.gw-hourly-col.is-now .gw-hourly-time {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Daily Selector Row (The 5 Days Below the Main Card) */
+.gw-daily-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 2px 1px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    overscroll-behavior: contain;
+    touch-action: pan-x;
+}
+
+.gw-daily-row::-webkit-scrollbar {
+    display: none;
+}
+
+.gw-daily-card {
+    flex: 1 1 0;
+    min-width: 58px;
+    background: rgba(0, 0, 0, 0.14);
+    border: 1.5px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.gw-daily-card:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: translateY(-2px);
+}
+
+.gw-daily-card.active {
+    border-color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.gw-daily-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.gw-daily-card.active .gw-daily-name {
+    color: #ffffff;
+}
+
+.gw-daily-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.gw-daily-range {
+    font-size: 10px;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+}
+
+/* Planning Metrics Grid */
+.gw-metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.gw-metric-card {
+    background: rgba(0, 0, 0, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.gw-metric-header {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: #9aa0a6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1;
+}
+
+.gw-metric-card .gw-metric-icon,
+.gw-metric-header .gw-metric-icon,
+span.material-symbols-outlined.gw-metric-icon {
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+    line-height: 13px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    flex-shrink: 0 !important;
+    user-select: none !important;
+    vertical-align: middle !important;
+}
+
+.gw-metric-val {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 2px;
+}
+
+.gw-metric-sub {
+    font-size: 10px;
+    color: #cbd5e1;
+}
+
+.expanded-loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px 8px;
+    font-size: 11.5px;
+    color: #9aa0a6;
+}
+
+.expanded-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-top-color: #8ab4f8;
+    border-radius: 50%;
+    animation: exp-spin 0.8s linear infinite;
+}
+
+@keyframes exp-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+    .weather-expanded-panel {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: calc(100vw - 20px);
+    }
+}
+
+
 
 /* .today-name-text-container {
     box-sizing: border-box;

@@ -881,8 +881,12 @@ taskInput.addEventListener('focus', () => {
 
 
 let todayNameText = document.getElementById('today-name');
-todayNameText.addEventListener('click', () => {
-    location.reload();
+todayNameText.addEventListener('click', (e) => {
+    if (typeof window.toggleWeatherExpandedPanel === 'function') {
+        window.toggleWeatherExpandedPanel();
+    } else {
+        location.reload();
+    }
 });
 
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
