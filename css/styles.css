@@ -2892,12 +2892,33 @@ h1 {
     box-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
 }
 
+.gw-daily-action-icon {
+    font-size: 14px !important;
+    line-height: 1;
+    color: #ffffff;
+    pointer-events: none;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    margin-left: 2px; /* optical center adjustment for chevron */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gw-daily-action-card:hover .gw-daily-action-icon {
+    transform: translateX(2px);
+}
+
 .gw-daily-action-svg {
     display: block;
     width: 16px;
     height: 16px;
     color: #ffffff;
     pointer-events: none;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.gw-daily-action-card:hover .gw-daily-action-svg:not(.gw-spin) {
+    transform: translateX(2px);
 }
 
 .gw-daily-action-card.is-loading {

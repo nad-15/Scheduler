@@ -1176,7 +1176,7 @@ function buildDayForecastDetails(data, dayKey) {
                         <img class="gw-alert-meteo-icon" src="./images/weather/snow.svg" alt="Snow" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
-                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Snow Expected</div>
+                        <div class="gw-alert-title">Snow Expected</div>
                         <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)</div>
                     </div>
                 </div>
@@ -1189,7 +1189,7 @@ function buildDayForecastDetails(data, dayKey) {
                         <img class="gw-alert-meteo-icon" src="./images/weather/thunderstorms-rain.svg" alt="Storm" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
-                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Storm Alert</div>
+                        <div class="gw-alert-title">Storm Alert</div>
                         <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)</div>
                     </div>
                 </div>
@@ -1203,7 +1203,7 @@ function buildDayForecastDetails(data, dayKey) {
                         <img class="gw-alert-meteo-icon" src="./images/weather/rain.svg" alt="Rain" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
-                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Rain Expected</div>
+                        <div class="gw-alert-title">Rain Expected</div>
                         <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)${vol}</div>
                     </div>
                 </div>
@@ -1224,7 +1224,7 @@ function buildDayForecastDetails(data, dayKey) {
                         <img class="gw-alert-meteo-icon" src="./images/weather/sleet.svg" alt="Frost" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
-                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Frost Warning</div>
+                        <div class="gw-alert-title">Frost Warning</div>
                         <div class="gw-alert-desc">Overnight low dropping to ${activeLow}°</div>
                     </div>
                 </div>
@@ -1237,7 +1237,7 @@ function buildDayForecastDetails(data, dayKey) {
                         <img class="gw-alert-meteo-icon" src="./images/weather/${clearMeteoIcon}.svg" alt="Dry" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
-                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Dry Conditions</div>
+                        <div class="gw-alert-title">Dry Conditions</div>
                         <div class="gw-alert-desc">${dryColdSub}</div>
                     </div>
                 </div>
@@ -1252,7 +1252,7 @@ function buildDayForecastDetails(data, dayKey) {
                         <img class="gw-alert-meteo-icon" src="./images/weather/${clearMeteoIcon}.svg" alt="Clear" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
-                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Dry & Clear</div>
+                        <div class="gw-alert-title">Dry & Clear</div>
                         <div class="gw-alert-desc">${clearSub}</div>
                     </div>
                 </div>
@@ -1520,14 +1520,11 @@ function renderExpandedForecast() {
         `;
     }).join('');
 
-    // Trigger action card (Minimalist single centered plus button)
+    // Trigger action card (Minimalist single centered arrow_forward_ios button)
     const actionCardHtml = !isExtendedForecast ? `
         <div class="gw-daily-action-card" id="gw-daily-more-btn" role="button" tabindex="0" title="Extend to 14-day forecast" aria-label="Extend to 14-day forecast">
             <div class="gw-daily-plus-circle">
-                <svg class="gw-daily-action-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
+                <span class="material-symbols-outlined gw-daily-action-icon">arrow_forward_ios</span>
             </div>
         </div>
     ` : '';
@@ -1771,10 +1768,7 @@ function renderExpandedForecast() {
                 moreBtn.classList.remove('is-loading');
                 if (circle) {
                     circle.innerHTML = `
-                        <svg class="gw-daily-action-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
+                        <span class="material-symbols-outlined gw-daily-action-icon">arrow_forward_ios</span>
                     `;
                 }
             }
