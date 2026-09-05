@@ -3541,21 +3541,164 @@ input[type="radio"]:checked::after {
 
 /* Submenu containers are vertical lists */
 .submenu,
-.sub-submenu {
+.sub-submenu,
+.sub-sub-submenu {
     display: flex;
     flex-direction: column;
 }
 
-/* -------- Indentation -------- */
+/* -------- Hierarchy: Indentation, Font Size & Scaling -------- */
 
-/* Indent submenu level 1 */
-.submenu .menu-label {
-    padding-left: 16px;
+/* Level 0: Top-level menu items */
+.menu-list > .menu-item {
+    font-size: 1.12rem;
+    padding: 0.6rem 0;
+}
+.menu-list > .menu-item > .menu-label {
+    padding-left: 0;
+}
+.menu-list > .menu-item > .menu-label .material-symbols-outlined,
+.menu-list > .menu-item > .menu-label .material-icons {
+    font-size: 24px;
 }
 
-/* Indent submenu level 2 */
-.sub-submenu .menu-label {
-    padding-left: 32px;
+/* Level 1: Submenu (direct children of top level, e.g. Settings -> Startup, Color Theme, Add Task Modal) */
+.submenu > .menu-item {
+    font-size: 1.02rem;
+    padding: 0.54rem 0;
+}
+.submenu > .menu-item > .menu-label {
+    padding-left: 18px;
+}
+.submenu > .menu-item > .menu-label .material-symbols-outlined,
+.submenu > .menu-item > .menu-label .material-icons {
+    font-size: 22px;
+}
+.submenu > .menu-item > .menu-label .submenu-indicator {
+    font-size: 21px;
+}
+
+/* Level 2: Sub-submenu (children of Level 1, e.g. Startup -> Default View, Show Pop-up, Show Weather) */
+.sub-submenu > .menu-item {
+    font-size: 0.92rem;
+    padding: 0.46rem 0;
+}
+.sub-submenu > .menu-item > .menu-label {
+    padding-left: 36px;
+}
+.sub-submenu > .menu-item > .menu-label .material-symbols-outlined,
+.sub-submenu > .menu-item > .menu-label .material-icons {
+    font-size: 20px;
+}
+.sub-submenu > .menu-item > .menu-label .submenu-indicator {
+    font-size: 19px;
+}
+/* Scale switches in Level 2 */
+.sub-submenu > .menu-item .switch {
+    width: 34px;
+    height: 17px;
+}
+.sub-submenu > .menu-item .switch .slider:before {
+    width: 11px;
+    height: 11px;
+    left: 3px;
+    bottom: 3px;
+}
+.sub-submenu > .menu-item .switch input:checked + .slider:before {
+    transform: translateX(17px);
+}
+
+/* Level 3: Sub-sub-submenu (children of Level 2, e.g. Default View -> List View, Month View, To-Do) */
+.sub-submenu .sub-submenu > .menu-item,
+.sub-sub-submenu > .menu-item {
+    font-size: 0.84rem;
+    padding: 0.4rem 0;
+}
+.sub-submenu .sub-submenu > .menu-item > .menu-label,
+.sub-sub-submenu > .menu-item > .menu-label {
+    padding-left: 54px;
+}
+.sub-submenu .sub-submenu > .menu-item > .menu-label .material-symbols-outlined,
+.sub-submenu .sub-submenu > .menu-item > .menu-label .material-icons,
+.sub-sub-submenu > .menu-item > .menu-label .material-symbols-outlined,
+.sub-sub-submenu > .menu-item > .menu-label .material-icons {
+    font-size: 18px;
+    color: #ddd;
+}
+.sub-submenu .sub-submenu input[type="radio"],
+.sub-sub-submenu input[type="radio"] {
+    width: 16px;
+    height: 16px;
+}
+.sub-submenu .sub-submenu input[type="radio"]:checked::after,
+.sub-sub-submenu input[type="radio"]:checked::after {
+    font-size: 10px;
+}
+/* Scale switches in Level 3 (if any) */
+.sub-submenu .sub-submenu > .menu-item .switch,
+.sub-sub-submenu > .menu-item .switch {
+    width: 30px;
+    height: 15px;
+}
+.sub-submenu .sub-submenu > .menu-item .switch .slider:before,
+.sub-sub-submenu > .menu-item .switch .slider:before {
+    width: 9px;
+    height: 9px;
+    left: 3px;
+    bottom: 3px;
+}
+.sub-submenu .sub-submenu > .menu-item .switch input:checked + .slider:before,
+.sub-sub-submenu > .menu-item .switch input:checked + .slider:before {
+    transform: translateX(15px);
+}
+
+/* -------- Tree Hierarchy Vertical Guide Lines (Comment Thread Style) -------- */
+.menu-slider ul.submenu,
+.menu-slider ul.sub-submenu,
+.menu-slider ul.sub-sub-submenu {
+    position: relative;
+}
+
+.menu-slider ul.submenu::before,
+.menu-slider ul.sub-submenu::before,
+.menu-slider ul.sub-sub-submenu::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 8px;
+    width: 2px;
+    background-color: rgba(255, 255, 255, 0.18);
+    border-radius: 1px;
+    pointer-events: none;
+    transition: background-color 0.25s ease;
+}
+
+/* Level 1 vertical thread line (under Settings / Backups) */
+.menu-slider ul.submenu::before {
+    left: 11px;
+}
+
+/* Level 2 vertical thread line (under Startup / Add Task Modal) */
+.menu-slider ul.sub-submenu::before {
+    left: 28px;
+}
+
+/* Level 3 vertical thread line (under Default View) */
+.menu-slider ul.sub-submenu .sub-submenu::before,
+.menu-slider ul.sub-sub-submenu::before {
+    left: 45px;
+}
+
+/* Exclude theme swatch grid from having vertical line across swatches */
+.menu-slider ul.theme-submenu::before {
+    display: none;
+}
+
+/* Subtle glow on hover over the branch */
+.menu-slider ul.submenu:hover::before,
+.menu-slider ul.sub-submenu:hover::before,
+.menu-slider ul.sub-sub-submenu:hover::before {
+    background-color: rgba(255, 255, 255, 0.35);
 }
 
 
@@ -3619,13 +3762,15 @@ input[type="radio"]:checked::after {
 }
 
 .submenu,
-.sub-submenu {
+.sub-submenu,
+.sub-sub-submenu {
     display: none;
     margin-left: 1rem;
 }
 
 .submenu.open,
-.sub-submenu.open {
+.sub-submenu.open,
+.sub-sub-submenu.open {
     display: flex;
 }
 

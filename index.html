@@ -936,6 +936,75 @@
                     <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
                 </div>
                 <ul class="submenu">
+                    <!-- Startup (submenu) -->
+                    <li data-setting="startup" class="menu-item has-submenu">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">rocket_launch</span>
+                            <span class="menu-text">Startup</span>
+                            <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
+                        </div>
+                        <ul class="sub-submenu">
+                            <li data-setting="default-view" class="menu-item has-submenu">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">view_agenda</span>
+                                    <span class="menu-text">Default View</span>
+                                    <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
+                                </div>
+                                <ul class="sub-submenu sub-sub-submenu">
+                                    <li data-view="list" class="menu-item">
+                                        <div class="menu-label">
+                                            <span class="material-symbols-outlined">event_note</span>
+                                            <span class="menu-text">List View</span>
+                                            <label class="list-radio">
+                                                <input type="radio" name="view-mode" value="list">
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li data-view="month" class="menu-item">
+                                        <div class="menu-label">
+                                            <span class="material-symbols-outlined">calendar_month</span>
+                                            <span class="menu-text">Month View</span>
+                                            <label class="month-radio">
+                                                <input type="radio" name="view-mode" value="month">
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li data-view="todo" class="menu-item">
+                                        <div class="menu-label">
+                                            <span class="material-symbols-outlined">checklist</span>
+                                            <span class="menu-text">To-Do</span>
+                                            <label class="todo-radio">
+                                                <input type="radio" name="view-mode" value="todo">
+                                            </label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li data-setting="startup-popup" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">notifications</span>
+                                    <span class="menu-text">Show Pop-up</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="startup-popup-toggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </li>
+
+                            <li data-setting="weather-widget" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">cloud</span>
+                                    <span class="menu-text">Show Weather</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="weather-widget-toggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
                     <li data-setting="theme" class="menu-item has-submenu">
                         <div class="menu-label">
                             <span class="material-symbols-outlined">routine</span>
@@ -946,48 +1015,7 @@
                             <!-- insert them here -->
                         </ul>
                     </li>
-                    <li data-setting="default-view" class="menu-item has-submenu">
-                        <div class="menu-label">
-                            <span class="material-symbols-outlined">view_agenda</span>
-                            <span class="menu-text">Default View at Startup</span>
-                            <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
-                        </div>
-                        <ul class="sub-submenu">
-                            <li data-view="list" class="menu-item">
-                                <div class="menu-label">
-                                    <span class="material-symbols-outlined">event_note</span>
-                                    <span class="menu-text">List View</span>
-                                    <label class="list-radio">
-                                        <input type="radio" name="view-mode" value="list">
-                                    </label>
-                                </div>
 
-                            </li>
-                            <li data-view="month" class="menu-item">
-                                <div class="menu-label">
-                                    <span class="material-symbols-outlined">calendar_month</span>
-                                    <span class="menu-text">Month View</span>
-                                    <label class="month-radio">
-                                        <input type="radio" name="view-mode" value="month">
-                                    </label>
-                                </div>
-
-                            </li>
-
-                            <li data-view="todo" class="menu-item">
-                                <div class="menu-label">
-                                    <span class="material-symbols-outlined">checklist</span>
-                                    <span class="menu-text">To-Do</span>
-                                    <label class="todo-radio">
-                                        <input type="radio" name="view-mode" value="todo">
-                                    </label>
-                                </div>
-                            </li>
-
-                        </ul>
-
-
-                    </li>
                     <li data-setting="add-task-modal" class="menu-item has-submenu">
                         <div class="menu-label">
                             <span class="material-symbols-outlined">add_box</span>
@@ -1014,29 +1042,6 @@
                                 </div>
                             </li>
                         </ul>
-                    </li>
-                    <li data-setting="startup-popup" class="menu-item">
-                        <div class="menu-label">
-                            <span class="material-symbols-outlined">notifications</span>
-                            <span class="menu-text">Show Pop-up at Startup</span>
-                            <label class="switch">
-                                <input type="checkbox" id="startup-popup-toggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-
-                    </li>
-
-                    <li data-setting="weather-widget" class="menu-item">
-                        <div class="menu-label">
-                            <span class="material-symbols-outlined">cloud</span>
-                            <span class="menu-text">Show Weather Widget at Startup</span>
-                            <label class="switch">
-                                <input type="checkbox" id="weather-widget-toggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-
                     </li>
 
                     <li data-setting="todo-floating-btn" class="menu-item">
