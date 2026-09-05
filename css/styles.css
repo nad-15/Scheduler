@@ -2015,9 +2015,9 @@ h1 {
 .weather-expanded-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(4, 9, 24, 0.30);
-    backdrop-filter: blur(3.5px);
-    -webkit-backdrop-filter: blur(3.5px);
+    background: rgba(4, 9, 24, 0.24);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     z-index: 99998;
     opacity: 0;
     transition: opacity 0.25s ease;
@@ -2038,20 +2038,18 @@ h1 {
     max-width: calc(100vw - 28px);
     max-height: calc(100vh - 28px);
     z-index: 99999;
-    /* Living animated translucent aurora with see-through frosted glass */
+    /* Static Frosted Glass with exact colors from .movable-template - Balanced Sweet Spot */
     background: linear-gradient(135deg,
-            rgba(5, 40, 100, 0.62),
-            rgba(20, 100, 200, 0.58),
-            rgba(0, 175, 105, 0.54),
-            rgba(180, 60, 140, 0.56),
-            rgba(80, 25, 150, 0.62));
-    background-size: 400% 400%;
-    animation: aurora 15s ease infinite;
-    backdrop-filter: blur(14px) saturate(150%);
-    -webkit-backdrop-filter: blur(14px) saturate(150%);
+            rgba(3, 25, 70, 0.58),
+            rgba(15, 70, 150, 0.56),
+            rgba(0, 150, 70, 0.54),
+            rgba(150, 50, 100, 0.56),
+            rgba(70, 20, 130, 0.58));
+    backdrop-filter: blur(14px) saturate(145%);
+    -webkit-backdrop-filter: blur(14px) saturate(145%);
     border: 1px solid rgba(255, 255, 255, 0.28);
     border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.30), inset 0 1px 1.5px rgba(255, 255, 255, 0.35);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.26), inset 0 1px 1.5px rgba(255, 255, 255, 0.35);
     color: #ffffff;
     font-family: Arial, sans-serif;
     user-select: none;
@@ -2358,7 +2356,7 @@ h1 {
 
 /* Main Weather Card (Selected Day Overview & Hourly Strip) */
 .gw-main-card {
-    background: rgba(0, 0, 0, 0.14);
+    background: rgba(0, 0, 0, 0.11);
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 16px;
     padding: 14px 14px 12px 14px;
@@ -2551,7 +2549,7 @@ h1 {
 .gw-daily-card {
     flex: 1 1 0;
     min-width: 58px;
-    background: rgba(0, 0, 0, 0.14);
+    background: rgba(0, 0, 0, 0.11);
     border: 1.5px solid rgba(255, 255, 255, 0.14);
     border-radius: 14px;
     padding: 8px 4px;
@@ -2607,7 +2605,7 @@ h1 {
 }
 
 .gw-metric-card {
-    background: rgba(0, 0, 0, 0.14);
+    background: rgba(0, 0, 0, 0.11);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 14px;
     padding: 10px 12px;
