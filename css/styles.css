@@ -2837,7 +2837,7 @@ h1 {
     font-weight: 650;
 }
 
-/* Extended Forecast Action Card (More / Less Trigger) */
+/* Extended Forecast Action Card (Apple-Style Centered Plus & Subtitle) */
 .gw-daily-action-card {
     flex: 1 1 0;
     min-width: 58px;
@@ -2855,51 +2855,82 @@ h1 {
     box-sizing: border-box;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    opacity: 0.82;
+    opacity: 0.85;
 }
 
-.gw-daily-action-card:hover {
-    background: rgba(255, 255, 255, 0.11);
-    border-color: rgba(255, 255, 255, 0.5);
-    border-style: solid;
-    transform: translateY(-1px);
-    opacity: 1;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+.gw-daily-action-card .gw-daily-empty-slot {
+    font-size: 11px;
+    line-height: 14px;
+    height: 14px;
+    visibility: hidden;
+    pointer-events: none;
+    user-select: none;
 }
 
-.gw-daily-action-card:active {
-    transform: translateY(0px) scale(0.97);
-}
-
-.gw-daily-action-icon {
-    font-size: 21px !important;
-    color: rgba(255, 255, 255, 0.88);
+.gw-daily-plus-circle {
+    width: 26px;
+    height: 26px;
+    margin: -1px 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    transition: transform 0.2s ease, color 0.2s ease;
+    transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+    box-sizing: border-box;
 }
 
-.gw-daily-action-card:hover .gw-daily-action-icon {
-    color: #ffffff;
-    transform: scale(1.1);
-}
-
-.gw-daily-action-card.is-collapse {
+.gw-daily-action-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.55);
     border-style: solid;
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+    opacity: 1;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.gw-daily-action-card:hover .gw-daily-plus-circle {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.75);
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+.gw-daily-action-card:active {
+    transform: translateY(0px) scale(0.96);
+}
+
+.gw-daily-action-svg {
+    display: block;
+    width: 14px;
+    height: 14px;
+    color: #ffffff;
+    pointer-events: none;
+}
+
+.gw-daily-action-card .gw-daily-range {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 13px;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+    transition: color 0.2s ease;
+}
+
+.gw-daily-action-card:hover .gw-daily-range {
+    color: #ffffff;
 }
 
 .gw-daily-action-card.is-loading {
     pointer-events: none;
-    opacity: 0.7;
+    opacity: 0.75;
 }
 
 .gw-spin {
-    animation: gw-action-spin 1s linear infinite;
+    animation: gw-action-spin 0.9s linear infinite;
 }
 
 @keyframes gw-action-spin {

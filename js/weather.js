@@ -1329,11 +1329,16 @@ function renderExpandedForecast() {
         `;
     }).join('');
 
-    // Trigger action card (disappears once extended days are loaded)
+    // Trigger action card (Apple-style centered plus circle & subtitle, aligned with sibling cards)
     const actionCardHtml = !isExtendedForecast ? `
         <div class="gw-daily-action-card" id="gw-daily-more-btn" role="button" tabindex="0" title="Extend forecast to 14 days">
-            <span class="gw-daily-name">+ More</span>
-            <span class="material-symbols-outlined gw-daily-action-icon">calendar_add_on</span>
+            <span class="gw-daily-empty-slot" aria-hidden="true">&nbsp;</span>
+            <div class="gw-daily-plus-circle">
+                <svg class="gw-daily-action-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </div>
             <span class="gw-daily-range">14 Days</span>
         </div>
     ` : '';
@@ -1549,10 +1554,13 @@ function renderExpandedForecast() {
         moreBtn.addEventListener('click', async () => {
             if (moreBtn.classList.contains('is-loading')) return;
             moreBtn.classList.add('is-loading');
-            const icon = moreBtn.querySelector('.gw-daily-action-icon');
-            if (icon) {
-                icon.textContent = 'progress_activity';
-                icon.classList.add('gw-spin');
+            const circle = moreBtn.querySelector('.gw-daily-plus-circle');
+            if (circle) {
+                circle.innerHTML = `
+                    <svg class="gw-daily-action-svg gw-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+                        <path d="M12 2 A 10 10 0 0 1 22 12"></path>
+                    </svg>
+                `;
             }
             const range = moreBtn.querySelector('.gw-daily-range');
             if (range) range.textContent = 'Loading...';
@@ -1572,9 +1580,13 @@ function renderExpandedForecast() {
             } catch (err) {
                 console.error('Failed to extend weather forecast:', err);
                 moreBtn.classList.remove('is-loading');
-                if (icon) {
-                    icon.textContent = 'calendar_add_on';
-                    icon.classList.remove('gw-spin');
+                if (circle) {
+                    circle.innerHTML = `
+                        <svg class="gw-daily-action-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    `;
                 }
                 if (range) range.textContent = 'Retry';
             }
