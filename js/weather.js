@@ -121,6 +121,8 @@ let weatherFetchPromise = null;
 let isExpandedPanelInitialized = false;
 let selectedDayKey = null;
 let timeTickerInterval = null;
+let isExtendedForecast = false;
+const EXTENDED_FORECAST_DAYS = 14;
 
 /**
  * Robust date key in target city's timezone (YYYY-MM-DD)
@@ -409,6 +411,7 @@ async function selectLocation(newLoc) {
     cachedWeatherData = null;
     isCitySearchOpen = false;
     selectedDayKey = null;
+    isExtendedForecast = false;
 
     // Refresh weather & update all UI
     await getWeather();
@@ -421,11 +424,21 @@ async function selectLocation(newLoc) {
 /**
  * Fetches comprehensive forecast data from Open-Meteo for currentLocation
  */
-async function fetchWeatherData(forceRefresh = false) {
+async function fetchWeatherData(forceRefresh = false, targetDays = 7) {
     const { lat, lon, timezone } = currentLocation;
     const cacheKey = `${lat},${lon}`;
-    if (!forceRefresh && cachedWeatherData && cachedWeatherData._locationKey === cacheKey && cachedWeatherData._fetchedAt && (Date.now() - cachedWeatherData._fetchedAt < 10 * 60 * 1000)) {
-        return cachedWeatherData;
+    const daysToFetch = Math.max(targetDays, 7);
+
+    const isCacheValid = cachedWeatherData &&
+        cachedWeatherData._locationKey === cacheKey &&
+        cachedWeatherData._fetchedAt &&
+        (Date.now() - cachedWeatherData._fetchedAt < 10 * 60 * 1000);
+
+    if (!forceRefresh && isCacheValid) {
+        const availableDays = cachedWeatherData.daily?.time?.length || 0;
+        if (availableDays >= daysToFetch) {
+            return cachedWeatherData;
+        }
     }
     if (weatherFetchPromise) return weatherFetchPromise;
 
@@ -433,7 +446,7 @@ async function fetchWeatherData(forceRefresh = false) {
         `&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index` +
         `&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,is_day,uv_index` +
         `&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,daylight_duration,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,uv_index_max,snowfall_sum` +
-        `&timezone=${encodeURIComponent(timezone)}&forecast_days=7`;
+        `&timezone=${encodeURIComponent(timezone)}&forecast_days=${daysToFetch}`;
 
     weatherFetchPromise = (async () => {
         try {
@@ -1239,7 +1252,7 @@ function selectExpandedDay(clickedKey) {
     metricsGrid.innerHTML = metricsGridInnerHtml;
 
     // The day row SURVIVES the re-render completely! Update active state in-place
-    dailyRow.querySelectorAll('.gw-daily-card').forEach(card => {
+    dailyRow.querySelectorAll('.gw-daily-card[data-day-key]').forEach(card => {
         const isCardActive = card.getAttribute('data-day-key') === selectedDayKey;
         card.classList.toggle('active', isCardActive);
     });
@@ -1269,7 +1282,7 @@ function renderExpandedForecast() {
                         <span class="expanded-city-name">${locationTitle}</span>
                         <span class="material-symbols-outlined expanded-city-arrow">expand_more</span>
                     </div>
-                    <span class="expanded-day-badge">7-Day Forecast</span>
+                    <span class="expanded-day-badge">${isExtendedForecast ? EXTENDED_FORECAST_DAYS : '7'}-Day Forecast</span>
                 </div>
                 <div class="expanded-controls-box">
                     <button class="expanded-panel-close" id="expanded-panel-close-btn" title="Close" aria-label="Close dashboard">✕</button>
@@ -1288,15 +1301,18 @@ function renderExpandedForecast() {
     }
 
     const todayDateKey = getCityDateKey(new Date(), currentLocation.timezone);
-    if (!selectedDayKey || !data.daily.time.includes(selectedDayKey)) {
+    const availableDays = data.daily.time || [];
+    const displayedDayKeys = isExtendedForecast ? availableDays.slice(0, EXTENDED_FORECAST_DAYS) : availableDays.slice(0, 7);
+
+    if (!selectedDayKey || !displayedDayKeys.includes(selectedDayKey)) {
         selectedDayKey = todayDateKey;
     }
 
     // Preserve scroll position of daily row if panel was already rendered
     const prevDailyScroll = panel.querySelector('.gw-daily-row')?.scrollLeft;
 
-    // 1. Build Daily Selector Cards (7 Days)
-    const dailyCardsHtml = data.daily.time.map((dateStr, i) => {
+    // 1. Build Daily Selector Cards
+    const dailyCardsHtml = displayedDayKeys.map((dateStr, i) => {
         const isSelected = dateStr === selectedDayKey;
         const isCurrentDay = dateStr === todayDateKey;
         const dayShortName = isCurrentDay ? 'Today' : formatWeekday(dateStr);
@@ -1313,6 +1329,15 @@ function renderExpandedForecast() {
         `;
     }).join('');
 
+    // Trigger action card (disappears once extended days are loaded)
+    const actionCardHtml = !isExtendedForecast ? `
+        <div class="gw-daily-action-card" id="gw-daily-more-btn" role="button" tabindex="0" title="Extend forecast to 14 days">
+            <span class="gw-daily-name">+ More</span>
+            <span class="material-symbols-outlined gw-daily-action-icon">calendar_add_on</span>
+            <span class="gw-daily-range">14 Days</span>
+        </div>
+    ` : '';
+
     // 2. Build Hero Card & Metrics Details for Active Day
     const { mainCardInnerHtml, metricsGridInnerHtml } = buildDayForecastDetails(data, selectedDayKey);
 
@@ -1324,7 +1349,7 @@ function renderExpandedForecast() {
                     <span class="expanded-city-name">${locationTitle}</span>
                     <span class="material-symbols-outlined expanded-city-arrow">expand_more</span>
                 </div>
-                <span class="expanded-day-badge">7-Day Forecast</span>
+                <span class="expanded-day-badge">${displayedDayKeys.length}-Day Forecast</span>
             </div>
             <div class="expanded-controls-box">
                 <button class="expanded-panel-close" id="expanded-panel-close-btn" title="Close" aria-label="Close dashboard">✕</button>
@@ -1350,9 +1375,10 @@ function renderExpandedForecast() {
             ${mainCardInnerHtml}
         </div>
 
-        <!-- 7-Day Selector Row -->
+        <!-- Daily Selector Row -->
         <div class="gw-daily-row">
             ${dailyCardsHtml}
+            ${actionCardHtml}
         </div>
 
         <!-- Planning Metrics Grid (Using Google Material Symbols) -->
@@ -1509,11 +1535,49 @@ function renderExpandedForecast() {
     }
 
     // Wire daily selector card clicks
-    const dayCards = panel.querySelectorAll('.gw-daily-card');
+    const dayCards = panel.querySelectorAll('.gw-daily-card[data-day-key]');
     dayCards.forEach(card => {
         card.addEventListener('click', (e) => {
             const clickedKey = e.currentTarget.getAttribute('data-day-key');
             selectExpandedDay(clickedKey);
         });
     });
+
+    // Wire 'More Days' trigger
+    const moreBtn = panel.querySelector('#gw-daily-more-btn');
+    if (moreBtn) {
+        moreBtn.addEventListener('click', async () => {
+            if (moreBtn.classList.contains('is-loading')) return;
+            moreBtn.classList.add('is-loading');
+            const icon = moreBtn.querySelector('.gw-daily-action-icon');
+            if (icon) {
+                icon.textContent = 'progress_activity';
+                icon.classList.add('gw-spin');
+            }
+            const range = moreBtn.querySelector('.gw-daily-range');
+            if (range) range.textContent = 'Loading...';
+
+            try {
+                isExtendedForecast = true;
+                await fetchWeatherData(false, EXTENDED_FORECAST_DAYS);
+                renderExpandedForecast();
+
+                const dailyRow = panel.querySelector('.gw-daily-row');
+                if (dailyRow) {
+                    const cards = dailyRow.querySelectorAll('.gw-daily-card[data-day-key]');
+                    if (cards.length > 7) {
+                        cards[7].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to extend weather forecast:', err);
+                moreBtn.classList.remove('is-loading');
+                if (icon) {
+                    icon.textContent = 'calendar_add_on';
+                    icon.classList.remove('gw-spin');
+                }
+                if (range) range.textContent = 'Retry';
+            }
+        });
+    }
 }

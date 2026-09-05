@@ -2837,6 +2837,76 @@ h1 {
     font-weight: 650;
 }
 
+/* Extended Forecast Action Card (More / Less Trigger) */
+.gw-daily-action-card {
+    flex: 1 1 0;
+    min-width: 58px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.28);
+    border-radius: 14px;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    user-select: none;
+    box-sizing: border-box;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0.82;
+}
+
+.gw-daily-action-card:hover {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.5);
+    border-style: solid;
+    transform: translateY(-1px);
+    opacity: 1;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+}
+
+.gw-daily-action-card:active {
+    transform: translateY(0px) scale(0.97);
+}
+
+.gw-daily-action-icon {
+    font-size: 21px !important;
+    color: rgba(255, 255, 255, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.gw-daily-action-card:hover .gw-daily-action-icon {
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.gw-daily-action-card.is-collapse {
+    border-style: solid;
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.gw-daily-action-card.is-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.gw-spin {
+    animation: gw-action-spin 1s linear infinite;
+}
+
+@keyframes gw-action-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 /* Planning Metrics Grid */
 .gw-metrics-grid {
     display: grid;
