@@ -849,18 +849,60 @@ templateTaskBtn.addEventListener('click', () => {
 // submitTaskBtn.disabled = true;
 // console.log(submitTaskBtn.disabled);
 
-hideAllButtons.addEventListener('click', () => {
+function applyHideAllButtonsState(hidden) {
     const extrasToolbar = document.querySelector(".extras-toolbar");
+    const todayNameEl = document.getElementById('today-name');
+    const hideWidgetBtnEl = document.querySelector('.hide-widget');
+    const taskToolbarEl = document.querySelector('.task-toolbar-container');
+    const slidingInputViewEl = document.getElementById('slidingInputView');
 
-    extrasToolbar.style.display = extrasToolbar.style.display === 'none' ? 'flex' : 'none';
-    todayNameText.style.display = todayNameText.style.display === 'none' ? 'flex' : 'none';
-    hideWidgetBtn.style.display = hideWidgetBtn.style.display === 'none' ? 'flex' : 'none';
-    taskToolbar.style.display = taskToolbar.style.display === 'none' ? 'flex' : 'none';
-    slidingInputView.style.display = slidingInputView.style.display !== 'none' ? 'none' : 'flex';
+    if (extrasToolbar) extrasToolbar.style.display = hidden ? 'none' : 'flex';
+    if (todayNameEl) todayNameEl.style.display = hidden ? 'none' : 'flex';
+    if (hideWidgetBtnEl) hideWidgetBtnEl.style.display = hidden ? 'none' : 'flex';
+    if (taskToolbarEl) taskToolbarEl.style.display = hidden ? 'none' : 'flex';
+    if (slidingInputViewEl) {
+        if (hidden) {
+            slidingInputViewEl.style.display = 'none';
+        } else {
+            slidingInputViewEl.style.display = 'flex';
+        }
+    }
 
-    // const isFullScreen = !!document.fullscreenElement;
-    // fullscreenIcon.textContent = isFullScreen ? 'fullscreen_exit' : 'fullscreen';
+    const outlookBar = document.getElementById('weather-outlook-bar');
+    if (outlookBar && hidden) {
+        outlookBar.style.display = 'none';
+    }
+}
+
+let isAllButtonsHidden = (typeof appSettings !== 'undefined' && appSettings["hide-all-buttons"] !== undefined)
+    ? Boolean(appSettings["hide-all-buttons"])
+    : (localStorage.getItem("hideAllButtons") === 'true');
+
+// Apply immediately if saved as hidden
+if (isAllButtonsHidden) {
+    applyHideAllButtonsState(true);
+}
+
+// Re-apply on DOM ready to catch any asynchronously rendered elements
+window.addEventListener('DOMContentLoaded', () => {
+    if (isAllButtonsHidden) {
+        applyHideAllButtonsState(true);
+    }
 });
+
+if (hideAllButtons) {
+    hideAllButtons.addEventListener('click', () => {
+        isAllButtonsHidden = !isAllButtonsHidden;
+        applyHideAllButtonsState(isAllButtonsHidden);
+
+        // Persist to appSettings and localStorage
+        if (typeof appSettings !== 'undefined') {
+            appSettings["hide-all-buttons"] = isAllButtonsHidden;
+            localStorage.setItem("appSettings", JSON.stringify(appSettings));
+        }
+        localStorage.setItem("hideAllButtons", isAllButtonsHidden ? 'true' : 'false');
+    });
+}
 
 
 // const yearContainer = document.getElementById('year-container');

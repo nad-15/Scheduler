@@ -9,7 +9,8 @@ const DEFAULT_SETTINGS = {
   "todo-floating-btn": false,
   "color-mode": "all",
   "color-shade-name": "red",
-  "add-task-modal": "on-click"
+  "add-task-modal": "on-click",
+  "hide-all-buttons": false
 };
 
 
