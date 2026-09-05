@@ -1020,26 +1020,41 @@ function renderExpandedForecast() {
 
         if ([71, 73, 75, 77, 85, 86].includes(code)) {
             alertBannerHtml = `
-                <div class="gw-alert-pill is-alert">
-                    <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/snow.svg" alt="Snow" onerror="this.style.display='none'">
-                    <span>Snow expected at ${timeLabel} (${pop}%)</span>
+                <div class="gw-alert-pill is-snow is-alert">
+                    <div class="gw-alert-icon-box">
+                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/snow.svg" alt="Snow" onerror="this.style.display='none'">
+                    </div>
+                    <div class="gw-alert-text-group">
+                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Snow Expected</div>
+                        <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)</div>
+                    </div>
                 </div>
             `;
             break;
         } else if ([95, 96, 99].includes(code)) {
             alertBannerHtml = `
-                <div class="gw-alert-pill is-alert">
-                    <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/thunderstorms-rain.svg" alt="Storm" onerror="this.style.display='none'">
-                    <span>Thunderstorm expected at ${timeLabel} (${pop}%)</span>
+                <div class="gw-alert-pill is-storm is-alert">
+                    <div class="gw-alert-icon-box">
+                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/thunderstorms-rain.svg" alt="Storm" onerror="this.style.display='none'">
+                    </div>
+                    <div class="gw-alert-text-group">
+                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Storm Alert</div>
+                        <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)</div>
+                    </div>
                 </div>
             `;
             break;
         } else if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code) || pop >= 30 || precip >= 0.2) {
             const vol = precip > 0 ? ` • ~${precip.toFixed(1)} mm` : '';
             alertBannerHtml = `
-                <div class="gw-alert-pill is-alert">
-                    <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/rain.svg" alt="Rain" onerror="this.style.display='none'">
-                    <span>Rain expected at ${timeLabel} (${pop}%)${vol}</span>
+                <div class="gw-alert-pill is-rain is-alert">
+                    <div class="gw-alert-icon-box">
+                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/rain.svg" alt="Rain" onerror="this.style.display='none'">
+                    </div>
+                    <div class="gw-alert-text-group">
+                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Rain Expected</div>
+                        <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)${vol}</div>
+                    </div>
                 </div>
             `;
             break;
@@ -1049,26 +1064,46 @@ function renderExpandedForecast() {
     if (!alertBannerHtml) {
         const isDayForAlert = isTodayActive ? Boolean(data.current.is_day) : true;
         const clearMeteoIcon = isDayForAlert ? 'clear-day' : 'clear-night';
+        const dayNightClass = isDayForAlert ? 'is-day' : 'is-night';
 
         if (activeLow <= 0 && activeHigh > 3) {
             alertBannerHtml = `
-                <div class="gw-alert-pill">
-                    <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/sleet.svg" alt="Frost" onerror="this.style.display='none'">
-                    <span>Overnight frost warning: Low ${activeLow}°</span>
+                <div class="gw-alert-pill is-freeze is-alert">
+                    <div class="gw-alert-icon-box">
+                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/sleet.svg" alt="Frost" onerror="this.style.display='none'">
+                    </div>
+                    <div class="gw-alert-text-group">
+                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Frost Warning</div>
+                        <div class="gw-alert-desc">Overnight low dropping to ${activeLow}°</div>
+                    </div>
                 </div>
             `;
         } else if (activeLow <= 3) {
+            const dryColdSub = isTodayActive ? 'No snow or precipitation expected' : 'Dry weather expected';
             alertBannerHtml = `
-                <div class="gw-alert-pill">
-                    <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${clearMeteoIcon}.svg" alt="Dry" onerror="this.style.display='none'">
-                    <span>Dry conditions • No snow expected</span>
+                <div class="gw-alert-pill is-clear ${dayNightClass}">
+                    <div class="gw-alert-icon-box">
+                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${clearMeteoIcon}.svg" alt="Dry" onerror="this.style.display='none'">
+                    </div>
+                    <div class="gw-alert-text-group">
+                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Dry Conditions</div>
+                        <div class="gw-alert-desc">${dryColdSub}</div>
+                    </div>
                 </div>
             `;
         } else {
+            const clearSub = isTodayActive
+                ? (isDayForAlert ? 'No rain expected through tonight' : 'No rain expected overnight')
+                : 'No rain expected for this day';
             alertBannerHtml = `
-                <div class="gw-alert-pill">
-                    <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${clearMeteoIcon}.svg" alt="Clear" onerror="this.style.display='none'">
-                    <span>Dry & clear • No rain expected</span>
+                <div class="gw-alert-pill is-clear ${dayNightClass}">
+                    <div class="gw-alert-icon-box">
+                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${clearMeteoIcon}.svg" alt="Clear" onerror="this.style.display='none'">
+                    </div>
+                    <div class="gw-alert-text-group">
+                        <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Dry & Clear</div>
+                        <div class="gw-alert-desc">${clearSub}</div>
+                    </div>
                 </div>
             `;
         }
