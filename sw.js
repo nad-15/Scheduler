@@ -2,7 +2,7 @@
 // Skhayeduler Service Worker - Network-First Strategy (Zero Stale Code)
 // ==========================================================================
 
-const CACHE_NAME = 'scheduler-pwa-v27';
+const CACHE_NAME = 'scheduler-pwa-v38';
 
 const STATIC_ASSETS = [
     './',
@@ -24,9 +24,11 @@ const STATIC_ASSETS = [
     './images/icon.png',
     './images/icon-192.png',
     './images/icon-512.png',
+    './images/screenshot-1.png',
+    './images/screenshot-2.png',
+    './images/apple-touch-icon.png',
     './images/web-app-manifest-192x192.png',
     './images/web-app-manifest-512x512.png',
-    './images/apple-touch-icon.png',
     './images/favicon-96x96.png',
     './images/favicon.svg',
     './images/favicon.ico',
@@ -73,6 +75,11 @@ self.addEventListener('fetch', (event) => {
     // Only handle standard HTTP/HTTPS GET requests
     if (event.request.method !== 'GET') return;
     if (!event.request.url.startsWith('http')) return;
+
+    // Do NOT intercept live weather or geocoding API requests - let browser handle directly
+    if (event.request.url.includes('open-meteo.com')) {
+        return;
+    }
 
     // Avoid Chrome DevTools / extension bug with only-if-cached requests
     if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;

@@ -1668,10 +1668,10 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 170px;
-    height: 103px;
-    height: fit-content;
     width: fit-content;
+    min-width: 170px;
+    box-sizing: border-box;
+    height: fit-content;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     user-select: none;
@@ -1736,18 +1736,19 @@ h1 {
 
 #today-location {
     font-size: 12px;
+    white-space: nowrap;
 }
 
 #today-date {
     font-size: 12px;
     margin-bottom: 25px;
-
-
+    white-space: nowrap;
 }
 
 #today-time {
     font-size: 20px;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 #today-seconds {
@@ -1782,22 +1783,32 @@ h1 {
 
 #today-icon {
     font-size: small;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 36px;
+    margin: 1px 0 2px 0;
 }
 
 #today-icon img {
     /* border: .5px solid white; */
-    width: 45px;
-    height: auto;
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    display: block;
 }
 
 #today-temp {
     font-size: 25px;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 #today-weather {
     font-size: 8px;
     font-style: italic;
+    white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -1901,6 +1912,16 @@ h1 {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.outlook-meteo-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
+    display: block;
 }
 
 .outlook-icon.pulse {
@@ -1994,9 +2015,9 @@ h1 {
 .weather-expanded-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(4, 9, 24, 0.55);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    background: rgba(4, 9, 24, 0.30);
+    backdrop-filter: blur(3.5px);
+    -webkit-backdrop-filter: blur(3.5px);
     z-index: 99998;
     opacity: 0;
     transition: opacity 0.25s ease;
@@ -2017,20 +2038,20 @@ h1 {
     max-width: calc(100vw - 28px);
     max-height: calc(100vh - 28px);
     z-index: 99999;
-    /* Living animated translucent aurora identical to #today-name widget */
+    /* Living animated translucent aurora with see-through frosted glass */
     background: linear-gradient(135deg,
-            rgba(5, 40, 100, 0.85),
-            rgba(20, 100, 200, 0.85),
-            rgba(0, 200, 100, 0.85),
-            rgba(200, 80, 150, 0.85),
-            rgba(100, 30, 180, 0.85));
+            rgba(5, 40, 100, 0.62),
+            rgba(20, 100, 200, 0.58),
+            rgba(0, 175, 105, 0.54),
+            rgba(180, 60, 140, 0.56),
+            rgba(80, 25, 150, 0.62));
     background-size: 400% 400%;
     animation: aurora 15s ease infinite;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 1.5px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.30), inset 0 1px 1.5px rgba(255, 255, 255, 0.35);
     color: #ffffff;
     font-family: Arial, sans-serif;
     user-select: none;
@@ -2078,9 +2099,230 @@ h1 {
     letter-spacing: 0.2px;
 }
 
+.expanded-city-selector {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 2px 6px 2px 4px;
+    margin-left: -4px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+    user-select: none;
+    border: 1px solid transparent;
+}
+
+.expanded-city-selector:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.expanded-city-arrow {
+    font-size: 16px !important;
+    color: #cbd5e1;
+    transition: transform 0.2s ease;
+    line-height: 1;
+}
+
+.expanded-city-selector.is-open .expanded-city-arrow {
+    transform: rotate(180deg);
+}
+
 .expanded-day-badge {
     font-size: 10.5px;
     color: #cbd5e1;
+}
+
+/* City Search Dropdown Box */
+.expanded-search-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 8px 10px;
+    margin-top: 2px;
+    animation: searchDropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes searchDropIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.expanded-search-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    padding: 4px 8px;
+}
+
+.expanded-search-icon {
+    font-size: 14px !important;
+    color: #cbd5e1;
+}
+
+.expanded-search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 12px;
+    font-family: inherit;
+    width: 100%;
+}
+
+.expanded-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.expanded-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 180px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.expanded-search-results:empty {
+    display: none !important;
+}
+
+/* Recent Searches */
+.expanded-search-recents-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 6px 1px 6px;
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: rgba(255, 255, 255, 0.5);
+    user-select: none;
+}
+
+.recent-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.recent-search-item-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.recent-search-history-icon {
+    font-size: 13px !important;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.recent-search-item-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-search-item-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.recent-search-remove-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.recent-search-remove-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.expanded-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    color: #f1f5f9;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.expanded-search-item:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.expanded-search-item.is-current {
+    background: rgba(255, 255, 255, 0.22);
+    font-weight: 600;
+}
+
+.expanded-search-item-tz {
+    font-size: 9.5px;
+    color: #94a3b8;
+}
+
+.expanded-search-empty {
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+    padding: 8px 0;
+}
+
+.expanded-search-reset-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.18);
+    border: 1px solid rgba(147, 197, 253, 0.3);
+    border-radius: 6px;
+    padding: 5px;
+    cursor: pointer;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+}
+
+.expanded-search-reset-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    color: #ffffff;
 }
 
 .expanded-controls-box {
@@ -2196,14 +2438,23 @@ h1 {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 20px;
-    padding: 6px 12px;
+    padding: 5px 12px;
     font-size: 11px;
     font-weight: 500;
     color: #ffffff;
     margin-top: 2px;
+}
+
+.gw-alert-meteo-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+    display: block;
 }
 
 .gw-alert-pill.is-alert {
@@ -2426,6 +2677,27 @@ span.material-symbols-outlined.gw-metric-icon {
 
 @keyframes exp-spin {
     to { transform: rotate(360deg); }
+}
+
+.gw-attribution {
+    text-align: center;
+    font-size: 9.5px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 2px;
+    padding-bottom: 2px;
+    user-select: none;
+}
+
+.gw-attribution a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease;
+}
+
+.gw-attribution a:hover {
+    color: #ffffff;
 }
 
 @media (max-width: 480px) {
