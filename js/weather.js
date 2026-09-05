@@ -276,7 +276,7 @@ function getWmoDetails(code, isDay = true) {
         code: c,
         text: text,
         icon: icon,
-        iconUrl: `https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${icon}.svg`
+        iconUrl: `./images/weather/${icon}.svg`
     };
 }
 
@@ -505,7 +505,7 @@ async function getWeather() {
 
                     <div class="weather-container">
                         <div id="today-icon">
-                             <img src="${iconUrl}" alt="weather icon" onerror="this.onerror=null; this.src='https://fonts.gstatic.com/s/i/materialicons/umbrella/v1/24px.svg';">
+                             <img src="${iconUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
                         </div>
                         <div id="today-temp">${tempVal}°</div>
                         <div id="today-weather">${weatherDescription}</div>
@@ -585,7 +585,7 @@ async function getWeather() {
 
                 <div class="weather-container">
                     <div id="today-icon">
-                        <img src="https://fonts.gstatic.com/s/i/materialicons/umbrella/v1/24px.svg" alt="icon">
+                        <img src="./images/weather/umbrella.svg" alt="icon">
                     </div>
                     <div id="today-temp">--°</div>
                     <div id="today-weather">Weather unavailable</div>
@@ -642,7 +642,7 @@ function renderWeatherOutlook(data) {
         // Snow detection
         if ([71, 73, 75, 77, 85, 86].includes(code)) {
             alertType = 'snow';
-            alertIconUrl = 'https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/snow.svg';
+            alertIconUrl = './images/weather/snow.svg';
             alertText = `Snow at ${timeLabel} (${pop}%)`;
             isPulse = true;
             outlookBar.classList.add('has-snow');
@@ -651,7 +651,7 @@ function renderWeatherOutlook(data) {
         // Thunderstorm
         if ([95, 96, 99].includes(code)) {
             alertType = 'storm';
-            alertIconUrl = 'https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/thunderstorms-rain.svg';
+            alertIconUrl = './images/weather/thunderstorms-rain.svg';
             alertText = `Storm at ${timeLabel} (${pop}%)`;
             isPulse = true;
             outlookBar.classList.add('has-rain');
@@ -660,7 +660,7 @@ function renderWeatherOutlook(data) {
         // Rain / Showers / Drizzle
         if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code) || pop >= 30 || precip >= 0.2) {
             alertType = 'rain';
-            alertIconUrl = 'https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/rain.svg';
+            alertIconUrl = './images/weather/rain.svg';
             alertText = `Rain at ${timeLabel} (${pop}%)`;
             isPulse = true;
             outlookBar.classList.add('has-rain');
@@ -671,7 +671,7 @@ function renderWeatherOutlook(data) {
     // Freeze / Frost Alert
     if (!alertType && (lowTemp <= -15 || (lowTemp <= 0 && highTemp > 3))) {
         alertType = 'freeze';
-        alertIconUrl = 'https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/sleet.svg';
+        alertIconUrl = './images/weather/sleet.svg';
         alertText = lowTemp <= -15 ? `Extreme cold: Low ${lowTemp}°` : (lowTemp < 0 ? `Freeze alert: Low ${lowTemp}°` : `Frost alert: Low 0°`);
         outlookBar.classList.add('has-freeze');
     }
@@ -685,7 +685,7 @@ function renderWeatherOutlook(data) {
         }
         if (maxGust >= 38) {
             alertType = 'wind';
-            alertIconUrl = 'https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/wind.svg';
+            alertIconUrl = './images/weather/wind.svg';
             alertText = `Gusts up to ${Math.round(maxGust)} km/h`;
             outlookBar.classList.add('has-wind');
         }
@@ -696,7 +696,7 @@ function renderWeatherOutlook(data) {
         for (const idx of upcomingHourlyIndices) {
             if ([45, 48].includes(data.hourly.weather_code[idx])) {
                 alertType = 'fog';
-                alertIconUrl = `https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${isCurrentDaytime ? 'fog-day' : 'fog-night'}.svg`;
+                alertIconUrl = `./images/weather/${isCurrentDaytime ? 'fog-day' : 'fog-night'}.svg`;
                 alertText = `Fog / low visibility`;
                 outlookBar.classList.add('has-fog');
                 break;
@@ -707,7 +707,7 @@ function renderWeatherOutlook(data) {
     // Default: Clear / Dry Conditions
     if (!alertType) {
         alertType = 'clear';
-        alertIconUrl = `https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${isCurrentDaytime ? 'clear-day' : 'clear-night'}.svg`;
+        alertIconUrl = `./images/weather/${isCurrentDaytime ? 'clear-day' : 'clear-night'}.svg`;
         const isColdSeason = highTemp <= 3;
         alertText = isColdSeason ? `No snow expected` : `No rain expected`;
     }
@@ -736,7 +736,7 @@ function renderWeatherOutlook(data) {
         <div class="outlook-header">
             <div class="outlook-main-info">
                 <span class="outlook-icon ${isPulse ? 'pulse' : ''}">
-                    <img class="outlook-meteo-icon" src="${alertIconUrl}" alt="${alertType}" onerror="this.style.display='none'">
+                    <img class="outlook-meteo-icon" src="${alertIconUrl}" alt="${alertType}" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
                 </span>
                 <span class="outlook-status">${alertText}</span>
             </div>
@@ -984,7 +984,7 @@ function renderExpandedForecast() {
         return `
             <div class="gw-daily-card ${isSelected ? 'active' : ''}" data-day-key="${dateStr}">
                 <span class="gw-daily-name">${dayShortName}</span>
-                <img class="gw-daily-icon" src="${wmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='https://fonts.gstatic.com/s/i/materialicons/umbrella/v1/24px.svg';">
+                <img class="gw-daily-icon" src="${wmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
                 <span class="gw-daily-range">${maxT}°/${minT}°</span>
             </div>
         `;
@@ -1022,7 +1022,7 @@ function renderExpandedForecast() {
             alertBannerHtml = `
                 <div class="gw-alert-pill is-snow is-alert">
                     <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/snow.svg" alt="Snow" onerror="this.style.display='none'">
+                        <img class="gw-alert-meteo-icon" src="./images/weather/snow.svg" alt="Snow" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
                         <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Snow Expected</div>
@@ -1035,7 +1035,7 @@ function renderExpandedForecast() {
             alertBannerHtml = `
                 <div class="gw-alert-pill is-storm is-alert">
                     <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/thunderstorms-rain.svg" alt="Storm" onerror="this.style.display='none'">
+                        <img class="gw-alert-meteo-icon" src="./images/weather/thunderstorms-rain.svg" alt="Storm" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
                         <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Storm Alert</div>
@@ -1049,7 +1049,7 @@ function renderExpandedForecast() {
             alertBannerHtml = `
                 <div class="gw-alert-pill is-rain is-alert">
                     <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/rain.svg" alt="Rain" onerror="this.style.display='none'">
+                        <img class="gw-alert-meteo-icon" src="./images/weather/rain.svg" alt="Rain" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
                         <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Rain Expected</div>
@@ -1070,7 +1070,7 @@ function renderExpandedForecast() {
             alertBannerHtml = `
                 <div class="gw-alert-pill is-freeze is-alert">
                     <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/sleet.svg" alt="Frost" onerror="this.style.display='none'">
+                        <img class="gw-alert-meteo-icon" src="./images/weather/sleet.svg" alt="Frost" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
                         <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Frost Warning</div>
@@ -1083,7 +1083,7 @@ function renderExpandedForecast() {
             alertBannerHtml = `
                 <div class="gw-alert-pill is-clear ${dayNightClass}">
                     <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${clearMeteoIcon}.svg" alt="Dry" onerror="this.style.display='none'">
+                        <img class="gw-alert-meteo-icon" src="./images/weather/${clearMeteoIcon}.svg" alt="Dry" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
                         <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Dry Conditions</div>
@@ -1098,7 +1098,7 @@ function renderExpandedForecast() {
             alertBannerHtml = `
                 <div class="gw-alert-pill is-clear ${dayNightClass}">
                     <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="https://cdn.jsdelivr.net/npm/@meteocons/svg/fill/${clearMeteoIcon}.svg" alt="Clear" onerror="this.style.display='none'">
+                        <img class="gw-alert-meteo-icon" src="./images/weather/${clearMeteoIcon}.svg" alt="Clear" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
                         <div class="gw-alert-title"><span class="gw-alert-dot-pulse"></span>Dry & Clear</div>
@@ -1125,7 +1125,7 @@ function renderExpandedForecast() {
             <div class="gw-hourly-col is-now">
                 <span class="gw-hourly-temp">${liveTemp}°</span>
                 <span class="gw-hourly-pop ${isRainingNow ? '' : 'is-empty'}">${isRainingNow ? 'Now' : '&nbsp;'}</span>
-                <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='https://fonts.gstatic.com/s/i/materialicons/umbrella/v1/24px.svg';">
+                <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
                 <span class="gw-hourly-time">Now</span>
             </div>
         `;
@@ -1145,7 +1145,7 @@ function renderExpandedForecast() {
                     <div class="gw-hourly-col">
                         <span class="gw-hourly-temp">${sTemp}°</span>
                         <span class="gw-hourly-pop ${popVal >= 20 ? '' : 'is-empty'}">${popVal >= 20 ? `${popVal}%` : '&nbsp;'}</span>
-                        <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='https://fonts.gstatic.com/s/i/materialicons/umbrella/v1/24px.svg';">
+                        <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
                         <span class="gw-hourly-time">${timeLabel}</span>
                     </div>
                 `;
@@ -1165,7 +1165,7 @@ function renderExpandedForecast() {
                 <div class="gw-hourly-col">
                     <span class="gw-hourly-temp">${sTemp}°</span>
                     <span class="gw-hourly-pop ${popVal >= 20 ? '' : 'is-empty'}">${popVal >= 20 ? `${popVal}%` : '&nbsp;'}</span>
-                    <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='https://fonts.gstatic.com/s/i/materialicons/umbrella/v1/24px.svg';">
+                    <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
                     <span class="gw-hourly-time">${timeLabel}</span>
                 </div>
             `;
@@ -1241,7 +1241,7 @@ function renderExpandedForecast() {
                     <span class="gw-hero-day">${activeDayLabel}</span>
                     <div class="gw-hero-temp-row">
                         <span class="gw-hero-temp">${heroTemp}</span>
-                        <img class="gw-hero-icon" src="${heroMeteoUrl}" alt="weather icon" onerror="this.onerror=null; this.src='https://fonts.gstatic.com/s/i/materialicons/umbrella/v1/24px.svg';">
+                        <img class="gw-hero-icon" src="${heroMeteoUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
                     </div>
                 </div>
                 <div class="gw-hero-right">
