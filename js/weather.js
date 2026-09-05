@@ -282,6 +282,99 @@ function getWmoDetails(code, isDay = true) {
     };
 }
 
+const weatherSvgCache = new Map();
+const weatherSvgPromises = new Map();
+
+/**
+ * Loads and caches SVG content text from URL
+ */
+async function loadWeatherSvg(url) {
+    if (!url) return null;
+    if (weatherSvgCache.has(url)) return weatherSvgCache.get(url);
+    if (weatherSvgPromises.has(url)) return weatherSvgPromises.get(url);
+
+    const p = (async () => {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) return null;
+            let text = await res.text();
+            text = text.replace(/<\?xml.*?\?>/i, '').trim();
+            weatherSvgCache.set(url, text);
+            return text;
+        } catch (e) {
+            return null;
+        } finally {
+            weatherSvgPromises.delete(url);
+        }
+    })();
+
+    weatherSvgPromises.set(url, p);
+    return p;
+}
+
+/**
+ * Preloads all unique weather SVGs in the forecast data into memory
+ */
+function preloadWeatherSvgs(data) {
+    if (!data || !data.daily || !data.hourly) return;
+    const urls = new Set();
+    if (data.current) {
+        const curWmo = getWmoDetails(data.current.weather_code, Boolean(data.current.is_day));
+        if (curWmo?.iconUrl) urls.add(curWmo.iconUrl);
+    }
+    data.daily.weather_code?.forEach((code, i) => {
+        const wmo = getWmoDetails(code, true);
+        if (wmo?.iconUrl) urls.add(wmo.iconUrl);
+    });
+    data.hourly.weather_code?.forEach((code, i) => {
+        const isDay = Boolean(data.hourly.is_day?.[i]);
+        const wmo = getWmoDetails(code, isDay);
+        if (wmo?.iconUrl) urls.add(wmo.iconUrl);
+    });
+    urls.add('./images/weather/umbrella.svg');
+    urls.add('./images/weather/rain.svg');
+    urls.add('./images/weather/snow.svg');
+    urls.add('./images/weather/wind.svg');
+    urls.add('./images/weather/sleet.svg');
+    urls.add('./images/weather/clear-day.svg');
+    urls.add('./images/weather/clear-night.svg');
+
+    urls.forEach(url => loadWeatherSvg(url));
+}
+
+/**
+ * Automatically upgrades <img> tags for weather icons into living inline <svg> elements.
+ * This guarantees SMIL animations run continuously on standalone mobile PWAs (where <img> SMIL is frozen)
+ * and ensures 0ms render latency.
+ */
+async function inlineWeatherSvgs(container) {
+    if (!container) return;
+    const imgElements = Array.from(container.querySelectorAll('img[src*="/images/weather/"]'));
+    if (!imgElements.length) return;
+
+    await Promise.all(imgElements.map(async (img) => {
+        const src = img.getAttribute('src');
+        if (!src) return;
+        const svgText = await loadWeatherSvg(src);
+        if (!svgText || !img.parentNode) return;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = svgText;
+        const svgElem = tempDiv.querySelector('svg');
+        if (!svgElem) return;
+
+        if (img.className) {
+            svgElem.setAttribute('class', (svgElem.getAttribute('class') || '') + ' ' + img.className);
+        }
+        if (img.id) svgElem.id = img.id;
+        if (img.getAttribute('alt')) svgElem.setAttribute('aria-label', img.getAttribute('alt'));
+        svgElem.setAttribute('role', 'img');
+        svgElem.style.pointerEvents = 'none';
+
+        img.replaceWith(svgElem);
+    }));
+}
+
 /**
  * Searches worldwide cities via Open-Meteo free Geocoding API
  * Robust to casing (lowercase, uppercase, Title Case) and compound queries (e.g. "toronto on", "toronto, canada")
@@ -456,6 +549,7 @@ async function fetchWeatherData(forceRefresh = false, targetDays = 7) {
                 data._fetchedAt = Date.now();
                 data._locationKey = cacheKey;
                 cachedWeatherData = data;
+                preloadWeatherSvgs(data);
 
                 // Re-render expanded panel if open
                 const panel = document.getElementById('weather-expanded-panel');
@@ -536,6 +630,7 @@ async function getWeather() {
                     iconImg.src = iconUrl;
                 }
             }
+            inlineWeatherSvgs(todayName);
 
             const dateEl = todayName.querySelector('#today-date');
             const hourMinuteEl = todayName.querySelector('#today-hour-minute');
@@ -1250,6 +1345,7 @@ function selectExpandedDay(clickedKey) {
     // Re-render only the updated content cards
     mainCard.innerHTML = mainCardInnerHtml;
     metricsGrid.innerHTML = metricsGridInnerHtml;
+    inlineWeatherSvgs(mainCard);
 
     // The day row SURVIVES the re-render completely! Update active state in-place
     dailyRow.querySelectorAll('.gw-daily-card[data-day-key]').forEach(card => {
@@ -1394,6 +1490,8 @@ function renderExpandedForecast() {
             Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>
         </div>
     `;
+
+    inlineWeatherSvgs(panel);
 
     // Restore daily row scroll position if it existed
     const newDailyRow = panel.querySelector('.gw-daily-row');
