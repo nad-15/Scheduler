@@ -929,70 +929,18 @@ window.closeWeatherExpandedPanel = closeWeatherExpandedPanel;
 window.toggleWeatherExpandedPanel = toggleWeatherExpandedPanel;
 
 /**
- * Renders the full expanded weather dashboard
+ * Computes and renders HTML for the active day's Hero Overview Card and Planning Metrics Grid
  */
-function renderExpandedForecast() {
-    const panel = document.getElementById('weather-expanded-panel');
-    if (!panel) return;
-
-    const data = cachedWeatherData;
-    const locationTitle = `${currentLocation.name}, ${currentLocation.admin || currentLocation.countryCode || currentLocation.country}`;
-
-    if (!data || !data.daily || !data.hourly) {
-        panel.innerHTML = `
-            <div class="expanded-header-row">
-                <div class="expanded-location-box">
-                    <div class="expanded-city-selector" id="expanded-city-selector-btn">
-                        <span class="expanded-city-name">${locationTitle}</span>
-                        <span class="material-symbols-outlined expanded-city-arrow">expand_more</span>
-                    </div>
-                    <span class="expanded-day-badge">7-Day Forecast</span>
-                </div>
-                <div class="expanded-controls-box">
-                    <button class="expanded-panel-close" id="expanded-panel-close-btn" title="Close" aria-label="Close dashboard">✕</button>
-                </div>
-            </div>
-            <div class="gw-main-card">
-                <div class="expanded-loading-state">
-                    <div class="expanded-spinner"></div>
-                    <span>Loading forecast details for ${currentLocation.name}...</span>
-                </div>
-            </div>
-        `;
-        const closeBtn = panel.querySelector('#expanded-panel-close-btn');
-        if (closeBtn) closeBtn.addEventListener('click', closeWeatherExpandedPanel);
-        return;
-    }
-
+function buildDayForecastDetails(data, dayKey) {
     const todayDateKey = getCityDateKey(new Date(), currentLocation.timezone);
-    if (!selectedDayKey || !data.daily.time.includes(selectedDayKey)) {
-        selectedDayKey = todayDateKey;
+    if (!dayKey || !data.daily.time.includes(dayKey)) {
+        dayKey = todayDateKey;
     }
 
-    const activeIndex = data.daily.time.indexOf(selectedDayKey);
-    const isTodayActive = selectedDayKey === todayDateKey;
+    const activeIndex = data.daily.time.indexOf(dayKey);
+    const isTodayActive = dayKey === todayDateKey;
 
-    // 1. Build Daily Selector Cards (7 Days)
-    const dailyCardsHtml = data.daily.time.map((dateStr, i) => {
-        const isSelected = dateStr === selectedDayKey;
-        const isCurrentDay = dateStr === todayDateKey;
-        const dayShortName = isCurrentDay ? 'Today' : formatWeekday(dateStr);
-        const wmo = getWmoDetails(data.daily.weather_code[i], true);
-        const maxT = Math.round(data.daily.temperature_2m_max[i]);
-        const minT = Math.round(data.daily.temperature_2m_min[i]);
-
-        return `
-            <div class="gw-daily-card ${isSelected ? 'active' : ''}" data-day-key="${dateStr}">
-                <span class="gw-daily-name">${dayShortName}</span>
-                <img class="gw-daily-icon" src="${wmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
-                <span class="gw-daily-range">${maxT}°/${minT}°</span>
-            </div>
-        `;
-    }).join('');
-
-    // 2. Active Day Overview Details
-    const activeDayLabel = isTodayActive ? 'Now' : formatFullDateLabel(selectedDayKey);
-
+    const activeDayLabel = isTodayActive ? 'Now' : formatFullDateLabel(dayKey);
     const activeHigh = Math.round(data.daily.temperature_2m_max[activeIndex]);
     const activeLow = Math.round(data.daily.temperature_2m_min[activeIndex]);
     const activeCode = isTodayActive ? data.current.weather_code : data.daily.weather_code[activeIndex];
@@ -1003,10 +951,10 @@ function renderExpandedForecast() {
     const heroCondition = activeWmo.text;
     const heroMeteoUrl = activeWmo.iconUrl;
 
-    // 3. Hourly Slots for Selected Day (24 individual 1-Hour increments)
+    // Hourly Slots for Selected Day (24 individual 1-Hour increments)
     const dayIndices = [];
     data.hourly.time.forEach((t, idx) => {
-        if (t.startsWith(selectedDayKey)) {
+        if (t.startsWith(dayKey)) {
             dayIndices.push(idx);
         }
     });
@@ -1109,13 +1057,12 @@ function renderExpandedForecast() {
         }
     }
 
-    // 4. Hourly Forecast Strip (True 1-Hour Step in City's Local Time)
+    // Hourly Forecast Strip (True 1-Hour Step in City's Local Time)
     let hourlyColumnsHtml = '';
     const now = new Date();
     const cityHour24 = getCityHour24(now, currentLocation.timezone);
 
     if (isTodayActive) {
-        // First column is live Now
         const liveTemp = Math.round(data.current.temperature_2m);
         const liveWmo = getWmoDetails(data.current.weather_code, Boolean(data.current.is_day));
         const livePrecip = data.current.precipitation || 0;
@@ -1130,7 +1077,6 @@ function renderExpandedForecast() {
             </div>
         `;
 
-        // Remaining 1-hour slots for today (starting from next city hour)
         dayIndices.forEach(idx => {
             const tStr = data.hourly.time[idx];
             const slotHour = parseInt(tStr.split('T')[1].split(':')[0], 10);
@@ -1152,7 +1098,6 @@ function renderExpandedForecast() {
             }
         });
     } else {
-        // Future Day: Display all 24 individual hours
         dayIndices.forEach(idx => {
             const tStr = data.hourly.time[idx];
             const sTemp = Math.round(data.hourly.temperature_2m[idx]);
@@ -1172,7 +1117,7 @@ function renderExpandedForecast() {
         });
     }
 
-    // 5. Planning Metrics Calculation
+    // Planning Metrics Calculation
     const maxPop = data.daily.precipitation_probability_max[activeIndex] || 0;
     const precipSum = data.daily.precipitation_sum[activeIndex] || 0;
     const snowfallSum = (data.daily.snowfall_sum && data.daily.snowfall_sum[activeIndex]) || 0;
@@ -1199,11 +1144,177 @@ function renderExpandedForecast() {
     const sunriseStr = formatIsoTime(data.daily.sunrise[activeIndex]);
     const sunsetStr = formatIsoTime(data.daily.sunset[activeIndex]);
 
-    // Smart noon swap for Today only (Morning = Sunrise above; Afternoon/Evening = Sunset above)
     const cityHour = getCityHour24(now, currentLocation.timezone);
     const isAfterNoonToday = isTodayActive && cityHour >= 12;
     const dawnDuskPrimary = isAfterNoonToday ? `Set ${sunsetStr}` : `Rise ${sunriseStr}`;
     const dawnDuskSecondary = isAfterNoonToday ? `Rise ${sunriseStr}` : `Set ${sunsetStr}`;
+
+    const mainCardInnerHtml = `
+        <div class="gw-hero-header">
+            <div class="gw-hero-left">
+                <span class="gw-hero-day">${activeDayLabel}</span>
+                <div class="gw-hero-temp-row">
+                    <span class="gw-hero-temp">${heroTemp}</span>
+                    <img class="gw-hero-icon" src="${heroMeteoUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                </div>
+            </div>
+            <div class="gw-hero-right">
+                <span class="gw-hero-condition">${heroCondition}</span>
+                <span class="gw-hero-sub">H: ${activeHigh}° • L: ${activeLow}°</span>
+            </div>
+        </div>
+
+        <!-- Dynamic Weather Advisory Pill -->
+        ${alertBannerHtml}
+
+        <!-- Google-Style 1-Hour Granular Timeline Strip -->
+        <div class="gw-hourly-scroll">
+            ${hourlyColumnsHtml}
+        </div>
+    `;
+
+    const metricsGridInnerHtml = `
+        <div class="gw-metric-card">
+            <span class="gw-metric-header">
+                <span class="material-symbols-outlined gw-metric-icon">weather_mix</span>
+                Precipitation
+            </span>
+            <span class="gw-metric-val">${maxPop}% Chance</span>
+            <span class="gw-metric-sub">${precipSubText}</span>
+        </div>
+        <div class="gw-metric-card">
+            <span class="gw-metric-header">
+                <span class="material-symbols-outlined gw-metric-icon">air</span>
+                Wind & Gusts
+            </span>
+            <span class="gw-metric-val">${windSpeedMax} km/h</span>
+            <span class="gw-metric-sub">Gusts: ${windGustMax} km/h</span>
+        </div>
+        <div class="gw-metric-card">
+            <span class="gw-metric-header">
+                <span class="material-symbols-outlined gw-metric-icon">thermostat</span>
+                Feels Like
+            </span>
+            <span class="gw-metric-val">${feelsLikeVal}°</span>
+            <span class="gw-metric-sub">${feelsLikeSub}</span>
+        </div>
+        <div class="gw-metric-card">
+            <span class="gw-metric-header">
+                <span class="material-symbols-outlined gw-metric-icon">wb_sunny</span>
+                Dawn & Dusk
+            </span>
+            <span class="gw-metric-val">${dawnDuskPrimary}</span>
+            <span class="gw-metric-sub">${dawnDuskSecondary}</span>
+        </div>
+    `;
+
+    return { mainCardInnerHtml, metricsGridInnerHtml };
+}
+
+/**
+ * Handles selecting a day in the 7-day row without re-rendering the whole panel.
+ * The daily row survives completely in the DOM, preserving its scroll position.
+ */
+function selectExpandedDay(clickedKey) {
+    if (!clickedKey || clickedKey === selectedDayKey) return;
+    selectedDayKey = clickedKey;
+
+    const panel = document.getElementById('weather-expanded-panel');
+    if (!panel || !cachedWeatherData) return;
+
+    const mainCard = panel.querySelector('.gw-main-card');
+    const metricsGrid = panel.querySelector('.gw-metrics-grid');
+    const dailyRow = panel.querySelector('.gw-daily-row');
+
+    // If components are missing, fall back to full render
+    if (!mainCard || !metricsGrid || !dailyRow) {
+        renderExpandedForecast();
+        return;
+    }
+
+    const { mainCardInnerHtml, metricsGridInnerHtml } = buildDayForecastDetails(cachedWeatherData, selectedDayKey);
+
+    // Re-render only the updated content cards
+    mainCard.innerHTML = mainCardInnerHtml;
+    metricsGrid.innerHTML = metricsGridInnerHtml;
+
+    // The day row SURVIVES the re-render completely! Update active state in-place
+    dailyRow.querySelectorAll('.gw-daily-card').forEach(card => {
+        const isCardActive = card.getAttribute('data-day-key') === selectedDayKey;
+        card.classList.toggle('active', isCardActive);
+    });
+
+    // Ensure the clicked card stays comfortably in view without snapping back to start
+    const activeCard = dailyRow.querySelector(`.gw-daily-card[data-day-key="${selectedDayKey}"]`);
+    if (activeCard) {
+        activeCard.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+    }
+}
+
+/**
+ * Renders the full expanded weather dashboard
+ */
+function renderExpandedForecast() {
+    const panel = document.getElementById('weather-expanded-panel');
+    if (!panel) return;
+
+    const data = cachedWeatherData;
+    const locationTitle = `${currentLocation.name}, ${currentLocation.admin || currentLocation.countryCode || currentLocation.country}`;
+
+    if (!data || !data.daily || !data.hourly) {
+        panel.innerHTML = `
+            <div class="expanded-header-row">
+                <div class="expanded-location-box">
+                    <div class="expanded-city-selector" id="expanded-city-selector-btn">
+                        <span class="expanded-city-name">${locationTitle}</span>
+                        <span class="material-symbols-outlined expanded-city-arrow">expand_more</span>
+                    </div>
+                    <span class="expanded-day-badge">7-Day Forecast</span>
+                </div>
+                <div class="expanded-controls-box">
+                    <button class="expanded-panel-close" id="expanded-panel-close-btn" title="Close" aria-label="Close dashboard">✕</button>
+                </div>
+            </div>
+            <div class="gw-main-card">
+                <div class="expanded-loading-state">
+                    <div class="expanded-spinner"></div>
+                    <span>Loading forecast details for ${currentLocation.name}...</span>
+                </div>
+            </div>
+        `;
+        const closeBtn = panel.querySelector('#expanded-panel-close-btn');
+        if (closeBtn) closeBtn.addEventListener('click', closeWeatherExpandedPanel);
+        return;
+    }
+
+    const todayDateKey = getCityDateKey(new Date(), currentLocation.timezone);
+    if (!selectedDayKey || !data.daily.time.includes(selectedDayKey)) {
+        selectedDayKey = todayDateKey;
+    }
+
+    // Preserve scroll position of daily row if panel was already rendered
+    const prevDailyScroll = panel.querySelector('.gw-daily-row')?.scrollLeft;
+
+    // 1. Build Daily Selector Cards (7 Days)
+    const dailyCardsHtml = data.daily.time.map((dateStr, i) => {
+        const isSelected = dateStr === selectedDayKey;
+        const isCurrentDay = dateStr === todayDateKey;
+        const dayShortName = isCurrentDay ? 'Today' : formatWeekday(dateStr);
+        const wmo = getWmoDetails(data.daily.weather_code[i], true);
+        const maxT = Math.round(data.daily.temperature_2m_max[i]);
+        const minT = Math.round(data.daily.temperature_2m_min[i]);
+
+        return `
+            <div class="gw-daily-card ${isSelected ? 'active' : ''}" data-day-key="${dateStr}">
+                <span class="gw-daily-name">${dayShortName}</span>
+                <img class="gw-daily-icon" src="${wmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                <span class="gw-daily-range">${maxT}°/${minT}°</span>
+            </div>
+        `;
+    }).join('');
+
+    // 2. Build Hero Card & Metrics Details for Active Day
+    const { mainCardInnerHtml, metricsGridInnerHtml } = buildDayForecastDetails(data, selectedDayKey);
 
     // Render Completed Panel
     panel.innerHTML = `
@@ -1236,27 +1347,7 @@ function renderExpandedForecast() {
 
         <!-- Hero Overview Card -->
         <div class="gw-main-card">
-            <div class="gw-hero-header">
-                <div class="gw-hero-left">
-                    <span class="gw-hero-day">${activeDayLabel}</span>
-                    <div class="gw-hero-temp-row">
-                        <span class="gw-hero-temp">${heroTemp}</span>
-                        <img class="gw-hero-icon" src="${heroMeteoUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
-                    </div>
-                </div>
-                <div class="gw-hero-right">
-                    <span class="gw-hero-condition">${heroCondition}</span>
-                    <span class="gw-hero-sub">H: ${activeHigh}° • L: ${activeLow}°</span>
-                </div>
-            </div>
-
-            <!-- Dynamic Weather Advisory Pill -->
-            ${alertBannerHtml}
-
-            <!-- Google-Style 1-Hour Granular Timeline Strip -->
-            <div class="gw-hourly-scroll">
-                ${hourlyColumnsHtml}
-            </div>
+            ${mainCardInnerHtml}
         </div>
 
         <!-- 7-Day Selector Row -->
@@ -1266,38 +1357,7 @@ function renderExpandedForecast() {
 
         <!-- Planning Metrics Grid (Using Google Material Symbols) -->
         <div class="gw-metrics-grid">
-            <div class="gw-metric-card">
-                <span class="gw-metric-header">
-                    <span class="material-symbols-outlined gw-metric-icon">weather_mix</span>
-                    Precipitation
-                </span>
-                <span class="gw-metric-val">${maxPop}% Chance</span>
-                <span class="gw-metric-sub">${precipSubText}</span>
-            </div>
-            <div class="gw-metric-card">
-                <span class="gw-metric-header">
-                    <span class="material-symbols-outlined gw-metric-icon">air</span>
-                    Wind & Gusts
-                </span>
-                <span class="gw-metric-val">${windSpeedMax} km/h</span>
-                <span class="gw-metric-sub">Gusts: ${windGustMax} km/h</span>
-            </div>
-            <div class="gw-metric-card">
-                <span class="gw-metric-header">
-                    <span class="material-symbols-outlined gw-metric-icon">thermostat</span>
-                    Feels Like
-                </span>
-                <span class="gw-metric-val">${feelsLikeVal}°</span>
-                <span class="gw-metric-sub">${feelsLikeSub}</span>
-            </div>
-            <div class="gw-metric-card">
-                <span class="gw-metric-header">
-                    <span class="material-symbols-outlined gw-metric-icon">wb_sunny</span>
-                    Dawn & Dusk
-                </span>
-                <span class="gw-metric-val">${dawnDuskPrimary}</span>
-                <span class="gw-metric-sub">${dawnDuskSecondary}</span>
-            </div>
+            ${metricsGridInnerHtml}
         </div>
 
         <!-- Subtle Open-Meteo Attribution -->
@@ -1305,6 +1365,12 @@ function renderExpandedForecast() {
             Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>
         </div>
     `;
+
+    // Restore daily row scroll position if it existed
+    const newDailyRow = panel.querySelector('.gw-daily-row');
+    if (newDailyRow && prevDailyScroll !== undefined && prevDailyScroll > 0) {
+        newDailyRow.scrollLeft = prevDailyScroll;
+    }
 
     // Wire close button
     const closeBtn = panel.querySelector('#expanded-panel-close-btn');
@@ -1447,10 +1513,7 @@ function renderExpandedForecast() {
     dayCards.forEach(card => {
         card.addEventListener('click', (e) => {
             const clickedKey = e.currentTarget.getAttribute('data-day-key');
-            if (clickedKey && clickedKey !== selectedDayKey) {
-                selectedDayKey = clickedKey;
-                renderExpandedForecast();
-            }
+            selectExpandedDay(clickedKey);
         });
     });
 }

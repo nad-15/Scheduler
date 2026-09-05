@@ -2772,17 +2772,18 @@ h1 {
     font-weight: 700;
 }
 
-/* Daily Selector Row (The 5 Days Below the Main Card) */
+/* Daily Selector Row (The 7 Days Below the Main Card) */
 .gw-daily-row {
     display: flex;
     gap: 6px;
     overflow-x: auto;
-    padding: 2px 1px;
+    padding: 3px 2px 5px 2px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
     overscroll-behavior: contain;
     touch-action: pan-x;
+    scroll-behavior: smooth;
 }
 
 .gw-daily-row::-webkit-scrollbar {
@@ -2792,8 +2793,8 @@ h1 {
 .gw-daily-card {
     flex: 1 1 0;
     min-width: 58px;
-    background: rgba(0, 0, 0, 0.11);
-    border: 1.5px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.11);
     border-radius: 14px;
     padding: 8px 4px;
     display: flex;
@@ -2801,43 +2802,66 @@ h1 {
     align-items: center;
     gap: 4px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
     user-select: none;
     box-sizing: border-box;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0.82;
 }
 
 .gw-daily-card:hover {
-    background: rgba(255, 255, 255, 0.16);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+    opacity: 0.95;
 }
 
+/* Soft, elegant Apple-style frosted active card — no harsh white bloom */
 .gw-daily-card.active {
-    border-color: rgba(255, 255, 255, 0.9);
-    background: rgba(255, 255, 255, 0.22);
-    box-shadow: 0 0 16px rgba(255, 255, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    opacity: 1;
+    transform: translateY(-1px);
 }
 
 .gw-daily-name {
     font-size: 11px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.78);
+    transition: color 0.2s ease;
 }
 
 .gw-daily-card.active .gw-daily-name {
     color: #ffffff;
+    font-weight: 700;
 }
 
 .gw-daily-icon {
     width: 24px;
     height: 24px;
     object-fit: contain;
+    transition: transform 0.2s ease;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.gw-daily-card.active .gw-daily-icon {
+    transform: scale(1.06);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28));
 }
 
 .gw-daily-range {
     font-size: 10px;
-    font-weight: 600;
-    color: #e2e8f0;
+    font-weight: 550;
+    color: rgba(255, 255, 255, 0.70);
     white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+.gw-daily-card.active .gw-daily-range {
+    color: #ffffff;
+    font-weight: 650;
 }
 
 /* Planning Metrics Grid */
