@@ -2837,18 +2837,17 @@ h1 {
     font-weight: 650;
 }
 
-/* Extended Forecast Action Card (Apple-Style Centered Plus & Subtitle) */
+/* Extended Forecast Action Card (Minimalist Single Centered Plus) */
 .gw-daily-action-card {
     flex: 1 1 0;
-    min-width: 58px;
+    min-width: 54px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px dashed rgba(255, 255, 255, 0.28);
     border-radius: 14px;
-    padding: 8px 4px;
+    padding: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
     cursor: pointer;
     transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
     user-select: none;
@@ -2856,30 +2855,6 @@ h1 {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     opacity: 0.85;
-}
-
-.gw-daily-action-card .gw-daily-empty-slot {
-    font-size: 11px;
-    line-height: 14px;
-    height: 14px;
-    visibility: hidden;
-    pointer-events: none;
-    user-select: none;
-}
-
-.gw-daily-plus-circle {
-    width: 26px;
-    height: 26px;
-    margin: -1px 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.10);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
-    box-sizing: border-box;
 }
 
 .gw-daily-action-card:hover {
@@ -2891,37 +2866,37 @@ h1 {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
-.gw-daily-action-card:hover .gw-daily-plus-circle {
-    background: rgba(255, 255, 255, 0.24);
-    border-color: rgba(255, 255, 255, 0.75);
-    transform: scale(1.1);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-}
-
 .gw-daily-action-card:active {
     transform: translateY(0px) scale(0.96);
 }
 
+.gw-daily-plus-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+}
+
+.gw-daily-action-card:hover .gw-daily-plus-circle {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.75);
+    transform: scale(1.12);
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
+}
+
 .gw-daily-action-svg {
     display: block;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     color: #ffffff;
     pointer-events: none;
-}
-
-.gw-daily-action-card .gw-daily-range {
-    font-size: 10px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.78);
-    line-height: 13px;
-    white-space: nowrap;
-    letter-spacing: 0.2px;
-    transition: color 0.2s ease;
-}
-
-.gw-daily-action-card:hover .gw-daily-range {
-    color: #ffffff;
 }
 
 .gw-daily-action-card.is-loading {

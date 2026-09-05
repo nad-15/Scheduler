@@ -1329,17 +1329,15 @@ function renderExpandedForecast() {
         `;
     }).join('');
 
-    // Trigger action card (Apple-style centered plus circle & subtitle, aligned with sibling cards)
+    // Trigger action card (Minimalist single centered plus button)
     const actionCardHtml = !isExtendedForecast ? `
-        <div class="gw-daily-action-card" id="gw-daily-more-btn" role="button" tabindex="0" title="Extend forecast to 14 days">
-            <span class="gw-daily-empty-slot" aria-hidden="true">&nbsp;</span>
+        <div class="gw-daily-action-card" id="gw-daily-more-btn" role="button" tabindex="0" title="Extend to 14-day forecast" aria-label="Extend to 14-day forecast">
             <div class="gw-daily-plus-circle">
                 <svg class="gw-daily-action-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
             </div>
-            <span class="gw-daily-range">14 Days</span>
         </div>
     ` : '';
 
@@ -1562,8 +1560,6 @@ function renderExpandedForecast() {
                     </svg>
                 `;
             }
-            const range = moreBtn.querySelector('.gw-daily-range');
-            if (range) range.textContent = 'Loading...';
 
             try {
                 isExtendedForecast = true;
@@ -1588,7 +1584,6 @@ function renderExpandedForecast() {
                         </svg>
                     `;
                 }
-                if (range) range.textContent = 'Retry';
             }
         });
     }
