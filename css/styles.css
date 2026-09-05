@@ -1861,26 +1861,24 @@ h1 {
     justify-content: center;
     padding: 7px 9px 7px 10px;
     border-radius: 10px;
-    /* Companion Aurora: Harmonious with main widget, but shifted to deep twilight indigo-cyan-orchid with reverse motion */
-    background: linear-gradient(225deg,
+    /* Companion Aurora: Same 135deg gradient angle and 15s motion as #today-name */
+    background: linear-gradient(135deg,
             rgba(6, 26, 75, 0.93),
             rgba(12, 78, 165, 0.90),
             rgba(0, 165, 145, 0.88),
             rgba(125, 38, 140, 0.88),
             rgba(35, 16, 85, 0.94));
     background-size: 400% 400%;
-    animation: aurora 18s ease infinite reverse;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 10px rgba(0, 0, 0, 0.25);
+    animation: aurora 15s ease infinite;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     color: #ffffff;
     font-family: Arial, sans-serif;
     user-select: none;
     box-sizing: border-box;
     width: fit-content;
     min-width: 170px;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -1893,31 +1891,6 @@ h1 {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.weather-outlook-bar.has-rain {
-    border-color: rgba(56, 189, 248, 0.5);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(56, 189, 248, 0.25);
-}
-
-.weather-outlook-bar.has-snow {
-    border-color: rgba(186, 230, 253, 0.55);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(224, 242, 254, 0.3);
-}
-
-.weather-outlook-bar.has-freeze {
-    border-color: rgba(165, 243, 252, 0.6);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(165, 243, 252, 0.3);
-}
-
-.weather-outlook-bar.has-wind {
-    border-color: rgba(148, 163, 184, 0.5);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(148, 163, 184, 0.25);
-}
-
-.weather-outlook-bar.has-fog {
-    border-color: rgba(203, 213, 225, 0.45);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(203, 213, 225, 0.2);
 }
 
 .weather-outlook-bar.dismissed {
