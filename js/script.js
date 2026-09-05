@@ -728,7 +728,7 @@ function startLongPress(e) {
         return;
     }
 
-    const currentMode = (typeof appSettings !== 'undefined' && appSettings['add-task-modal']) || 'long-press';
+    const currentMode = (typeof appSettings !== 'undefined' && appSettings['add-task-modal']) || 'on-click';
 
     if (currentMode === 'on-click') {
         return;
@@ -792,7 +792,7 @@ addTaskBtn.addEventListener('click', (e) => {
         return;
     }
 
-    const currentMode = (typeof appSettings !== 'undefined' && appSettings['add-task-modal']) || 'long-press';
+    const currentMode = (typeof appSettings !== 'undefined' && appSettings['add-task-modal']) || 'on-click';
 
     // If "on-click" mode is selected, bypass default bottom addition and toggle the modal
     if (currentMode === 'on-click') {
