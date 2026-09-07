@@ -2042,7 +2042,9 @@ h1 {
     right: 14px;
     width: 375px;
     max-width: calc(100vw - 28px);
+    height: auto;
     max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - 28px);
     z-index: 99999;
     /* Static Frosted Glass with exact colors from .movable-template - Balanced Sweet Spot */
     background: linear-gradient(135deg,
@@ -2069,12 +2071,38 @@ h1 {
     overscroll-behavior: contain;
     overscroll-behavior-x: contain;
     touch-action: pan-y;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
     transform: translateY(-8px) scale(0.97) translateZ(0);
     opacity: 0;
     pointer-events: none;
     will-change: transform, opacity;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent any child element from being squeezed or crushed when panel hits max-height */
+.weather-expanded-panel > * {
+    flex-shrink: 0;
+}
+
+/* Custom sleek translucent scrollbar */
+.weather-expanded-panel::-webkit-scrollbar {
+    width: 5px;
+}
+
+.weather-expanded-panel::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 8px 0;
+}
+
+.weather-expanded-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+}
+
+.weather-expanded-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .weather-expanded-panel.active {
@@ -3038,6 +3066,8 @@ span.material-symbols-outlined.gw-metric-icon {
         right: 10px;
         width: auto;
         max-width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
     }
 }
 
