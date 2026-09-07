@@ -955,7 +955,6 @@ function renderWeatherOutlook(data) {
         </div>
     `;
 
-    outlookBar.style.display = 'flex';
     inlineWeatherSvgs(outlookBar);
 
     // Position dynamically directly below #weather-widget and lock exact width matching
@@ -972,14 +971,54 @@ function renderWeatherOutlook(data) {
         }
     };
 
-    alignPosition();
+    // Sync visibility with #weather-widget and global hide-all-buttons state
+    const weatherWidget = document.getElementById('weather-widget');
+    const hideWidgetBtn = document.getElementById('hide-widget-btn') || document.querySelector('.hide-widget');
+
+    const syncVisibility = () => {
+        if (!weatherWidget || outlookBar.classList.contains('dismissed')) return;
+
+        const isButtonsHidden = (typeof isAllButtonsHidden !== 'undefined' && isAllButtonsHidden) ||
+            (typeof appSettings !== 'undefined' && appSettings["hide-all-buttons"]) ||
+            (localStorage.getItem("hideAllButtons") === 'true');
+
+        const isSlideHidden = weatherWidget.style.transform &&
+            weatherWidget.style.transform !== 'translateX(0px)' &&
+            weatherWidget.style.transform !== 'translateX(0)';
+
+        const isDisplayNone = isButtonsHidden ||
+            weatherWidget.style.display === 'none' ||
+            getComputedStyle(weatherWidget).display === 'none';
+
+        if (isDisplayNone) {
+            outlookBar.style.display = 'none';
+        } else if (isSlideHidden) {
+            const barWidth = outlookBar.offsetWidth || 220;
+            outlookBar.style.transform = `translateX(${barWidth + 24}px)`;
+            outlookBar.style.opacity = '0';
+            outlookBar.style.pointerEvents = 'none';
+        } else {
+            outlookBar.style.display = 'flex';
+            outlookBar.style.transform = 'translateX(0)';
+            outlookBar.style.opacity = '1';
+            outlookBar.style.pointerEvents = 'auto';
+            alignPosition();
+        }
+    };
+
+    // Expose for external controls (e.g. script.js unhide button)
+    window.syncWeatherOutlookVisibility = syncVisibility;
+
+    // Apply visibility immediately & synchronously (eliminates any 50ms async glimpse/flash)
+    syncVisibility();
+
     window.addEventListener('resize', alignPosition);
-    setTimeout(alignPosition, 50);
-    setTimeout(alignPosition, 150);
-    setTimeout(alignPosition, 600);
+    setTimeout(syncVisibility, 50);
+    setTimeout(syncVisibility, 150);
+    setTimeout(syncVisibility, 600);
 
     if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(alignPosition);
+        document.fonts.ready.then(syncVisibility);
     }
 
     const weatherWidgetEl = document.getElementById('weather-widget');
@@ -1008,36 +1047,6 @@ function renderWeatherOutlook(data) {
         if (e.target.closest('#close-weather-outlook')) return;
         openWeatherExpandedPanel();
     });
-
-    // Sync visibility with #weather-widget sliding state
-    const weatherWidget = document.getElementById('weather-widget');
-    const hideWidgetBtn = document.getElementById('hide-widget-btn') || document.querySelector('.hide-widget');
-
-    const syncVisibility = () => {
-        if (!weatherWidget || outlookBar.classList.contains('dismissed')) return;
-        const isSlideHidden = weatherWidget.style.transform &&
-            weatherWidget.style.transform !== 'translateX(0px)' &&
-            weatherWidget.style.transform !== 'translateX(0)';
-        const isDisplayNone = weatherWidget.style.display === 'none' || getComputedStyle(weatherWidget).display === 'none';
-
-        if (isDisplayNone) {
-            outlookBar.style.display = 'none';
-        } else if (isSlideHidden) {
-            const barWidth = outlookBar.offsetWidth || 220;
-            outlookBar.style.transform = `translateX(${barWidth + 24}px)`;
-            outlookBar.style.opacity = '0';
-            outlookBar.style.pointerEvents = 'none';
-        } else {
-            outlookBar.style.display = 'flex';
-            outlookBar.style.transform = 'translateX(0)';
-            outlookBar.style.opacity = '1';
-            outlookBar.style.pointerEvents = 'auto';
-            alignPosition();
-        }
-    };
-
-    setTimeout(syncVisibility, 50);
-    setTimeout(syncVisibility, 250);
 
     if (hideWidgetBtn) {
         hideWidgetBtn.addEventListener('click', () => setTimeout(syncVisibility, 20));

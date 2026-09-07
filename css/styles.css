@@ -5506,6 +5506,16 @@ input[type="radio"]:checked::after {
 
 }
 
+/* Zero-Glimpse / Zero-FOUC Global State on Startup */
+html.hide-all-buttons-active #weather-widget,
+html.hide-all-buttons-active .weather-outlook-bar,
+html.hide-all-buttons-active .hide-widget,
+html.hide-all-buttons-active .extras-toolbar,
+html.hide-all-buttons-active .task-toolbar-container,
+html.hide-all-buttons-active #slidingInputView {
+    display: none !important;
+}
+
 
 
 /* cloned elements */

@@ -41,6 +41,18 @@
 
       gtag('config', 'G-201JTXNXE8');
     </script>
+
+    <!-- Early State Initialization (Zero Glimpse/FOUC on Startup) -->
+    <script>
+      (function() {
+        try {
+          var s = JSON.parse(localStorage.getItem('appSettings') || '{}');
+          if (localStorage.getItem('hideAllButtons') === 'true' || s['hide-all-buttons'] === true) {
+            document.documentElement.classList.add('hide-all-buttons-active');
+          }
+        } catch(e) {}
+      })();
+    </script>
 </head>
 
 <body>

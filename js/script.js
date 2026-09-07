@@ -850,6 +850,7 @@ templateTaskBtn.addEventListener('click', () => {
 // console.log(submitTaskBtn.disabled);
 
 function applyHideAllButtonsState(hidden) {
+    document.documentElement.classList.toggle('hide-all-buttons-active', hidden);
     const extrasToolbar = document.querySelector(".extras-toolbar");
     const weatherWidgetEl = document.getElementById('weather-widget');
     const hideWidgetBtnEl = document.querySelector('.hide-widget');
@@ -869,8 +870,15 @@ function applyHideAllButtonsState(hidden) {
     }
 
     const outlookBar = document.getElementById('weather-outlook-bar');
-    if (outlookBar && hidden) {
-        outlookBar.style.display = 'none';
+    if (outlookBar) {
+        if (hidden) {
+            outlookBar.style.display = 'none';
+        } else if (typeof window.syncWeatherOutlookVisibility === 'function') {
+            window.syncWeatherOutlookVisibility();
+        } else {
+            const isDismissed = sessionStorage.getItem('weather-outlook-dismissed') === 'true';
+            if (!isDismissed) outlookBar.style.display = 'flex';
+        }
     }
 }
 

@@ -1196,20 +1196,18 @@ function initSettings() {
 function runStartupFeatures() {
   const settings = loadSettings();
 
-  getWeather().finally(() => {
-    const offset = 8;
-    const weatherWidget = document.getElementById("weather-widget");
-    if (!weatherWidget) return;
-
-    // If user chose to hide widget, slide it
-    if (!settings["weather-widget"]) {
-      requestAnimationFrame(() => {
-        const weatherWidgetWidth = weatherWidget.offsetWidth || 170;
-        weatherWidget.style.transform = `translateX(${weatherWidgetWidth + offset}px)`;
-        hideWidgetBtn.classList.add("is-true");
-      });
+  // If user chose to hide weather widget in settings, slide it off-screen immediately on startup
+  const offset = 8;
+  const weatherWidget = document.getElementById("weather-widget");
+  if (weatherWidget && !settings["weather-widget"]) {
+    const weatherWidgetWidth = weatherWidget.offsetWidth || 170;
+    weatherWidget.style.transform = `translateX(${weatherWidgetWidth + offset}px)`;
+    if (typeof hideWidgetBtn !== 'undefined' && hideWidgetBtn) {
+      hideWidgetBtn.classList.add("is-true");
     }
-  });
+  }
+
+  getWeather();
 
   // Apply saved view mode
   if (settings["view-mode"] === "month") {
