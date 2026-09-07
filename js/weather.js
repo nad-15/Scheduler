@@ -664,12 +664,12 @@ async function fetchWeatherData(forceRefresh = false, targetDays = 7) {
  */
 async function getWeather() {
     try {
-        const todayName = document.getElementById('today-name');
-        if (todayName && !todayName.querySelector('.time-container') && !todayName.querySelector('.today-loading-state')) {
-            todayName.innerHTML = `
-                <div class="today-loading-state">
-                    <div class="today-spinner"></div>
-                    <span class="today-loading-text">Loading weather...</span>
+        const weatherWidget = document.getElementById('weather-widget');
+        if (weatherWidget && !weatherWidget.querySelector('.time-container') && !weatherWidget.querySelector('.weather-widget-loading')) {
+            weatherWidget.innerHTML = `
+                <div class="weather-widget-loading">
+                    <div class="weather-widget-spinner"></div>
+                    <span class="weather-widget-loading-text">Loading weather...</span>
                 </div>
             `;
         }
@@ -687,35 +687,35 @@ async function getWeather() {
 
         const locationLabel = `${currentLocation.name}, ${currentLocation.admin || currentLocation.countryCode || currentLocation.country}`;
 
-        if (todayName) {
+        if (weatherWidget) {
             // Render structure once if not already rendered
-            if (!todayName.querySelector('.time-container')) {
-                todayName.innerHTML = `
+            if (!weatherWidget.querySelector('.time-container')) {
+                weatherWidget.innerHTML = `
                     <div class="time-container">
-                        <div id="today-location">${locationLabel}</div>
-                        <div id="today-date"></div>
-                        <div id="today-time">
-                            <span id="today-hour-minute"></span>
+                        <div id="weather-location">${locationLabel}</div>
+                        <div id="weather-date"></div>
+                        <div id="weather-time">
+                            <span id="weather-hour-minute"></span>
                         </div>
-                        <span id="today-seconds"></span>
+                        <span id="weather-seconds"></span>
                     </div>
 
                     <div class="weather-container">
-                        <div id="today-icon">
+                        <div id="weather-icon">
                              <img src="${iconUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
                         </div>
-                        <div id="today-temp">${tempVal}°</div>
-                        <div id="today-weather">${weatherDescription}</div>
+                        <div id="weather-temp">${tempVal}°</div>
+                        <div id="weather-desc">${weatherDescription}</div>
                     </div>
                 `;
             } else {
-                const locEl = todayName.querySelector('#today-location');
+                const locEl = weatherWidget.querySelector('#weather-location');
                 if (locEl) locEl.textContent = locationLabel;
-                const tempEl = todayName.querySelector('#today-temp');
+                const tempEl = weatherWidget.querySelector('#weather-temp');
                 if (tempEl) tempEl.textContent = `${tempVal}°`;
-                const weatherEl = todayName.querySelector('#today-weather');
+                const weatherEl = weatherWidget.querySelector('#weather-desc');
                 if (weatherEl) weatherEl.textContent = weatherDescription;
-                const iconContainer = todayName.querySelector('#today-icon');
+                const iconContainer = weatherWidget.querySelector('#weather-icon');
                 if (iconContainer) {
                     const currentSrc = iconContainer.querySelector('img')?.getAttribute('src') ||
                                        iconContainer.querySelector('svg')?.getAttribute('data-weather-src');
@@ -724,11 +724,11 @@ async function getWeather() {
                     }
                 }
             }
-            inlineWeatherSvgs(todayName);
+            inlineWeatherSvgs(weatherWidget);
 
-            const dateEl = todayName.querySelector('#today-date');
-            const hourMinuteEl = todayName.querySelector('#today-hour-minute');
-            const secondsEl = todayName.querySelector('#today-seconds');
+            const dateEl = weatherWidget.querySelector('#weather-date');
+            const hourMinuteEl = weatherWidget.querySelector('#weather-hour-minute');
+            const secondsEl = weatherWidget.querySelector('#weather-seconds');
 
             function updateTime() {
                 const now = new Date();
@@ -773,24 +773,24 @@ async function getWeather() {
 
     } catch (error) {
         console.error('Error fetching weather data:', error);
-        const todayName = document.getElementById('today-name');
-        if (todayName) {
-            todayName.innerHTML = `
+        const weatherWidget = document.getElementById('weather-widget');
+        if (weatherWidget) {
+            weatherWidget.innerHTML = `
                 <div class="time-container">
-                    <div id="today-location">${currentLocation.name}</div>
-                    <div id="today-date">--, ----</div>
-                    <div id="today-time">
-                        <span id="today-hour-minute">--:--</span>
+                    <div id="weather-location">${currentLocation.name}</div>
+                    <div id="weather-date">--, ----</div>
+                    <div id="weather-time">
+                        <span id="weather-hour-minute">--:--</span>
                     </div>
-                    <span id="today-seconds">:-- --</span>
+                    <span id="weather-seconds">:-- --</span>
                 </div>
 
                 <div class="weather-container">
-                    <div id="today-icon">
+                    <div id="weather-icon">
                         <img src="./images/weather/umbrella.svg" alt="icon">
                     </div>
-                    <div id="today-temp">--°</div>
-                    <div id="today-weather">Weather unavailable</div>
+                    <div id="weather-temp">--°</div>
+                    <div id="weather-desc">Weather unavailable</div>
                 </div>
             `;
         }
@@ -798,7 +798,7 @@ async function getWeather() {
 }
 
 /**
- * Companion Forecast Outlook Bar (Under #today-name)
+ * Companion Forecast Outlook Bar (Under #weather-widget)
  */
 function renderWeatherOutlook(data) {
     const outlookBar = document.getElementById('weather-outlook-bar');
@@ -958,11 +958,11 @@ function renderWeatherOutlook(data) {
     outlookBar.style.display = 'flex';
     inlineWeatherSvgs(outlookBar);
 
-    // Position dynamically directly below #today-name and lock exact width matching
+    // Position dynamically directly below #weather-widget and lock exact width matching
     const alignPosition = () => {
-        const todayName = document.getElementById('today-name');
-        if (todayName && outlookBar) {
-            const rect = todayName.getBoundingClientRect();
+        const weatherWidget = document.getElementById('weather-widget');
+        if (weatherWidget && outlookBar) {
+            const rect = weatherWidget.getBoundingClientRect();
             if (rect.height > 0) outlookBar.style.top = `${rect.bottom + 6}px`;
             if (rect.width > 0) {
                 outlookBar.style.width = `${rect.width}px`;
@@ -982,12 +982,12 @@ function renderWeatherOutlook(data) {
         document.fonts.ready.then(alignPosition);
     }
 
-    const todayNameEl = document.getElementById('today-name');
-    if (window.ResizeObserver && todayNameEl) {
+    const weatherWidgetEl = document.getElementById('weather-widget');
+    if (window.ResizeObserver && weatherWidgetEl) {
         const ro = new ResizeObserver(() => {
             alignPosition();
         });
-        ro.observe(todayNameEl);
+        ro.observe(weatherWidgetEl);
     }
 
     // Dismiss action
@@ -1009,16 +1009,16 @@ function renderWeatherOutlook(data) {
         openWeatherExpandedPanel();
     });
 
-    // Sync visibility with #today-name sliding state
-    const todayName = document.getElementById('today-name');
+    // Sync visibility with #weather-widget sliding state
+    const weatherWidget = document.getElementById('weather-widget');
     const hideWidgetBtn = document.getElementById('hide-widget-btn') || document.querySelector('.hide-widget');
 
     const syncVisibility = () => {
-        if (!todayName || outlookBar.classList.contains('dismissed')) return;
-        const isSlideHidden = todayName.style.transform &&
-            todayName.style.transform !== 'translateX(0px)' &&
-            todayName.style.transform !== 'translateX(0)';
-        const isDisplayNone = todayName.style.display === 'none' || getComputedStyle(todayName).display === 'none';
+        if (!weatherWidget || outlookBar.classList.contains('dismissed')) return;
+        const isSlideHidden = weatherWidget.style.transform &&
+            weatherWidget.style.transform !== 'translateX(0px)' &&
+            weatherWidget.style.transform !== 'translateX(0)';
+        const isDisplayNone = weatherWidget.style.display === 'none' || getComputedStyle(weatherWidget).display === 'none';
 
         if (isDisplayNone) {
             outlookBar.style.display = 'none';
@@ -1066,10 +1066,10 @@ function initWeatherExpandedPanel() {
         if (e.key === 'Escape') closeWeatherExpandedPanel();
     });
 
-    // Make #today-name also open the expanded dashboard on click
-    const todayName = document.getElementById('today-name');
-    if (todayName) {
-        todayName.addEventListener('click', (e) => {
+    // Make #weather-widget also open the expanded dashboard on click
+    const weatherWidget = document.getElementById('weather-widget');
+    if (weatherWidget) {
+        weatherWidget.addEventListener('click', (e) => {
             if (e.target.closest('.hide-widget') || e.target.closest('#hide-widget-btn')) return;
             openWeatherExpandedPanel();
         });

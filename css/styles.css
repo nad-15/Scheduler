@@ -1633,7 +1633,7 @@ h1 {
 
 
 
-#today-name {
+#weather-widget {
     position: fixed;
     right: 8px;
     top: 8px;
@@ -1735,40 +1735,35 @@ h1 {
     width: fit-content;
 }
 
-#today-location {
+#weather-location {
     font-size: 12px;
     white-space: nowrap;
 }
 
-#today-date {
+#weather-date {
     font-size: 12px;
     margin-bottom: 25px;
     white-space: nowrap;
 }
 
-#today-time {
+#weather-time {
     font-size: 20px;
     font-weight: bold;
     white-space: nowrap;
 }
 
-#today-seconds {
+#weather-seconds {
     font-size: 10px;
     font-weight: bold;
     /* opacity: 0.7; */
 }
 
-#today-ampm {
+#weather-ampm {
     font-size: 14px;
     text-transform: uppercase;
     font-weight: bold;
     /* margin-left: 2px; */
     /* opacity: 0.7; */
-}
-
-#today-weather {
-    font-size: 16px;
-    font-style: italic;
 }
 
 
@@ -1782,7 +1777,7 @@ h1 {
     width: fit-content;
 }
 
-#today-icon {
+#weather-icon {
     font-size: small;
     display: flex;
     align-items: center;
@@ -1792,8 +1787,8 @@ h1 {
     margin: 1px 0 2px 0;
 }
 
-#today-icon img,
-#today-icon svg {
+#weather-icon img,
+#weather-icon svg {
     /* border: .5px solid white; */
     width: 34px;
     height: 34px;
@@ -1801,20 +1796,20 @@ h1 {
     display: block;
 }
 
-#today-temp {
+#weather-temp {
     font-size: 25px;
     font-weight: bold;
     white-space: nowrap;
 }
 
-#today-weather {
+#weather-desc {
     font-size: 8px;
     font-style: italic;
     white-space: nowrap;
 }
 
-/* Loading State for #today-name (Prevents Layout Shift) */
-.today-loading-state {
+/* Loading State for #weather-widget (Prevents Layout Shift) */
+.weather-widget-loading {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1826,22 +1821,22 @@ h1 {
     box-sizing: border-box;
 }
 
-.today-spinner {
+.weather-widget-spinner {
     width: 22px;
     height: 22px;
     border: 2.5px solid rgba(255, 255, 255, 0.25);
     border-top-color: #ffffff;
     border-radius: 50%;
-    animation: todaySpin 0.75s linear infinite;
+    animation: widgetSpin 0.75s linear infinite;
 }
 
-@keyframes todaySpin {
+@keyframes widgetSpin {
     to {
         transform: rotate(360deg);
     }
 }
 
-.today-loading-text {
+.weather-widget-loading-text {
     font-size: 10.5px;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
@@ -1862,7 +1857,7 @@ h1 {
     justify-content: center;
     padding: 7px 9px 7px 10px;
     border-radius: 10px;
-    /* Companion Aurora: Same 135deg gradient angle and 15s motion as #today-name */
+    /* Companion Aurora: Same 135deg gradient angle and 15s motion as #weather-widget */
     background: linear-gradient(135deg,
             rgba(6, 26, 75, 0.93),
             rgba(12, 78, 165, 0.90),
@@ -2007,7 +2002,7 @@ h1 {
 }
 
 /* Make both weather widgets visibly interactive */
-#today-name:hover {
+#weather-widget:hover {
     filter: brightness(1.05);
 }
 
@@ -3048,7 +3043,7 @@ span.material-symbols-outlined.gw-metric-icon {
 
 
 
-/* .today-name-text-container {
+/* .weather-widget-text-container {
     box-sizing: border-box;
     display: flex;
     margin: 0;
@@ -6825,7 +6820,7 @@ ic {
 
     }
 
-    #today-name {
+    #weather-widget {
         right: calc(20px + 20vw);
     }
 

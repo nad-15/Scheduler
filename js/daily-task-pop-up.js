@@ -1198,14 +1198,14 @@ function runStartupFeatures() {
 
   getWeather().finally(() => {
     const offset = 8;
-    const todayName = document.getElementById("today-name");
-    if (!todayName) return;
+    const weatherWidget = document.getElementById("weather-widget");
+    if (!weatherWidget) return;
 
     // If user chose to hide widget, slide it
     if (!settings["weather-widget"]) {
       requestAnimationFrame(() => {
-        const todayNameWidth = todayName.offsetWidth || 170;
-        todayName.style.transform = `translateX(${todayNameWidth + offset}px)`;
+        const weatherWidgetWidth = weatherWidget.offsetWidth || 170;
+        weatherWidget.style.transform = `translateX(${weatherWidgetWidth + offset}px)`;
         hideWidgetBtn.classList.add("is-true");
       });
     }

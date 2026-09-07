@@ -12,7 +12,7 @@ const closeButton = document.querySelector('.btn-close');
 const addButton = document.querySelector('.btn-add');
 const deleteButton = document.querySelector('.btn-delete');
 const deselectTemplateBtn = document.querySelector('.btn-clear');
-const todayName = document.getElementById('today-name');
+const weatherWidget = document.getElementById('weather-widget');
 const hideWidgetBtn = document.querySelector(`.hide-widget`);
 const selectedTaskCounter = document.querySelector(`.selected-task`);
 const jobTemplateContainer = document.querySelector(`.job-template-container`);
@@ -824,15 +824,15 @@ const offset = 8;
 
 // Add an event listener to hide the element on button click
 hideWidgetBtn.addEventListener('click', () => {
-    // Get the width of #today-name element
-    const todayNameWidth = todayName.offsetWidth;
+    // Get the width of #weather-widget element
+    const weatherWidgetWidth = weatherWidget ? weatherWidget.offsetWidth : 0;
 
     // Toggle the visibility and the arrow
-    if (todayName.style.transform === `translateX(${todayNameWidth + offset}px)`) {
-        todayName.style.transform = 'translateX(0)'; // Show it again
+    if (weatherWidget && weatherWidget.style.transform === `translateX(${weatherWidgetWidth + offset}px)`) {
+        weatherWidget.style.transform = 'translateX(0)'; // Show it again
         hideWidgetBtn.classList.remove('is-true'); // Reset the arrow and button style
-    } else {
-        todayName.style.transform = `translateX(${todayNameWidth + offset}px)`; // Move it off-screen to the right including the offset
+    } else if (weatherWidget) {
+        weatherWidget.style.transform = `translateX(${weatherWidgetWidth + offset}px)`; // Move it off-screen to the right including the offset
         hideWidgetBtn.classList.add('is-true'); // Apply active class for arrow and background change
     }
 });
@@ -851,13 +851,13 @@ templateTaskBtn.addEventListener('click', () => {
 
 function applyHideAllButtonsState(hidden) {
     const extrasToolbar = document.querySelector(".extras-toolbar");
-    const todayNameEl = document.getElementById('today-name');
+    const weatherWidgetEl = document.getElementById('weather-widget');
     const hideWidgetBtnEl = document.querySelector('.hide-widget');
     const taskToolbarEl = document.querySelector('.task-toolbar-container');
     const slidingInputViewEl = document.getElementById('slidingInputView');
 
     if (extrasToolbar) extrasToolbar.style.display = hidden ? 'none' : 'flex';
-    if (todayNameEl) todayNameEl.style.display = hidden ? 'none' : 'flex';
+    if (weatherWidgetEl) weatherWidgetEl.style.display = hidden ? 'none' : 'flex';
     if (hideWidgetBtnEl) hideWidgetBtnEl.style.display = hidden ? 'none' : 'flex';
     if (taskToolbarEl) taskToolbarEl.style.display = hidden ? 'none' : 'flex';
     if (slidingInputViewEl) {
@@ -922,14 +922,15 @@ taskInput.addEventListener('focus', () => {
 
 
 
-let todayNameText = document.getElementById('today-name');
-todayNameText.addEventListener('click', (e) => {
-    if (typeof window.toggleWeatherExpandedPanel === 'function') {
-        window.toggleWeatherExpandedPanel();
-    } else {
-        location.reload();
-    }
-});
+if (weatherWidget) {
+    weatherWidget.addEventListener('click', (e) => {
+        if (typeof window.toggleWeatherExpandedPanel === 'function') {
+            window.toggleWeatherExpandedPanel();
+        } else {
+            location.reload();
+        }
+    });
+}
 
 // let monthNameDayContainer = document.getElementById('month-name-day-container');
 // let currentMonthContainer = null;
