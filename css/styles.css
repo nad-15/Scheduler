@@ -2068,9 +2068,10 @@ h1 {
     gap: 10px;
     overflow-y: auto;
     overflow-x: hidden;
-    overscroll-behavior: contain;
-    overscroll-behavior-x: contain;
-    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y pan-x;
+    scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
     transform: translateY(-8px) scale(0.97) translateZ(0);
@@ -2109,6 +2110,7 @@ h1 {
     transform: translateY(0) scale(1) translateZ(0);
     opacity: 1;
     pointer-events: auto;
+    will-change: auto;
 }
 
 /* Header & Segmented Tabs */
@@ -2171,8 +2173,6 @@ h1 {
     flex-direction: column;
     gap: 6px;
     background: rgba(0, 0, 0, 0.28);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     padding: 8px 10px;
@@ -2214,6 +2214,8 @@ h1 {
     font-size: 12px;
     font-family: inherit;
     width: 100%;
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 .expanded-search-input::placeholder {
@@ -2226,6 +2228,9 @@ h1 {
     gap: 2px;
     max-height: 180px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+    touch-action: pan-y;
     scrollbar-width: thin;
 }
 
@@ -2400,8 +2405,6 @@ h1 {
     gap: 8px;
     position: relative;
     overflow: hidden;
-    overscroll-behavior: contain;
-    overscroll-behavior-x: contain;
 }
 
 .gw-hero-header {
@@ -2709,9 +2712,7 @@ h1 {
     padding: 12px 2px 8px 2px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    overscroll-behavior: contain;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y;
 }
 
 .gw-hourly-scroll::-webkit-scrollbar {
@@ -2777,9 +2778,7 @@ h1 {
     padding: 3px 2px 5px 2px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    overscroll-behavior: contain;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y;
     scroll-behavior: smooth;
 }
 
@@ -2802,8 +2801,6 @@ h1 {
     transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
     user-select: none;
     box-sizing: border-box;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     opacity: 0.82;
 }
 

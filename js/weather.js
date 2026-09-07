@@ -1625,6 +1625,9 @@ function renderExpandedForecast() {
         citySelectorBtn.addEventListener('click', () => {
             isCitySearchOpen = !isCitySearchOpen;
             renderExpandedForecast();
+            if (isCitySearchOpen) {
+                panel.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         });
     }
 
@@ -1687,9 +1690,15 @@ function renderExpandedForecast() {
         }
 
         if (searchInput) {
+            // Render recent searches synchronously to avoid layout shift
+            renderRecentSearches(resultsEl);
+
             setTimeout(() => {
-                searchInput.focus();
-                renderRecentSearches(resultsEl);
+                try {
+                    searchInput.focus({ preventScroll: true });
+                } catch (_) {
+                    searchInput.focus();
+                }
             }, 50);
 
             searchInput.addEventListener('focus', () => {
