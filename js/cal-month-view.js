@@ -37,7 +37,7 @@ let nextMonthContainer = null;
 let prevMonthContainer = null;
 
 
-let todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+let todayVertView = AppTimezone.now();
 let currentMonthVertView = todayVertView.getMonth();
 let currentYearVertView = todayVertView.getFullYear();
 
@@ -47,6 +47,19 @@ let currentYearValue = currentYearVertView;
 
 let popUpDate = `${todayVertView.getFullYear()}-${todayVertView.getMonth()}-${todayVertView.getDate()}`;
 console.log("POPUPDATE IS:", popUpDate);
+
+// Re-render calendar when timezone changes mid-session
+window.addEventListener('timezone-changed', () => {
+    todayVertView = AppTimezone.now();
+    currentMonthVertView = todayVertView.getMonth();
+    currentYearVertView = todayVertView.getFullYear();
+    currentMonthValue = currentMonthVertView;
+    currentYearValue = currentYearVertView;
+    popUpDate = `${todayVertView.getFullYear()}-${todayVertView.getMonth()}-${todayVertView.getDate()}`;
+    if (daysGridVertView && daysGridVertView.children.length >= 42) {
+        updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+    }
+});
 
 
 let touchStartX = 0;
@@ -183,6 +196,7 @@ function createCalendarGrid() {
 }
 
 function updateCalendarWithTasks(month, year) {
+  if (!daysGridVertView || daysGridVertView.children.length < 42) return;
 
   document.querySelectorAll(".grid-cell").forEach(cell => {
     cell.classList.remove("is-active");
@@ -237,7 +251,7 @@ function updateCalendarWithTasks(month, year) {
 
 
       // Restore the "today" highlight
-      const todayVertView = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+      const todayVertView = AppTimezone.now();
 
       if (
         currentDay === todayVertView.getDate() &&
@@ -715,7 +729,7 @@ function removeExtraBordersFromEventContent() {
 
 
 document.getElementById('go-to-today').addEventListener('click', () => {
-  const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+  const today = AppTimezone.now();
   const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
   showDayTasks(todayKey);
 });

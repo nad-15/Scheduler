@@ -151,10 +151,15 @@ function todoNormalizeColor(color) {
 
 
 function getTorontoNow() {
-  return new Date(
-    new Date().toLocaleString("en-US", { timeZone: "America/Toronto" })
-  ).getTime();
+  return AppTimezone.nowMs();
 }
+
+// Re-render todos if timezone changes mid-session so relative dates update
+window.addEventListener('timezone-changed', () => {
+  if (typeof renderTodos === 'function') {
+    renderTodos();
+  }
+});
 // === Format due date ===
 // function todoFormatDueDate(dueDate) {
 //   if (!dueDate) return "";

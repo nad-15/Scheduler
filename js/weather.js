@@ -113,6 +113,7 @@ function removeRecentCity(indexToRemove) {
 }
 
 let currentLocation = getSavedLocation();
+AppTimezone.set(currentLocation.timezone);
 let isCitySearchOpen = false;
 let searchDebounceTimer = null;
 
@@ -607,6 +608,7 @@ async function searchCities(query) {
  */
 async function selectLocation(newLoc) {
     currentLocation = { ...newLoc };
+    AppTimezone.set(newLoc.timezone);
     const state = getWeatherStoredState();
     state.location = { ...currentLocation };
     saveWeatherStoredState(state);

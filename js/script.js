@@ -945,15 +945,33 @@ if (weatherWidget) {
 // let nextMonthContainer = null;
 // let prevMonthContainer = null;
 
-const todayDateObj = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
-
-// Convert it back to a Date object
-const today = new Date(todayDateObj);
+let today = AppTimezone.now();
 
 let todayDayNumber = today.getDate(); // Get the day of the month
 let todayDay = getDayName(today.getDay()); // Get the weekday name
 let todayMonth = today.getMonth(); // Get the month (0-11)
 let todayYear = today.getFullYear(); // Get the year
+
+// Sync continuous scroll view when timezone changes mid-session
+window.addEventListener('timezone-changed', () => {
+    today = AppTimezone.now();
+    todayDayNumber = today.getDate();
+    todayDay = getDayName(today.getDay());
+    todayMonth = today.getMonth();
+    todayYear = today.getFullYear();
+
+    const oldAurora = document.querySelector('.date.aurora');
+    if (oldAurora) {
+        oldAurora.classList.remove('aurora');
+        oldAurora.style.color = '';
+    }
+    const newTodayKey = `${todayYear}-${todayMonth}-${todayDayNumber}`;
+    const newAurora = document.querySelector(`.date[data-full-date="${newTodayKey}"]`);
+    if (newAurora) {
+        newAurora.classList.add('aurora');
+        newAurora.style.color = 'white';
+    }
+});
 
 // Get the current date details
 // let today = new Date();

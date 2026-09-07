@@ -1,7 +1,6 @@
 const popupTasks = document.getElementById("popup-tasks");
 
-const todayDateObjScroll = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' });
-const nowTodayElementScroll = new Date(todayDateObjScroll);
+const nowTodayElementScroll = AppTimezone.now();
 
 const yearTodayElementScroll = nowTodayElementScroll.getFullYear();
 const monthTodayElementScroll = nowTodayElementScroll.getMonth();
@@ -177,7 +176,7 @@ function showDayTasks(d) {
   currentMonthValue = dateObj.getMonth();
   currentYearValue = dateObj.getFullYear();
 
-  const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+  const today = AppTimezone.now();
   const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
   const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
