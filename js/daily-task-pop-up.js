@@ -1220,8 +1220,10 @@ function runStartupFeatures() {
   }
 
   if (settings["startup-popup"]) {
-    showDayTasks(popUpDate);
-    console.log("pop up shown");
+    const _startupToday = AppTimezone.now();
+    const _startupKey = `${_startupToday.getFullYear()}-${_startupToday.getMonth()}-${_startupToday.getDate()}`;
+    showDayTasks(_startupKey);
+    console.log("pop up shown", _startupKey);
   }
 
   const todoBtn = document.querySelector(".todo-button");

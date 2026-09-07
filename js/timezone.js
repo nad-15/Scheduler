@@ -5,14 +5,23 @@
  * Single source of truth for the app's active timezone.
  * 
  * Boot: Reads the user's saved city timezone from localStorage (read-only).
- *       Falls back to America/Toronto (Kitchener) if nothing is saved.
+ *       Falls back to the device's own IANA timezone (Intl API), then
+ *       America/Toronto as a last resort if nothing can be determined.
  * 
  * Runtime: Updated by weather.js when the user changes cities.
  *          Dispatches 'timezone-changed' event so components can re-render.
  * ==========================================================================
  */
 const AppTimezone = (() => {
-    const DEFAULT_TZ = 'America/Toronto';
+    // Use device timezone as fallback so the app shows the correct local date
+    // even when no city has been explicitly selected in the weather widget.
+    const DEFAULT_TZ = (() => {
+        try {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (tz && typeof tz === 'string') return tz;
+        } catch (e) {}
+        return 'America/Toronto'; // last resort
+    })();
 
     function _isValidTimezone(tz) {
         if (!tz || typeof tz !== 'string') return false;
