@@ -228,13 +228,22 @@ function getWmoDetails(code, isDay = true) {
         text = 'Overcast';
         icon = isDay ? 'overcast-day' : 'overcast-night';
     } else if (c === 45 || c === 48) {
-        text = 'Foggy';
+        text = c === 48 ? 'Depositing Rime Fog' : 'Foggy';
         icon = isDay ? 'fog-day' : 'fog-night';
-    } else if (c === 51 || c === 53 || c === 55) {
+    } else if (c === 51) {
+        text = 'Light Drizzle';
+        icon = 'drizzle';
+    } else if (c === 53) {
         text = 'Drizzle';
         icon = 'drizzle';
-    } else if (c === 56 || c === 57) {
-        text = 'Freezing Drizzle';
+    } else if (c === 55) {
+        text = 'Heavy Drizzle';
+        icon = 'drizzle';
+    } else if (c === 56) {
+        text = 'Light Freezing Drizzle';
+        icon = 'sleet';
+    } else if (c === 57) {
+        text = 'Dense Freezing Drizzle';
         icon = 'sleet';
     } else if (c === 61) {
         text = 'Light Rain';
@@ -245,8 +254,11 @@ function getWmoDetails(code, isDay = true) {
     } else if (c === 65) {
         text = 'Heavy Rain';
         icon = 'rain';
-    } else if (c === 66 || c === 67) {
-        text = 'Freezing Rain';
+    } else if (c === 66) {
+        text = 'Light Freezing Rain';
+        icon = 'sleet';
+    } else if (c === 67) {
+        text = 'Heavy Freezing Rain';
         icon = 'sleet';
     } else if (c === 71) {
         text = 'Light Snow';
@@ -254,24 +266,36 @@ function getWmoDetails(code, isDay = true) {
     } else if (c === 73) {
         text = 'Snow';
         icon = 'snow';
-    } else if (c === 75 || c === 77) {
+    } else if (c === 75) {
         text = 'Heavy Snow';
         icon = 'snow';
-    } else if (c === 80 || c === 81) {
+    } else if (c === 77) {
+        text = 'Snow Grains';
+        icon = 'snowflake';
+    } else if (c === 80) {
+        text = 'Light Showers';
+        icon = isDay ? 'partly-cloudy-day-rain' : 'partly-cloudy-night-rain';
+    } else if (c === 81) {
         text = 'Rain Showers';
         icon = isDay ? 'partly-cloudy-day-rain' : 'partly-cloudy-night-rain';
     } else if (c === 82) {
         text = 'Violent Showers';
         icon = 'rain';
-    } else if (c === 85 || c === 86) {
-        text = 'Snow Showers';
+    } else if (c === 85) {
+        text = 'Light Snow Showers';
+        icon = isDay ? 'partly-cloudy-day-snow' : 'partly-cloudy-night-snow';
+    } else if (c === 86) {
+        text = 'Heavy Snow Showers';
         icon = isDay ? 'partly-cloudy-day-snow' : 'partly-cloudy-night-snow';
     } else if (c === 95) {
         text = 'Thunderstorm';
-        icon = 'thunderstorms-rain';
-    } else if (c === 96 || c === 99) {
-        text = 'Severe Thunderstorm';
-        icon = 'thunderstorms-rain';
+        icon = isDay ? 'thunderstorms-day-rain' : 'thunderstorms-night-rain';
+    } else if (c === 96) {
+        text = 'Thunderstorm with Hail';
+        icon = 'hail';
+    } else if (c === 99) {
+        text = 'Severe Hailstorm';
+        icon = 'hail';
     }
 
     return {
