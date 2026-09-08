@@ -1490,7 +1490,11 @@ function selectExpandedDay(clickedKey) {
     // Re-render only the updated content cards
     mainCard.innerHTML = mainCardInnerHtml;
     metricsGrid.innerHTML = metricsGridInnerHtml;
-    inlineWeatherSvgs(mainCard);
+    // Inlined animated SVGs are focused on Hero header and Alert pill only
+    const heroHeader = mainCard.querySelector('.gw-hero-header');
+    if (heroHeader) inlineWeatherSvgs(heroHeader);
+    const alertPill = mainCard.querySelector('.gw-alert-pill');
+    if (alertPill) inlineWeatherSvgs(alertPill);
 
     // The day row SURVIVES the re-render completely! Update active state in-place
     dailyRow.querySelectorAll('.gw-daily-card[data-day-key]').forEach(card => {
@@ -1633,7 +1637,11 @@ function renderExpandedForecast() {
         </div>
     `;
 
-    inlineWeatherSvgs(panel);
+    // Inlined animated SVGs are focused on Hero header and Alert pill only
+    const heroHeader = panel.querySelector('.gw-hero-header');
+    if (heroHeader) inlineWeatherSvgs(heroHeader);
+    const alertPill = panel.querySelector('.gw-alert-pill');
+    if (alertPill) inlineWeatherSvgs(alertPill);
 
     // Restore daily row scroll position if it existed
     const newDailyRow = panel.querySelector('.gw-daily-row');
