@@ -179,6 +179,16 @@ function formatFullDateLabel(dateStr) {
 }
 
 /**
+ * Formats short date ("Sep 12") deterministically using UTC noon
+ */
+function formatShortDate(dateStr) {
+    if (!dateStr) return '';
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+    return new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }).format(date);
+}
+
+/**
  * Format ISO datetime string ("2026-09-05T06:50") to 12-hour time ("6:50 AM")
  */
 function formatIsoTime(isoStr) {
@@ -883,12 +893,14 @@ function renderWeatherOutlook(data) {
         const pop = data.hourly.precipitation_probability[idx] || 0;
         const precip = data.hourly.precipitation[idx] || 0;
         const timeLabel = formatIsoHour(data.hourly.time[idx]);
+        const slotDateKey = data.hourly.time[idx].split('T')[0];
+        const dateSuffix = slotDateKey !== todayDateKey ? ` · ${formatShortDate(slotDateKey)}` : '';
 
         // Freezing Rain / Ice Hazard
         if ([56, 57, 66, 67].includes(code)) {
             alertType = 'freeze';
             alertIconUrl = './images/weather/extreme-sleet.svg';
-            alertText = `Freezing rain at ${timeLabel} (${pop}%)`;
+            alertText = `Freezing rain at ${timeLabel} (${pop}%)${dateSuffix}`;
             isPulse = true;
             outlookBar.classList.add('has-freeze');
             break;
@@ -897,7 +909,7 @@ function renderWeatherOutlook(data) {
         if ([71, 73, 75, 77, 85, 86].includes(code)) {
             alertType = 'snow';
             alertIconUrl = './images/weather/snowflake.svg';
-            alertText = `Snow at ${timeLabel} (${pop}%)`;
+            alertText = `Snow at ${timeLabel} (${pop}%)${dateSuffix}`;
             isPulse = true;
             outlookBar.classList.add('has-snow');
             break;
@@ -906,7 +918,7 @@ function renderWeatherOutlook(data) {
         if ([95, 96, 99].includes(code)) {
             alertType = 'storm';
             alertIconUrl = './images/weather/thunderstorms-extreme.svg';
-            alertText = `Storm at ${timeLabel} (${pop}%)`;
+            alertText = `Storm at ${timeLabel} (${pop}%)${dateSuffix}`;
             isPulse = true;
             outlookBar.classList.add('has-rain');
             break;
@@ -915,7 +927,7 @@ function renderWeatherOutlook(data) {
         if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code) || pop >= 30 || precip >= 0.2) {
             alertType = 'rain';
             alertIconUrl = './images/weather/umbrella.svg';
-            alertText = `Rain at ${timeLabel} (${pop}%)`;
+            alertText = `Rain at ${timeLabel} (${pop}%)${dateSuffix}`;
             isPulse = true;
             outlookBar.classList.add('has-rain');
             break;
@@ -936,14 +948,20 @@ function renderWeatherOutlook(data) {
     // High Wind / Gusts (>= 38 km/h)
     if (!alertType) {
         let maxGust = 0;
+        let gustTimeIdx = -1;
         for (const idx of upcomingHourlyIndices) {
             const g = data.hourly.wind_gusts_10m[idx] || 0;
-            if (g > maxGust) maxGust = g;
+            if (g > maxGust) {
+                maxGust = g;
+                gustTimeIdx = idx;
+            }
         }
         if (maxGust >= 38) {
             alertType = 'wind';
             alertIconUrl = './images/weather/wind-alert.svg';
-            alertText = `Gusts up to ${Math.round(maxGust)} km/h`;
+            const gustSlotDate = gustTimeIdx >= 0 ? data.hourly.time[gustTimeIdx].split('T')[0] : todayDateKey;
+            const gustSuffix = gustSlotDate !== todayDateKey ? ` · ${formatShortDate(gustSlotDate)}` : '';
+            alertText = `Gusts up to ${Math.round(maxGust)} km/h${gustSuffix}`;
             outlookBar.classList.add('has-wind');
         }
     }
@@ -954,7 +972,9 @@ function renderWeatherOutlook(data) {
             if ([45, 48].includes(data.hourly.weather_code[idx])) {
                 alertType = 'fog';
                 alertIconUrl = './images/weather/fog.svg';
-                alertText = `Fog / low visibility`;
+                const fogSlotDate = data.hourly.time[idx].split('T')[0];
+                const fogSuffix = fogSlotDate !== todayDateKey ? ` · ${formatShortDate(fogSlotDate)}` : '';
+                alertText = `Fog / low visibility${fogSuffix}`;
                 outlookBar.classList.add('has-fog');
                 break;
             }
