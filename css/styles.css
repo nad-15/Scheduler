@@ -2613,7 +2613,23 @@ h1 {
     height: 5px;
 }
 
-/* 1. Pleasant & Mild / Dry & Clear - Day (Soft Sky Glass) */
+/* 1. Pleasant & Mild - Day (Soft Rainbow Aura Glass) */
+.gw-alert-pill.is-neutral.is-pleasant.is-day {
+    background: linear-gradient(135deg, rgba(244, 114, 182, 0.06) 0%, rgba(56, 189, 248, 0.06) 50%, rgba(52, 211, 153, 0.05) 100%);
+    border-color: rgba(56, 189, 248, 0.22);
+    box-shadow: 0 2px 12px rgba(56, 189, 248, 0.06);
+}
+
+.gw-alert-pill.is-neutral.is-pleasant.is-day .gw-alert-icon-box {
+    background: linear-gradient(135deg, rgba(244, 114, 182, 0.14), rgba(56, 189, 248, 0.14));
+    border-color: rgba(56, 189, 248, 0.26);
+}
+
+.gw-alert-pill.is-neutral.is-pleasant.is-day .gw-alert-dot-pulse {
+    color: #38bdf8;
+}
+
+/* 2. Dry & Clear - Day (Soft Sky Glass) */
 .gw-alert-pill.is-neutral.is-clear.is-day,
 .gw-alert-pill.is-clear.is-day {
     background: linear-gradient(135deg, rgba(56, 189, 248, 0.06) 0%, rgba(255, 255, 255, 0.03) 100%);

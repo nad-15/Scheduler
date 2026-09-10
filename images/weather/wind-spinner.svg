@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 128 128">
+<g id="wind-spinner" clip-path="url(#wind-spinner-clip)">
+<g id="Wind_Spinner">
+<path id="Pole" fill="#cbd5e1" fill-rule="evenodd" d="M62 96V64h4v32z" clip-rule="evenodd"/>
+<g id="Blades">
+<g id="Blade_4">
+<path id="Blade_4_Fill" fill="url(#paint0_linear_blade4)" d="M50.667 73C44.774 73 40 67.627 40 61h24v12z"/>
+<path id="Blade_4_Stroke" fill="#1d4ed8" fill-rule="evenodd" d="M41.039 62c.447 5.7 4.682 10 9.627 10H63V62zm-1.003 0c.452 6.16 5.039 11 10.63 11H64V61H40q0 .505.036 1" clip-rule="evenodd"/>
+</g>
+<g id="Blade_3">
+<path id="Blade_3_Fill" fill="url(#paint1_linear_blade3)" d="M76 74.333C76 80.224 70.627 85 64 85V61h12z"/>
+<path id="Blade_3_Stroke" fill="#facc15" fill-rule="evenodd" d="M65 83.961c5.7-.447 10-4.682 10-9.628V62H65zm0 1.002Q64.505 85 64 85V61h12v13.333c0 5.592-4.84 10.179-11 10.63" clip-rule="evenodd"/>
+</g>
+<g id="Blade_2">
+<path id="Blade_2_Fill" fill="url(#paint2_linear_blade2)" d="M77.333 49C83.224 49 88 54.373 88 61H64V49z"/>
+<path id="Blade_2_Stroke" fill="#16a34a" fill-rule="evenodd" d="M86.96 60c-.446-5.7-4.68-10-9.627-10H65v10zm1.003 0q.037.495.037 1H64V49h13.333c5.592 0 10.179 4.84 10.63 11" clip-rule="evenodd"/>
+</g>
+<g id="Blade_1">
+<path id="Blade_1_Fill" fill="url(#paint3_linear_blade1)" d="M52 47.667C52 41.776 57.373 37 64 37v24H52z"/>
+<path id="Blade_1_Stroke" fill="#dc2626" fill-rule="evenodd" d="M63 38.039c-5.7.447-10 4.682-10 9.628V60h10zm0-1.003c-6.16.452-11 5.039-11 10.63V61h12V37q-.505 0-1 .036" clip-rule="evenodd"/>
+</g>
+<animateTransform attributeName="transform" begin="0s" dur="6s" repeatCount="indefinite" type="rotate" values="0 64 61;-360 64 61"/>
+</g>
+<circle id="Core" cx="64" cy="61" r="3.5" fill="url(#paint4_linear_core)" stroke="#e6effc"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_blade4" x1="64" x2="64" y1="61" y2="73" gradientUnits="userSpaceOnUse">
+<stop stop-color="#2563eb"/>
+<stop offset="1" stop-color="#1d4ed8"/>
+</linearGradient>
+<linearGradient id="paint1_linear_blade3" x1="64" x2="64" y1="61" y2="85" gradientUnits="userSpaceOnUse">
+<stop stop-color="#fde047"/>
+<stop offset="1" stop-color="#facc15"/>
+</linearGradient>
+<linearGradient id="paint2_linear_blade2" x1="76" x2="76" y1="49" y2="61" gradientUnits="userSpaceOnUse">
+<stop stop-color="#22c55e"/>
+<stop offset="1" stop-color="#16a34a"/>
+</linearGradient>
+<linearGradient id="paint3_linear_blade1" x1="64" x2="64" y1="37" y2="61" gradientUnits="userSpaceOnUse">
+<stop stop-color="#ef4444"/>
+<stop offset="1" stop-color="#dc2626"/>
+</linearGradient>
+<linearGradient id="paint4_linear_core" x1="64" x2="64" y1="57" y2="65" gradientUnits="userSpaceOnUse">
+<stop stop-color="#fff"/>
+<stop offset="1" stop-color="#f1f5f9"/>
+</linearGradient>
+<clipPath id="wind-spinner-clip">
+<rect width="128" height="128" fill="#fff"/>
+</clipPath>
+</defs>
+</svg>

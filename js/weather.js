@@ -424,6 +424,8 @@ function preloadWeatherSvgs(data) {
         if (wmo?.iconUrl) urls.add(wmo.iconUrl);
     });
     urls.add('./images/weather/umbrella.svg');
+    urls.add('./images/weather/wind-spinner.svg');
+    urls.add('./images/weather/not-available.svg');
     urls.add('./images/weather/rain.svg');
     urls.add('./images/weather/snow.svg');
     urls.add('./images/weather/wind.svg');
@@ -445,6 +447,7 @@ function preloadWeatherSvgs(data) {
     urls.add('./images/weather/thermometer.svg');
     urls.add('./images/weather/fog.svg');
     urls.add('./images/weather/horizon.svg');
+    urls.add('./images/weather/rainbow-clear.svg');
     urls.add('./images/weather/starry-night.svg');
     urls.add('./images/weather/barometer.svg');
 
@@ -742,7 +745,7 @@ async function getWeather() {
 
                     <div class="weather-container">
                         <div id="weather-icon">
-                             <img src="${iconUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                             <img src="${iconUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                         </div>
                         <div id="weather-temp">${tempVal}°</div>
                         <div id="weather-desc">${weatherDescription}</div>
@@ -760,7 +763,7 @@ async function getWeather() {
                     const currentSrc = iconContainer.querySelector('img')?.getAttribute('src') ||
                                        iconContainer.querySelector('svg')?.getAttribute('data-weather-src');
                     if (currentSrc !== iconUrl) {
-                        iconContainer.innerHTML = `<img src="${iconUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">`;
+                        iconContainer.innerHTML = `<img src="${iconUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">`;
                     }
                 }
             }
@@ -827,7 +830,7 @@ async function getWeather() {
 
                 <div class="weather-container">
                     <div id="weather-icon">
-                        <img src="./images/weather/umbrella.svg" alt="icon">
+                        <img src="./images/weather/wind-spinner.svg" alt="icon">
                     </div>
                     <div id="weather-temp">--°</div>
                     <div id="weather-desc">Weather unavailable</div>
@@ -911,7 +914,7 @@ function renderWeatherOutlook(data) {
         // Rain / Showers / Drizzle
         if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code) || pop >= 30 || precip >= 0.2) {
             alertType = 'rain';
-            alertIconUrl = './images/weather/raindrops.svg';
+            alertIconUrl = './images/weather/umbrella.svg';
             alertText = `Rain at ${timeLabel} (${pop}%)`;
             isPulse = true;
             outlookBar.classList.add('has-rain');
@@ -920,10 +923,13 @@ function renderWeatherOutlook(data) {
     }
 
     // Freeze / Frost Alert
-    if (!alertType && (lowTemp <= -15 || (lowTemp <= 0 && highTemp > 3))) {
+    const curApparent = Math.round(data.current.apparent_temperature);
+    if (!alertType && (lowTemp <= -12 || curApparent <= -16 || (lowTemp <= 0 && highTemp > 3))) {
         alertType = 'freeze';
         alertIconUrl = './images/weather/thermometer-colder.svg';
-        alertText = lowTemp <= -15 ? `Extreme cold: Low ${lowTemp}°` : (lowTemp < 0 ? `Freeze alert: Low ${lowTemp}°` : `Frost alert: Low 0°`);
+        alertText = (lowTemp <= -12 || curApparent <= -16)
+            ? `Extreme cold: Low ${lowTemp}°`
+            : (lowTemp < 0 ? `Freeze alert: Low ${lowTemp}°` : `Frost alert: Low 0°`);
         outlookBar.classList.add('has-freeze');
     }
 
@@ -967,9 +973,28 @@ function renderWeatherOutlook(data) {
     // Default: Clear / Dry Conditions
     if (!alertType) {
         alertType = 'clear';
-        alertIconUrl = isCurrentDaytime ? './images/weather/horizon.svg' : './images/weather/starry-night.svg';
-        const isColdSeason = highTemp <= 3;
-        alertText = isColdSeason ? `No snow expected` : `No rain expected`;
+        let maxGust = 0;
+        let maxPop = 0;
+        for (const idx of upcomingHourlyIndices) {
+            const g = data.hourly.wind_gusts_10m[idx] || 0;
+            if (g > maxGust) maxGust = g;
+            const p = data.hourly.precipitation_probability[idx] || 0;
+            if (p > maxPop) maxPop = p;
+        }
+        const isIdeal = highTemp >= 19 && highTemp <= 26 && maxGust < 30 && maxPop < 25;
+        if (isIdeal) {
+            alertIconUrl = isCurrentDaytime ? './images/weather/rainbow-clear.svg' : './images/weather/starry-night.svg';
+            alertText = `Pleasant & mild conditions`;
+        } else {
+            const isColdSeason = lowTemp <= 3 || highTemp <= 3;
+            if (isColdSeason) {
+                alertIconUrl = './images/weather/thermometer.svg';
+                alertText = `No snow expected`;
+            } else {
+                alertIconUrl = isCurrentDaytime ? './images/weather/horizon.svg' : './images/weather/starry-night.svg';
+                alertText = `No rain expected`;
+            }
+        }
     }
 
     // Contextual Sub-Info (Golden Hours Model)
@@ -996,7 +1021,7 @@ function renderWeatherOutlook(data) {
         <div class="outlook-header">
             <div class="outlook-main-info">
                 <span class="outlook-icon ${isPulse ? 'pulse' : ''}">
-                    <img class="outlook-meteo-icon" src="${alertIconUrl}" alt="${alertType}" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                    <img class="outlook-meteo-icon" src="${alertIconUrl}" alt="${alertType}" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                 </span>
                 <span class="outlook-status">${alertText}</span>
             </div>
@@ -1373,7 +1398,7 @@ function buildDayForecastDetails(data, dayKey) {
                 alertBannerHtml = `
                     <div class="gw-alert-pill is-rain is-alert">
                         <div class="gw-alert-icon-box">
-                            <img class="gw-alert-meteo-icon" src="./images/weather/raindrops.svg" alt="Rain" onerror="this.style.display='none'">
+                            <img class="gw-alert-meteo-icon" src="./images/weather/umbrella.svg" alt="Rain" onerror="this.style.display='none'">
                         </div>
                         <div class="gw-alert-text-group">
                             <div class="gw-alert-title">${rainTitle}</div>
@@ -1387,7 +1412,7 @@ function buildDayForecastDetails(data, dayKey) {
     }
 
     // 5. High Wind Advisory
-    if (!alertBannerHtml && windGustMax >= 45) {
+    if (!alertBannerHtml && windGustMax >= 38) {
         alertBannerHtml = `
             <div class="gw-alert-pill is-wind is-alert">
                 <div class="gw-alert-icon-box">
@@ -1496,9 +1521,11 @@ function buildDayForecastDetails(data, dayKey) {
             : (isTodayActive
                 ? (isDayForAlert ? 'No rain expected through tonight' : 'No rain expected overnight')
                 : 'No rain expected for this day');
-        const clearIconUrl = isDayForAlert ? './images/weather/horizon.svg' : './images/weather/starry-night.svg';
+        const clearIconUrl = isDayForAlert
+            ? (isIdeal ? './images/weather/rainbow-clear.svg' : './images/weather/horizon.svg')
+            : './images/weather/starry-night.svg';
         alertBannerHtml = `
-            <div class="gw-alert-pill is-neutral is-clear ${dayNightClass}">
+            <div class="gw-alert-pill is-neutral is-clear ${isIdeal ? 'is-pleasant' : ''} ${dayNightClass}">
                 <div class="gw-alert-icon-box">
                     <img class="gw-alert-meteo-icon" src="${clearIconUrl}" alt="Clear" onerror="this.style.display='none'">
                 </div>
@@ -1535,7 +1562,7 @@ function buildDayForecastDetails(data, dayKey) {
                     <div class="gw-hourly-col is-now">
                         <span class="gw-hourly-temp">${liveTemp}°</span>
                         <span class="gw-hourly-pop ${isRainingNow ? '' : 'is-empty'}">${isRainingNow ? 'Now' : '&nbsp;'}</span>
-                        <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                        <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                         <span class="gw-hourly-time">Now</span>
                     </div>
                 `;
@@ -1544,7 +1571,7 @@ function buildDayForecastDetails(data, dayKey) {
                     <div class="gw-hourly-col is-past">
                         <span class="gw-hourly-temp">${sTemp}°</span>
                         <span class="gw-hourly-pop ${popVal >= 20 ? '' : 'is-empty'}">${popVal >= 20 ? `${popVal}%` : '&nbsp;'}</span>
-                        <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                        <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                         <span class="gw-hourly-time">${timeLabel}</span>
                     </div>
                 `;
@@ -1553,7 +1580,7 @@ function buildDayForecastDetails(data, dayKey) {
                     <div class="gw-hourly-col">
                         <span class="gw-hourly-temp">${sTemp}°</span>
                         <span class="gw-hourly-pop ${popVal >= 20 ? '' : 'is-empty'}">${popVal >= 20 ? `${popVal}%` : '&nbsp;'}</span>
-                        <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                        <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                         <span class="gw-hourly-time">${timeLabel}</span>
                     </div>
                 `;
@@ -1565,7 +1592,7 @@ function buildDayForecastDetails(data, dayKey) {
                 <div class="gw-hourly-col is-now">
                     <span class="gw-hourly-temp">${liveTemp}°</span>
                     <span class="gw-hourly-pop ${isRainingNow ? '' : 'is-empty'}">${isRainingNow ? 'Now' : '&nbsp;'}</span>
-                    <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                    <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                     <span class="gw-hourly-time">Now</span>
                 </div>
             ` + hourlyColumnsHtml;
@@ -1583,7 +1610,7 @@ function buildDayForecastDetails(data, dayKey) {
                 <div class="gw-hourly-col">
                     <span class="gw-hourly-temp">${sTemp}°</span>
                     <span class="gw-hourly-pop ${popVal >= 20 ? '' : 'is-empty'}">${popVal >= 20 ? `${popVal}%` : '&nbsp;'}</span>
-                    <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                    <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                     <span class="gw-hourly-time">${timeLabel}</span>
                 </div>
             `;
@@ -1632,7 +1659,7 @@ function buildDayForecastDetails(data, dayKey) {
                 <span class="gw-hero-day">${activeDayLabel}</span>
                 <div class="gw-hero-temp-row">
                     <span class="gw-hero-temp">${heroTemp}</span>
-                    <img class="gw-hero-icon" src="${heroMeteoUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                    <img class="gw-hero-icon" src="${heroMeteoUrl}" alt="weather icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                 </div>
             </div>
             <div class="gw-hero-right">
@@ -1794,7 +1821,7 @@ function renderExpandedForecast() {
         return `
             <div class="gw-daily-card ${isSelected ? 'active' : ''}" data-day-key="${dateStr}">
                 <span class="gw-daily-name">${dayShortName}</span>
-                <img class="gw-daily-icon" src="${wmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                <img class="gw-daily-icon" src="${wmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
                 <span class="gw-daily-range">${maxT}°/${minT}°</span>
             </div>
         `;
