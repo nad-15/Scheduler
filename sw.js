@@ -2,7 +2,7 @@
 // Skhayeduler Service Worker - Network-First Strategy (Zero Stale Code)
 // ==========================================================================
 
-const CACHE_NAME = 'scheduler-pwa-v66';
+const CACHE_NAME = 'scheduler-pwa-v68';
 
 const STATIC_ASSETS = [
     './',
@@ -41,10 +41,12 @@ const STATIC_ASSETS = [
     './images/weather/dust-day.svg',
     './images/weather/dust-night.svg',
     './images/weather/dust.svg',
+    './images/weather/extreme-sleet.svg',
     './images/weather/fog-day.svg',
     './images/weather/fog-night.svg',
     './images/weather/fog.svg',
     './images/weather/hail.svg',
+    './images/weather/horizon.svg',
     './images/weather/humidity.svg',
     './images/weather/hurricane.svg',
     './images/weather/not-available.svg',
@@ -64,9 +66,13 @@ const STATIC_ASSETS = [
     './images/weather/smoke.svg',
     './images/weather/snow.svg',
     './images/weather/snowflake.svg',
+    './images/weather/starry-night.svg',
+    './images/weather/sun-hot.svg',
+    './images/weather/thermometer-colder.svg',
     './images/weather/thermometer.svg',
     './images/weather/thunderstorms-day-rain.svg',
     './images/weather/thunderstorms-day.svg',
+    './images/weather/thunderstorms-extreme.svg',
     './images/weather/thunderstorms-night-rain.svg',
     './images/weather/thunderstorms-night.svg',
     './images/weather/thunderstorms-rain.svg',

@@ -272,7 +272,7 @@ function getWmoDetails(code, isDay = true) {
         icon = 'snow';
     } else if (c === 77) {
         text = 'Snow Grains';
-        icon = 'snowflake';
+        icon = 'snow';
     } else if (c === 80) {
         text = 'Light Showers';
         icon = isDay ? 'partly-cloudy-day-rain' : 'partly-cloudy-night-rain';
@@ -433,6 +433,20 @@ function preloadWeatherSvgs(data) {
     urls.add('./images/weather/thunderstorms-rain.svg');
     urls.add('./images/weather/fog-day.svg');
     urls.add('./images/weather/fog-night.svg');
+    urls.add('./images/weather/extreme-sleet.svg');
+    urls.add('./images/weather/wind-alert.svg');
+    urls.add('./images/weather/raindrops.svg');
+    urls.add('./images/weather/thunderstorms.svg');
+    urls.add('./images/weather/thunderstorms-extreme.svg');
+    urls.add('./images/weather/snowflake.svg');
+    urls.add('./images/weather/sun-hot.svg');
+    urls.add('./images/weather/uv-index.svg');
+    urls.add('./images/weather/thermometer-colder.svg');
+    urls.add('./images/weather/thermometer.svg');
+    urls.add('./images/weather/fog.svg');
+    urls.add('./images/weather/horizon.svg');
+    urls.add('./images/weather/starry-night.svg');
+    urls.add('./images/weather/barometer.svg');
 
     urls.forEach(url => loadWeatherSvg(url));
 }
@@ -867,10 +881,19 @@ function renderWeatherOutlook(data) {
         const precip = data.hourly.precipitation[idx] || 0;
         const timeLabel = formatIsoHour(data.hourly.time[idx]);
 
+        // Freezing Rain / Ice Hazard
+        if ([56, 57, 66, 67].includes(code)) {
+            alertType = 'freeze';
+            alertIconUrl = './images/weather/extreme-sleet.svg';
+            alertText = `Freezing rain at ${timeLabel} (${pop}%)`;
+            isPulse = true;
+            outlookBar.classList.add('has-freeze');
+            break;
+        }
         // Snow detection
         if ([71, 73, 75, 77, 85, 86].includes(code)) {
             alertType = 'snow';
-            alertIconUrl = './images/weather/snow.svg';
+            alertIconUrl = './images/weather/snowflake.svg';
             alertText = `Snow at ${timeLabel} (${pop}%)`;
             isPulse = true;
             outlookBar.classList.add('has-snow');
@@ -879,16 +902,16 @@ function renderWeatherOutlook(data) {
         // Thunderstorm
         if ([95, 96, 99].includes(code)) {
             alertType = 'storm';
-            alertIconUrl = './images/weather/thunderstorms-rain.svg';
+            alertIconUrl = './images/weather/thunderstorms-extreme.svg';
             alertText = `Storm at ${timeLabel} (${pop}%)`;
             isPulse = true;
             outlookBar.classList.add('has-rain');
             break;
         }
         // Rain / Showers / Drizzle
-        if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code) || pop >= 30 || precip >= 0.2) {
+        if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code) || pop >= 30 || precip >= 0.2) {
             alertType = 'rain';
-            alertIconUrl = './images/weather/rain.svg';
+            alertIconUrl = './images/weather/raindrops.svg';
             alertText = `Rain at ${timeLabel} (${pop}%)`;
             isPulse = true;
             outlookBar.classList.add('has-rain');
@@ -899,7 +922,7 @@ function renderWeatherOutlook(data) {
     // Freeze / Frost Alert
     if (!alertType && (lowTemp <= -15 || (lowTemp <= 0 && highTemp > 3))) {
         alertType = 'freeze';
-        alertIconUrl = './images/weather/sleet.svg';
+        alertIconUrl = './images/weather/thermometer-colder.svg';
         alertText = lowTemp <= -15 ? `Extreme cold: Low ${lowTemp}°` : (lowTemp < 0 ? `Freeze alert: Low ${lowTemp}°` : `Frost alert: Low 0°`);
         outlookBar.classList.add('has-freeze');
     }
@@ -913,7 +936,7 @@ function renderWeatherOutlook(data) {
         }
         if (maxGust >= 38) {
             alertType = 'wind';
-            alertIconUrl = './images/weather/wind.svg';
+            alertIconUrl = './images/weather/wind-alert.svg';
             alertText = `Gusts up to ${Math.round(maxGust)} km/h`;
             outlookBar.classList.add('has-wind');
         }
@@ -924,7 +947,7 @@ function renderWeatherOutlook(data) {
         for (const idx of upcomingHourlyIndices) {
             if ([45, 48].includes(data.hourly.weather_code[idx])) {
                 alertType = 'fog';
-                alertIconUrl = `./images/weather/${isCurrentDaytime ? 'fog-day' : 'fog-night'}.svg`;
+                alertIconUrl = './images/weather/fog.svg';
                 alertText = `Fog / low visibility`;
                 outlookBar.classList.add('has-fog');
                 break;
@@ -932,10 +955,19 @@ function renderWeatherOutlook(data) {
         }
     }
 
+    // Heat & High UV Alert
+    if (!alertType && (highTemp >= 30 || Math.round(data.current.apparent_temperature) >= 35 || (data.current.uv_index && data.current.uv_index >= 8))) {
+        alertType = 'heat';
+        alertIconUrl = './images/weather/sun-hot.svg';
+        const feels = Math.round(data.current.apparent_temperature);
+        alertText = `Heat advisory: Feels ${feels}°`;
+        outlookBar.classList.add('has-rain');
+    }
+
     // Default: Clear / Dry Conditions
     if (!alertType) {
         alertType = 'clear';
-        alertIconUrl = `./images/weather/${isCurrentDaytime ? 'clear-day' : 'clear-night'}.svg`;
+        alertIconUrl = isCurrentDaytime ? './images/weather/horizon.svg' : './images/weather/starry-night.svg';
         const isColdSeason = highTemp <= 3;
         alertText = isColdSeason ? `No snow expected` : `No rain expected`;
     }
@@ -1225,49 +1257,47 @@ function buildDayForecastDetails(data, dayKey) {
         }
     });
 
+    // Planning Metrics Calculation
+    const maxPop = data.daily.precipitation_probability_max[activeIndex] || 0;
+    const precipSum = data.daily.precipitation_sum[activeIndex] || 0;
+    const snowfallSum = (data.daily.snowfall_sum && data.daily.snowfall_sum[activeIndex]) || 0;
+    const windSpeedMax = Math.round(data.daily.wind_speed_10m_max[activeIndex] || 0);
+    const windGustMax = Math.round(data.daily.wind_gusts_10m_max[activeIndex] || 0);
+
+    const feelsLikeVal = isTodayActive
+        ? Math.round(data.current.apparent_temperature)
+        : Math.round(data.daily.apparent_temperature_max[activeIndex]);
+
+    const uvVal = isTodayActive
+        ? (data.current.uv_index !== undefined ? Math.round(data.current.uv_index) : (data.daily.uv_index_max ? Math.round(data.daily.uv_index_max[activeIndex]) : 0))
+        : (data.daily.uv_index_max ? Math.round(data.daily.uv_index_max[activeIndex]) : 0);
+
+    const now = new Date();
+    const cityHour24 = getCityHour24(now, currentLocation.timezone);
+
+    // For Today, prioritize remaining hours so past morning rain doesn't show in the evening
+    let alertIndices = isTodayActive
+        ? dayIndices.filter(idx => parseInt(data.hourly.time[idx].split('T')[1], 10) >= cityHour24)
+        : dayIndices;
+    if (alertIndices.length === 0) alertIndices = dayIndices;
+
     let alertBannerHtml = '';
-    for (const idx of dayIndices) {
+
+    // 1. Freezing Rain / Ice Hazard (Highest hazard priority)
+    for (const idx of alertIndices) {
         const code = data.hourly.weather_code[idx];
         const pop = data.hourly.precipitation_probability[idx] || 0;
-        const precip = data.hourly.precipitation[idx] || 0;
         const timeLabel = formatIsoHour(data.hourly.time[idx]);
 
-        if ([71, 73, 75, 77, 85, 86].includes(code)) {
+        if ([56, 57, 66, 67].includes(code)) {
             alertBannerHtml = `
-                <div class="gw-alert-pill is-snow is-alert">
+                <div class="gw-alert-pill is-freeze is-alert">
                     <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="./images/weather/snow.svg" alt="Snow" onerror="this.style.display='none'">
+                        <img class="gw-alert-meteo-icon" src="./images/weather/extreme-sleet.svg" alt="Ice Hazard" onerror="this.style.display='none'">
                     </div>
                     <div class="gw-alert-text-group">
-                        <div class="gw-alert-title">Snow Expected</div>
-                        <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)</div>
-                    </div>
-                </div>
-            `;
-            break;
-        } else if ([95, 96, 99].includes(code)) {
-            alertBannerHtml = `
-                <div class="gw-alert-pill is-storm is-alert">
-                    <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="./images/weather/thunderstorms-rain.svg" alt="Storm" onerror="this.style.display='none'">
-                    </div>
-                    <div class="gw-alert-text-group">
-                        <div class="gw-alert-title">Storm Alert</div>
-                        <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)</div>
-                    </div>
-                </div>
-            `;
-            break;
-        } else if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code) || pop >= 30 || precip >= 0.2) {
-            const vol = precip > 0 ? ` • ~${precip.toFixed(1)} mm` : '';
-            alertBannerHtml = `
-                <div class="gw-alert-pill is-rain is-alert">
-                    <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="./images/weather/rain.svg" alt="Rain" onerror="this.style.display='none'">
-                    </div>
-                    <div class="gw-alert-text-group">
-                        <div class="gw-alert-title">Rain Expected</div>
-                        <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)${vol}</div>
+                        <div class="gw-alert-title">Ice Hazard Warning</div>
+                        <div class="gw-alert-desc">Slippery freezing rain around ${timeLabel} (${pop}% chance)</div>
                     </div>
                 </div>
             `;
@@ -1275,58 +1305,213 @@ function buildDayForecastDetails(data, dayKey) {
         }
     }
 
+    // 2. Severe Storm Alert
     if (!alertBannerHtml) {
-        const isDayForAlert = isTodayActive ? Boolean(data.current.is_day) : true;
-        const clearMeteoIcon = isDayForAlert ? 'clear-day' : 'clear-night';
-        const dayNightClass = isDayForAlert ? 'is-day' : 'is-night';
+        for (const idx of alertIndices) {
+            const code = data.hourly.weather_code[idx];
+            const pop = data.hourly.precipitation_probability[idx] || 0;
+            const timeLabel = formatIsoHour(data.hourly.time[idx]);
 
-        if (activeLow <= 0 && activeHigh > 3) {
-            alertBannerHtml = `
-                <div class="gw-alert-pill is-freeze is-alert">
-                    <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="./images/weather/sleet.svg" alt="Frost" onerror="this.style.display='none'">
+            if ([95, 96, 99].includes(code)) {
+                alertBannerHtml = `
+                    <div class="gw-alert-pill is-storm is-alert">
+                        <div class="gw-alert-icon-box">
+                            <img class="gw-alert-meteo-icon" src="./images/weather/thunderstorms-extreme.svg" alt="Storm" onerror="this.style.display='none'">
+                        </div>
+                        <div class="gw-alert-text-group">
+                            <div class="gw-alert-title">Storm Alert</div>
+                            <div class="gw-alert-desc">Thunderstorms expected at ${timeLabel} (${pop}% chance)</div>
+                        </div>
                     </div>
-                    <div class="gw-alert-text-group">
-                        <div class="gw-alert-title">Frost Warning</div>
-                        <div class="gw-alert-desc">Overnight low dropping to ${activeLow}°</div>
-                    </div>
-                </div>
-            `;
-        } else if (activeLow <= 3) {
-            const dryColdSub = isTodayActive ? 'No snow or precipitation expected' : 'Dry weather expected';
-            alertBannerHtml = `
-                <div class="gw-alert-pill is-clear ${dayNightClass}">
-                    <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="./images/weather/${clearMeteoIcon}.svg" alt="Dry" onerror="this.style.display='none'">
-                    </div>
-                    <div class="gw-alert-text-group">
-                        <div class="gw-alert-title">Dry Conditions</div>
-                        <div class="gw-alert-desc">${dryColdSub}</div>
-                    </div>
-                </div>
-            `;
-        } else {
-            const clearSub = isTodayActive
-                ? (isDayForAlert ? 'No rain expected through tonight' : 'No rain expected overnight')
-                : 'No rain expected for this day';
-            alertBannerHtml = `
-                <div class="gw-alert-pill is-clear ${dayNightClass}">
-                    <div class="gw-alert-icon-box">
-                        <img class="gw-alert-meteo-icon" src="./images/weather/${clearMeteoIcon}.svg" alt="Clear" onerror="this.style.display='none'">
-                    </div>
-                    <div class="gw-alert-text-group">
-                        <div class="gw-alert-title">Dry & Clear</div>
-                        <div class="gw-alert-desc">${clearSub}</div>
-                    </div>
-                </div>
-            `;
+                `;
+                break;
+            }
         }
+    }
+
+    // 3. Snow Expected / Accumulation
+    if (!alertBannerHtml) {
+        for (const idx of alertIndices) {
+            const code = data.hourly.weather_code[idx];
+            const pop = data.hourly.precipitation_probability[idx] || 0;
+            const timeLabel = formatIsoHour(data.hourly.time[idx]);
+
+            if ([71, 73, 75, 77, 85, 86].includes(code) || (snowfallSum > 0 && pop >= 30)) {
+                const isHeavy = snowfallSum >= 2 || [75, 86].includes(code);
+                const snowTitle = isHeavy ? 'Snow Accumulation' : 'Snow Expected';
+                const snowDesc = isHeavy && snowfallSum > 0
+                    ? `~${snowfallSum.toFixed(1)} cm expected starting around ${timeLabel}`
+                    : `At ${timeLabel} (${pop}% chance)`;
+                alertBannerHtml = `
+                    <div class="gw-alert-pill is-snow is-alert">
+                        <div class="gw-alert-icon-box">
+                            <img class="gw-alert-meteo-icon" src="./images/weather/snowflake.svg" alt="Snow" onerror="this.style.display='none'">
+                        </div>
+                        <div class="gw-alert-text-group">
+                            <div class="gw-alert-title">${snowTitle}</div>
+                            <div class="gw-alert-desc">${snowDesc}</div>
+                        </div>
+                    </div>
+                `;
+                break;
+            }
+        }
+    }
+
+    // 4. Rain Expected / Heavy Rain
+    if (!alertBannerHtml) {
+        for (const idx of alertIndices) {
+            const code = data.hourly.weather_code[idx];
+            const pop = data.hourly.precipitation_probability[idx] || 0;
+            const precip = data.hourly.precipitation[idx] || 0;
+            const timeLabel = formatIsoHour(data.hourly.time[idx]);
+
+            if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code) || pop >= 30 || precip >= 0.2) {
+                const vol = precip > 0 ? ` • ~${precip.toFixed(1)} mm` : (precipSum > 0 ? ` • ~${precipSum.toFixed(1)} mm` : '');
+                const isHeavy = precip >= 4 || [65, 82].includes(code);
+                const rainTitle = isHeavy ? 'Heavy Rain Alert' : 'Rain Expected';
+                alertBannerHtml = `
+                    <div class="gw-alert-pill is-rain is-alert">
+                        <div class="gw-alert-icon-box">
+                            <img class="gw-alert-meteo-icon" src="./images/weather/raindrops.svg" alt="Rain" onerror="this.style.display='none'">
+                        </div>
+                        <div class="gw-alert-text-group">
+                            <div class="gw-alert-title">${rainTitle}</div>
+                            <div class="gw-alert-desc">At ${timeLabel} (${pop}% chance)${vol}</div>
+                        </div>
+                    </div>
+                `;
+                break;
+            }
+        }
+    }
+
+    // 5. High Wind Advisory
+    if (!alertBannerHtml && windGustMax >= 45) {
+        alertBannerHtml = `
+            <div class="gw-alert-pill is-wind is-alert">
+                <div class="gw-alert-icon-box">
+                    <img class="gw-alert-meteo-icon" src="./images/weather/wind-alert.svg" alt="Wind" onerror="this.style.display='none'">
+                </div>
+                <div class="gw-alert-text-group">
+                    <div class="gw-alert-title">Wind Advisory</div>
+                    <div class="gw-alert-desc">Strong gusts up to ${windGustMax} km/h expected</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 6. Dense Fog / Low Visibility
+    if (!alertBannerHtml) {
+        for (const idx of alertIndices) {
+            const code = data.hourly.weather_code[idx];
+            if ([45, 48].includes(code)) {
+                alertBannerHtml = `
+                    <div class="gw-alert-pill is-fog is-alert">
+                        <div class="gw-alert-icon-box">
+                            <img class="gw-alert-meteo-icon" src="./images/weather/fog.svg" alt="Fog" onerror="this.style.display='none'">
+                        </div>
+                        <div class="gw-alert-text-group">
+                            <div class="gw-alert-title">Dense Fog Advisory</div>
+                            <div class="gw-alert-desc">Low driving visibility expected</div>
+                        </div>
+                    </div>
+                `;
+                break;
+            }
+        }
+    }
+
+    // 7. Extreme Heat & High UV Alert
+    if (!alertBannerHtml && (activeHigh >= 30 || feelsLikeVal >= 35 || uvVal >= 8)) {
+        const heatSub = uvVal >= 6 ? `Feels like ${feelsLikeVal}° • Peak UV ${uvVal} (Sun protection needed)` : `Feels like ${feelsLikeVal}° • Stay hydrated`;
+        alertBannerHtml = `
+            <div class="gw-alert-pill is-heat is-alert">
+                <div class="gw-alert-icon-box">
+                    <img class="gw-alert-meteo-icon" src="./images/weather/sun-hot.svg" alt="Heat and UV" onerror="this.style.display='none'">
+                </div>
+                <div class="gw-alert-text-group">
+                    <div class="gw-alert-title">Heat & UV Alert</div>
+                    <div class="gw-alert-desc">${heatSub}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 8. Extreme Cold Warning
+    if (!alertBannerHtml && (activeLow <= -12 || feelsLikeVal <= -16)) {
+        alertBannerHtml = `
+            <div class="gw-alert-pill is-freeze is-alert">
+                <div class="gw-alert-icon-box">
+                    <img class="gw-alert-meteo-icon" src="./images/weather/thermometer-colder.svg" alt="Extreme Cold" onerror="this.style.display='none'">
+                </div>
+                <div class="gw-alert-text-group">
+                    <div class="gw-alert-title">Extreme Cold Warning</div>
+                    <div class="gw-alert-desc">Low dropping to ${activeLow}° • Dress in warm layers</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 9. Frost Advisory (Freeze-thaw frost risk)
+    if (!alertBannerHtml && activeLow <= 0 && activeHigh > 3) {
+        alertBannerHtml = `
+            <div class="gw-alert-pill is-freeze is-alert">
+                <div class="gw-alert-icon-box">
+                    <img class="gw-alert-meteo-icon" src="./images/weather/thermometer-colder.svg" alt="Frost" onerror="this.style.display='none'">
+                </div>
+                <div class="gw-alert-text-group">
+                    <div class="gw-alert-title">Frost Advisory</div>
+                    <div class="gw-alert-desc">Overnight low dropping to ${activeLow}° • Frost expected</div>
+                </div>
+            </div>
+        `;
+    }
+
+    const isDayForAlert = isTodayActive ? Boolean(data.current.is_day) : true;
+    const dayNightClass = isDayForAlert ? 'is-day' : 'is-night';
+
+    // 10. Cold & Dry Season
+    if (!alertBannerHtml && activeLow <= 3) {
+        const dryColdSub = isTodayActive ? 'No snow or precipitation expected' : 'Dry weather expected';
+        alertBannerHtml = `
+            <div class="gw-alert-pill is-neutral is-cold ${dayNightClass}">
+                <div class="gw-alert-icon-box">
+                    <img class="gw-alert-meteo-icon" src="./images/weather/thermometer.svg" alt="Cold Dry" onerror="this.style.display='none'">
+                </div>
+                <div class="gw-alert-text-group">
+                    <div class="gw-alert-title">Cold & Dry</div>
+                    <div class="gw-alert-desc">${dryColdSub}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 11. Pleasant & Mild / Dry & Clear
+    if (!alertBannerHtml) {
+        const isIdeal = activeHigh >= 19 && activeHigh <= 26 && windGustMax < 30 && maxPop < 25;
+        const bannerTitle = isIdeal ? 'Pleasant & Mild' : 'Dry & Clear';
+        const clearSub = isIdeal
+            ? 'Comfortable temperatures and calm conditions'
+            : (isTodayActive
+                ? (isDayForAlert ? 'No rain expected through tonight' : 'No rain expected overnight')
+                : 'No rain expected for this day');
+        const clearIconUrl = isDayForAlert ? './images/weather/horizon.svg' : './images/weather/starry-night.svg';
+        alertBannerHtml = `
+            <div class="gw-alert-pill is-neutral is-clear ${dayNightClass}">
+                <div class="gw-alert-icon-box">
+                    <img class="gw-alert-meteo-icon" src="${clearIconUrl}" alt="Clear" onerror="this.style.display='none'">
+                </div>
+                <div class="gw-alert-text-group">
+                    <div class="gw-alert-title">${bannerTitle}</div>
+                    <div class="gw-alert-desc">${clearSub}</div>
+                </div>
+            </div>
+        `;
     }
 
     // Hourly Forecast Strip (True 1-Hour Step in City's Local Time)
     let hourlyColumnsHtml = '';
-    const now = new Date();
-    const cityHour24 = getCityHour24(now, currentLocation.timezone);
 
     if (isTodayActive) {
         const liveTemp = Math.round(data.current.temperature_2m);
@@ -1404,17 +1589,6 @@ function buildDayForecastDetails(data, dayKey) {
             `;
         });
     }
-
-    // Planning Metrics Calculation
-    const maxPop = data.daily.precipitation_probability_max[activeIndex] || 0;
-    const precipSum = data.daily.precipitation_sum[activeIndex] || 0;
-    const snowfallSum = (data.daily.snowfall_sum && data.daily.snowfall_sum[activeIndex]) || 0;
-    const windSpeedMax = Math.round(data.daily.wind_speed_10m_max[activeIndex] || 0);
-    const windGustMax = Math.round(data.daily.wind_gusts_10m_max[activeIndex] || 0);
-
-    const feelsLikeVal = isTodayActive
-        ? Math.round(data.current.apparent_temperature)
-        : Math.round(data.daily.apparent_temperature_max[activeIndex]);
 
     // Calculate Humidity for Selected Day
     let humidityVal = 0;
