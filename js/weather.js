@@ -1135,6 +1135,7 @@ function openWeatherExpandedPanel() {
     requestAnimationFrame(() => {
         backdrop.classList.add('active');
         panel.classList.add('active');
+        scrollHourlyStripToNow(panel);
     });
 }
 
@@ -1165,6 +1166,33 @@ function toggleWeatherExpandedPanel() {
 window.openWeatherExpandedPanel = openWeatherExpandedPanel;
 window.closeWeatherExpandedPanel = closeWeatherExpandedPanel;
 window.toggleWeatherExpandedPanel = toggleWeatherExpandedPanel;
+
+/**
+ * Smoothly positions the hourly forecast strip to 'Now' for today, or start of day for other days
+ */
+function scrollHourlyStripToNow(panel) {
+    if (!panel) panel = document.getElementById('weather-expanded-panel');
+    if (!panel) return;
+    const hourlyScroll = panel.querySelector('.gw-hourly-scroll');
+    if (!hourlyScroll) return;
+
+    const doScroll = () => {
+        const nowCol = hourlyScroll.querySelector('.gw-hourly-col.is-now');
+        if (nowCol) {
+            const colRect = nowCol.getBoundingClientRect();
+            const scrollRect = hourlyScroll.getBoundingClientRect();
+            if (scrollRect.width > 0) {
+                const diff = colRect.left - scrollRect.left;
+                hourlyScroll.scrollLeft = Math.max(0, hourlyScroll.scrollLeft + diff);
+            }
+        } else {
+            hourlyScroll.scrollLeft = 0;
+        }
+    };
+
+    doScroll();
+    requestAnimationFrame(doScroll);
+}
 
 /**
  * Computes and renders HTML for the active day's Hero Overview Card and Planning Metrics Grid
@@ -1306,25 +1334,36 @@ function buildDayForecastDetails(data, dayKey) {
         const livePrecip = data.current.precipitation || 0;
         const isRainingNow = livePrecip > 0 || [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(data.current.weather_code);
 
-        hourlyColumnsHtml += `
-            <div class="gw-hourly-col is-now">
-                <span class="gw-hourly-temp">${liveTemp}°</span>
-                <span class="gw-hourly-pop ${isRainingNow ? '' : 'is-empty'}">${isRainingNow ? 'Now' : '&nbsp;'}</span>
-                <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
-                <span class="gw-hourly-time">Now</span>
-            </div>
-        `;
-
+        let nowInserted = false;
         dayIndices.forEach(idx => {
             const tStr = data.hourly.time[idx];
             const slotHour = parseInt(tStr.split('T')[1].split(':')[0], 10);
-            if (slotHour > cityHour24) {
-                const sTemp = Math.round(data.hourly.temperature_2m[idx]);
-                const popVal = data.hourly.precipitation_probability[idx] || 0;
-                const isDaySlot = Boolean(data.hourly.is_day[idx]);
-                const sWmo = getWmoDetails(data.hourly.weather_code[idx], isDaySlot);
-                const timeLabel = formatIsoHour(tStr);
+            const sTemp = Math.round(data.hourly.temperature_2m[idx]);
+            const popVal = data.hourly.precipitation_probability[idx] || 0;
+            const isDaySlot = Boolean(data.hourly.is_day[idx]);
+            const sWmo = getWmoDetails(data.hourly.weather_code[idx], isDaySlot);
+            const timeLabel = formatIsoHour(tStr);
 
+            if (slotHour === cityHour24) {
+                nowInserted = true;
+                hourlyColumnsHtml += `
+                    <div class="gw-hourly-col is-now">
+                        <span class="gw-hourly-temp">${liveTemp}°</span>
+                        <span class="gw-hourly-pop ${isRainingNow ? '' : 'is-empty'}">${isRainingNow ? 'Now' : '&nbsp;'}</span>
+                        <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                        <span class="gw-hourly-time">Now</span>
+                    </div>
+                `;
+            } else if (slotHour < cityHour24) {
+                hourlyColumnsHtml += `
+                    <div class="gw-hourly-col is-past">
+                        <span class="gw-hourly-temp">${sTemp}°</span>
+                        <span class="gw-hourly-pop ${popVal >= 20 ? '' : 'is-empty'}">${popVal >= 20 ? `${popVal}%` : '&nbsp;'}</span>
+                        <img class="gw-hourly-icon" src="${sWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                        <span class="gw-hourly-time">${timeLabel}</span>
+                    </div>
+                `;
+            } else {
                 hourlyColumnsHtml += `
                     <div class="gw-hourly-col">
                         <span class="gw-hourly-temp">${sTemp}°</span>
@@ -1335,6 +1374,17 @@ function buildDayForecastDetails(data, dayKey) {
                 `;
             }
         });
+
+        if (!nowInserted) {
+            hourlyColumnsHtml = `
+                <div class="gw-hourly-col is-now">
+                    <span class="gw-hourly-temp">${liveTemp}°</span>
+                    <span class="gw-hourly-pop ${isRainingNow ? '' : 'is-empty'}">${isRainingNow ? 'Now' : '&nbsp;'}</span>
+                    <img class="gw-hourly-icon" src="${liveWmo.iconUrl}" alt="icon" onerror="this.onerror=null; this.src='./images/weather/umbrella.svg';">
+                    <span class="gw-hourly-time">Now</span>
+                </div>
+            ` + hourlyColumnsHtml;
+        }
     } else {
         dayIndices.forEach(idx => {
             const tStr = data.hourly.time[idx];
@@ -1507,6 +1557,8 @@ function selectExpandedDay(clickedKey) {
     if (activeCard) {
         activeCard.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
     }
+
+    scrollHourlyStripToNow(panel);
 }
 
 /**
@@ -1648,6 +1700,8 @@ function renderExpandedForecast() {
     if (newDailyRow && prevDailyScroll !== undefined && prevDailyScroll > 0) {
         newDailyRow.scrollLeft = prevDailyScroll;
     }
+
+    scrollHourlyStripToNow(panel);
 
     // Wire close button
     const closeBtn = panel.querySelector('#expanded-panel-close-btn');

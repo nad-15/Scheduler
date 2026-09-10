@@ -2770,6 +2770,15 @@ h1 {
     font-weight: 700;
 }
 
+.gw-hourly-col.is-past {
+    opacity: 0.55;
+    transition: opacity 0.2s ease;
+}
+
+.gw-hourly-col.is-past:hover {
+    opacity: 0.85;
+}
+
 /* Daily Selector Row (The 7 Days Below the Main Card) */
 .gw-daily-row {
     display: flex;
