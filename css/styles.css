@@ -1668,8 +1668,9 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: fit-content;
+    width: 170px;
     min-width: 170px;
+    max-width: 170px;
     min-height: 104px;
     box-sizing: border-box;
     height: fit-content;
@@ -1732,12 +1733,19 @@ h1 {
     align-items: flex-start;
     margin-left: 5px;
     height: fit-content;
-    width: fit-content;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 #weather-location {
     font-size: 12px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    max-width: 100%;
+    line-height: 1.2;
 }
 
 #weather-date {
@@ -1774,7 +1782,7 @@ h1 {
     align-items: center;
     margin-right: 5px;
     height: fit-content;
-    width: fit-content;
+    flex-shrink: 0;
 }
 
 #weather-icon {
@@ -1872,8 +1880,11 @@ h1 {
     font-family: Arial, sans-serif;
     user-select: none;
     box-sizing: border-box;
-    width: fit-content;
+    width: 170px;
     min-width: 170px;
+    max-width: 170px;
+    height: fit-content;
+    touch-action: pan-y;
     transition: transform 0.3s ease, opacity 0.3s ease;
     -webkit-tap-highlight-color: transparent;
 }
@@ -1890,25 +1901,14 @@ h1 {
 }
 
 .weather-outlook-bar.dismissed {
-    transform: translateX(120%) !important;
+    transform: translateX(140%) !important;
     opacity: 0 !important;
     pointer-events: none !important;
 }
 
 .outlook-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: block;
     width: 100%;
-    gap: 4px;
-}
-
-.outlook-main-info {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    overflow: hidden;
-    min-width: 0;
 }
 
 .outlook-icon {
@@ -1917,14 +1917,16 @@ h1 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    vertical-align: -3px;
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
+    margin-right: 5px;
 }
 
 .outlook-meteo-icon {
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
     object-fit: contain;
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
     display: block;
@@ -1947,10 +1949,11 @@ h1 {
     font-size: 11.5px;
     font-weight: bold;
     color: #ffffff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.35;
     letter-spacing: 0.1px;
+    white-space: normal;
+    word-break: normal;
+    width: 100%;
 }
 
 .outlook-sub-info {
@@ -1958,7 +1961,7 @@ h1 {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    margin-top: 3px;
+    margin-top: 4px;
     font-size: 10.5px;
     color: rgba(255, 255, 255, 0.85);
     gap: 6px;
@@ -1988,6 +1991,7 @@ h1 {
     justify-content: center;
     line-height: 1;
     flex-shrink: 0;
+    margin-top: 1px;
     transition: all 0.2s ease;
 }
 

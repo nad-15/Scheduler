@@ -745,7 +745,7 @@ async function getWeather() {
             if (!weatherWidget.querySelector('.time-container')) {
                 weatherWidget.innerHTML = `
                     <div class="time-container">
-                        <div id="weather-location">${locationLabel}</div>
+                        <div id="weather-location" title="${locationLabel}">${locationLabel}</div>
                         <div id="weather-date"></div>
                         <div id="weather-time">
                             <span id="weather-hour-minute"></span>
@@ -763,7 +763,10 @@ async function getWeather() {
                 `;
             } else {
                 const locEl = weatherWidget.querySelector('#weather-location');
-                if (locEl) locEl.textContent = locationLabel;
+                if (locEl) {
+                    locEl.textContent = locationLabel;
+                    locEl.title = locationLabel;
+                }
                 const tempEl = weatherWidget.querySelector('#weather-temp');
                 if (tempEl) tempEl.textContent = `${tempVal}°`;
                 const weatherEl = weatherWidget.querySelector('#weather-desc');
@@ -1039,18 +1042,7 @@ function renderWeatherOutlook(data) {
 
     outlookBar.innerHTML = `
         <div class="outlook-header">
-            <div class="outlook-main-info">
-                <span class="outlook-icon ${isPulse ? 'pulse' : ''}">
-                    <img class="outlook-meteo-icon" src="${alertIconUrl}" alt="${alertType}" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';">
-                </span>
-                <span class="outlook-status">${alertText}</span>
-            </div>
-            <button id="close-weather-outlook" class="outlook-close-btn" title="Dismiss forecast" aria-label="Close forecast">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
+            <div class="outlook-status" title="${alertText}"><span class="outlook-icon ${isPulse ? 'pulse' : ''}"><img class="outlook-meteo-icon" src="${alertIconUrl}" alt="${alertType}" onerror="this.onerror=null; this.src='./images/weather/wind-spinner.svg';"></span>${alertText}</div>
         </div>
         <div class="outlook-sub-info">
             <span class="outlook-temps">H: ${highTemp}° L: ${lowTemp}°</span>
@@ -1132,22 +1124,133 @@ function renderWeatherOutlook(data) {
         ro.observe(weatherWidgetEl);
     }
 
-    // Dismiss action
-    const closeBtn = document.getElementById('close-weather-outlook');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
+    // Slide left / right gesture to dismiss companion outlook bar
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchDeltaX = 0;
+    let isSwiping = false;
+    let hasMoved = false;
+
+    function handleDragStart(x, y) {
+        touchStartX = x;
+        touchStartY = y;
+        touchDeltaX = 0;
+        isSwiping = false;
+        hasMoved = false;
+    }
+
+    function handleDragMove(x, y) {
+        const diffX = x - touchStartX;
+        const diffY = y - touchStartY;
+
+        // If predominantly horizontal movement > 7px, engage swipe
+        if (!isSwiping) {
+            if (Math.abs(diffX) > 7 && Math.abs(diffX) > Math.abs(diffY)) {
+                isSwiping = true;
+                hasMoved = true;
+                outlookBar.style.transition = 'none';
+            }
+        }
+
+        if (isSwiping) {
+            touchDeltaX = diffX;
+            outlookBar.style.transform = `translateX(${touchDeltaX}px)`;
+            const opacityVal = Math.max(0.2, 1 - (Math.abs(touchDeltaX) / 220));
+            outlookBar.style.opacity = String(opacityVal);
+        }
+    }
+
+    function handleDragEnd() {
+        if (!isSwiping) {
+            outlookBar.style.transition = '';
+            outlookBar.style.transform = '';
+            outlookBar.style.opacity = '';
+            return;
+        }
+
+        outlookBar.style.transition = 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s ease';
+
+        // Threshold to dismiss: 40px in either direction
+        if (Math.abs(touchDeltaX) > 40) {
+            const dismissDirection = touchDeltaX > 0 ? 'translateX(150%)' : 'translateX(-150%)';
+            outlookBar.style.transform = dismissDirection;
+            outlookBar.style.opacity = '0';
             outlookBar.classList.add('dismissed');
             sessionStorage.setItem('weather-outlook-dismissed', 'true');
             setTimeout(() => {
                 outlookBar.style.display = 'none';
-            }, 350);
-        });
+                outlookBar.style.transition = '';
+            }, 300);
+        } else {
+            // Snap back
+            outlookBar.style.transform = 'translateX(0)';
+            outlookBar.style.opacity = '1';
+            setTimeout(() => {
+                outlookBar.style.transition = '';
+            }, 300);
+        }
     }
 
-    // Clicking outlook bar opens expanded dashboard
+    // Touch events for mobile devices
+    outlookBar.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    }, { passive: true });
+
+    outlookBar.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1) {
+            handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+            if (isSwiping && e.cancelable) {
+                e.preventDefault();
+            }
+        }
+    }, { passive: false });
+
+    outlookBar.addEventListener('touchend', () => {
+        handleDragEnd();
+    });
+
+    outlookBar.addEventListener('touchcancel', () => {
+        handleDragEnd();
+    });
+
+    // Pointer events for desktop drag support
+    let isPointerDown = false;
+    outlookBar.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse') {
+            isPointerDown = true;
+            handleDragStart(e.clientX, e.clientY);
+        }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+        if (isPointerDown && e.pointerType === 'mouse') {
+            handleDragMove(e.clientX, e.clientY);
+        }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+        if (isPointerDown && e.pointerType === 'mouse') {
+            isPointerDown = false;
+            handleDragEnd();
+        }
+    });
+
+    window.addEventListener('pointercancel', (e) => {
+        if (isPointerDown && e.pointerType === 'mouse') {
+            isPointerDown = false;
+            handleDragEnd();
+        }
+    });
+
+    // Clicking outlook bar opens expanded dashboard (only if not dragging/swiping)
     outlookBar.addEventListener('click', (e) => {
-        if (e.target.closest('#close-weather-outlook')) return;
+        if (hasMoved) {
+            e.stopPropagation();
+            hasMoved = false;
+            return;
+        }
         openWeatherExpandedPanel();
     });
 
