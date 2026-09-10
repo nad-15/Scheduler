@@ -219,10 +219,12 @@ function renderColorOptions(colors) {
     if (first) {
         chosenColor = first.dataset.color;
 
-        picker.querySelectorAll('.color-option').forEach(btn =>
-            btn.classList.remove('selected-color')
-        );
+        picker.querySelectorAll('.color-option').forEach(btn => {
+            btn.classList.remove('selected-color');
+            btn.parentElement?.classList.remove('selected-container');
+        });
         first.classList.add('selected-color');
+        first.parentElement?.classList.add('selected-container');
 
         if (flower) flower.style.color = chosenColor;
     }
@@ -279,10 +281,12 @@ function applyColorMode(mode, shadeName = null, save = true) {
         const firstButton = picker.querySelector('.color-option');
         if (firstButton) {
             chosenColor = firstButton.getAttribute('data-color');
-            picker.querySelectorAll('.color-option').forEach(btn =>
-                btn.classList.remove('selected-color')
-            );
+            picker.querySelectorAll('.color-option').forEach(btn => {
+                btn.classList.remove('selected-color');
+                btn.parentElement?.classList.remove('selected-container');
+            });
             firstButton.classList.add('selected-color');
+            firstButton.parentElement?.classList.add('selected-container');
             if (flower) flower.style.color = chosenColor;
         }
         updateActiveColorModeUI("all");
@@ -1574,10 +1578,12 @@ document.getElementById('colorPicker').addEventListener('click', (e) => {
     chosenColor = button.getAttribute('data-color');
 
     // Highlight the selected button
-    document.querySelectorAll('.color-option').forEach(btn =>
-        btn.classList.remove('selected-color')
-    );
+    document.querySelectorAll('.color-option').forEach(btn => {
+        btn.classList.remove('selected-color');
+        btn.parentElement?.classList.remove('selected-container');
+    });
     button.classList.add('selected-color');
+    button.parentElement?.classList.add('selected-container');
 
     // Update flower color
     flower.style.color = chosenColor;
@@ -2391,8 +2397,12 @@ colorOptionTemplate.forEach(button => {
         // Get the selected color
         chosenColorTemplate = button.getAttribute('data-color');
         // Highlight the selected button
-        colorOptionTemplate.forEach(btn => btn.classList.remove('selected-color'));
+        colorOptionTemplate.forEach(btn => {
+            btn.classList.remove('selected-color');
+            btn.parentElement?.classList.remove('selected-container');
+        });
         button.classList.add('selected-color');
+        button.parentElement?.classList.add('selected-container');
         console.log(`color option for template color is ${chosenColorTemplate}`);
         colorIndicatorTemplate.style.color = chosenColorTemplate;
     });

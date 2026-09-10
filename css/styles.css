@@ -4617,17 +4617,17 @@ input[type="radio"]:checked::after {
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    /* flex-wrap: wrap; */
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
     scrollbar-width: none;
-    gap: 10px;
-    padding: 5px;
-    /* padding-bottom: 0px; */
-    /* border: 2px solid red; */
+    -ms-overflow-style: none;
+    gap: 12px;
+    padding: 8px 12px;
     border-radius: 60px;
-    /* margin-bottom: 5px; */
-    /* margin-top: 5px;
-    margin-bottom: 5px; */
+}
+
+.color-picker::-webkit-scrollbar {
+    display: none;
 }
 
 /* .color-option {
@@ -5339,55 +5339,50 @@ input[type="radio"]:checked::after {
 
 
 .color-option {
-    /* border: 5px solid green; */
     box-sizing: border-box;
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-shrink: 0;
     flex-grow: 0;
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    /* Ensures circular shape */
     border: 2px solid transparent;
-    /* Default transparent border */
     cursor: pointer;
-    transition: transform 0.3s ease, border 0.3s ease;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border 0.25s ease, width 0.25s ease, height 0.25s ease;
     background-color: transparent;
-    /* Default background */
     -webkit-tap-highlight-color: transparent;
 }
 
-.color-option:hover {
-    transform: scale(.95);
+.color-option:not(.selected-color):hover {
+    transform: scale(1.06);
 }
 
 .color-option.selected-color {
-    border: 5px solid transparent;
-    width: 25px;
-    height: 25px;
+    border: 2px solid transparent;
+    width: 26px;
+    height: 26px;
 }
 
 .color-option-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* align-content: center; */
     width: 30px;
     height: 30px;
     border-radius: 50%;
     flex-shrink: 0;
     flex-grow: 0;
-    /* background: linear-gradient(
-        90deg, 
-        red,
-        orange,
-        yellow,
-        green,
-        blue,
-        indigo,
-        violet
-    ); */
     background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.color-option-container:has(.selected-color),
+.color-option-container.selected-container {
+    transform: scale(1.26);
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
 }
 
 
@@ -5753,30 +5748,28 @@ html.hide-all-buttons-active #slidingInputView {
 .color-option-template {
     box-sizing: border-box;
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-shrink: 0;
     flex-grow: 0;
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    /* Ensures circular shape */
     border: 2px solid transparent;
-    /* Default transparent border */
     cursor: pointer;
-    transition: transform 0.3s ease, border 0.3s ease;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border 0.25s ease, width 0.25s ease, height 0.25s ease;
     background-color: transparent;
-    /* Default background */
-
     -webkit-tap-highlight-color: transparent;
 }
 
-/* .color-option-template:hover {
-    transform: scale(.95);
-} */
+.color-option-template:not(.selected-color):hover {
+    transform: scale(1.06);
+}
 
 .color-option-template.selected-color {
-    border: 5px solid transparent;
-    width: 25px;
-    height: 25px;
+    border: 2px solid transparent;
+    width: 26px;
+    height: 26px;
 }
 
 
