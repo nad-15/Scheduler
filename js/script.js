@@ -2531,7 +2531,7 @@ function toggleTemplateExpansion(forceState) {
         const currentLeft = parseFloat(movableTemplate.style.left) || 0;
         const isLandscape = window.innerWidth > window.innerHeight;
         const expandedW = isLandscape ? window.innerHeight - 30 : window.innerWidth - 30;
-        const targetW = isNowExpanded ? expandedW : 160;
+        const targetW = isNowExpanded ? expandedW : 176;
         const maxLeft = Math.max(10, window.innerWidth - targetW - 10);
         const newLeft = Math.max(10, Math.min(currentLeft, maxLeft));
         movableTemplate.style.left = `${newLeft}px`;

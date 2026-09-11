@@ -5524,10 +5524,10 @@ input[type="radio"]:checked::after {
     /* flex-direction: column; */
     /* flex-direction: row-reverse; */
     /* justify-content: flex-start; */
-    top: calc(50% - 80px);
-    left: calc(50% - 80px);
-    width: 160px;
-    height: 160px;
+    top: calc(50% - 92px);
+    left: calc(50% - 88px);
+    width: 176px;
+    height: 185px;
     /* border-radius: 50%; */
     /* gap: 5px; */
     /* border: 2px solid black; */
@@ -5595,17 +5595,17 @@ input[type="radio"]:checked::after {
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    padding: 4px 0;
+    padding: 6px 0;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
 
 }
 
 .template-tools-divider {
-    width: 20px;
+    width: 22px;
     height: 1px;
     background: rgba(255, 255, 255, 0.25);
-    margin: 2px 0;
+    margin: 3px 0;
     border-radius: 1px;
 }
 
@@ -5613,7 +5613,7 @@ input[type="radio"]:checked::after {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     background: rgba(0, 0, 0, 0.28);
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 14px;
@@ -5649,7 +5649,7 @@ input[type="radio"]:checked::after {
 .icon-container-template .material-icons.template-btn,
 .icon-container-template .material-symbols-outlined.template-btn,
 .icon-container-template .template-btn {
-    font-size: 22px;
+    font-size: 26px;
     background-color: transparent;
     color: white;
     font-weight: bold;
@@ -5657,7 +5657,7 @@ input[type="radio"]:checked::after {
 
 .material-icons.task-div-delete-btn {
     color: #ff7675;
-    font-size: 21px;
+    font-size: 25px;
     transition: color 0.2s ease, transform 0.2s ease;
 }
 
@@ -5669,7 +5669,7 @@ input[type="radio"]:checked::after {
     /* border: 2px solid red; */
     margin: 0px;
     padding: 0px;
-    font-size: 25px;
+    font-size: 27px;
     /* rotate: 90deg; */
 }
 
@@ -5677,13 +5677,13 @@ input[type="radio"]:checked::after {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 12px !important;
+    font-size: 13px !important;
     line-height: 1;
     font-weight: bold;
     color: white;
     background: transparent;
-    width: 25px;
-    height: 25px;
+    width: 27px;
+    height: 27px;
     border-radius: 50%;
     border: 2px solid white;
     transition: all 0.2s ease;
@@ -5703,8 +5703,8 @@ input[type="radio"]:checked::after {
     margin-top: 5px;
     /* margin-bottom: 5px; */
     /* margin-right: 5px; */
-    margin-left: 5px;
-    margin-right: 2px;
+    margin-left: 4px;
+    margin-right: 3px;
     /* padding-right: 5px; */
     background-color: transparent;
     gap: 5px;
@@ -5713,6 +5713,7 @@ input[type="radio"]:checked::after {
     color: white;
     font-size: 12px;
     flex-grow: 1;
+    min-width: 104px;
     scrollbar-width: none;
     /* border: 2px solid black; */
 }
@@ -5722,13 +5723,16 @@ input[type="radio"]:checked::after {
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: max-content;
     align-items: start;
+    min-width: 0;
 }
 
 .line {
     width: 1.5px;
     background-color: white;
-    height: auto;
+    height: 100%;
+    min-height: 100%;
     align-self: stretch;
+    flex-shrink: 0;
 }
 
 
@@ -5741,7 +5745,7 @@ input[type="radio"]:checked::after {
     box-sizing: border-box;
     min-height: 30px;
     height: auto;
-    width: 95px;
+    width: 102px;
     font-size: 10px;
     line-height: 1.25;
     color: black;
