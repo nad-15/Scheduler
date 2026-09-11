@@ -2537,23 +2537,17 @@ function toggleTemplateExpansion(forceState) {
         movableTemplate.style.left = `${newLeft}px`;
     }
 
-    // Sync hamburger settings toggle switch
-    const settingsToggle = document.getElementById('movable-template-expanded-toggle');
-    if (settingsToggle && settingsToggle.checked !== isNowExpanded) {
-        settingsToggle.checked = isNowExpanded;
-    }
-
-    // Sync with appSettings
-    if (typeof appSettings !== 'undefined') {
-        appSettings['movable-template-expanded'] = isNowExpanded;
-        localStorage.setItem('appSettings', JSON.stringify(appSettings));
-    } else {
+    // Save persistent state directly into appSettings
+    try {
         const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
         settings['movable-template-expanded'] = isNowExpanded;
         localStorage.setItem('appSettings', JSON.stringify(settings));
+        if (typeof appSettings !== 'undefined') {
+            appSettings['movable-template-expanded'] = isNowExpanded;
+        }
+    } catch (e) {
+        console.warn('Failed to save movable-template-expanded in appSettings', e);
     }
-
-    localStorage.setItem('movableTemplateExpanded', isNowExpanded ? 'true' : 'false');
 }
 
 window.toggleTemplateExpansion = toggleTemplateExpansion;
@@ -2564,16 +2558,12 @@ if (expandTemplateBtn) {
     });
 }
 
-// Restore saved expanded state from appSettings / localStorage
+// Restore saved expanded state from appSettings on visit
 function restoreTemplateExpansionState() {
     let shouldBeExpanded = false;
     try {
         const savedSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
-        if (savedSettings['movable-template-expanded'] !== undefined) {
-            shouldBeExpanded = Boolean(savedSettings['movable-template-expanded']);
-        } else if (localStorage.getItem('movableTemplateExpanded') !== null) {
-            shouldBeExpanded = localStorage.getItem('movableTemplateExpanded') === 'true';
-        }
+        shouldBeExpanded = savedSettings['movable-template-expanded'] === true;
     } catch (e) {
         shouldBeExpanded = false;
     }

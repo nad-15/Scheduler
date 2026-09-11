@@ -25,6 +25,10 @@ if (localStorage.getItem("clampExpanded") !== null) {
   localStorage.removeItem("clampExpanded");
 }
 
+if (localStorage.getItem("movableTemplateExpanded") !== null) {
+  localStorage.removeItem("movableTemplateExpanded");
+}
+
 // load from localStorage or use defaults
 let appSettings = JSON.parse(localStorage.getItem("appSettings")) || { ...DEFAULT_SETTINGS };
 
@@ -192,24 +196,6 @@ if (slidingTemplatesToggle) {
     }
     if (slidingInput && slidingInput.classList.contains('show') && taskToolbar) {
       taskToolbar.style.bottom = `${(checked ? 156 : 130) + 10}px`;
-    }
-  });
-}
-
-const movableTemplateExpandedToggle = document.getElementById("movable-template-expanded-toggle");
-if (movableTemplateExpandedToggle) {
-  const isTemplateExpanded = Boolean(appSettings["movable-template-expanded"]);
-  movableTemplateExpandedToggle.checked = isTemplateExpanded;
-
-  movableTemplateExpandedToggle.addEventListener("change", (e) => {
-    const checked = e.target.checked;
-    appSettings["movable-template-expanded"] = checked;
-    localStorage.setItem("appSettings", JSON.stringify(appSettings));
-
-    if (typeof window.toggleTemplateExpansion === "function") {
-      window.toggleTemplateExpansion(checked);
-    } else if (typeof toggleTemplateExpansion === "function") {
-      toggleTemplateExpansion(checked);
     }
   });
 }
