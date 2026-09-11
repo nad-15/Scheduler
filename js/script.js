@@ -15,6 +15,7 @@ const btnTemplateDone = document.getElementById('btn-template-done');
 const btnTemplateUndo = document.getElementById('btn-template-undo');
 const btnTemplateRedo = document.getElementById('btn-template-redo');
 const btnDeleteAllTemplates = document.getElementById('btn-delete-all-templates');
+const templateEditOverlay = document.getElementById('template-edit-overlay');
 const addButton = document.querySelector('.btn-add');
 const deleteButton = document.querySelector('.btn-delete');
 const deselectTemplateBtn = document.querySelector('.btn-clear');
@@ -2656,6 +2657,9 @@ function setTemplateEditMode(enable) {
     isTemplateEditMode = !!enable;
     if (movableTemplate) {
         movableTemplate.classList.toggle('is-editing', isTemplateEditMode);
+    }
+    if (templateEditOverlay) {
+        templateEditOverlay.classList.toggle('is-active', isTemplateEditMode);
     }
     updateTemplateUndoRedoButtons();
 }

@@ -5640,7 +5640,31 @@ input[type="radio"]:checked::after {
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
 }
 
+.template-edit-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.48);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    z-index: 2400;
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.template-edit-overlay.is-active {
+    display: block;
+}
+
 .movable-template.is-editing {
+    z-index: 2500 !important;
     border: 1.5px solid rgba(255, 171, 0, 0.85);
     box-shadow: 0 0 16px rgba(255, 171, 0, 0.45), inset 0 0 12px rgba(255, 171, 0, 0.15);
 }
