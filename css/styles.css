@@ -3396,6 +3396,12 @@ h2 {
     -ms-user-select: none;
 }
 
+.floating-add-btn .material-icons,
+.floating-add-btn .floating-add-icon {
+    font-size: 30px !important;
+    color: white;
+}
+
 .clear-button {
     display: flex;
     justify-content: center;
@@ -4711,8 +4717,8 @@ input[type="radio"]:checked::after {
     color: #6a5044;
 }
 
-.material-icons.arrow-upward,
-.material-icons.add-btn {
+.title-submit-container .material-icons.arrow-upward,
+.title-submit-container .material-icons.add-btn {
     font-size: 20px;
 }
 
@@ -5639,8 +5645,9 @@ input[type="radio"]:checked::after {
 
 
 
-.material-icons.template-btn,
-.material-symbols-outlined.template-btn {
+.icon-container-template .material-icons.template-btn,
+.icon-container-template .material-symbols-outlined.template-btn,
+.icon-container-template .template-btn {
     font-size: 22px;
     background-color: transparent;
     color: white;

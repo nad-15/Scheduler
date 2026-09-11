@@ -2,7 +2,7 @@
 // Skhayeduler Service Worker - Network-First Strategy (Zero Stale Code)
 // ==========================================================================
 
-const CACHE_NAME = 'scheduler-pwa-v91';
+const CACHE_NAME = 'scheduler-pwa-v92';
 
 const STATIC_ASSETS = [
     './',
