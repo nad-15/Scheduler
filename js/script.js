@@ -845,8 +845,11 @@ hideWidgetBtn.addEventListener('click', () => {
 
 
 templateTaskBtn.addEventListener('click', () => {
-    movableTemplate.style.display =
-        movableTemplate.style.display === 'flex' ? 'none' : 'flex';
+    const willBeOpen = movableTemplate.style.display !== 'flex';
+    movableTemplate.style.display = willBeOpen ? 'flex' : 'none';
+    if (willBeOpen) {
+        renderJobTemplates();
+    }
     console.log(`drag is cllick`);
 });
 
@@ -1972,37 +1975,55 @@ function submitTask() {
     }
 }
 
+function bumpTemplateToTop(text, color) {
+    if (!text || !color) return;
+    const normColor = normalizeHex(color);
+
+    // 1. Move to index 0 in taskClipboard and save
+    const index = taskClipboard.findIndex(task => 
+        task.text === text && normalizeHex(task.color) === normColor
+    );
+
+    if (index !== -1) {
+        const [matched] = taskClipboard.splice(index, 1);
+        taskClipboard.unshift(matched);
+        saveTemplate();
+    }
+}
+
 function addTemplate(taskTitle, color) {
 
     //save task template here
     if (taskTitle !== ``) {
-
+        const normColor = normalizeHex(color);
         const taskTemplate = {
             text: taskTitle,
             color: color
         };
 
-        // Check if the task already exists in the array
-        const taskExists = taskClipboard.some(task => task.text === taskTemplate.text && task.color === taskTemplate.color);
+        // Check if the exact task (text AND color) already exists in the array
+        const existingIndex = taskClipboard.findIndex(task => 
+            task.text === taskTemplate.text && normalizeHex(task.color) === normColor
+        );
 
-        if (!taskExists) {
-            // If the task doesn't exist, push it to the array
-            taskClipboard.push(taskTemplate);
+        if (existingIndex !== -1) {
+            // Already exists -> pull it to position #1 (front of list & top of dock)
+            bumpTemplateToTop(taskTitle, color);
+        } else {
+            // If the task doesn't exist, push to front of the array (position #1)
+            taskClipboard.unshift(taskTemplate);
 
             // Create the div and append it to the container
             const itemDiv = document.createElement('div');
-
 
             itemDiv.addEventListener(`dblclick`, () => {
                 removeTemplate(itemDiv);
             });
 
-
             itemDiv.classList.add('items'); // Add the 'items' class
 
             // Set the background color of the div based on the task's color
             itemDiv.style.backgroundColor = taskTemplate.color;
-
 
             // Set the text content of the div based on the task's title
             itemDiv.textContent = taskTemplate.text;
@@ -2039,6 +2060,9 @@ jobTemplateContainer.addEventListener('click', (event) => {
 function submitTemplate(item) {
     const taskText = item.textContent;
     const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
+
+    // Move to position #1 in array and storage (will show at top next time dock is opened)
+    bumpTemplateToTop(taskText, taskColor);
 
     if (taskColor) {
         const colorBtn = document.querySelector(`button.color-option[data-color="${taskColor}"]`);
@@ -2113,16 +2137,15 @@ function submitTemplate(item) {
 function removeTemplate(item) {
     // Get task text and color from the clicked item
     const taskText = item.textContent;
-    const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
-
+    const taskColor = normalizeHex(item.style.backgroundColor);
 
     console.log(taskText, taskColor);
 
     // Load the current taskClipboard from localStorage
     let savedTasks = JSON.parse(localStorage.getItem('taskClipboard')) || [];
 
-    // Filter out the clicked task
-    savedTasks = savedTasks.filter(task => !(task.text === taskText && task.color === taskColor));
+    // Filter out the clicked task (exact text and color match)
+    savedTasks = savedTasks.filter(task => !(task.text === taskText && normalizeHex(task.color) === taskColor));
 
     // Save the updated taskClipboard back to localStorage
     localStorage.setItem('taskClipboard', JSON.stringify(savedTasks));
@@ -2141,6 +2164,27 @@ function saveTemplate() {
 }
 
 
+function renderJobTemplates() {
+    if (!jobTemplateContainer) return;
+    jobTemplateContainer.innerHTML = '';
+    taskClipboard.forEach(task => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('items'); // Add the 'items' class
+        itemDiv.addEventListener('dblclick', () => {
+            removeTemplate(itemDiv);
+        });
+
+        // Set the background color of the div based on the task's color
+        itemDiv.style.backgroundColor = task.color;
+
+        // Set the text content of the div based on the task's title
+        itemDiv.textContent = task.text;
+
+        // Append the created item div to the container
+        jobTemplateContainer.appendChild(itemDiv);
+    });
+}
+
 function loadTemplate() {
     // Load tasks from localStorage
     const savedTemplate = JSON.parse(localStorage.getItem('taskClipboard'));
@@ -2148,28 +2192,8 @@ function loadTemplate() {
     // If there are tasks saved in localStorage, load them into taskClipboard
     if (savedTemplate) {
         taskClipboard = savedTemplate;
-
-        // Reverse the order of tasks before rendering
-        taskClipboard.reverse();
-
-        // Loop through each saved task and create the corresponding div
-        taskClipboard.forEach(task => {
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('items'); // Add the 'items' class
-            itemDiv.addEventListener(`dblclick`, () => {
-                removeTemplate(itemDiv);
-            });
-
-            // Set the background color of the div based on the task's color
-            itemDiv.style.backgroundColor = task.color;
-
-            // Set the text content of the div based on the task's title
-            itemDiv.textContent = task.text;
-
-            // Append the created item div to the container
-            jobTemplateContainer.appendChild(itemDiv);
-        });
     }
+    renderJobTemplates();
 }
 
 
@@ -2538,13 +2562,11 @@ jumPingText.addEventListener("click", () => {
 
 function rgbToHex(rgb) {
 
-    if (rgb.startsWith('#')) {
-        return color;
-    }
-    //if transparent return ""
     if (!rgb) {
-        // console.log(`color is undefined`);
         return "";
+    }
+    if (rgb.startsWith('#')) {
+        return rgb;
     }
 
     // Extract the RGB values and convert to hex
@@ -2552,7 +2574,14 @@ function rgbToHex(rgb) {
     if (match) {
         return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
     }
+    return rgb;
+}
 
+function normalizeHex(color) {
+    if (!color) return '';
+    if (color.startsWith('#')) return color.toLowerCase();
+    const hex = rgbToHex(color);
+    return hex ? hex.toLowerCase() : color.toLowerCase();
 }
 
 // Function to trigger the shake effect
