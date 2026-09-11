@@ -11,7 +11,8 @@ const DEFAULT_SETTINGS = {
   "color-shade-name": "red",
   "add-task-modal": "on-click",
   "hide-all-buttons": false,
-  "sliding-templates": false
+  "sliding-templates": false,
+  "movable-template-expanded": false
 };
 
 
@@ -191,6 +192,24 @@ if (slidingTemplatesToggle) {
     }
     if (slidingInput && slidingInput.classList.contains('show') && taskToolbar) {
       taskToolbar.style.bottom = `${(checked ? 156 : 130) + 10}px`;
+    }
+  });
+}
+
+const movableTemplateExpandedToggle = document.getElementById("movable-template-expanded-toggle");
+if (movableTemplateExpandedToggle) {
+  const isTemplateExpanded = Boolean(appSettings["movable-template-expanded"]);
+  movableTemplateExpandedToggle.checked = isTemplateExpanded;
+
+  movableTemplateExpandedToggle.addEventListener("change", (e) => {
+    const checked = e.target.checked;
+    appSettings["movable-template-expanded"] = checked;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
+    if (typeof window.toggleTemplateExpansion === "function") {
+      window.toggleTemplateExpansion(checked);
+    } else if (typeof toggleTemplateExpansion === "function") {
+      toggleTemplateExpansion(checked);
     }
   });
 }

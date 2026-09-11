@@ -9,6 +9,7 @@ const templateTaskBtn = document.querySelector(`.template-task-btn`);
 const movableTemplate = document.getElementById(`movable-template`);
 const flower = document.querySelector(`.flower`);
 const closeButton = document.querySelector('.btn-close');
+const expandTemplateBtn = document.getElementById('btn-toggle-expand-template');
 const addButton = document.querySelector('.btn-add');
 const deleteButton = document.querySelector('.btn-delete');
 const deselectTemplateBtn = document.querySelector('.btn-clear');
@@ -1903,6 +1904,7 @@ const counterObserver = new MutationObserver(() => {
         submitTaskBtn.classList.remove('disabled-btn'); // Remove disabled styling
         addTaskBtn.classList.remove('disabled-btn'); // Remove 
         selectedTaskCounter.classList.add(`selection-true`);
+        if (deselectTemplateBtn) deselectTemplateBtn.classList.add('has-selection');
         // submitTaskBtn.disabled = false;
         // selectedTaskCounter.classList.remove('shake-btn'); // Remove shake effect when counter is > 0
     } else {
@@ -1920,6 +1922,7 @@ const counterObserver = new MutationObserver(() => {
         // disabled styling
         // submitTaskBtn.disabled = true;
         selectedTaskCounter.classList.remove(`selection-true`);
+        if (deselectTemplateBtn) deselectTemplateBtn.classList.remove('has-selection');
         triggerShakeEffect();
     }
 });
@@ -2508,6 +2511,79 @@ floatingAddBtn.addEventListener('click', () => {
 closeButton.addEventListener('click', () => {
     templateTaskBtn.click();
 });
+
+function toggleTemplateExpansion(forceState) {
+    if (!movableTemplate) return;
+    const isNowExpanded = typeof forceState === 'boolean'
+        ? movableTemplate.classList.toggle('is-expanded', forceState)
+        : movableTemplate.classList.toggle('is-expanded');
+
+    const icon = expandTemplateBtn ? expandTemplateBtn.querySelector('.material-symbols-outlined, .material-icons') : null;
+    if (icon) {
+        icon.textContent = isNowExpanded ? 'menu_open' : 'read_more';
+    }
+    if (expandTemplateBtn) {
+        expandTemplateBtn.title = isNowExpanded ? 'Collapse width' : 'Expand width';
+    }
+
+    // Keep it on screen if it was dragged
+    if (movableTemplate.style.left) {
+        const currentLeft = parseFloat(movableTemplate.style.left) || 0;
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const expandedW = isLandscape ? window.innerHeight - 30 : window.innerWidth - 30;
+        const targetW = isNowExpanded ? expandedW : 160;
+        const maxLeft = Math.max(10, window.innerWidth - targetW - 10);
+        const newLeft = Math.max(10, Math.min(currentLeft, maxLeft));
+        movableTemplate.style.left = `${newLeft}px`;
+    }
+
+    // Sync hamburger settings toggle switch
+    const settingsToggle = document.getElementById('movable-template-expanded-toggle');
+    if (settingsToggle && settingsToggle.checked !== isNowExpanded) {
+        settingsToggle.checked = isNowExpanded;
+    }
+
+    // Sync with appSettings
+    if (typeof appSettings !== 'undefined') {
+        appSettings['movable-template-expanded'] = isNowExpanded;
+        localStorage.setItem('appSettings', JSON.stringify(appSettings));
+    } else {
+        const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+        settings['movable-template-expanded'] = isNowExpanded;
+        localStorage.setItem('appSettings', JSON.stringify(settings));
+    }
+
+    localStorage.setItem('movableTemplateExpanded', isNowExpanded ? 'true' : 'false');
+}
+
+window.toggleTemplateExpansion = toggleTemplateExpansion;
+
+if (expandTemplateBtn) {
+    expandTemplateBtn.addEventListener('click', () => {
+        toggleTemplateExpansion();
+    });
+}
+
+// Restore saved expanded state from appSettings / localStorage
+function restoreTemplateExpansionState() {
+    let shouldBeExpanded = false;
+    try {
+        const savedSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+        if (savedSettings['movable-template-expanded'] !== undefined) {
+            shouldBeExpanded = Boolean(savedSettings['movable-template-expanded']);
+        } else if (localStorage.getItem('movableTemplateExpanded') !== null) {
+            shouldBeExpanded = localStorage.getItem('movableTemplateExpanded') === 'true';
+        }
+    } catch (e) {
+        shouldBeExpanded = false;
+    }
+
+    if (shouldBeExpanded) {
+        toggleTemplateExpansion(true);
+    }
+}
+
+restoreTemplateExpansionState();
 
 
 

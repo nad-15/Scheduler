@@ -699,20 +699,27 @@
                 <div class="job-template-container"></div>
                 <div class="icon-container-template">
 
-                    <button class="btn-close button-template">
+                    <button class="btn-close button-template" title="Close template dock">
                         <span class="material-icons close-btn template-btn">close</span>
                     </button>
 
-                    <button class="btn-add button-template">
+                    <button class="btn-toggle-expand button-template" id="btn-toggle-expand-template" title="Toggle width">
+                        <span class="material-symbols-outlined expand-btn template-btn">read_more</span>
+                    </button>
+
+                    <button class="btn-add button-template" title="Add new template">
                         <span class="material-icons add-btn template-btn">add</span>
                     </button>
 
-                    <button class="btn-delete button-template">
-                        <span class="material-icons delete-btn template-btn">delete</span>
-                    </button>
+                    <div class="template-tools-divider"></div>
 
+                    <div class="task-divs-dock-group" title="Calendar Task Tools">
+                        <button class="btn-delete button-template" title="Delete selected task(s) — Double click">
+                            <span class="material-icons delete-btn template-btn task-div-delete-btn">delete</span>
+                        </button>
 
-                    <button class="btn-clear button-template template-btn clear-btn">0</button>
+                        <button class="btn-clear button-template template-btn clear-btn" title="Deselect task(s) — Double click">0</button>
+                    </div>
                 </div>
             </div>
     </div>
@@ -1078,6 +1085,17 @@
                             <span class="menu-text">Show Templates in Drawer</span>
                             <label class="switch">
                                 <input type="checkbox" id="sliding-templates-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </li>
+
+                    <li data-setting="movable-template-expanded" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">read_more</span>
+                            <span class="menu-text">Expand Movable Template</span>
+                            <label class="switch">
+                                <input type="checkbox" id="movable-template-expanded-toggle">
                                 <span class="slider"></span>
                             </label>
                         </div>
