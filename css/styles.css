@@ -1954,6 +1954,12 @@ h1 {
     white-space: normal;
     word-break: normal;
     width: 100%;
+    text-align: justify;
+    text-justify: inter-word;
+    text-align-last: left;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
 }
 
 .outlook-sub-info {

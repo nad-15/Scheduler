@@ -189,6 +189,22 @@ function formatShortDate(dateStr) {
 }
 
 /**
+ * Formats relative date suffix for upcoming alerts:
+ * Next day -> ' · Tomorrow'
+ * Further days -> ' · Sep 12'
+ */
+function formatRelativeAlertDate(slotDateKey, todayDateKey) {
+    if (!slotDateKey || slotDateKey === todayDateKey) return '';
+    const [ty, tm, td] = todayDateKey.split('-').map(Number);
+    const todayDate = new Date(Date.UTC(ty, tm - 1, td, 12, 0, 0));
+    const [sy, sm, sd] = slotDateKey.split('-').map(Number);
+    const slotDate = new Date(Date.UTC(sy, sm - 1, sd, 12, 0, 0));
+    const diffDays = Math.round((slotDate - todayDate) / (1000 * 60 * 60 * 24));
+    if (diffDays === 1) return ' · Tomorrow';
+    return ` · ${formatShortDate(slotDateKey)}`;
+}
+
+/**
  * Format ISO datetime string ("2026-09-05T06:50") to 12-hour time ("6:50 AM")
  */
 function formatIsoTime(isoStr) {
@@ -897,7 +913,7 @@ function renderWeatherOutlook(data) {
         const precip = data.hourly.precipitation[idx] || 0;
         const timeLabel = formatIsoHour(data.hourly.time[idx]);
         const slotDateKey = data.hourly.time[idx].split('T')[0];
-        const dateSuffix = slotDateKey !== todayDateKey ? ` · ${formatShortDate(slotDateKey)}` : '';
+        const dateSuffix = formatRelativeAlertDate(slotDateKey, todayDateKey);
 
         // Freezing Rain / Ice Hazard
         if ([56, 57, 66, 67].includes(code)) {
@@ -963,7 +979,7 @@ function renderWeatherOutlook(data) {
             alertType = 'wind';
             alertIconUrl = './images/weather/wind-alert.svg';
             const gustSlotDate = gustTimeIdx >= 0 ? data.hourly.time[gustTimeIdx].split('T')[0] : todayDateKey;
-            const gustSuffix = gustSlotDate !== todayDateKey ? ` · ${formatShortDate(gustSlotDate)}` : '';
+            const gustSuffix = formatRelativeAlertDate(gustSlotDate, todayDateKey);
             alertText = `Gusts up to ${Math.round(maxGust)} km/h${gustSuffix}`;
             outlookBar.classList.add('has-wind');
         }
@@ -976,7 +992,7 @@ function renderWeatherOutlook(data) {
                 alertType = 'fog';
                 alertIconUrl = './images/weather/fog.svg';
                 const fogSlotDate = data.hourly.time[idx].split('T')[0];
-                const fogSuffix = fogSlotDate !== todayDateKey ? ` · ${formatShortDate(fogSlotDate)}` : '';
+                const fogSuffix = formatRelativeAlertDate(fogSlotDate, todayDateKey);
                 alertText = `Fog / low visibility${fogSuffix}`;
                 outlookBar.classList.add('has-fog');
                 break;
