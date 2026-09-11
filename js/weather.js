@@ -1007,7 +1007,7 @@ function renderWeatherOutlook(data) {
         const isIdeal = highTemp >= 19 && highTemp <= 26 && maxGust < 30 && maxPop < 25;
         if (isIdeal) {
             alertIconUrl = isCurrentDaytime ? './images/weather/rainbow-clear.svg' : './images/weather/starry-night.svg';
-            alertText = `Pleasant & mild conditions`;
+            alertText = `Pleasant & mild`;
         } else {
             const isColdSeason = lowTemp <= 3 || highTemp <= 3;
             if (isColdSeason) {
