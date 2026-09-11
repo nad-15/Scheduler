@@ -699,27 +699,54 @@
                 <div class="job-template-container"></div>
                 <div class="icon-container-template">
 
-                    <button class="btn-close button-template" title="Close template dock">
-                        <span class="material-icons close-btn template-btn">close</span>
-                    </button>
-
-                    <button class="btn-toggle-expand button-template" id="btn-toggle-expand-template" title="Toggle width">
-                        <span class="material-symbols-outlined expand-btn template-btn">read_more</span>
-                    </button>
-
-                    <button class="btn-add button-template" title="Add new template">
-                        <span class="material-icons add-btn template-btn">add</span>
-                    </button>
-
-                    <div class="template-tools-divider"></div>
-
-                    <div class="task-divs-dock-group" title="Calendar Task Tools">
-                        <button class="btn-delete button-template" title="Delete selected task(s) — Double click">
-                            <span class="material-icons delete-btn task-div-delete-btn">delete</span>
+                    <!-- Normal Mode Tools -->
+                    <div class="dock-tools-group dock-tools-normal">
+                        <button class="btn-close button-template" title="Close template dock">
+                            <span class="material-symbols-outlined close-btn template-btn">close</span>
                         </button>
 
-                        <button class="btn-clear button-template clear-btn" title="Deselect task(s) — Double click">0</button>
+                        <button class="btn-template-more button-template" id="btn-template-more" title="Edit templates">
+                            <span class="material-symbols-outlined more-btn template-btn">more_horiz</span>
+                        </button>
+
+                        <button class="btn-toggle-expand button-template" id="btn-toggle-expand-template" title="Toggle width">
+                            <span class="material-symbols-outlined expand-btn template-btn">read_more</span>
+                        </button>
+
+                        <div class="template-tools-divider"></div>
+
+                        <div class="task-divs-dock-group" title="Calendar Task Tools">
+                            <button class="btn-delete button-template" title="Delete selected task(s) — Double click">
+                                <span class="material-icons delete-btn task-div-delete-btn">delete</span>
+                            </button>
+
+                            <button class="btn-clear button-template clear-btn" title="Deselect task(s) — Double click">0</button>
+                        </div>
                     </div>
+
+                    <!-- Edit Mode Tools -->
+                    <div class="dock-tools-group dock-tools-editing">
+                        <button class="btn-template-done button-template" id="btn-template-done" title="Done editing">
+                            <span class="material-symbols-outlined template-done-btn">check_circle</span>
+                        </button>
+
+                        <button class="btn-add button-template" id="btn-add" title="Add new template">
+                            <span class="material-icons add-btn template-btn">add</span>
+                        </button>
+
+                        <button class="btn-template-undo button-template" id="btn-template-undo" title="Undo">
+                            <span class="material-symbols-outlined template-btn">undo</span>
+                        </button>
+
+                        <button class="btn-template-redo button-template" id="btn-template-redo" title="Redo">
+                            <span class="material-symbols-outlined template-btn">redo</span>
+                        </button>
+
+                        <button class="btn-delete-all-templates button-template" id="btn-delete-all-templates" title="Delete all templates">
+                            <span class="material-symbols-outlined template-btn template-delete-all-btn">delete_sweep</span>
+                        </button>
+                    </div>
+
                 </div>
             </div>
     </div>

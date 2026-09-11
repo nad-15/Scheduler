@@ -5598,7 +5598,94 @@ input[type="radio"]:checked::after {
     padding: 6px 0;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    height: 100%;
+    box-sizing: border-box;
+}
 
+.dock-tools-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.dock-tools-normal {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.dock-tools-editing {
+    display: none;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.btn-template-undo:disabled,
+.btn-template-redo:disabled,
+.btn-template-undo.disabled-btn,
+.btn-template-redo.disabled-btn {
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+.btn-template-undo:not(:disabled):hover .template-btn,
+.btn-template-redo:not(:disabled):hover .template-btn {
+    color: white;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+}
+
+.movable-template.is-editing {
+    border: 1.5px solid rgba(255, 171, 0, 0.85);
+    box-shadow: 0 0 16px rgba(255, 171, 0, 0.45), inset 0 0 12px rgba(255, 171, 0, 0.15);
+}
+
+.movable-template.is-editing .dock-tools-normal {
+    display: none;
+}
+
+.movable-template.is-editing .dock-tools-editing {
+    display: flex;
+}
+
+.btn-template-done {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+.template-done-btn {
+    color: white !important;
+    font-size: 26px !important;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-template-done:hover .template-done-btn {
+    color: white !important;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+    transform: scale(1.12);
+}
+
+.template-delete-all-btn {
+    color: white !important;
+    font-size: 26px;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.button-template:hover .template-delete-all-btn {
+    color: white !important;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
 }
 
 .template-tools-divider {
@@ -5655,14 +5742,25 @@ input[type="radio"]:checked::after {
     font-weight: bold;
 }
 
+.more-btn {
+    transition: transform 0.2s ease;
+}
+
+.button-template:hover .more-btn {
+    transform: scale(1.15);
+    color: white;
+}
+
 .material-icons.task-div-delete-btn {
-    color: #ff7675;
+    color: white;
     font-size: 25px;
-    transition: color 0.2s ease, transform 0.2s ease;
+    transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .button-template:hover .task-div-delete-btn {
-    color: #ff5252;
+    color: white;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
 }
 
 .material-icons.drag-icon {
@@ -5762,6 +5860,58 @@ input[type="radio"]:checked::after {
 
 .movable-template.is-expanded .items {
     width: 100%;
+}
+
+.movable-template.is-editing .items {
+    position: relative;
+    border: 1.5px dashed rgba(255, 255, 255, 0.95);
+    cursor: pointer;
+    padding-right: 22px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    animation: template-wiggle 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes template-wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(0.4deg); }
+    75% { transform: rotate(-0.4deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.movable-template.is-editing .items::after {
+    content: '×';
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.52);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    pointer-events: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.movable-template.is-editing .items:hover {
+    border-color: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.75);
+    transform: scale(1.03);
+}
+
+.movable-template.is-editing .items:hover::after {
+    transform: translateY(-50%) scale(1.18);
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.9);
 }
 
 .items:active {

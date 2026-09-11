@@ -10,6 +10,11 @@ const movableTemplate = document.getElementById(`movable-template`);
 const flower = document.querySelector(`.flower`);
 const closeButton = document.querySelector('.btn-close');
 const expandTemplateBtn = document.getElementById('btn-toggle-expand-template');
+const btnTemplateMore = document.getElementById('btn-template-more');
+const btnTemplateDone = document.getElementById('btn-template-done');
+const btnTemplateUndo = document.getElementById('btn-template-undo');
+const btnTemplateRedo = document.getElementById('btn-template-redo');
+const btnDeleteAllTemplates = document.getElementById('btn-delete-all-templates');
 const addButton = document.querySelector('.btn-add');
 const deleteButton = document.querySelector('.btn-delete');
 const deselectTemplateBtn = document.querySelector('.btn-clear');
@@ -879,6 +884,9 @@ hideWidgetBtn.addEventListener('click', () => {
 templateTaskBtn.addEventListener('click', () => {
     const willBeOpen = movableTemplate.style.display !== 'flex';
     movableTemplate.style.display = willBeOpen ? 'flex' : 'none';
+    if (!willBeOpen && typeof setTemplateEditMode === 'function') {
+        setTemplateEditMode(false);
+    }
     if (willBeOpen) {
         renderJobTemplates();
     }
@@ -2044,6 +2052,9 @@ function addTemplate(taskTitle, color) {
             // Already exists -> pull it to position #1 (front of list & top of dock)
             bumpTemplateToTop(taskTitle, color);
         } else {
+            // Save undo state before modifying taskClipboard
+            saveTemplateStateForUndo();
+
             // If the task doesn't exist, push to front of the array (position #1)
             taskClipboard.unshift(taskTemplate);
 
@@ -2086,9 +2097,20 @@ function addTemplate(taskTitle, color) {
 // });
 
 jobTemplateContainer.addEventListener('click', (event) => {
-    if (event.target.classList.contains('items')) {
-        submitTemplate(event.target);
+    const item = event.target.closest('.items');
+    if (!item) return;
+
+    if (isTemplateEditMode) {
+        item.style.transform = 'scale(0.7)';
+        item.style.opacity = '0';
+        setTimeout(() => {
+            removeTemplate(item);
+            renderSlidingTemplates();
+        }, 150);
+        return;
     }
+
+    submitTemplate(item);
 });
 
 
@@ -2170,6 +2192,9 @@ function submitTemplate(item) {
 
 
 function removeTemplate(item) {
+    // Save undo state before deleting template
+    saveTemplateStateForUndo();
+
     // Get task text and color from the clicked item
     const taskText = item.textContent;
     const taskColor = normalizeHex(item.style.backgroundColor);
@@ -2509,6 +2534,9 @@ floatingAddBtn.addEventListener('click', () => {
 
 
 closeButton.addEventListener('click', () => {
+    if (typeof setTemplateEditMode === 'function') {
+        setTemplateEditMode(false);
+    }
     templateTaskBtn.click();
 });
 
@@ -2574,6 +2602,105 @@ function restoreTemplateExpansionState() {
 }
 
 restoreTemplateExpansionState();
+ 
+// --- Movable Template Edit Mode & Undo/Redo Controller ---
+let isTemplateEditMode = false;
+let templateUndoStack = [];
+let templateRedoStack = [];
+
+function saveTemplateStateForUndo() {
+    templateUndoStack.push(JSON.stringify(taskClipboard));
+    if (templateUndoStack.length > 50) {
+        templateUndoStack.shift();
+    }
+    templateRedoStack = [];
+    updateTemplateUndoRedoButtons();
+}
+
+function updateTemplateUndoRedoButtons() {
+    if (btnTemplateUndo) {
+        const canUndo = templateUndoStack.length > 0;
+        btnTemplateUndo.disabled = !canUndo;
+        btnTemplateUndo.classList.toggle('disabled-btn', !canUndo);
+    }
+    if (btnTemplateRedo) {
+        const canRedo = templateRedoStack.length > 0;
+        btnTemplateRedo.disabled = !canRedo;
+        btnTemplateRedo.classList.toggle('disabled-btn', !canRedo);
+    }
+}
+
+function undoTemplateAction() {
+    if (templateUndoStack.length === 0) return;
+    templateRedoStack.push(JSON.stringify(taskClipboard));
+    const previousState = templateUndoStack.pop();
+    taskClipboard = JSON.parse(previousState);
+    saveTemplate();
+    renderJobTemplates();
+    renderSlidingTemplates();
+    updateTemplateUndoRedoButtons();
+}
+
+function redoTemplateAction() {
+    if (templateRedoStack.length === 0) return;
+    templateUndoStack.push(JSON.stringify(taskClipboard));
+    const nextState = templateRedoStack.pop();
+    taskClipboard = JSON.parse(nextState);
+    saveTemplate();
+    renderJobTemplates();
+    renderSlidingTemplates();
+    updateTemplateUndoRedoButtons();
+}
+
+function setTemplateEditMode(enable) {
+    isTemplateEditMode = !!enable;
+    if (movableTemplate) {
+        movableTemplate.classList.toggle('is-editing', isTemplateEditMode);
+    }
+    updateTemplateUndoRedoButtons();
+}
+
+window.setTemplateEditMode = setTemplateEditMode;
+
+if (btnTemplateMore) {
+    btnTemplateMore.addEventListener('click', () => {
+        setTemplateEditMode(true);
+    });
+}
+
+if (btnTemplateDone) {
+    btnTemplateDone.addEventListener('click', () => {
+        setTemplateEditMode(false);
+    });
+}
+
+if (btnTemplateUndo) {
+    btnTemplateUndo.addEventListener('click', () => {
+        undoTemplateAction();
+    });
+}
+
+if (btnTemplateRedo) {
+    btnTemplateRedo.addEventListener('click', () => {
+        redoTemplateAction();
+    });
+}
+
+if (btnDeleteAllTemplates) {
+    btnDeleteAllTemplates.addEventListener('click', () => {
+        if (!taskClipboard || taskClipboard.length === 0) return;
+        if (confirm('Delete all templates? You can use Undo to restore them.')) {
+            saveTemplateStateForUndo();
+            taskClipboard = [];
+            localStorage.setItem('taskClipboard', JSON.stringify([]));
+            renderJobTemplates();
+            renderSlidingTemplates();
+            updateTemplateUndoRedoButtons();
+        }
+    });
+}
+
+updateTemplateUndoRedoButtons();
 
 
 
