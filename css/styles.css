@@ -3399,6 +3399,7 @@ h2 {
 .floating-add-btn .material-icons,
 .floating-add-btn .floating-add-icon {
     font-size: 30px !important;
+    font-weight: bold;
     color: white;
 }
 
