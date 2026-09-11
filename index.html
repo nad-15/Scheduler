@@ -229,6 +229,11 @@
             <!-- Sliding Input View -->
             <div class="sliding-input-view" id="slidingInputView">
                 <div class="taskinput-color-container">
+                    <div class="sliding-templates-container" id="slidingTemplatesContainer">
+                        <div class="sliding-templates-scroll" id="slidingTemplatesScroll">
+                            <!-- Template pills rendered dynamically -->
+                        </div>
+                    </div>
                     <div class="template-title-submit-container">
                         <!-- <button class="task-template-button"><i class="material-icons template-list">list_alt</i></button> -->
 
@@ -1062,6 +1067,17 @@
                             <span class="menu-text">Show To-Do Floating Button</span>
                             <label class="switch">
                                 <input type="checkbox" id="todo-floating-btn-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </li>
+
+                    <li data-setting="sliding-templates" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">view_carousel</span>
+                            <span class="menu-text">Show Templates in Drawer</span>
+                            <label class="switch">
+                                <input type="checkbox" id="sliding-templates-toggle">
                                 <span class="slider"></span>
                             </label>
                         </div>

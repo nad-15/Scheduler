@@ -10,7 +10,8 @@ const DEFAULT_SETTINGS = {
   "color-mode": "all",
   "color-shade-name": "red",
   "add-task-modal": "on-click",
-  "hide-all-buttons": false
+  "hide-all-buttons": false,
+  "sliding-templates": false
 };
 
 
@@ -25,6 +26,14 @@ if (localStorage.getItem("clampExpanded") !== null) {
 
 // load from localStorage or use defaults
 let appSettings = JSON.parse(localStorage.getItem("appSettings")) || { ...DEFAULT_SETTINGS };
+
+// Clean up unused / deprecated settings from localStorage
+if ("sliding-templates-row" in appSettings) {
+  if (appSettings["sliding-templates"] === undefined) {
+    appSettings["sliding-templates"] = appSettings["sliding-templates-row"];
+  }
+  delete appSettings["sliding-templates-row"];
+}
 
 // make sure all new defaults are added even if user already has saved settings
 appSettings = { ...DEFAULT_SETTINGS, ...appSettings };
@@ -151,6 +160,40 @@ document.getElementById("todo-floating-btn-toggle").addEventListener("change", (
     todoBtn.style.display = e.target.checked ? "flex" : "none";
   }
 });
+
+const slidingTemplatesToggle = document.getElementById("sliding-templates-toggle");
+if (slidingTemplatesToggle) {
+  const isEnabled = Boolean(appSettings["sliding-templates"]);
+  slidingTemplatesToggle.checked = isEnabled;
+
+  slidingTemplatesToggle.addEventListener("change", (e) => {
+    const checked = e.target.checked;
+    appSettings["sliding-templates"] = checked;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
+    // Direct reference toggle for immediate live UI response
+    const container = document.getElementById('slidingTemplatesContainer');
+    const slidingInput = document.getElementById('slidingInputView');
+    const taskToolbar = document.querySelector('.task-toolbar-container');
+
+    if (container) {
+      container.style.display = checked ? 'flex' : 'none';
+    }
+    if (slidingInput) {
+      slidingInput.classList.toggle('has-templates-row', checked);
+    }
+    if (checked) {
+      if (typeof window.renderSlidingTemplates === 'function') {
+        window.renderSlidingTemplates();
+      } else if (typeof renderSlidingTemplates === 'function') {
+        renderSlidingTemplates();
+      }
+    }
+    if (slidingInput && slidingInput.classList.contains('show') && taskToolbar) {
+      taskToolbar.style.bottom = `${(checked ? 156 : 130) + 10}px`;
+    }
+  });
+}
 
 
 

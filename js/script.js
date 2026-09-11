@@ -367,8 +367,39 @@ const showVertViewBtn = document.getElementById('calendar-icon-vertview');
 const showHorViewBtn = document.getElementById('calendar-icon-horview');
 
 
+function isSlidingTemplatesEnabled() {
+    if (typeof appSettings === 'undefined') {
+        try {
+            const stored = JSON.parse(localStorage.getItem("appSettings") || '{}');
+            return Boolean(stored["sliding-templates"]);
+        } catch (e) {
+            return false;
+        }
+    }
+    return Boolean(appSettings["sliding-templates"]);
+}
+window.isSlidingTemplatesEnabled = isSlidingTemplatesEnabled;
+
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
+    const isTemplatesRowEnabled = isSlidingTemplatesEnabled();
+    applySlidingTemplatesRowState(isTemplatesRowEnabled);
+    const slidingToggleEl = document.getElementById("sliding-templates-toggle");
+    if (slidingToggleEl) {
+        slidingToggleEl.checked = isTemplatesRowEnabled;
+        slidingToggleEl.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            if (typeof appSettings !== 'undefined') {
+                appSettings["sliding-templates"] = isChecked;
+            }
+            try {
+                const s = JSON.parse(localStorage.getItem("appSettings") || '{}');
+                s["sliding-templates"] = isChecked;
+                localStorage.setItem("appSettings", JSON.stringify(s));
+            } catch (err) {}
+            applySlidingTemplatesRowState(isChecked);
+        });
+    }
 });
 
 let expanded = appSettings["clamp-expanded"] ?? true;
@@ -2032,6 +2063,7 @@ function addTemplate(taskTitle, color) {
             jobTemplateContainer.prepend(itemDiv);
             // Save the updated taskClipboard to localStorage
             saveTemplate();
+            renderSlidingTemplates();
         }
     }
 }
@@ -2194,7 +2226,130 @@ function loadTemplate() {
         taskClipboard = savedTemplate;
     }
     renderJobTemplates();
+    renderSlidingTemplates();
 }
+
+function renderSlidingTemplates() {
+    const scrollContainer = document.getElementById('slidingTemplatesScroll');
+    if (!scrollContainer) return;
+    scrollContainer.innerHTML = '';
+
+    if (!Array.isArray(taskClipboard) || taskClipboard.length === 0) {
+        const saved = JSON.parse(localStorage.getItem('taskClipboard')) || [];
+        if (Array.isArray(saved) && saved.length > 0) {
+            taskClipboard = saved;
+        } else {
+            return;
+        }
+    }
+
+    taskClipboard.forEach(task => {
+        if (!task || !task.text) return;
+        const item = document.createElement('div');
+        item.className = 'sliding-template-item';
+        item.title = task.text;
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'sliding-template-text';
+        textSpan.textContent = task.text;
+        item.appendChild(textSpan);
+
+        const hexColor = task.color || '#6a5044';
+        item.style.borderLeft = `4px solid ${hexColor}`;
+        item.style.backgroundColor = fadeColor(hexColor);
+
+        item.addEventListener('click', () => {
+            // 1. Recency bump in data/storage (remains stationary while drawer is open)
+            bumpTemplateToTop(task.text, hexColor);
+
+            // 2. Select & scroll color in color picker
+            const normHex = normalizeHex(hexColor);
+            const colorBtn = document.querySelector(`button.color-option[data-color="${normHex}"]`)
+                          || document.querySelector(`button.color-option[data-color="${hexColor}"]`);
+            if (colorBtn) {
+                colorBtn.click();
+                const pickerContainer = document.querySelector('.color-picker');
+                if (pickerContainer) {
+                    const containerRect = pickerContainer.getBoundingClientRect();
+                    const targetRect = colorBtn.getBoundingClientRect();
+                    const offset = targetRect.left - containerRect.left;
+                    const centerOffset = offset - (pickerContainer.clientWidth / 2) + (colorBtn.clientWidth / 2);
+                    pickerContainer.scrollTo({
+                        left: pickerContainer.scrollLeft + centerOffset,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+
+            // 3. Load text into taskTitle input and dispatch input event
+            const taskTitleInput = document.getElementById('taskTitle');
+            if (taskTitleInput) {
+                taskTitleInput.value = task.text;
+                taskTitleInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            // 4. If selectedDivs exist, stamp directly into them
+            if (selectedDivs.length > 0) {
+                selectedDivs.forEach(div => {
+                    const span = document.createElement('span');
+                    span.className = 'clamp-text';
+                    if (expanded) {
+                        span.classList.add('expanded');
+                    }
+                    span.textContent = task.text;
+                    div.innerHTML = '';
+                    div.appendChild(span);
+
+                    div.style.borderLeft = `4px solid ${hexColor}`;
+                    div.style.backgroundColor = fadeColor(hexColor);
+
+                    const dayContainer = div.closest('.day-container');
+                    const date = dayContainer ? dayContainer.querySelector('.date').getAttribute('data-full-date') : null;
+                    if (!date) return;
+
+                    let taskKey;
+                    if (div.classList.contains('morningTaskSub')) taskKey = 'morning';
+                    else if (div.classList.contains('afternoonTaskSub')) taskKey = 'afternoon';
+                    else if (div.classList.contains('eveningTaskSub')) taskKey = 'evening';
+                    else return;
+
+                    const parent = div.parentElement;
+                    const taskDivs = Array.from(parent.querySelectorAll(`.${taskKey}TaskSub`));
+                    const index = taskDivs.indexOf(div);
+
+                    saveTaskData(date, taskKey, task.text, hexColor, index);
+                });
+
+                [selectedTaskCounter, deselectTemplateBtn].forEach(el => {
+                    if (el) el.textContent = selectedDivs.length;
+                });
+            }
+        });
+
+        scrollContainer.appendChild(item);
+    });
+}
+
+function applySlidingTemplatesRowState(visible) {
+    const container = document.getElementById('slidingTemplatesContainer');
+    const slidingInput = document.getElementById('slidingInputView');
+    if (container) {
+        container.style.display = visible ? 'flex' : 'none';
+    }
+    if (slidingInput) {
+        slidingInput.classList.toggle('has-templates-row', visible);
+    }
+    if (visible) {
+        renderSlidingTemplates();
+    }
+    const isDrawerOpen = slidingInput && slidingInput.classList.contains('show');
+    if (isDrawerOpen && taskToolbar) {
+        const drawerHeight = visible ? 156 : 130;
+        taskToolbar.style.bottom = `${drawerHeight + 10}px`;
+    }
+}
+window.applySlidingTemplatesRowState = applySlidingTemplatesRowState;
+window.renderSlidingTemplates = renderSlidingTemplates;
 
 
 
@@ -2338,7 +2493,8 @@ floatingAddBtn.addEventListener('click', () => {
 
         floatingAddBtn.style.backgroundColor = 'rgba(244, 67, 54, 0.9)';
 
-        taskToolbar.style.bottom = `${130 + 10}px`;
+        const isTemplatesRowActive = isSlidingTemplatesEnabled();
+        applySlidingTemplatesRowState(isTemplatesRowActive);
     } else {
         slidingInputView.classList.toggle("show");
 
@@ -2361,6 +2517,12 @@ closeButton.addEventListener('click', () => {
 // Clone the container
 const clonedSlidingInputView = slidingInputView.cloneNode(true);
 clonedSlidingInputView.classList.add('cloned-sliding-view');
+
+// Remove template strip from cloned view
+const clonedTemplatesContainer = clonedSlidingInputView.querySelector('#slidingTemplatesContainer') || clonedSlidingInputView.querySelector('.sliding-templates-container');
+if (clonedTemplatesContainer) {
+    clonedTemplatesContainer.remove();
+}
 
 // Remove the selected task counter/button
 const selectedTask = clonedSlidingInputView.querySelector('.selected-task');

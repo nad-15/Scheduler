@@ -1159,7 +1159,20 @@ function initSettings() {
     input.addEventListener("change", () => {
       settings[settingName] = input.checked;
       saveSettings(settings);
+      if (typeof appSettings !== "undefined") {
+        appSettings[settingName] = input.checked;
+      }
     });
+
+    const parentMenuItem = input.closest(".menu-item");
+    if (parentMenuItem) {
+      parentMenuItem.addEventListener("click", (e) => {
+        if (e.target !== input && !e.target.closest(".switch")) {
+          input.checked = !input.checked;
+          input.dispatchEvent(new Event("change"));
+        }
+      });
+    }
   });
 
   // Handle radio buttons (view selection, add task modal selection, etc.)
