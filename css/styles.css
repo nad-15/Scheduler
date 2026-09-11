@@ -3146,11 +3146,29 @@ span.material-symbols-outlined.gw-metric-icon {
     font-weight: 700;
     color: #ffffff;
     margin-top: 2px;
+    transition: color 0.3s ease;
 }
 
 .gw-metric-sub {
     font-size: 10px;
     color: #cbd5e1;
+}
+
+/* ── Scientific Status Accents on Value Text Only (Card stays identical neutral glass) ── */
+
+/* 1. Moderate / Caution (Yellow) */
+.gw-metric-val.is-status-yellow {
+    color: #facc15;
+}
+
+/* 2. Elevated / Advisory (Orange) */
+.gw-metric-val.is-status-orange {
+    color: #fb923c;
+}
+
+/* 3. High / Warning & Hazard (Red) */
+.gw-metric-val.is-status-red {
+    color: #f87171;
 }
 
 .expanded-loading-state {

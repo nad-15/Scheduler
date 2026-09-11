@@ -1776,6 +1776,37 @@ function buildDayForecastDetails(data, dayKey) {
     const dawnDuskPrimary = isAfterNoonToday ? `Set ${sunsetStr}` : `Rise ${sunriseStr}`;
     const dawnDuskSecondary = isAfterNoonToday ? `Rise ${sunriseStr}` : `Set ${sunsetStr}`;
 
+    // Scientific Status Class Evaluation (WMO / NOAA NWS, Beaufort, ASHRAE 55)
+    // 1. Precipitation Status: WMO / NOAA PoP & rainfall amounts
+    let precipStatusClass = '';
+    if (maxPop >= 80 || precipSum >= 7.6 || snowfallSum >= 5) {
+        precipStatusClass = 'is-status-red';
+    } else if (maxPop >= 60 || precipSum >= 2.5 || snowfallSum >= 2) {
+        precipStatusClass = 'is-status-orange';
+    } else if (maxPop >= 30 || precipSum >= 0.5 || snowfallSum >= 0.5) {
+        precipStatusClass = 'is-status-yellow';
+    }
+
+    // 2. Wind & Gusts Status: Beaufort Scale & NWS Wind Advisory Criteria
+    let windStatusClass = '';
+    if (windSpeedMax >= 70 || windGustMax >= 80) {
+        windStatusClass = 'is-status-red';
+    } else if (windSpeedMax >= 50 || windGustMax >= 60) {
+        windStatusClass = 'is-status-orange';
+    } else if (windSpeedMax >= 30 || windGustMax >= 40) {
+        windStatusClass = 'is-status-yellow';
+    }
+
+    // 3. Humidity Status: ASHRAE Standard 55 Human Comfort Zone (30-60% normal)
+    let humidityStatusClass = '';
+    if (humidityVal >= 85) {
+        humidityStatusClass = 'is-status-red';
+    } else if (humidityVal >= 75) {
+        humidityStatusClass = 'is-status-orange';
+    } else if (humidityVal >= 61) {
+        humidityStatusClass = 'is-status-yellow';
+    }
+
     const mainCardInnerHtml = `
         <div class="gw-hero-header">
             <div class="gw-hero-left">
@@ -1806,7 +1837,7 @@ function buildDayForecastDetails(data, dayKey) {
                 <span class="material-symbols-outlined gw-metric-icon">weather_mix</span>
                 Precipitation
             </span>
-            <span class="gw-metric-val">${maxPop}% Chance</span>
+            <span class="gw-metric-val ${precipStatusClass}">${maxPop}% Chance</span>
             <span class="gw-metric-sub">${precipSubText}</span>
         </div>
         <div class="gw-metric-card">
@@ -1814,7 +1845,7 @@ function buildDayForecastDetails(data, dayKey) {
                 <span class="material-symbols-outlined gw-metric-icon">air</span>
                 Wind & Gusts
             </span>
-            <span class="gw-metric-val">${windSpeedMax} km/h</span>
+            <span class="gw-metric-val ${windStatusClass}">${windSpeedMax} km/h</span>
             <span class="gw-metric-sub">Gusts: ${windGustMax} km/h</span>
         </div>
         <div class="gw-metric-card">
@@ -1822,7 +1853,7 @@ function buildDayForecastDetails(data, dayKey) {
                 <span class="material-symbols-outlined gw-metric-icon">cool_to_dry</span>
                 Humidity
             </span>
-            <span class="gw-metric-val">${humidityVal}%</span>
+            <span class="gw-metric-val ${humidityStatusClass}">${humidityVal}%</span>
             <span class="gw-metric-sub">${humiditySub}</span>
         </div>
         <div class="gw-metric-card">
