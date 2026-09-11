@@ -4102,6 +4102,7 @@ input[type="radio"]:checked::after {
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
     padding: 1px 2px;
     box-sizing: border-box;
 }
@@ -4150,6 +4151,17 @@ input[type="radio"]:checked::after {
 
 .sliding-template-item:active {
     transform: scale(0.95);
+}
+
+.sliding-input-view.peek-mode {
+    transform: translateY(calc(100% - var(--template-peek-height, 32px) - env(safe-area-inset-bottom, 0px)));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    overflow: hidden;
+}
+
+.sliding-input-view.show {
+    transform: translateY(0);
+    overflow: visible;
 }
 
 .show {

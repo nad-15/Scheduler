@@ -176,26 +176,10 @@ if (slidingTemplatesToggle) {
     appSettings["sliding-templates"] = checked;
     localStorage.setItem("appSettings", JSON.stringify(appSettings));
 
-    // Direct reference toggle for immediate live UI response
-    const container = document.getElementById('slidingTemplatesContainer');
-    const slidingInput = document.getElementById('slidingInputView');
-    const taskToolbar = document.querySelector('.task-toolbar-container');
-
-    if (container) {
-      container.style.display = checked ? 'flex' : 'none';
-    }
-    if (slidingInput) {
-      slidingInput.classList.toggle('has-templates-row', checked);
-    }
-    if (checked) {
-      if (typeof window.renderSlidingTemplates === 'function') {
-        window.renderSlidingTemplates();
-      } else if (typeof renderSlidingTemplates === 'function') {
-        renderSlidingTemplates();
-      }
-    }
-    if (slidingInput && slidingInput.classList.contains('show') && taskToolbar) {
-      taskToolbar.style.bottom = `${(checked ? 156 : 130) + 10}px`;
+    if (typeof window.applySlidingTemplatesRowState === 'function') {
+      window.applySlidingTemplatesRowState(checked);
+    } else if (typeof applySlidingTemplatesRowState === 'function') {
+      applySlidingTemplatesRowState(checked);
     }
   });
 }
