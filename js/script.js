@@ -844,8 +844,8 @@ function openTemplateStripDropdown(itemEl, taskText, hexColor) {
     const dropdown = document.getElementById('template-strip-dropdown');
     if (!dropdown) return;
 
-    // Highlight the triggering template pill
-    document.querySelectorAll('.sliding-template-item.dropdown-active').forEach(el => el.classList.remove('dropdown-active'));
+    // Highlight the triggering template pill or movable template item
+    document.querySelectorAll('.sliding-template-item.dropdown-active, .items.dropdown-active').forEach(el => el.classList.remove('dropdown-active'));
     if (itemEl) {
         itemEl.classList.add('dropdown-active');
     }
@@ -868,6 +868,7 @@ function openTemplateStripDropdown(itemEl, taskText, hexColor) {
         top = rect.bottom + arrowGap;
         isAbove = false;
     }
+    top = Math.max(10, Math.min(top, window.innerHeight - dropdownHeight - 10));
 
     if (isAbove) {
         dropdown.classList.remove('arrow-top');
@@ -896,7 +897,7 @@ function closeTemplateStripDropdown() {
         dropdown.classList.add('hidden');
         dropdown.classList.remove('arrow-top');
     }
-    document.querySelectorAll('.sliding-template-item.dropdown-active').forEach(el => el.classList.remove('dropdown-active'));
+    document.querySelectorAll('.sliding-template-item.dropdown-active, .items.dropdown-active').forEach(el => el.classList.remove('dropdown-active'));
     currentTemplateAction = null;
 }
 
@@ -2286,22 +2287,148 @@ function addTemplate(taskTitle, color) {
 //     });
 // });
 
-jobTemplateContainer.addEventListener('click', (event) => {
-    const item = event.target.closest('.items');
-    if (!item) return;
+// === MOVABLE TEMPLATE DOCK LONG-PRESS CONTROLLER ===
+let movableLongPressTimer = null;
+let isMovableLongPressTriggered = false;
+let movableStartCoords = { x: 0, y: 0 };
+let movableTargetItem = null;
+let lastMovableTouchTime = 0;
 
-    if (isTemplateEditMode) {
-        item.style.transform = 'scale(0.7)';
-        item.style.opacity = '0';
-        setTimeout(() => {
-            removeTemplate(item);
-            renderSlidingTemplates();
-        }, 150);
+const cancelMovableLongPress = () => {
+    clearTimeout(movableLongPressTimer);
+    movableLongPressTimer = null;
+    movableTargetItem = null;
+};
+
+const startMovableLongPress = (item, clientX, clientY) => {
+    if (!item || selectedDivs.length === 0 || isTemplateEditMode) {
+        return;
+    }
+    const dropdown = document.getElementById('template-strip-dropdown');
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        return;
+    }
+    if (Date.now() - lastDropdownCloseTime < 400) {
         return;
     }
 
-    submitTemplate(item);
-});
+    movableTargetItem = item;
+    movableStartCoords = { x: clientX, y: clientY };
+    isMovableLongPressTriggered = false;
+    clearTimeout(movableLongPressTimer);
+
+    movableLongPressTimer = setTimeout(() => {
+        isMovableLongPressTriggered = true;
+        if (navigator.vibrate) {
+            try { navigator.vibrate(40); } catch (_) {}
+        }
+        const taskText = item.textContent ? item.textContent.trim() : '';
+        const taskColor = rgbToHex(item.style.backgroundColor) || '#6a5044';
+        openTemplateStripDropdown(item, taskText, taskColor);
+    }, 400);
+};
+
+if (jobTemplateContainer) {
+    jobTemplateContainer.addEventListener('touchstart', (e) => {
+        lastMovableTouchTime = Date.now();
+        const item = e.target.closest('.items');
+        if (!item) return;
+        const touch = e.touches[0];
+        startMovableLongPress(item, touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    jobTemplateContainer.addEventListener('touchmove', (e) => {
+        if (!movableLongPressTimer) return;
+        const touch = e.touches[0];
+        const dx = Math.abs(touch.clientX - movableStartCoords.x);
+        const dy = Math.abs(touch.clientY - movableStartCoords.y);
+        if (dx > 16 || dy > 16) {
+            cancelMovableLongPress();
+        }
+    }, { passive: true });
+
+    jobTemplateContainer.addEventListener('touchend', (e) => {
+        cancelMovableLongPress();
+        if (isMovableLongPressTriggered) {
+            if (e.cancelable) e.preventDefault();
+        }
+    });
+
+    jobTemplateContainer.addEventListener('touchcancel', () => {
+        cancelMovableLongPress();
+    });
+
+    jobTemplateContainer.addEventListener('mousedown', (e) => {
+        if (Date.now() - lastMovableTouchTime < 500) return;
+        if (e.button !== 0) return;
+        const item = e.target.closest('.items');
+        if (!item) return;
+        startMovableLongPress(item, e.clientX, e.clientY);
+    });
+
+    jobTemplateContainer.addEventListener('mousemove', (e) => {
+        if (!movableLongPressTimer) return;
+        const dx = Math.abs(e.clientX - movableStartCoords.x);
+        const dy = Math.abs(e.clientY - movableStartCoords.y);
+        if (dx > 16 || dy > 16) {
+            cancelMovableLongPress();
+        }
+    });
+
+    jobTemplateContainer.addEventListener('mouseup', () => {
+        cancelMovableLongPress();
+    });
+
+    jobTemplateContainer.addEventListener('mouseleave', () => {
+        cancelMovableLongPress();
+    });
+
+    jobTemplateContainer.addEventListener('contextmenu', (e) => {
+        if (e.target.closest('.items')) {
+            e.preventDefault();
+        }
+    });
+
+    jobTemplateContainer.addEventListener('scroll', closeTemplateStripDropdown, { passive: true });
+
+    jobTemplateContainer.addEventListener('click', (event) => {
+        const item = event.target.closest('.items');
+        if (!item) return;
+
+        if (isMovableLongPressTriggered) {
+            isMovableLongPressTriggered = false;
+            if (event.cancelable) event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
+
+        // Dismissal safety: if dropdown is open or was just closed, ONLY close the modal
+        const dropdown = document.getElementById('template-strip-dropdown');
+        const isDropdownOpen = dropdown && !dropdown.classList.contains('hidden');
+        const wasJustClosed = (Date.now() - lastDropdownCloseTime < 400);
+
+        if (isDropdownOpen || wasJustClosed) {
+            if (isDropdownOpen) {
+                closeTemplateStripDropdown();
+            }
+            if (event.cancelable) event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
+
+        if (isTemplateEditMode) {
+            item.style.transform = 'scale(0.7)';
+            item.style.opacity = '0';
+            setTimeout(() => {
+                removeTemplate(item);
+                renderSlidingTemplates();
+            }, 150);
+            return;
+        }
+
+        submitTemplate(item);
+    });
+}
 
 
 function submitTemplate(item) {

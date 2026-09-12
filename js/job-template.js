@@ -6,6 +6,9 @@ let offsetX = 0;
 let offsetY = 0;
 
 function startDrag(e) {
+    if (typeof closeTemplateStripDropdown === 'function') {
+        closeTemplateStripDropdown();
+    }
     e.preventDefault();
     isDragging = true;
 

@@ -6003,12 +6003,19 @@ input[type="radio"]:checked::after {
     border-radius: 3px;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     text-align: center;
     padding: 5px 4px;
     word-wrap: break-word;
     overflow-wrap: anywhere;
     white-space: normal;
     word-break: break-word;
+}
+
+.items.dropdown-active {
+    box-shadow: 0 0 0 2px #0078FF, 0 2px 8px rgba(0, 120, 255, 0.4);
+    transform: scale(1.02);
 }
 
 .movable-template.is-expanded .items {
