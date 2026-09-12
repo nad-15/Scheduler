@@ -7701,13 +7701,13 @@ ic {
 /* Dynamic mode drawer sizing: auto-expands upward with content (capped at 3 lines) */
 .sliding-input-view.dynamic-bar-active {
     height: auto !important;
-    min-height: 124px;
+    min-height: 130px !important;
     max-height: 170px;
     transition: transform 0.3s ease-in-out, min-height 0.22s ease-in-out, max-height 0.22s ease-in-out;
 }
 
 .sliding-input-view.dynamic-bar-active.has-templates-row {
-    min-height: 150px;
+    min-height: 156px !important;
     max-height: 196px;
 }
 
@@ -7821,6 +7821,53 @@ ic {
 .sliding-input-view.dynamic-bar-active .add-task-dropdown {
     bottom: calc(100% + 8px);
     left: 0;
+}
+
+/* Voice Recording Mode:
+   When active, only the Mic button is shown at the far left.
+   All other left tools (Counter, Template Strip, Add button) and the collapse chevron are hidden.
+   The center input pill smoothly takes up the remaining width and receives real-time speech.
+   The only way to return to the normal arrangement is clicking the mic button off. */
+.sliding-input-view.dynamic-bar-active.voice-recording-mode #btnCollapseActions {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
+}
+
+.sliding-input-view.dynamic-bar-active.voice-recording-mode .dynamic-collapsible-tools {
+    max-width: 32px !important;
+    opacity: 1 !important;
+    transform: none !important;
+    gap: 0 !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+}
+
+.sliding-input-view.dynamic-bar-active.voice-recording-mode .dynamic-collapsible-tools .selected-task,
+.sliding-input-view.dynamic-bar-active.voice-recording-mode .dynamic-collapsible-tools .btn-toggle-template-strip,
+.sliding-input-view.dynamic-bar-active.voice-recording-mode .dynamic-collapsible-tools .add-task-wrapper {
+    max-width: 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    display: none !important;
+}
+
+.sliding-input-view.dynamic-bar-active.voice-recording-mode .btn-voice-input {
+    display: flex !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+.sliding-input-view.dynamic-bar-active.voice-recording-mode .input-task-template {
+    height: auto !important;
+    max-height: 60px !important;
+    overflow-y: auto !important;
 }
 
 /* Compact Add Task (+) Button in Dynamic Mode (Idle: bare blue add sign, no circle) */
@@ -8089,35 +8136,41 @@ ic {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 22px;
-    border-radius: 50%;
-    padding: 0;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
     margin-left: auto;
     flex-shrink: 0;
     align-self: flex-end;
-    margin-bottom: 0;
+    margin-bottom: -1px;
     color: #0078FF;
-    transition: transform 0.15s ease, background-color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
 
 .sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger:hover {
-    transform: scale(1.18);
     background-color: rgba(0, 120, 255, 0.12);
 }
 
 .sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger:active,
 .sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger.active {
-    transform: scale(0.95);
-    background-color: #0078FF;
-    border-radius: 50%;
+    background-color: #0078FF !important;
+    border-radius: 50% !important;
+    box-shadow: 0 1px 4px rgba(0, 120, 255, 0.4);
 }
 
 .sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger .emoji-trigger-icon {
-    font-size: 23px;
+    font-size: 20px;
     color: #0078FF;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
 }
 

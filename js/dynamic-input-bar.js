@@ -74,7 +74,23 @@
     addTaskWrapper = document.querySelector('.add-task-wrapper');
   }
 
-  // --- Voice-to-Text (Native Web Speech API) ---
+  // --- Voice-to-Text (Native Web Speech API with Real-Time Transcription) ---
+  let voiceBaseText = '';
+  let isExplicitlyStopped = false;
+  let voiceRestartTimer = null;
+  let originalTaskPlaceholder = '';
+
+  function setVoiceRecordingMode(active) {
+    if (!slidingInputView) return;
+    if (active) {
+      slidingInputView.classList.add('voice-recording-mode');
+      slidingInputView.classList.remove('actions-collapsed');
+    } else {
+      slidingInputView.classList.remove('voice-recording-mode');
+      updateCollapseLogic();
+    }
+  }
+
   function setupSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -87,37 +103,74 @@
 
     try {
       const rec = new SpeechRecognition();
-      rec.continuous = false;
-      rec.interimResults = false;
+      rec.continuous = true;
+      rec.interimResults = true;
       rec.lang = navigator.language || 'en-CA';
 
       rec.onstart = () => {
         isVoiceRecording = true;
+        setVoiceRecordingMode(true);
         if (btnVoiceInput) {
           btnVoiceInput.classList.add('recording');
-          btnVoiceInput.title = 'Listening... Tap to stop';
+          btnVoiceInput.title = 'Listening... Tap mic to stop';
         }
       };
 
       rec.onresult = (event) => {
-        if (event.results && event.results.length > 0) {
-          const transcript = event.results[0][0].transcript;
-          if (taskTitle) {
-            const curVal = taskTitle.value.trim();
-            taskTitle.value = curVal ? `${curVal} ${transcript}` : transcript;
-            autoResizeTextarea();
-            taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
+        let finalTranscript = '';
+        let interimTranscript = '';
+
+        for (let i = 0; i < event.results.length; ++i) {
+          const res = event.results[i];
+          if (res.isFinal) {
+            finalTranscript += (finalTranscript ? ' ' : '') + res[0].transcript.trim();
+          } else {
+            interimTranscript += res[0].transcript;
           }
+        }
+
+        if (taskTitle) {
+          let fullText = voiceBaseText;
+          if (finalTranscript) {
+            fullText += (fullText ? ' ' : '') + finalTranscript;
+          }
+          if (interimTranscript) {
+            const separator = fullText && !fullText.endsWith(' ') ? ' ' : '';
+            fullText += separator + interimTranscript.trimStart();
+          }
+          taskTitle.value = fullText;
+          autoResizeTextarea();
+          taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
         }
       };
 
       rec.onerror = (event) => {
-        console.warn('Voice input error:', event.error);
-        stopSpeechRecognition();
+        console.warn('SpeechRecognition event/error:', event.error);
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          alert('Microphone access was not allowed. Please grant microphone permission in your browser settings.');
+          stopSpeechRecognition();
+        }
       };
 
       rec.onend = () => {
-        stopSpeechRecognition();
+        // As long as user has NOT clicked mic off, keep recognition alive
+        if (isVoiceRecording && !isExplicitlyStopped) {
+          if (taskTitle) {
+            voiceBaseText = taskTitle.value.trim();
+          }
+          clearTimeout(voiceRestartTimer);
+          voiceRestartTimer = setTimeout(() => {
+            if (isVoiceRecording && !isExplicitlyStopped) {
+              try {
+                rec.start();
+              } catch (e) {
+                // Ignore if already running
+              }
+            }
+          }, 120);
+        } else {
+          stopSpeechRecognition();
+        }
       };
 
       return rec;
@@ -135,25 +188,58 @@
       alert('Speech recognition is not supported in this browser.');
       return;
     }
+
+    isExplicitlyStopped = false;
+    isVoiceRecording = true;
+    clearTimeout(voiceRestartTimer);
+
+    if (taskTitle) {
+      originalTaskPlaceholder = taskTitle.placeholder;
+      taskTitle.placeholder = 'Listening... speak now';
+      voiceBaseText = taskTitle.value ? taskTitle.value.trim() : '';
+    }
+
+    setVoiceRecordingMode(true);
+    if (btnVoiceInput) {
+      btnVoiceInput.classList.add('recording');
+      btnVoiceInput.title = 'Listening... Tap mic to stop';
+    }
+
     try {
       recognitionInstance.start();
     } catch (err) {
-      console.warn('Recognition already started or error:', err);
+      console.warn('Recognition start caught:', err);
     }
   }
 
   function stopSpeechRecognition() {
+    isExplicitlyStopped = true;
     isVoiceRecording = false;
+    clearTimeout(voiceRestartTimer);
+
     if (btnVoiceInput) {
       btnVoiceInput.classList.remove('recording');
       btnVoiceInput.title = 'Voice to text';
     }
+
+    if (taskTitle && originalTaskPlaceholder) {
+      taskTitle.placeholder = originalTaskPlaceholder;
+    }
+
+    setVoiceRecordingMode(false);
+
     if (recognitionInstance) {
       try {
         recognitionInstance.stop();
       } catch (err) {
         // ignore
       }
+    }
+
+    if (taskTitle) {
+      taskTitle.value = taskTitle.value.trim();
+      autoResizeTextarea();
+      taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
     }
   }
 
@@ -269,6 +355,8 @@
   function updateCollapseLogic() {
     if (!taskTitle || !slidingInputView) return;
     if (!slidingInputView.classList.contains('dynamic-bar-active')) return;
+    // When in voice recording mode, keep mic at the far left and never collapse to chevron
+    if (isVoiceRecording) return;
 
     const hasText = taskTitle.value.trim().length > 0;
     const isFocused = document.activeElement === taskTitle;
@@ -427,6 +515,7 @@
     if (submitTask) {
       submitTask.addEventListener('click', () => {
         if (isEmojiTrayOpen) closeEmojiTray();
+        if (isVoiceRecording) stopSpeechRecognition();
       });
     }
 
