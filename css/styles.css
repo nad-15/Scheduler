@@ -4128,6 +4128,8 @@ input[type="radio"]:checked::after {
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: pan-x;
     overflow: hidden;
     white-space: nowrap;
     flex-shrink: 0;
@@ -4151,6 +4153,11 @@ input[type="radio"]:checked::after {
 
 .sliding-template-item:active {
     transform: scale(0.95);
+}
+
+.sliding-template-item.dropdown-active {
+    box-shadow: 0 0 0 2px #0078FF, 0 2px 8px rgba(0, 120, 255, 0.35);
+    transform: translateY(-1px);
 }
 
 .sliding-input-view.peek-mode {
@@ -5461,6 +5468,116 @@ input[type="radio"]:checked::after {
     to {
         opacity: 1;
         transform: translateX(0);
+    }
+}
+
+/* Template Strip Long-Press Dropdown */
+.template-strip-dropdown {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    background: rgba(204, 230, 255, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid #b3d7ff;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    z-index: 99999;
+    padding: 4px;
+    gap: 4px;
+    white-space: nowrap;
+    animation: fadeInTemplateDropdown 0.15s ease-out;
+}
+
+.template-strip-dropdown.hidden {
+    display: none !important;
+}
+
+/* Dropdown pointing arrow (pointing down when above template pill) */
+.template-strip-dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: #b3d7ff transparent transparent transparent;
+    pointer-events: none;
+}
+
+.template-strip-dropdown::after {
+    content: '';
+    position: absolute;
+    top: calc(100% - 1px);
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    border-width: 5px 5px 0 5px;
+    border-style: solid;
+    border-color: rgba(204, 230, 255, 0.96) transparent transparent transparent;
+    pointer-events: none;
+}
+
+/* Dropdown pointing arrow (pointing up when below template pill) */
+.template-strip-dropdown.arrow-top::before {
+    top: auto;
+    bottom: 100%;
+    border-width: 0 6px 6px 6px;
+    border-color: transparent transparent #b3d7ff transparent;
+}
+
+.template-strip-dropdown.arrow-top::after {
+    top: auto;
+    bottom: calc(100% - 1px);
+    border-width: 0 5px 5px 5px;
+    border-color: transparent transparent rgba(204, 230, 255, 0.96) transparent;
+}
+
+.template-strip-dropdown .dropdown-option {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+    padding: 6px 10px;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    user-select: none;
+}
+
+.template-strip-dropdown .dropdown-option:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.template-strip-dropdown .dropdown-option:active {
+    transform: scale(0.96);
+}
+
+.template-strip-dropdown .dropdown-option-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px !important;
+    vertical-align: middle;
+}
+
+#templateInsertBelow .dropdown-option-icon {
+    transform: rotate(180deg);
+}
+
+@keyframes fadeInTemplateDropdown {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 

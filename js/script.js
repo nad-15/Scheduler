@@ -636,9 +636,16 @@ function executeDefaultAddTask() {
 }
 
 // Dynamic insertion: Inserts "above" (topmost selected) or "below" (lowest selected)
-function insertTask(direction) {
+function insertTask(direction, customTaskText = null, customColor = null) {
     if (selectedDivs.length === 0) return;
     closeAddTaskDropdown();
+    if (typeof closeTemplateStripDropdown === 'function') {
+        closeTemplateStripDropdown();
+    }
+
+    const isTemplateInsert = typeof customTaskText === 'string' && customTaskText.trim() !== '';
+    const textToInsert = isTemplateInsert ? customTaskText : '';
+    const colorToInsert = customColor || chosenColor || '#ccc';
 
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
     const selectedByParent = new Map();
@@ -664,7 +671,6 @@ function insertTask(direction) {
     selectedDivs.length = 0;
 
     const newlyCreatedDivs = [];
-    const currentActiveColor = chosenColor || '#ccc';
 
     selectedByParent.forEach((subTasks, parent) => {
         let taskType, taskKey;
@@ -728,21 +734,29 @@ function insertTask(direction) {
             (!targetDiv.style.backgroundColor || targetDiv.style.backgroundColor === 'transparent');
 
         if (children.length === 1 && isTargetBlank) {
-            targetDiv.textContent = "";
-            targetDiv.style.borderLeft = `4px solid ${currentActiveColor}`;
-            targetDiv.style.backgroundColor = fadeColor(currentActiveColor);
+            targetDiv.innerHTML = '';
+            if (isTemplateInsert) {
+                const span = document.createElement('span');
+                span.className = 'clamp-text';
+                if (expanded) span.classList.add('expanded');
+                span.textContent = textToInsert;
+                targetDiv.appendChild(span);
+            }
+            targetDiv.style.borderLeft = `4px solid ${colorToInsert}`;
+            targetDiv.style.backgroundColor = fadeColor(colorToInsert);
 
             const taskArray = storedData[date][taskKey];
             const emptyIndex = taskArray.findIndex(t =>
                 (t.task || '').trim() === '' && (!t.color || (t.color || '').trim() === '')
             );
 
+            const entryData = { task: textToInsert, color: colorToInsert };
             if (emptyIndex !== -1) {
-                taskArray[emptyIndex] = { task: '', color: currentActiveColor };
+                taskArray[emptyIndex] = entryData;
             } else if (taskArray.length === 0) {
-                taskArray.push({ task: '', color: currentActiveColor });
+                taskArray.push(entryData);
             } else {
-                taskArray[0] = { task: '', color: currentActiveColor };
+                taskArray[0] = entryData;
             }
 
             targetDiv.classList.add('selected');
@@ -752,10 +766,19 @@ function insertTask(direction) {
 
         // Create new task DOM element
         const newTaskDiv = document.createElement('div');
-        newTaskDiv.textContent = "";
         newTaskDiv.classList.add(`${taskType}Sub`);
-        newTaskDiv.style.borderLeft = `4px solid ${currentActiveColor}`;
-        newTaskDiv.style.backgroundColor = fadeColor(currentActiveColor);
+        newTaskDiv.style.borderLeft = `4px solid ${colorToInsert}`;
+        newTaskDiv.style.backgroundColor = fadeColor(colorToInsert);
+
+        if (isTemplateInsert) {
+            const span = document.createElement('span');
+            span.className = 'clamp-text';
+            if (expanded) span.classList.add('expanded');
+            span.textContent = textToInsert;
+            newTaskDiv.appendChild(span);
+        } else {
+            newTaskDiv.textContent = "";
+        }
 
         // Insert into DOM in the correct position
         if (targetDiv) {
@@ -771,8 +794,8 @@ function insertTask(direction) {
         // Synchronize with localStorage array at exact matching index
         const taskArray = storedData[date][taskKey];
         const newTaskData = {
-            task: '',
-            color: currentActiveColor
+            task: textToInsert,
+            color: colorToInsert
         };
 
         if (insertIndex >= taskArray.length) {
@@ -788,6 +811,10 @@ function insertTask(direction) {
     selectedDivs = newlyCreatedDivs;
     localStorage.setItem("tasks", JSON.stringify(storedData));
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
+
+    if (isTemplateInsert) {
+        bumpTemplateToTop(textToInsert, colorToInsert);
+    }
 }
 
 // Option button event handlers
@@ -803,6 +830,128 @@ if (addBelowOption) {
         e.stopPropagation();
         insertTask('below');
     });
+}
+
+// === TEMPLATE STRIP LONG-PRESS CONTROLLER ===
+let currentTemplateAction = null;
+let lastDropdownOpenTime = 0;
+let lastDropdownCloseTime = 0;
+
+function openTemplateStripDropdown(itemEl, taskText, hexColor) {
+    if (selectedDivs.length === 0) return;
+
+    currentTemplateAction = { text: taskText, color: hexColor };
+    const dropdown = document.getElementById('template-strip-dropdown');
+    if (!dropdown) return;
+
+    // Highlight the triggering template pill
+    document.querySelectorAll('.sliding-template-item.dropdown-active').forEach(el => el.classList.remove('dropdown-active'));
+    if (itemEl) {
+        itemEl.classList.add('dropdown-active');
+    }
+
+    dropdown.classList.remove('hidden');
+
+    const rect = itemEl.getBoundingClientRect();
+    const dropdownWidth = dropdown.offsetWidth || 130;
+    const dropdownHeight = dropdown.offsetHeight || 75;
+
+    let left = rect.left + (rect.width / 2) - (dropdownWidth / 2);
+    left = Math.max(10, Math.min(left, window.innerWidth - dropdownWidth - 10));
+
+    // Vertical placement with arrow gap
+    const arrowGap = 8;
+    let top = rect.top - dropdownHeight - arrowGap;
+    let isAbove = true;
+
+    if (top < 10) {
+        top = rect.bottom + arrowGap;
+        isAbove = false;
+    }
+
+    if (isAbove) {
+        dropdown.classList.remove('arrow-top');
+    } else {
+        dropdown.classList.add('arrow-top');
+    }
+
+    dropdown.style.left = `${left}px`;
+    dropdown.style.top = `${top}px`;
+
+    // Dynamic horizontal arrow position pointing directly at the pill's center
+    const pillCenter = rect.left + (rect.width / 2);
+    let arrowLeft = pillCenter - left;
+    arrowLeft = Math.max(16, Math.min(arrowLeft, dropdownWidth - 16));
+    dropdown.style.setProperty('--arrow-left', `${arrowLeft}px`);
+
+    lastDropdownOpenTime = Date.now();
+}
+
+function closeTemplateStripDropdown() {
+    const dropdown = document.getElementById('template-strip-dropdown');
+    if (dropdown) {
+        if (!dropdown.classList.contains('hidden')) {
+            lastDropdownCloseTime = Date.now();
+        }
+        dropdown.classList.add('hidden');
+        dropdown.classList.remove('arrow-top');
+    }
+    document.querySelectorAll('.sliding-template-item.dropdown-active').forEach(el => el.classList.remove('dropdown-active'));
+    currentTemplateAction = null;
+}
+
+const templateInsertAbove = document.getElementById('templateInsertAbove');
+if (templateInsertAbove) {
+    templateInsertAbove.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (selectedDivs.length === 0) {
+            closeTemplateStripDropdown();
+            return;
+        }
+        if (currentTemplateAction) {
+            insertTask('above', currentTemplateAction.text, currentTemplateAction.color);
+        }
+        closeTemplateStripDropdown();
+    });
+}
+
+const templateInsertBelow = document.getElementById('templateInsertBelow');
+if (templateInsertBelow) {
+    templateInsertBelow.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (selectedDivs.length === 0) {
+            closeTemplateStripDropdown();
+            return;
+        }
+        if (currentTemplateAction) {
+            insertTask('below', currentTemplateAction.text, currentTemplateAction.color);
+        }
+        closeTemplateStripDropdown();
+    });
+}
+
+const handleOutsideDropdownDismiss = (e) => {
+    if (Date.now() - lastDropdownOpenTime < 300) return;
+    const dropdown = document.getElementById('template-strip-dropdown');
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (!dropdown.contains(e.target)) {
+            closeTemplateStripDropdown();
+        }
+    }
+};
+
+document.addEventListener('click', handleOutsideDropdownDismiss);
+document.addEventListener('touchstart', handleOutsideDropdownDismiss, { passive: true });
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeTemplateStripDropdown();
+    }
+});
+
+const templatesScrollEl = document.getElementById('slidingTemplatesScroll');
+if (templatesScrollEl) {
+    templatesScrollEl.addEventListener('scroll', closeTemplateStripDropdown, { passive: true });
 }
 
 // Long-press vs Short-click detection on addTaskBtn
@@ -2324,7 +2473,117 @@ function renderSlidingTemplates() {
         item.style.borderLeft = `4px solid ${hexColor}`;
         item.style.backgroundColor = fadeColor(hexColor);
 
-        item.addEventListener('click', () => {
+        // Long-press vs Click detection for Template Strip
+        let itemLongPressTimer = null;
+        let isItemLongPressTriggered = false;
+        let itemStartCoords = { x: 0, y: 0 };
+        let lastItemTouchTime = 0;
+
+        const startItemLongPress = (clientX, clientY) => {
+            if (selectedDivs.length === 0) {
+                return;
+            }
+            const dropdown = document.getElementById('template-strip-dropdown');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                return;
+            }
+            if (Date.now() - lastDropdownCloseTime < 400) {
+                return;
+            }
+            itemStartCoords = { x: clientX, y: clientY };
+            isItemLongPressTriggered = false;
+            clearTimeout(itemLongPressTimer);
+
+            itemLongPressTimer = setTimeout(() => {
+                isItemLongPressTriggered = true;
+                if (navigator.vibrate) {
+                    try { navigator.vibrate(40); } catch (_) {}
+                }
+                openTemplateStripDropdown(item, task.text, hexColor);
+            }, 400);
+        };
+
+        const cancelItemLongPress = () => {
+            clearTimeout(itemLongPressTimer);
+            itemLongPressTimer = null;
+        };
+
+        item.addEventListener('touchstart', (e) => {
+            lastItemTouchTime = Date.now();
+            const touch = e.touches[0];
+            startItemLongPress(touch.clientX, touch.clientY);
+        }, { passive: true });
+
+        item.addEventListener('touchmove', (e) => {
+            if (!itemLongPressTimer) return;
+            const touch = e.touches[0];
+            const dx = Math.abs(touch.clientX - itemStartCoords.x);
+            const dy = Math.abs(touch.clientY - itemStartCoords.y);
+            if (dx > 16 || dy > 16) {
+                cancelItemLongPress();
+            }
+        }, { passive: true });
+
+        item.addEventListener('touchend', (e) => {
+            cancelItemLongPress();
+            if (isItemLongPressTriggered) {
+                if (e.cancelable) e.preventDefault();
+            }
+        });
+
+        item.addEventListener('touchcancel', () => {
+            cancelItemLongPress();
+        });
+
+        item.addEventListener('mousedown', (e) => {
+            if (Date.now() - lastItemTouchTime < 500) return;
+            if (e.button !== 0) return;
+            startItemLongPress(e.clientX, e.clientY);
+        });
+
+        item.addEventListener('mousemove', (e) => {
+            if (!itemLongPressTimer) return;
+            const dx = Math.abs(e.clientX - itemStartCoords.x);
+            const dy = Math.abs(e.clientY - itemStartCoords.y);
+            if (dx > 16 || dy > 16) {
+                cancelItemLongPress();
+            }
+        });
+
+        item.addEventListener('mouseup', () => {
+            cancelItemLongPress();
+        });
+
+        item.addEventListener('mouseleave', () => {
+            cancelItemLongPress();
+        });
+
+        item.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        item.addEventListener('click', (e) => {
+            if (isItemLongPressTriggered) {
+                isItemLongPressTriggered = false;
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
+            // If template dropdown is open or was just closed, ONLY close the modal and do not insert or stamp anything
+            const dropdown = document.getElementById('template-strip-dropdown');
+            const isDropdownOpen = dropdown && !dropdown.classList.contains('hidden');
+            const wasDropdownJustClosed = (Date.now() - lastDropdownCloseTime < 400);
+
+            if (isDropdownOpen || wasDropdownJustClosed) {
+                if (isDropdownOpen) {
+                    closeTemplateStripDropdown();
+                }
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
             // 1. Recency bump in data/storage (remains stationary while drawer is open)
             bumpTemplateToTop(task.text, hexColor);
 
