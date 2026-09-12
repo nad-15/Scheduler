@@ -7660,3 +7660,579 @@ ic {
 #year-container:not(.hide-dates) .day {
     flex: 1;
 }
+
+/* ==========================================================================
+   DYNAMIC INPUT BAR (MESSENGER STYLE) & EMOJI PICKER
+   ========================================================================== */
+
+/* Classic mode: ensure all dynamic bar elements are hidden */
+.dynamic-bar-only {
+    display: none;
+}
+
+.sliding-input-view:not(.dynamic-bar-active) .dynamic-bar-only,
+.cloned-sliding-view .dynamic-bar-only,
+.cloned-sliding-view .dynamic-left-cluster {
+    display: none !important;
+}
+
+/* When Dynamic Bar is active */
+.sliding-input-view.dynamic-bar-active .dynamic-left-cluster.dynamic-bar-only {
+    display: flex !important;
+}
+
+.sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger.dynamic-bar-only {
+    display: flex !important;
+}
+
+.sliding-input-view.dynamic-bar-active.emoji-tray-active .dynamic-emoji-tray.dynamic-bar-only {
+    display: flex !important;
+}
+
+.sliding-input-view.dynamic-bar-active.emoji-tray-active .color-button-options {
+    display: none !important;
+}
+
+.sliding-input-view.dynamic-bar-active.emoji-tray-active .jumping-text-box {
+    display: none !important;
+}
+
+
+/* Dynamic mode drawer sizing: auto-expands upward with content (capped at 3 lines) */
+.sliding-input-view.dynamic-bar-active {
+    height: auto !important;
+    min-height: 124px;
+    max-height: 170px;
+    transition: transform 0.3s ease-in-out, min-height 0.22s ease-in-out, max-height 0.22s ease-in-out;
+}
+
+.sliding-input-view.dynamic-bar-active.has-templates-row {
+    min-height: 150px;
+    max-height: 196px;
+}
+
+.sliding-input-view.dynamic-bar-active .taskinput-color-container {
+    height: auto !important;
+    min-height: 100%;
+    padding: 5px 8px 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 4px;
+    box-sizing: border-box;
+}
+
+.sliding-input-view.dynamic-bar-active .template-title-submit-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    position: relative;
+    padding: 2px 4px;
+    box-sizing: border-box;
+    min-height: 40px;
+}
+
+/* Left action cluster */
+.sliding-input-view.dynamic-bar-active .dynamic-left-cluster {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-bottom: 2px;
+    height: 32px;
+    min-width: 28px;
+    transition: width 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Messenger collapse chevron button (Overlayed smoothly without pushing flex flow) */
+.sliding-input-view.dynamic-bar-active .btn-collapse-actions {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) scale(0.6);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 120, 255, 0.1);
+    color: #0078FF;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+.sliding-input-view.dynamic-bar-active .btn-collapse-actions:hover {
+    background: rgba(0, 120, 255, 0.2);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.sliding-input-view.dynamic-bar-active .btn-collapse-actions:active {
+    transform: translateY(-50%) scale(0.92);
+}
+
+/* When actions collapsed: Chevron smoothly scales and fades in at exact left spot */
+.sliding-input-view.dynamic-bar-active.actions-collapsed .btn-collapse-actions {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) scale(1);
+}
+
+/* Collapsible action tools container */
+.sliding-input-view.dynamic-bar-active .dynamic-collapsible-tools {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    max-width: 140px;
+    opacity: 1;
+    overflow: visible;
+    transform: translateX(0);
+    transition: max-width 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Prevent ANY squishing of the tool buttons during transition */
+.sliding-input-view.dynamic-bar-active .dynamic-collapsible-tools > * {
+    flex-shrink: 0 !important;
+}
+
+/* When collapsed: Tools slide gracefully to the left, fade out, and contract to 0 width */
+.sliding-input-view.dynamic-bar-active.actions-collapsed .dynamic-collapsible-tools {
+    max-width: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+    transform: translateX(-16px) !important;
+}
+
+.sliding-input-view.dynamic-bar-active .add-task-dropdown {
+    bottom: calc(100% + 8px);
+    left: 0;
+}
+
+/* Compact Add Task (+) Button in Dynamic Mode (Idle: bare blue add sign, no circle) */
+.sliding-input-view.dynamic-bar-active #addTask {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: #0078FF !important;
+    opacity: 1 !important; /* Overrides disabled-btn opacity: 0.5 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0 !important;
+    flex-shrink: 0;
+    transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.sliding-input-view.dynamic-bar-active #addTask:hover {
+    background-color: rgba(0, 120, 255, 0.12) !important;
+}
+
+.sliding-input-view.dynamic-bar-active #addTask .add-btn {
+    font-size: 24px;
+    color: #0078FF !important;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+/* Add Task Active: When dropdown is open or pressed, placed in blue circle with white + (exact 28px, never gets bigger) */
+.sliding-input-view.dynamic-bar-active .add-task-wrapper:has(#add-task-dropdown:not(.hidden)) #addTask,
+.sliding-input-view.dynamic-bar-active #addTask.active,
+.sliding-input-view.dynamic-bar-active #addTask:active {
+    background-color: #0078FF !important;
+    box-shadow: 0 1px 4px rgba(0, 120, 255, 0.4);
+}
+
+.sliding-input-view.dynamic-bar-active .add-task-wrapper:has(#add-task-dropdown:not(.hidden)) #addTask .add-btn,
+.sliding-input-view.dynamic-bar-active #addTask.active .add-btn,
+.sliding-input-view.dynamic-bar-active #addTask:active .add-btn {
+    color: white !important;
+}
+
+/* Collapsible action tools: FILLED when not active (consistent solid blue glyphs) */
+.sliding-input-view.dynamic-bar-active .dynamic-collapsible-tools .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+/* Compact Template Strip Toggle Button (view_carousel) - Idle: transparent, blue FILLED icon */
+.sliding-input-view.dynamic-bar-active .btn-toggle-template-strip {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    box-sizing: border-box !important;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: #0078FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.sliding-input-view.dynamic-bar-active .btn-toggle-template-strip:hover {
+    background-color: rgba(0, 120, 255, 0.12);
+}
+
+.sliding-input-view.dynamic-bar-active .btn-toggle-template-strip .material-symbols-outlined {
+    font-size: 22px;
+    color: #0078FF;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+/* Active Template Strip: Inside blue circle with WHITE OUTLINED icon (exact 28px, strictly no size change) */
+.sliding-input-view.dynamic-bar-active .btn-toggle-template-strip.active {
+    background-color: #0078FF !important;
+    box-shadow: 0 1px 4px rgba(0, 120, 255, 0.45);
+}
+
+.sliding-input-view.dynamic-bar-active .btn-toggle-template-strip.active .material-symbols-outlined {
+    color: white !important;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+/* Compact Selected Task Counter - Solid blue circle with white count (exact 28px, strictly no size change) */
+.sliding-input-view.dynamic-bar-active .selected-task {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    background-color: #0078FF !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    cursor: pointer;
+    margin: 0;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0, 120, 255, 0.35) !important;
+    transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sliding-input-view.dynamic-bar-active .selected-task:hover {
+    background-color: #0066dc !important;
+}
+
+/* Active Selected Task Counter: When tasks are selected (> 0) */
+.sliding-input-view.dynamic-bar-active .selected-task.selection-true {
+    background-color: #0078FF !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(0, 120, 255, 0.6) !important;
+}
+
+/* Compact Voice Input Button (mic) - Idle: transparent, blue FILLED icon */
+.sliding-input-view.dynamic-bar-active .btn-voice-input {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    box-sizing: border-box !important;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: #0078FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.sliding-input-view.dynamic-bar-active .btn-voice-input:hover {
+    background-color: rgba(0, 120, 255, 0.12);
+}
+
+.sliding-input-view.dynamic-bar-active .btn-voice-input .material-symbols-outlined {
+    font-size: 22px;
+    color: #0078FF;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+/* Active Voice Recording: In solid blue circle with white OUTLINED mic inside (exact 28px, strictly no size change) */
+.sliding-input-view.dynamic-bar-active .btn-voice-input.recording {
+    background-color: #0078FF !important;
+    box-shadow: 0 1px 4px rgba(0, 120, 255, 0.45);
+    animation: micPulse 1.2s infinite ease-in-out;
+}
+
+.sliding-input-view.dynamic-bar-active .btn-voice-input.recording .material-symbols-outlined {
+    color: white !important;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+@keyframes micPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 120, 255, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(0, 120, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 120, 255, 0);
+    }
+}
+
+/* Center Pill Container (Contains Flower Paw, Input Textarea, and Emoji Trigger) */
+.sliding-input-view.dynamic-bar-active .title-submit-container {
+    flex: 1;
+    min-width: 0;
+    min-height: 36px;
+    height: auto;
+    max-height: 76px; /* Capped at exactly 3 lines */
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    border-radius: 18px;
+    padding: 7px 10px 7px 8px;
+    background-color: #e5e5e5;
+    gap: 6px;
+    position: relative;
+    box-sizing: border-box;
+    border: none;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.sliding-input-view.dynamic-bar-active .title-submit-container:focus-within {
+    background-color: #ededed;
+    box-shadow: 0 0 0 1.5px rgba(0, 120, 255, 0.35);
+}
+
+.sliding-input-view.dynamic-bar-active .flower-container {
+    width: 18px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-bottom: 1px;
+}
+
+.sliding-input-view.dynamic-bar-active .flower-container .flower {
+    font-size: 16px;
+}
+
+/* Compact Auto-Resizing Textarea (Capped at exactly 3 lines = 60px) */
+.sliding-input-view.dynamic-bar-active .input-task-template {
+    flex: 1;
+    min-width: 0;
+    font-size: 14.5px;
+    padding: 0;
+    margin: 0;
+    line-height: 20px;
+    height: 20px;
+    min-height: 20px;
+    max-height: 60px; /* Exactly 3 lines max */
+    overflow-y: auto;
+    border: none !important;
+    background: transparent;
+    outline: none !important;
+    color: inherit;
+    box-shadow: none !important;
+    resize: none;
+    scrollbar-width: thin;
+    word-break: break-word;
+}
+
+.sliding-input-view.dynamic-bar-active .input-task-template::-webkit-scrollbar {
+    display: none;
+}
+
+/* When unfocused, strictly clamp textarea height to 20px single line */
+.sliding-input-view.dynamic-bar-active .input-task-template:not(:focus) {
+    height: 20px !important;
+    overflow-y: hidden !important;
+}
+
+/* Inline Emoji Trigger Button (Inside the pill on the right, filled smiley) */
+.sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 22px;
+    border-radius: 50%;
+    padding: 0;
+    margin-left: auto;
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-bottom: 0;
+    color: #0078FF;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger:hover {
+    transform: scale(1.18);
+    background-color: rgba(0, 120, 255, 0.12);
+}
+
+.sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger:active,
+.sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger.active {
+    transform: scale(0.95);
+    background-color: #0078FF;
+    border-radius: 50%;
+}
+
+.sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger .emoji-trigger-icon {
+    font-size: 23px;
+    color: #0078FF;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+.sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger.active .emoji-trigger-icon {
+    color: white !important;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+/* Submit Task Button (Outside the pill on the far right, matching Messenger reaction/send button) */
+.sliding-input-view.dynamic-bar-active #submitTask {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    background-color: #0078FF;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-bottom: 2px;
+    transition: transform 0.15s, background-color 0.15s;
+}
+
+.sliding-input-view.dynamic-bar-active #submitTask:hover {
+    background-color: #005fcc;
+    transform: scale(1.08);
+}
+
+.sliding-input-view.dynamic-bar-active #submitTask:active {
+    transform: scale(0.92);
+}
+
+.sliding-input-view.dynamic-bar-active #submitTask .arrow-upward {
+    font-size: 18px;
+    color: white;
+}
+
+/* Inline Curated Dynamic Emoji Tray (Replaces color options row AND skhayeduler jumping text, zero drawer resizing) */
+.dynamic-emoji-tray {
+    display: none;
+    width: 100%;
+    min-width: 0;
+    height: 70px;
+    max-height: 72px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    animation: fadeInEmojiTray 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInEmojiTray {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Emoji Grid: Fills the entire 70px height with 3 clean rows of 24 immediately visible emojis, zero wasted space */
+.emoji-grid-container {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-auto-rows: 21.5px;
+    gap: 2px;
+    padding: 1px 2px;
+    width: 100%;
+    height: 100%;
+    max-height: 70px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 120, 255, 0.35) transparent;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+}
+
+.emoji-grid-container::-webkit-scrollbar {
+    width: 3px;
+}
+
+.emoji-grid-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 120, 255, 0.3);
+    border-radius: 3px;
+}
+
+.emoji-item-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 21.5px;
+    font-size: 18px;
+    line-height: 1;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.1s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+}
+
+.emoji-item-btn:hover {
+    transform: scale(1.22);
+    background-color: rgba(0, 120, 255, 0.12);
+}
+
+.emoji-item-btn:active {
+    transform: scale(0.88);
+}

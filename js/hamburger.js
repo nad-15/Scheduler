@@ -13,7 +13,8 @@ const DEFAULT_SETTINGS = {
   "hide-all-buttons": false,
   "sliding-templates": false,
   "sliding-templates-peek": false,
-  "movable-template-expanded": false
+  "movable-template-expanded": false,
+  "dynamic-input-bar": false
 };
 
 
@@ -208,6 +209,22 @@ if (slidingTemplatesPeekToggle) {
       window.applySlidingTemplatesRowState(isTemplatesEnabled);
     } else if (typeof applySlidingTemplatesRowState === 'function') {
       applySlidingTemplatesRowState(isTemplatesEnabled);
+    }
+  });
+}
+
+const dynamicInputBarToggle = document.getElementById("dynamic-input-bar-toggle");
+if (dynamicInputBarToggle) {
+  const isDynamic = Boolean(appSettings["dynamic-input-bar"]);
+  dynamicInputBarToggle.checked = isDynamic;
+
+  dynamicInputBarToggle.addEventListener("change", (e) => {
+    const checked = e.target.checked;
+    appSettings["dynamic-input-bar"] = checked;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
+    if (typeof window.applyInputBarMode === 'function') {
+      window.applyInputBarMode(checked);
     }
   });
 }

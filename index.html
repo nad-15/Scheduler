@@ -30,8 +30,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
-    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" /> -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-201JTXNXE8"></script>
     <script>
@@ -234,22 +233,27 @@
                             <!-- Template pills rendered dynamically -->
                         </div>
                     </div>
-                    <div class="template-title-submit-container">
-                        <!-- <button class="task-template-button"><i class="material-icons template-list">list_alt</i></button> -->
+                    <div class="template-title-submit-container" id="templateTitleSubmitContainer">
+                        <!-- Dynamic Left Cluster (Messenger style) -->
+                        <div class="dynamic-left-cluster dynamic-bar-only" id="dynamicLeftCluster">
+                            <button type="button" class="btn-collapse-actions" id="btnCollapseActions" title="Toggle action tools">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </button>
+                            <div class="dynamic-collapsible-tools" id="dynamicCollapsibleTools">
+                                <!-- .selected-task moved here in dynamic mode -->
+                                <button type="button" class="dynamic-action-btn btn-toggle-template-strip" id="btnToggleTemplateStrip" title="Toggle template strip">
+                                    <span class="material-symbols-outlined">view_carousel</span>
+                                </button>
+                                <!-- .add-task-wrapper moved here in dynamic mode -->
+                                <button type="button" class="dynamic-action-btn btn-voice-input" id="btnVoiceInput" title="Voice to text">
+                                    <span class="material-symbols-outlined">mic</span>
+                                </button>
+                            </div>
+                        </div>
 
                         <button class="selected-task">0</button>
 
-
-                        <!-- <div class="counter-icon-container">
-                            <div class="icon-with-number-container">
-                                <span class="material-symbols-outlined" id="gfont-counter-icon">ad_group</span>
-                                <span class="calendar-number">0</span>
-                            </div>
-                        </div> -->
-
-
-
-                        <div class="title-submit-container">
+                        <div class="title-submit-container" id="titleSubmitContainer">
                             <div class="add-task-wrapper">
                                 <button class="buttons disabled-btn" id="addTask" title="Click to add at bottom, hold for options">
                                     <span class="material-icons add-btn">add</span>
@@ -266,15 +270,23 @@
                                 </div>
                             </div>
 
-                            <!-- </div> -->
                             <div class="flower-container"><i class="material-icons flower">pets</i></div>
                             <textarea class="input-task-template" id="taskTitle" autocomplete="off" name="task"
                                 autocorrect="off" spellcheck="false" inputmode="text"
                                 placeholder="Enter task title."></textarea>
 
+                            <button type="button" class="dynamic-emoji-trigger dynamic-bar-only" id="btnEmojiPicker" title="Add Emoji">
+                                <span class="material-symbols-outlined emoji-trigger-icon">sentiment_satisfied</span>
+                            </button>
+
                             <button class="buttons disabled-btn" id="submitTask">
                                 <i class="material-icons arrow-upward">arrow_upward</i></button>
                         </div>
+                    </div>
+
+                    <!-- Dynamic Inline Emoji Tray (Pure emoji grid without tabs, zero drawer resizing) -->
+                    <div id="dynamicEmojiTray" class="dynamic-emoji-tray dynamic-bar-only hidden">
+                        <div class="emoji-grid-container" id="emojiGridContainer"></div>
                     </div>
 
                     <div class="color-button-options">
@@ -1139,6 +1151,18 @@
                         </ul>
                     </li>
 
+                    <!-- Dynamic Input Bar Toggle -->
+                    <li data-setting="dynamic-input-bar" class="menu-item">
+                        <div class="menu-label">
+                            <span class="material-symbols-outlined">chat</span>
+                            <span class="menu-text">Dynamic Input Bar</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dynamic-input-bar-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </li>
+
                 </ul>
             </li>
 
@@ -1229,6 +1253,7 @@
     <script src="./js/to-do.js"></script>
     <script src="./js/daily-task-pop-up.js"></script>
     <script src="./js/drag-and-drop-task.js"></script>
+    <script src="./js/dynamic-input-bar.js"></script>
 
     <!-- PWA Service Worker & In-App Install Handler -->
     <script>
