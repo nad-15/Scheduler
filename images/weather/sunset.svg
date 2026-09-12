@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="sunset-sun" x1="256" y1="150" x2="256" y2="350" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FED7AA"/>
+      <stop offset="35%" stop-color="#FB923C"/>
+      <stop offset="75%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+    <linearGradient id="sunset-arrow" x1="256" y1="55" x2="256" y2="135" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#FED7AA"/>
+    </linearGradient>
+    <clipPath id="sunset-clip">
+      <rect x="0" y="0" width="512" height="350"/>
+    </clipPath>
+  </defs>
+
+  <!-- Sun Rays (Above Horizon, Warm Dusk) -->
+  <g stroke="#FB923C" stroke-width="18" stroke-linecap="round" opacity="0.9">
+    <line x1="256" y1="220" x2="256" y2="175"/>
+    <line x1="321" y1="237" x2="344" y2="198"/>
+    <line x1="191" y1="237" x2="168" y2="198"/>
+    <line x1="369" y1="285" x2="408" y2="262"/>
+    <line x1="143" y1="285" x2="104" y2="262"/>
+  </g>
+
+  <!-- Setting Sun (Clipped by Horizon) -->
+  <g clip-path="url(#sunset-clip)">
+    <circle cx="256" cy="350" r="100" fill="url(#sunset-sun)" stroke="#EA580C" stroke-width="8"/>
+  </g>
+
+  <!-- Downward Setting Arrow -->
+  <g stroke="url(#sunset-arrow)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="256" y1="55" x2="256" y2="135"/>
+    <polyline points="230,108 256,135 282,108"/>
+  </g>
+
+  <!-- Horizon Line -->
+  <line x1="80" y1="350" x2="432" y2="350" stroke="#E2E8F0" stroke-width="22" stroke-linecap="round"/>
+
+  <!-- Subtle Horizon Reflections (Warm Amber) -->
+  <line x1="160" y1="382" x2="352" y2="382" stroke="#FB923C" stroke-width="12" stroke-linecap="round" opacity="0.5"/>
+  <line x1="200" y1="408" x2="312" y2="408" stroke="#EA580C" stroke-width="10" stroke-linecap="round" opacity="0.3"/>
+</svg>

@@ -221,6 +221,21 @@ function formatIsoTime(isoStr) {
 }
 
 /**
+ * Format ISO datetime string ("2026-09-05T06:50") to compact 12-hour time ("6:50")
+ */
+function formatSunTime(isoStr) {
+    if (!isoStr) return '--:--';
+    const parts = isoStr.split('T');
+    if (parts.length < 2) return isoStr;
+    const timeParts = parts[1].split(':');
+    let hour = parseInt(timeParts[0], 10);
+    const minute = timeParts[1];
+    hour = hour % 12;
+    if (hour === 0) hour = 12;
+    return `${hour}:${minute}`;
+}
+
+/**
  * Format ISO datetime string ("2026-09-05T14:00") to 12-hour hour label ("2 PM")
  */
 function formatIsoHour(isoStr) {
@@ -1679,6 +1694,66 @@ function buildDayForecastDetails(data, dayKey) {
     // Hourly Forecast Strip (True 1-Hour Step in City's Local Time)
     let hourlyColumnsHtml = '';
 
+    // Sunrise & Sunset Chronological Insertion for Selected Day
+    const rawSunrise = data.daily.sunrise ? data.daily.sunrise[activeIndex] : null;
+    const rawSunset = data.daily.sunset ? data.daily.sunset[activeIndex] : null;
+
+    const sunEvents = [];
+    if (rawSunrise && rawSunrise.startsWith(dayKey)) {
+        sunEvents.push({
+            type: 'sunrise',
+            isoTime: rawSunrise,
+            label: 'Sunrise',
+            iconUrl: './images/weather/sunrise.svg'
+        });
+    }
+    if (rawSunset && rawSunset.startsWith(dayKey)) {
+        sunEvents.push({
+            type: 'sunset',
+            isoTime: rawSunset,
+            label: 'Sunset',
+            iconUrl: './images/weather/sunset.svg'
+        });
+    }
+    sunEvents.sort((a, b) => a.isoTime.localeCompare(b.isoTime));
+
+    const cityNowParts = new Intl.DateTimeFormat('en-US', {
+        timeZone: currentLocation.timezone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    }).formatToParts(now);
+
+    const getCityPart = (t) => cityNowParts.find(p => p.type === t)?.value || '00';
+    let cHour = parseInt(getCityPart('hour'), 10);
+    if (cHour === 24) cHour = 0;
+    const currentCityLocalIso = `${getCityPart('year')}-${getCityPart('month')}-${getCityPart('day')}T${String(cHour).padStart(2, '0')}:${getCityPart('minute')}`;
+
+    const insertedSunIndices = new Set();
+    const renderSunColumnsBefore = (slotIso) => {
+        let html = '';
+        sunEvents.forEach((ev, evIdx) => {
+            if (!insertedSunIndices.has(evIdx) && ev.isoTime <= slotIso) {
+                insertedSunIndices.add(evIdx);
+                const isPast = isTodayActive && (ev.isoTime < currentCityLocalIso);
+                const pastClass = isPast ? 'is-past' : '';
+                const timeText = formatSunTime(ev.isoTime);
+                html += `
+                    <div class="gw-hourly-col gw-hourly-sun-col is-${ev.type} ${pastClass}">
+                        <span class="gw-hourly-temp gw-hourly-sun-label">${ev.label}</span>
+                        <span class="gw-hourly-pop is-empty">&nbsp;</span>
+                        <img class="gw-hourly-icon gw-hourly-sun-icon" src="${ev.iconUrl}" alt="${ev.label}" onerror="this.onerror=null; this.src='./images/weather/horizon.svg';">
+                        <span class="gw-hourly-time gw-hourly-sun-time">${timeText}</span>
+                    </div>
+                `;
+            }
+        });
+        return html;
+    };
+
     if (isTodayActive) {
         const liveTemp = Math.round(data.current.temperature_2m);
         const liveWmo = getWmoDetails(data.current.weather_code, Boolean(data.current.is_day));
@@ -1688,6 +1763,8 @@ function buildDayForecastDetails(data, dayKey) {
         let nowInserted = false;
         dayIndices.forEach(idx => {
             const tStr = data.hourly.time[idx];
+            hourlyColumnsHtml += renderSunColumnsBefore(tStr);
+
             const slotHour = parseInt(tStr.split('T')[1].split(':')[0], 10);
             const sTemp = Math.round(data.hourly.temperature_2m[idx]);
             const popVal = data.hourly.precipitation_probability[idx] || 0;
@@ -1726,6 +1803,8 @@ function buildDayForecastDetails(data, dayKey) {
             }
         });
 
+        hourlyColumnsHtml += renderSunColumnsBefore('9999-99-99T99:99');
+
         if (!nowInserted) {
             hourlyColumnsHtml = `
                 <div class="gw-hourly-col is-now">
@@ -1739,6 +1818,8 @@ function buildDayForecastDetails(data, dayKey) {
     } else {
         dayIndices.forEach(idx => {
             const tStr = data.hourly.time[idx];
+            hourlyColumnsHtml += renderSunColumnsBefore(tStr);
+
             const sTemp = Math.round(data.hourly.temperature_2m[idx]);
             const popVal = data.hourly.precipitation_probability[idx] || 0;
             const isDaySlot = Boolean(data.hourly.is_day[idx]);
@@ -1754,6 +1835,8 @@ function buildDayForecastDetails(data, dayKey) {
                 </div>
             `;
         });
+
+        hourlyColumnsHtml += renderSunColumnsBefore('9999-99-99T99:99');
     }
 
     // Calculate Humidity for Selected Day

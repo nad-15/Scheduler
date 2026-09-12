@@ -2,7 +2,7 @@
 // Skhayeduler Service Worker - Network-First Strategy (Zero Stale Code)
 // ==========================================================================
 
-const CACHE_NAME = 'scheduler-pwa-v26';
+const CACHE_NAME = 'scheduler-pwa-v28';
 
 const STATIC_ASSETS = [
     './',
@@ -69,6 +69,8 @@ const STATIC_ASSETS = [
     './images/weather/snowflake.svg',
     './images/weather/starry-night.svg',
     './images/weather/sun-hot.svg',
+    './images/weather/sunrise.svg',
+    './images/weather/sunset.svg',
     './images/weather/thermometer-colder.svg',
     './images/weather/thermometer.svg',
     './images/weather/thunderstorms-day-rain.svg',
