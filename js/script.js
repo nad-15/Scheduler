@@ -387,24 +387,69 @@ function isSlidingTemplatesEnabled() {
 }
 window.isSlidingTemplatesEnabled = isSlidingTemplatesEnabled;
 
+function isSlidingTemplatesPeekEnabled() {
+    if (typeof appSettings === 'undefined') {
+        try {
+            const stored = JSON.parse(localStorage.getItem("appSettings") || '{}');
+            return Boolean(stored["sliding-templates-peek"]);
+        } catch (e) {
+            return false;
+        }
+    }
+    return Boolean(appSettings["sliding-templates-peek"]);
+}
+window.isSlidingTemplatesPeekEnabled = isSlidingTemplatesPeekEnabled;
+
 window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
     const isTemplatesRowEnabled = isSlidingTemplatesEnabled();
     applySlidingTemplatesRowState(isTemplatesRowEnabled);
     const slidingToggleEl = document.getElementById("sliding-templates-toggle");
+    const slidingPeekToggleEl = document.getElementById("sliding-templates-peek-toggle");
+
     if (slidingToggleEl) {
         slidingToggleEl.checked = isTemplatesRowEnabled;
         slidingToggleEl.addEventListener('change', (e) => {
             const isChecked = e.target.checked;
             if (typeof appSettings !== 'undefined') {
                 appSettings["sliding-templates"] = isChecked;
+                if (!isChecked) {
+                    appSettings["sliding-templates-peek"] = false;
+                    if (slidingPeekToggleEl) slidingPeekToggleEl.checked = false;
+                }
             }
             try {
                 const s = JSON.parse(localStorage.getItem("appSettings") || '{}');
                 s["sliding-templates"] = isChecked;
+                if (!isChecked) {
+                    s["sliding-templates-peek"] = false;
+                }
                 localStorage.setItem("appSettings", JSON.stringify(s));
             } catch (err) {}
             applySlidingTemplatesRowState(isChecked);
+        });
+    }
+
+    if (slidingPeekToggleEl) {
+        slidingPeekToggleEl.checked = isSlidingTemplatesPeekEnabled();
+        slidingPeekToggleEl.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            if (typeof appSettings !== 'undefined') {
+                appSettings["sliding-templates-peek"] = isChecked;
+                if (isChecked && !appSettings["sliding-templates"]) {
+                    appSettings["sliding-templates"] = true;
+                    if (slidingToggleEl) slidingToggleEl.checked = true;
+                }
+            }
+            try {
+                const s = JSON.parse(localStorage.getItem("appSettings") || '{}');
+                s["sliding-templates-peek"] = isChecked;
+                if (isChecked && !s["sliding-templates"]) {
+                    s["sliding-templates"] = true;
+                }
+                localStorage.setItem("appSettings", JSON.stringify(s));
+            } catch (err) {}
+            applySlidingTemplatesRowState(isSlidingTemplatesEnabled());
         });
     }
 });
@@ -2386,7 +2431,8 @@ function applySlidingTemplatesRowState(visible) {
             taskToolbar.style.bottom = `calc(${drawerHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
         }
     } else {
-        if (visible) {
+        const isPeekActive = visible && isSlidingTemplatesPeekEnabled();
+        if (isPeekActive) {
             const peekHeight = updateSlidingTemplatesPeekHeight();
             if (slidingInput) slidingInput.classList.add('peek-mode');
             if (taskToolbar) {
@@ -2554,7 +2600,8 @@ floatingAddBtn.addEventListener('click', () => {
         floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
 
         const isTemplatesRowActive = isSlidingTemplatesEnabled();
-        if (isTemplatesRowActive) {
+        const isPeekActive = isTemplatesRowActive && isSlidingTemplatesPeekEnabled();
+        if (isPeekActive) {
             const peekHeight = updateSlidingTemplatesPeekHeight();
             slidingInputView.classList.add("peek-mode");
             taskToolbar.style.bottom = `calc(${peekHeight + 10}px + env(safe-area-inset-bottom, 0px))`;

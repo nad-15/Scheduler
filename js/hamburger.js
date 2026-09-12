@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
   "add-task-modal": "on-click",
   "hide-all-buttons": false,
   "sliding-templates": false,
+  "sliding-templates-peek": false,
   "movable-template-expanded": false
 };
 
@@ -174,12 +175,39 @@ if (slidingTemplatesToggle) {
   slidingTemplatesToggle.addEventListener("change", (e) => {
     const checked = e.target.checked;
     appSettings["sliding-templates"] = checked;
+    if (!checked) {
+      appSettings["sliding-templates-peek"] = false;
+      if (slidingTemplatesPeekToggle) slidingTemplatesPeekToggle.checked = false;
+    }
     localStorage.setItem("appSettings", JSON.stringify(appSettings));
 
     if (typeof window.applySlidingTemplatesRowState === 'function') {
       window.applySlidingTemplatesRowState(checked);
     } else if (typeof applySlidingTemplatesRowState === 'function') {
       applySlidingTemplatesRowState(checked);
+    }
+  });
+}
+
+const slidingTemplatesPeekToggle = document.getElementById("sliding-templates-peek-toggle");
+if (slidingTemplatesPeekToggle) {
+  const isPeekEnabled = Boolean(appSettings["sliding-templates-peek"]);
+  slidingTemplatesPeekToggle.checked = isPeekEnabled;
+
+  slidingTemplatesPeekToggle.addEventListener("change", (e) => {
+    const checked = e.target.checked;
+    appSettings["sliding-templates-peek"] = checked;
+    if (checked && !appSettings["sliding-templates"]) {
+      appSettings["sliding-templates"] = true;
+      if (slidingTemplatesToggle) slidingTemplatesToggle.checked = true;
+    }
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
+    const isTemplatesEnabled = Boolean(appSettings["sliding-templates"]);
+    if (typeof window.applySlidingTemplatesRowState === 'function') {
+      window.applySlidingTemplatesRowState(isTemplatesEnabled);
+    } else if (typeof applySlidingTemplatesRowState === 'function') {
+      applySlidingTemplatesRowState(isTemplatesEnabled);
     }
   });
 }

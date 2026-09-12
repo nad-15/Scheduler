@@ -1108,15 +1108,35 @@
                         </div>
                     </li>
 
-                    <li data-setting="sliding-templates" class="menu-item">
+                    <!-- Template Strip Submenu -->
+                    <li data-setting="template-strip" class="menu-item has-submenu">
                         <div class="menu-label">
                             <span class="material-symbols-outlined">view_carousel</span>
-                            <span class="menu-text">Show Templates in Drawer</span>
-                            <label class="switch">
-                                <input type="checkbox" id="sliding-templates-toggle">
-                                <span class="slider"></span>
-                            </label>
+                            <span class="menu-text">Template Strip</span>
+                            <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
                         </div>
+                        <ul class="sub-submenu">
+                            <li data-setting="sliding-templates" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">bottom_panel_open</span>
+                                    <span class="menu-text">Show in Input Drawer</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="sliding-templates-toggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </li>
+                            <li data-setting="sliding-templates-peek" class="menu-item">
+                                <div class="menu-label">
+                                    <span class="material-symbols-outlined">dock_to_bottom</span>
+                                    <span class="menu-text">Peek when Closed</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="sliding-templates-peek-toggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </li>
+                        </ul>
                     </li>
 
                 </ul>
