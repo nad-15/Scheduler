@@ -5862,25 +5862,38 @@ input[type="radio"]:checked::after {
 }
 
 .button-template {
-
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background-color: transparent;
     margin: 0;
     padding: 0;
-    /* margin-left: 5px; */
     border: none;
     outline: none;
-    /* Remove default focus outline */
     user-select: none;
-    /* Prevent text selection */
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    /* border: 2px solid green; */
+    transition: transform 0.12s ease;
 }
 
+/* Invisible hit-area expansion: captures edge clicks without shifting container layout by even 1px */
+.button-template::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    bottom: -5px;
+    left: -5px;
+    right: -5px;
+}
 
+/* Ensure inner icons do not separate event targeting from the button */
+.button-template > * {
+    pointer-events: none;
+}
 
 .button-template:active {
-    transform: scale(0.7);
+    transform: scale(0.92);
 }
 
 
@@ -5938,6 +5951,10 @@ input[type="radio"]:checked::after {
     border-radius: 50%;
     border: 2px solid white;
     transition: all 0.2s ease;
+}
+
+.clear-btn::before {
+    border-radius: 50%;
 }
 
 .clear-btn.has-selection {

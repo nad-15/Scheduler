@@ -2878,7 +2878,7 @@ function isEmptyTasks(dateTasks) {
 }
 
 let lastTapTime = 0;
-const delay = 300;
+const delay = 380;
 
 // Function for touchend event logic
 function handleTouchEnd(callback) {
