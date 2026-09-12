@@ -2269,6 +2269,9 @@ function addTemplate(taskTitle, color) {
             // Save the updated taskClipboard to localStorage
             saveTemplate();
             renderSlidingTemplates();
+            if (typeof updateMovableMasonry === 'function') {
+                requestAnimationFrame(updateMovableMasonry);
+            }
         }
     }
 }
@@ -2532,6 +2535,9 @@ function removeTemplate(item) {
 
     // Remove the item from the DOM
     item.remove();
+    if (typeof updateMovableMasonry === 'function') {
+        requestAnimationFrame(updateMovableMasonry);
+    }
 }
 
 
@@ -2557,6 +2563,9 @@ function renderJobTemplates() {
         // Append the created item div to the container
         jobTemplateContainer.appendChild(itemDiv);
     });
+    if (typeof updateMovableMasonry === 'function') {
+        requestAnimationFrame(updateMovableMasonry);
+    }
 }
 
 function loadTemplate() {
@@ -3028,6 +3037,49 @@ closeButton.addEventListener('click', () => {
     templateTaskBtn.click();
 });
 
+// --- Movable Template Dense Masonry Layout ---
+function updateMovableMasonry() {
+    if (!jobTemplateContainer) return;
+    const items = jobTemplateContainer.querySelectorAll('.items');
+    if (items.length === 0) return;
+
+    if (!movableTemplate || !movableTemplate.classList.contains('is-expanded')) {
+        items.forEach(item => {
+            if (item.style.gridRowEnd) {
+                item.style.gridRowEnd = '';
+            }
+        });
+        return;
+    }
+
+    items.forEach(item => {
+        const h = item.offsetHeight;
+        if (h > 0) {
+            // 2px row tracks + 5px margin-bottom gap
+            const span = Math.max(1, Math.ceil((h + 5) / 2));
+            item.style.gridRowEnd = `span ${span}`;
+        }
+    });
+}
+window.updateMovableMasonry = updateMovableMasonry;
+
+if (window.ResizeObserver && jobTemplateContainer) {
+    const ro = new ResizeObserver(() => {
+        if (movableTemplate && movableTemplate.classList.contains('is-expanded')) {
+            updateMovableMasonry();
+        }
+    });
+    ro.observe(jobTemplateContainer);
+}
+
+if (movableTemplate) {
+    movableTemplate.addEventListener('transitionend', (e) => {
+        if (e.propertyName === 'width' || e.propertyName === 'transform') {
+            updateMovableMasonry();
+        }
+    });
+}
+
 function toggleTemplateExpansion(forceState) {
     if (!movableTemplate) return;
     const isNowExpanded = typeof forceState === 'boolean'
@@ -3064,6 +3116,10 @@ function toggleTemplateExpansion(forceState) {
     } catch (e) {
         console.warn('Failed to save movable-template-expanded in appSettings', e);
     }
+
+    // Re-pack dense masonry grid
+    updateMovableMasonry();
+    setTimeout(updateMovableMasonry, 300);
 }
 
 window.toggleTemplateExpansion = toggleTemplateExpansion;
@@ -3149,6 +3205,10 @@ function setTemplateEditMode(enable) {
         templateEditOverlay.classList.toggle('is-active', isTemplateEditMode);
     }
     updateTemplateUndoRedoButtons();
+    if (typeof updateMovableMasonry === 'function') {
+        updateMovableMasonry();
+        setTimeout(updateMovableMasonry, 200);
+    }
 }
 
 window.setTemplateEditMode = setTemplateEditMode;
