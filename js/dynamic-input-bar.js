@@ -581,6 +581,10 @@
       isManualTextareaExpanded = false;
       if (taskTitle) taskTitle.style.height = '';
     }
+
+    if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+      window.syncTaskToolbarWithDrawer();
+    }
   }
 
   // --- Event Bindings ---

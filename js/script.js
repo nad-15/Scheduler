@@ -2814,18 +2814,37 @@ function syncTaskToolbarWithDrawer() {
 
     if (slidingInput.classList.contains('show')) {
         slidingInput.classList.remove('peek-mode');
+
+        // Toolbar gap: dynamically matches the gap between buttons in .task-toolbar-container (default 10px)
+        const computedGap = parseFloat(window.getComputedStyle(taskToolbar).rowGap || window.getComputedStyle(taskToolbar).gap);
+        const gap = (!isNaN(computedGap) && computedGap > 0) ? computedGap : 10;
+
         const isDynamic = slidingInput.classList.contains('dynamic-bar-active');
-        const targetHeight = isDynamic
-            ? (slidingInput.classList.contains('has-templates-row') ? 164 : 138)
-            : (slidingInput.classList.contains('has-templates-row') ? 156 : 130);
+        const hasTemplates = slidingInput.classList.contains('has-templates-row');
 
-        const taskTitle = document.getElementById('taskTitle');
-        const extraTextareaHeight = (taskTitle && taskTitle.offsetHeight > 22)
-            ? (taskTitle.offsetHeight - 22)
-            : 0;
+        let drawerHeight;
+        if (!isDynamic) {
+            // Normal Mode: strictly fixed drawer height (156px with templates, 130px without templates)
+            drawerHeight = hasTemplates ? 156 : 130;
+        } else {
+            // Dynamic Mode: measure actual rendered layout height with smart transition target detection
+            const templatesContainer = document.getElementById('slidingTemplatesContainer');
+            const currentStripHeight = templatesContainer ? templatesContainer.offsetHeight : 0;
+            const measuredHeight = slidingInput.offsetHeight || Math.round(slidingInput.getBoundingClientRect().height) || 138;
 
-        const finalHeight = targetHeight + extraTextareaHeight;
-        taskToolbar.style.bottom = `calc(${finalHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
+            if (hasTemplates && currentStripHeight < 10) {
+                // Template strip was just enabled and is animating open: target includes the strip (+24px)
+                drawerHeight = Math.max(164, measuredHeight + 24);
+            } else if (!hasTemplates && currentStripHeight > 10) {
+                // Template strip was just disabled and is animating closed: target excludes the strip (-24px)
+                drawerHeight = Math.max(138, measuredHeight - 24);
+            } else {
+                // Settled or resizing via textarea / tray: use measured height with dynamic mode floor
+                drawerHeight = Math.max(hasTemplates ? 164 : 138, measuredHeight);
+            }
+        }
+
+        taskToolbar.style.bottom = `${drawerHeight + gap}px`;
     } else {
         const isTemplatesRowActive = typeof isSlidingTemplatesEnabled === 'function' ? isSlidingTemplatesEnabled() : false;
         const isPeekActive = isTemplatesRowActive && typeof isSlidingTemplatesPeekEnabled === 'function' && isSlidingTemplatesPeekEnabled();
@@ -3015,6 +3034,14 @@ if (window.ResizeObserver && slidingInputView) {
         }
     });
     drawerResizeObserver.observe(slidingInputView);
+}
+
+if (slidingInputView) {
+    slidingInputView.addEventListener('transitionend', (e) => {
+        if (slidingInputView.classList.contains('show')) {
+            syncTaskToolbarWithDrawer();
+        }
+    });
 }
 
 
