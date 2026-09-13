@@ -7700,6 +7700,9 @@ ic {
 
 /* Dynamic mode drawer sizing: auto-expands upward with content (capped at 3 lines) */
 .sliding-input-view.dynamic-bar-active {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Anchor drawer content firmly to viewport bottom */
     height: auto !important;
     min-height: 130px !important;
     max-height: 170px;
@@ -7712,6 +7715,7 @@ ic {
 }
 
 .sliding-input-view.dynamic-bar-active .taskinput-color-container {
+    width: 100%;
     height: auto !important;
     min-height: 100%;
     padding: 5px 8px 6px;
@@ -7720,6 +7724,46 @@ ic {
     justify-content: flex-end;
     gap: 4px;
     box-sizing: border-box;
+}
+
+/* Dynamic mode template strip: smooth collapse without drawer jumping */
+.sliding-input-view.dynamic-bar-active .sliding-templates-container {
+    display: flex;
+    width: 100%;
+    height: 22px;
+    max-height: 22px;
+    box-sizing: border-box;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 2px;
+    opacity: 1;
+    transition: max-height 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease, margin-bottom 0.22s ease;
+}
+
+.sliding-input-view.dynamic-bar-active:not(.has-templates-row) .sliding-templates-container {
+    max-height: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+}
+
+/* When templates row is not active, closed drawer must ALWAYS hide completely (never peek input bar) */
+.sliding-input-view:not(.has-templates-row):not(.show) {
+    transform: translateY(100%) !important;
+}
+
+/* In Dynamic Mode when in peek-mode, align to top so only the template strip peeks */
+.sliding-input-view.dynamic-bar-active.peek-mode {
+    justify-content: flex-start !important;
+}
+
+.sliding-input-view.dynamic-bar-active.peek-mode .taskinput-color-container {
+    justify-content: flex-start !important;
 }
 
 .sliding-input-view.dynamic-bar-active .template-title-submit-container {

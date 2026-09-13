@@ -167,49 +167,68 @@ document.getElementById("todo-floating-btn-toggle").addEventListener("change", (
     todoBtn.style.display = e.target.checked ? "flex" : "none";
   }
 });
+function setSlidingTemplatesState(showTemplates, peekWhenClosed) {
+  if (typeof appSettings === "undefined") {
+    window.appSettings = JSON.parse(localStorage.getItem("appSettings")) || { ...DEFAULT_SETTINGS };
+  } else {
+    window.appSettings = appSettings;
+  }
+
+  const isShow = Boolean(showTemplates);
+  appSettings["sliding-templates"] = isShow;
+
+  if (peekWhenClosed !== undefined) {
+    appSettings["sliding-templates-peek"] = Boolean(peekWhenClosed);
+  }
+
+  // If templates are disabled, peek mode MUST also be disabled
+  if (!isShow) {
+    appSettings["sliding-templates-peek"] = false;
+  } else if (peekWhenClosed === true) {
+    // If peek is enabled, templates must be enabled
+    appSettings["sliding-templates"] = true;
+  }
+
+  // Persist to localStorage
+  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+
+  // 1. Sync Hamburger toggles in UI
+  const slidingToggleEl = document.getElementById("sliding-templates-toggle");
+  if (slidingToggleEl) slidingToggleEl.checked = appSettings["sliding-templates"];
+
+  const slidingPeekToggleEl = document.getElementById("sliding-templates-peek-toggle");
+  if (slidingPeekToggleEl) slidingPeekToggleEl.checked = appSettings["sliding-templates-peek"];
+
+  // 2. Sync Dynamic bar quick button in UI
+  const btnToggleTemplateStrip = document.getElementById("btnToggleTemplateStrip");
+  if (btnToggleTemplateStrip) {
+    btnToggleTemplateStrip.classList.toggle("active", appSettings["sliding-templates"]);
+    btnToggleTemplateStrip.title = appSettings["sliding-templates"] ? "Hide Template Strip" : "Show Template Strip";
+  }
+
+  // 3. Apply DOM state to drawer
+  if (typeof window.applySlidingTemplatesRowState === "function") {
+    window.applySlidingTemplatesRowState(appSettings["sliding-templates"]);
+  } else if (typeof applySlidingTemplatesRowState === "function") {
+    applySlidingTemplatesRowState(appSettings["sliding-templates"]);
+  }
+}
+window.setSlidingTemplatesState = setSlidingTemplatesState;
 
 const slidingTemplatesToggle = document.getElementById("sliding-templates-toggle");
 if (slidingTemplatesToggle) {
-  const isEnabled = Boolean(appSettings["sliding-templates"]);
-  slidingTemplatesToggle.checked = isEnabled;
-
+  slidingTemplatesToggle.checked = Boolean(appSettings["sliding-templates"]);
   slidingTemplatesToggle.addEventListener("change", (e) => {
-    const checked = e.target.checked;
-    appSettings["sliding-templates"] = checked;
-    if (!checked) {
-      appSettings["sliding-templates-peek"] = false;
-      if (slidingTemplatesPeekToggle) slidingTemplatesPeekToggle.checked = false;
-    }
-    localStorage.setItem("appSettings", JSON.stringify(appSettings));
-
-    if (typeof window.applySlidingTemplatesRowState === 'function') {
-      window.applySlidingTemplatesRowState(checked);
-    } else if (typeof applySlidingTemplatesRowState === 'function') {
-      applySlidingTemplatesRowState(checked);
-    }
+    setSlidingTemplatesState(e.target.checked);
   });
 }
 
 const slidingTemplatesPeekToggle = document.getElementById("sliding-templates-peek-toggle");
 if (slidingTemplatesPeekToggle) {
-  const isPeekEnabled = Boolean(appSettings["sliding-templates-peek"]);
-  slidingTemplatesPeekToggle.checked = isPeekEnabled;
-
+  slidingTemplatesPeekToggle.checked = Boolean(appSettings["sliding-templates-peek"]);
   slidingTemplatesPeekToggle.addEventListener("change", (e) => {
-    const checked = e.target.checked;
-    appSettings["sliding-templates-peek"] = checked;
-    if (checked && !appSettings["sliding-templates"]) {
-      appSettings["sliding-templates"] = true;
-      if (slidingTemplatesToggle) slidingTemplatesToggle.checked = true;
-    }
-    localStorage.setItem("appSettings", JSON.stringify(appSettings));
-
-    const isTemplatesEnabled = Boolean(appSettings["sliding-templates"]);
-    if (typeof window.applySlidingTemplatesRowState === 'function') {
-      window.applySlidingTemplatesRowState(isTemplatesEnabled);
-    } else if (typeof applySlidingTemplatesRowState === 'function') {
-      applySlidingTemplatesRowState(isTemplatesEnabled);
-    }
+    const isPeekChecked = e.target.checked;
+    setSlidingTemplatesState(isPeekChecked ? true : appSettings["sliding-templates"], isPeekChecked);
   });
 }
 

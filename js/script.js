@@ -375,28 +375,34 @@ const showHorViewBtn = document.getElementById('calendar-icon-horview');
 
 
 function isSlidingTemplatesEnabled() {
-    if (typeof appSettings === 'undefined') {
-        try {
-            const stored = JSON.parse(localStorage.getItem("appSettings") || '{}');
-            return Boolean(stored["sliding-templates"]);
-        } catch (e) {
-            return false;
-        }
+    if (typeof window.appSettings !== 'undefined' && window.appSettings["sliding-templates"] !== undefined) {
+        return Boolean(window.appSettings["sliding-templates"]);
     }
-    return Boolean(appSettings["sliding-templates"]);
+    if (typeof appSettings !== 'undefined' && appSettings["sliding-templates"] !== undefined) {
+        return Boolean(appSettings["sliding-templates"]);
+    }
+    try {
+        const stored = JSON.parse(localStorage.getItem("appSettings") || '{}');
+        return Boolean(stored["sliding-templates"]);
+    } catch (e) {
+        return false;
+    }
 }
 window.isSlidingTemplatesEnabled = isSlidingTemplatesEnabled;
 
 function isSlidingTemplatesPeekEnabled() {
-    if (typeof appSettings === 'undefined') {
-        try {
-            const stored = JSON.parse(localStorage.getItem("appSettings") || '{}');
-            return Boolean(stored["sliding-templates-peek"]);
-        } catch (e) {
-            return false;
-        }
+    if (typeof window.appSettings !== 'undefined' && window.appSettings["sliding-templates-peek"] !== undefined) {
+        return Boolean(window.appSettings["sliding-templates-peek"]);
     }
-    return Boolean(appSettings["sliding-templates-peek"]);
+    if (typeof appSettings !== 'undefined' && appSettings["sliding-templates-peek"] !== undefined) {
+        return Boolean(appSettings["sliding-templates-peek"]);
+    }
+    try {
+        const stored = JSON.parse(localStorage.getItem("appSettings") || '{}');
+        return Boolean(stored["sliding-templates-peek"]);
+    } catch (e) {
+        return false;
+    }
 }
 window.isSlidingTemplatesPeekEnabled = isSlidingTemplatesPeekEnabled;
 
@@ -404,54 +410,6 @@ window.addEventListener('DOMContentLoaded', () => {
     loadTemplate();
     const isTemplatesRowEnabled = isSlidingTemplatesEnabled();
     applySlidingTemplatesRowState(isTemplatesRowEnabled);
-    const slidingToggleEl = document.getElementById("sliding-templates-toggle");
-    const slidingPeekToggleEl = document.getElementById("sliding-templates-peek-toggle");
-
-    if (slidingToggleEl) {
-        slidingToggleEl.checked = isTemplatesRowEnabled;
-        slidingToggleEl.addEventListener('change', (e) => {
-            const isChecked = e.target.checked;
-            if (typeof appSettings !== 'undefined') {
-                appSettings["sliding-templates"] = isChecked;
-                if (!isChecked) {
-                    appSettings["sliding-templates-peek"] = false;
-                    if (slidingPeekToggleEl) slidingPeekToggleEl.checked = false;
-                }
-            }
-            try {
-                const s = JSON.parse(localStorage.getItem("appSettings") || '{}');
-                s["sliding-templates"] = isChecked;
-                if (!isChecked) {
-                    s["sliding-templates-peek"] = false;
-                }
-                localStorage.setItem("appSettings", JSON.stringify(s));
-            } catch (err) {}
-            applySlidingTemplatesRowState(isChecked);
-        });
-    }
-
-    if (slidingPeekToggleEl) {
-        slidingPeekToggleEl.checked = isSlidingTemplatesPeekEnabled();
-        slidingPeekToggleEl.addEventListener('change', (e) => {
-            const isChecked = e.target.checked;
-            if (typeof appSettings !== 'undefined') {
-                appSettings["sliding-templates-peek"] = isChecked;
-                if (isChecked && !appSettings["sliding-templates"]) {
-                    appSettings["sliding-templates"] = true;
-                    if (slidingToggleEl) slidingToggleEl.checked = true;
-                }
-            }
-            try {
-                const s = JSON.parse(localStorage.getItem("appSettings") || '{}');
-                s["sliding-templates-peek"] = isChecked;
-                if (isChecked && !s["sliding-templates"]) {
-                    s["sliding-templates"] = true;
-                }
-                localStorage.setItem("appSettings", JSON.stringify(s));
-            } catch (err) {}
-            applySlidingTemplatesRowState(isSlidingTemplatesEnabled());
-        });
-    }
 });
 
 let expanded = appSettings["clamp-expanded"] ?? true;
@@ -2810,13 +2768,23 @@ function applySlidingTemplatesRowState(visible) {
     const container = document.getElementById('slidingTemplatesContainer');
     const slidingInput = document.getElementById('slidingInputView');
     if (container) {
-        container.style.display = visible ? 'flex' : 'none';
+        if (slidingInput && slidingInput.classList.contains('dynamic-bar-active')) {
+            // Keep display flex in dynamic mode so CSS max-height/opacity can smoothly animate
+            container.style.display = 'flex';
+        } else {
+            container.style.display = visible ? 'flex' : 'none';
+        }
     }
     if (slidingInput) {
         slidingInput.classList.toggle('has-templates-row', visible);
     }
     if (visible) {
         renderSlidingTemplates();
+    }
+    const btnToggleTemplateStrip = document.getElementById('btnToggleTemplateStrip');
+    if (btnToggleTemplateStrip) {
+        btnToggleTemplateStrip.classList.toggle('active', visible);
+        btnToggleTemplateStrip.title = visible ? 'Hide Template Strip' : 'Show Template Strip';
     }
     const isDrawerOpen = slidingInput && slidingInput.classList.contains('show');
     if (isDrawerOpen) {

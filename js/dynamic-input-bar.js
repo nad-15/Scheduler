@@ -262,6 +262,9 @@
       emojiBtn.className = 'emoji-item-btn';
       emojiBtn.textContent = emoji;
       emojiBtn.title = `Insert ${emoji}`;
+      emojiBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+      });
       emojiBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         insertEmoji(emoji);
@@ -387,23 +390,32 @@
   }
 
   function handleTemplateStripToggle() {
-    const appSettings = JSON.parse(localStorage.getItem('appSettings')) || {};
-    const currentEnabled = Boolean(appSettings['sliding-templates']);
-    const newEnabled = !currentEnabled;
+    const isCurrentlyEnabled = typeof window.isSlidingTemplatesEnabled === 'function'
+      ? window.isSlidingTemplatesEnabled()
+      : false;
+    const newEnabled = !isCurrentlyEnabled;
 
-    appSettings['sliding-templates'] = newEnabled;
-    localStorage.setItem('appSettings', JSON.stringify(appSettings));
+    if (typeof window.setSlidingTemplatesState === 'function') {
+      window.setSlidingTemplatesState(newEnabled);
+    } else {
+      const appSettings = JSON.parse(localStorage.getItem('appSettings')) || {};
+      appSettings['sliding-templates'] = newEnabled;
+      if (!newEnabled) {
+        appSettings['sliding-templates-peek'] = false;
+      }
+      localStorage.setItem('appSettings', JSON.stringify(appSettings));
 
-    const hamburgerToggle = document.getElementById('sliding-templates-toggle');
-    if (hamburgerToggle) {
-      hamburgerToggle.checked = newEnabled;
+      const hamburgerToggle = document.getElementById('sliding-templates-toggle');
+      if (hamburgerToggle) hamburgerToggle.checked = newEnabled;
+
+      const peekToggle = document.getElementById('sliding-templates-peek-toggle');
+      if (peekToggle && !newEnabled) peekToggle.checked = false;
+
+      if (typeof window.applySlidingTemplatesRowState === 'function') {
+        window.applySlidingTemplatesRowState(newEnabled);
+      }
+      updateTemplateStripBtnState(newEnabled);
     }
-
-    if (typeof window.applySlidingTemplatesRowState === 'function') {
-      window.applySlidingTemplatesRowState(newEnabled);
-    }
-
-    updateTemplateStripBtnState(newEnabled);
   }
 
   // --- Mode Switching (Classic vs. Dynamic) ---
@@ -438,8 +450,13 @@
       slidingInputView.classList.add('dynamic-bar-active');
 
       // Sync template strip button state
-      const appSettings = JSON.parse(localStorage.getItem('appSettings')) || {};
-      updateTemplateStripBtnState(Boolean(appSettings['sliding-templates']));
+      const isTemplatesEnabled = typeof window.isSlidingTemplatesEnabled === 'function'
+        ? window.isSlidingTemplatesEnabled()
+        : false;
+      updateTemplateStripBtnState(isTemplatesEnabled);
+      if (typeof window.applySlidingTemplatesRowState === 'function') {
+        window.applySlidingTemplatesRowState(isTemplatesEnabled);
+      }
 
       isManualExpanded = false;
       autoResizeTextarea();
@@ -448,6 +465,13 @@
       // 1. Revert elements to Classic layout
       slidingInputView.classList.remove('dynamic-bar-active');
       slidingInputView.classList.remove('actions-collapsed');
+
+      const isTemplatesEnabled = typeof window.isSlidingTemplatesEnabled === 'function'
+        ? window.isSlidingTemplatesEnabled()
+        : false;
+      if (typeof window.applySlidingTemplatesRowState === 'function') {
+        window.applySlidingTemplatesRowState(isTemplatesEnabled);
+      }
 
       if (templateTitleSubmitContainer && selectedTaskCounter) {
         if (selectedTaskCounter.parentNode !== templateTitleSubmitContainer) {
@@ -485,6 +509,9 @@
     }
 
     if (btnToggleTemplateStrip) {
+      btnToggleTemplateStrip.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+      });
       btnToggleTemplateStrip.addEventListener('click', (e) => {
         e.stopPropagation();
         handleTemplateStripToggle();
@@ -499,6 +526,9 @@
     }
 
     if (btnEmojiPicker) {
+      btnEmojiPicker.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+      });
       btnEmojiPicker.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleEmojiTray();
@@ -535,8 +565,10 @@
 
       taskTitle.addEventListener('blur', () => {
         isManualExpanded = false;
-        // Snap back to compact single line when unfocused
-        collapseTextareaToSingleLine();
+        // Snap back to compact single line when unfocused unless emoji tray is open
+        if (!isEmojiTrayOpen) {
+          collapseTextareaToSingleLine();
+        }
         // Delay slightly in case user clicked on an action button
         setTimeout(updateCollapseLogic, 180);
       });
