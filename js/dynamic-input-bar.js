@@ -253,11 +253,42 @@
     }
   }
 
-  // --- Auto-Resize Textarea (Max 3 lines, then scrollable) ---
+  let measureCanvas = null;
+  function getTextWidth(text) {
+    if (!text) return 0;
+    if (!measureCanvas) {
+      measureCanvas = document.createElement('canvas');
+    }
+    const ctx = measureCanvas.getContext('2d');
+    const computedFont = taskTitle ? window.getComputedStyle(taskTitle).font : '';
+    ctx.font = computedFont || '15.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    return ctx.measureText(text).width;
+  }
+
+  function getAvailableTextareaWidth() {
+    if (!templateTitleSubmitContainer) return 200;
+    const totalRowWidth = templateTitleSubmitContainer.clientWidth;
+    if (totalRowWidth <= 0) return 200;
+
+    const isCollapsed = slidingInputView && slidingInputView.classList.contains('actions-collapsed');
+    // In collapsed state: chevron (30px) + submit (34px) + row gap (6px) + pill padding/icons/gaps (~80px) = ~150px
+    const collapsedDeduction = 150;
+
+    if (isCollapsed) {
+      return Math.max(totalRowWidth - collapsedDeduction, 100);
+    } else {
+      const toolsWidth = dynamicCollapsibleTools ? dynamicCollapsibleTools.offsetWidth : 110;
+      return Math.max(totalRowWidth - collapsedDeduction - toolsWidth, 80);
+    }
+  }
+
+  // --- Auto-Resize Textarea (Max 3 lines, strictly content-dependent) ---
   function autoResizeTextarea() {
     if (!taskTitle) return;
     if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
-    if (!taskTitle.value || taskTitle.value.length === 0) {
+
+    const val = taskTitle.value || '';
+    if (val.length === 0) {
       taskTitle.style.height = '22px';
       taskTitle.style.overflowY = 'hidden';
       if (typeof window.syncTaskToolbarWithDrawer === 'function') {
@@ -265,13 +296,38 @@
       }
       return;
     }
-    // Reset to single-line height so scrollHeight recalculates accurately on backspace/paste
+
+    // If there are no newlines and the text fits within the available width,
+    // the content can be held by one line — keep it strictly single-line (22px)!
+    const hasNewlines = val.includes('\n');
+    const availableWidth = Math.max(taskTitle.clientWidth, getAvailableTextareaWidth());
+    const textWidth = getTextWidth(val);
+
+    if (!hasNewlines && textWidth <= availableWidth) {
+      taskTitle.style.height = '22px';
+      taskTitle.style.overflowY = 'hidden';
+      if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+        window.syncTaskToolbarWithDrawer();
+      }
+      return;
+    }
+
+    // Text exceeds one line or contains newlines: step accurately
     taskTitle.style.height = '22px';
     const scrollH = taskTitle.scrollHeight;
-    // Exactly 3 lines max: 3 lines * 22px line-height = 66px
-    const newHeight = Math.min(scrollH, 66);
-    taskTitle.style.height = `${Math.max(newHeight, 22)}px`;
-    taskTitle.style.overflowY = scrollH > 66 ? 'auto' : 'hidden';
+
+    // Stepped line heights: 22px (1 line), 44px (2 lines), 66px (3 lines max)
+    let newHeight = 22;
+    if (scrollH > 50) {
+      newHeight = 66;
+    } else if (scrollH > 28) {
+      newHeight = 44;
+    } else {
+      newHeight = 22;
+    }
+
+    taskTitle.style.height = `${newHeight}px`;
+    taskTitle.style.overflowY = scrollH > 50 ? 'auto' : 'hidden';
     if (typeof window.syncTaskToolbarWithDrawer === 'function') {
       window.syncTaskToolbarWithDrawer();
     }
@@ -400,9 +456,8 @@
         // SWIPE LEFT (Action 2): Expand textarea without keyboard, collapse left tools
         isManualTextareaExpanded = true;
         updateCollapseLogic();
-        requestAnimationFrame(() => {
-          autoResizeTextarea();
-        });
+        setTimeout(autoResizeTextarea, 100);
+        setTimeout(autoResizeTextarea, 280);
       } else if (dx > 25) {
         // SWIPE RIGHT: Uncollapse left tools, contract textarea to single line
         isManualTextareaExpanded = false;
@@ -763,6 +818,28 @@
         }
       });
       drawerObserver.observe(slidingInputView, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (dynamicCollapsibleTools) {
+      dynamicCollapsibleTools.addEventListener('transitionend', (e) => {
+        if (e.propertyName === 'max-width') {
+          autoResizeTextarea();
+        }
+      });
+    }
+
+    if (taskTitle && typeof ResizeObserver !== 'undefined') {
+      let prevObservedWidth = 0;
+      const ro = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const w = Math.round(entry.contentRect.width);
+          if (w > 0 && Math.abs(w - prevObservedWidth) > 3) {
+            prevObservedWidth = w;
+            autoResizeTextarea();
+          }
+        }
+      });
+      ro.observe(taskTitle);
     }
   }
 
