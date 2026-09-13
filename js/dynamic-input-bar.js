@@ -261,8 +261,7 @@
       voicePrefixText = val.slice(0, selStart);
       voiceSuffixText = val.slice(selEnd);
 
-      // Dismiss on-screen keyboard so it does not block the screen while speaking
-      taskTitle.blur();
+      taskTitle.focus();
       taskTitle.setSelectionRange(selStart, selStart);
       lastCursorStart = selStart;
       lastCursorEnd = selStart;
@@ -349,6 +348,7 @@
       autoResizeTextarea();
       taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
       if (curPos !== null && curPos !== undefined && curPos >= 0) {
+        taskTitle.focus();
         taskTitle.setSelectionRange(curPos, curPos);
         lastCursorStart = curPos;
         lastCursorEnd = curPos;
