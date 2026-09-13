@@ -8092,6 +8092,8 @@ ic {
     min-height: 22px;
     max-height: 66px; /* Exactly 3 lines max */
     overflow-y: auto;
+    overflow-x: hidden !important;
+    white-space: pre-wrap !important;
     border: none !important;
     background: transparent;
     outline: none !important;

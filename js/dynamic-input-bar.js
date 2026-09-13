@@ -253,36 +253,7 @@
     }
   }
 
-  let measureCanvas = null;
-  function getTextWidth(text) {
-    if (!text) return 0;
-    if (!measureCanvas) {
-      measureCanvas = document.createElement('canvas');
-    }
-    const ctx = measureCanvas.getContext('2d');
-    const computedFont = taskTitle ? window.getComputedStyle(taskTitle).font : '';
-    ctx.font = computedFont || '15.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    return ctx.measureText(text).width;
-  }
-
-  function getAvailableTextareaWidth() {
-    if (!templateTitleSubmitContainer) return 200;
-    const totalRowWidth = templateTitleSubmitContainer.clientWidth;
-    if (totalRowWidth <= 0) return 200;
-
-    const isCollapsed = slidingInputView && slidingInputView.classList.contains('actions-collapsed');
-    // In collapsed state: chevron (30px) + submit (34px) + row gap (6px) + pill padding/icons/gaps (~80px) = ~150px
-    const collapsedDeduction = 150;
-
-    if (isCollapsed) {
-      return Math.max(totalRowWidth - collapsedDeduction, 100);
-    } else {
-      const toolsWidth = dynamicCollapsibleTools ? dynamicCollapsibleTools.offsetWidth : 110;
-      return Math.max(totalRowWidth - collapsedDeduction - toolsWidth, 80);
-    }
-  }
-
-  // --- Auto-Resize Textarea (Max 3 lines, strictly content-dependent) ---
+  // --- Auto-Resize Textarea (Max 3 lines: 22px, 44px, 66px) ---
   function autoResizeTextarea() {
     if (!taskTitle) return;
     if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
@@ -290,6 +261,8 @@
     const val = taskTitle.value || '';
     if (val.length === 0) {
       taskTitle.style.height = '22px';
+      taskTitle.scrollTop = 0;
+      taskTitle.scrollLeft = 0;
       taskTitle.style.overflowY = 'hidden';
       if (typeof window.syncTaskToolbarWithDrawer === 'function') {
         window.syncTaskToolbarWithDrawer();
@@ -297,26 +270,15 @@
       return;
     }
 
-    // If there are no newlines and the text fits within the available width,
-    // the content can be held by one line — keep it strictly single-line (22px)!
-    const hasNewlines = val.includes('\n');
-    const availableWidth = Math.max(taskTitle.clientWidth, getAvailableTextareaWidth());
-    const textWidth = getTextWidth(val);
-
-    if (!hasNewlines && textWidth <= availableWidth) {
-      taskTitle.style.height = '22px';
-      taskTitle.style.overflowY = 'hidden';
-      if (typeof window.syncTaskToolbarWithDrawer === 'function') {
-        window.syncTaskToolbarWithDrawer();
-      }
-      return;
-    }
-
-    // Text exceeds one line or contains newlines: step accurately
+    // Reset height to 22px and scrollLeft to 0 so scrollHeight reflects true wrapped lines
     taskTitle.style.height = '22px';
+    taskTitle.scrollLeft = 0;
     const scrollH = taskTitle.scrollHeight;
 
-    // Stepped line heights: 22px (1 line), 44px (2 lines), 66px (3 lines max)
+    // Stepped line heights based on real DOM content wrapping:
+    // 1 line:  scrollH <= 28px -> 22px
+    // 2 lines: scrollH > 28px && scrollH <= 50px -> 44px
+    // 3 lines: scrollH > 50px -> 66px
     let newHeight = 22;
     if (scrollH > 50) {
       newHeight = 66;
@@ -328,6 +290,7 @@
 
     taskTitle.style.height = `${newHeight}px`;
     taskTitle.style.overflowY = scrollH > 50 ? 'auto' : 'hidden';
+
     if (typeof window.syncTaskToolbarWithDrawer === 'function') {
       window.syncTaskToolbarWithDrawer();
     }
