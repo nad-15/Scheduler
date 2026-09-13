@@ -91,6 +91,12 @@
       emojiBtn.addEventListener('mousedown', (e) => {
         e.preventDefault();
       });
+      emojiBtn.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+      });
+      emojiBtn.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+      }, { passive: true });
       emojiBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         insertEmoji(emoji);
@@ -102,25 +108,37 @@
   function insertEmoji(emoji) {
     if (!taskTitle) return;
 
-    const start = taskTitle.selectionStart !== null && taskTitle.selectionStart !== undefined
-      ? taskTitle.selectionStart
-      : taskTitle.value.length;
-    const end = taskTitle.selectionEnd !== null && taskTitle.selectionEnd !== undefined
-      ? taskTitle.selectionEnd
-      : taskTitle.value.length;
-    const val = taskTitle.value;
+    const val = taskTitle.value || '';
 
-    taskTitle.value = val.slice(0, start) + emoji + val.slice(end);
-    const newPos = start + emoji.length;
+    if (!val || val.length === 0) {
+      taskTitle.value = emoji;
+    } else {
+      // Smart append to the end of the task title
+      const endsWithSpace = /\s$/.test(val);
+      let endsWithEmoji = false;
+      try {
+        endsWithEmoji = /\p{Extended_Pictographic}$/u.test(val);
+      } catch (_) {
+        endsWithEmoji = false;
+      }
+      const prefix = (endsWithSpace || endsWithEmoji) ? '' : ' ';
+      taskTitle.value = val + prefix + emoji;
+    }
+
+    const newPos = taskTitle.value.length;
     taskTitle.selectionStart = taskTitle.selectionEnd = newPos;
-    taskTitle.focus();
 
+    // Do NOT focus taskTitle so the mobile virtual keyboard does NOT show up
     autoResizeTextarea();
     taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
   function openEmojiTray() {
     if (!dynamicEmojiTray || !slidingInputView) return;
+    // Dismiss virtual keyboard if active so emoji tray has clear view
+    if (document.activeElement === taskTitle) {
+      taskTitle.blur();
+    }
     isEmojiTrayOpen = true;
     renderEmojiGrid();
     dynamicEmojiTray.classList.remove('hidden');
@@ -588,13 +606,8 @@
 
       taskTitle.addEventListener('blur', () => {
         setTimeout(() => {
-          if (document.activeElement !== taskTitle && (!dynamicEmojiTray || !dynamicEmojiTray.contains(document.activeElement))) {
-            if (isEmojiTrayOpen) {
-              closeEmojiTray();
-            }
-          }
           updateCollapseLogic();
-        }, 120);
+        }, 50);
       });
 
       taskTitle.addEventListener('input', () => {
