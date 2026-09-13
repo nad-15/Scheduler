@@ -34,6 +34,16 @@
 
   let isManualTextareaExpanded = false;
   let isEmojiTrayOpen = false;
+  let savedSelectionStart = null;
+  let savedSelectionEnd = null;
+  let wasExpandedBeforeEmoji = false;
+
+  function updateSavedSelection() {
+    if (taskTitle && typeof taskTitle.selectionStart === 'number') {
+      savedSelectionStart = taskTitle.selectionStart;
+      savedSelectionEnd = taskTitle.selectionEnd;
+    }
+  }
 
   // Touch gesture tracking for swipe-to-expand without keyboard
   let touchStartX = 0;
@@ -93,9 +103,12 @@
       });
       emojiBtn.addEventListener('pointerdown', (e) => {
         e.stopPropagation();
+        e.preventDefault();
+        updateSavedSelection();
       });
       emojiBtn.addEventListener('touchstart', (e) => {
         e.stopPropagation();
+        updateSavedSelection();
       }, { passive: true });
       emojiBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -108,12 +121,34 @@
   function insertEmoji(emoji) {
     if (!taskTitle) return;
 
-    const val = taskTitle.value || '';
+    // Dismiss virtual keyboard if active without losing caret selection
+    if (document.activeElement === taskTitle) {
+      updateSavedSelection();
+      taskTitle.blur();
+    }
 
-    if (!val || val.length === 0) {
-      taskTitle.value = emoji;
-    } else {
-      // Smart append to the end of the task title
+    const val = taskTitle.value || '';
+    let start = (typeof savedSelectionStart === 'number' && savedSelectionStart >= 0 && savedSelectionStart <= val.length)
+      ? savedSelectionStart
+      : (typeof taskTitle.selectionStart === 'number' && taskTitle.selectionStart >= 0 && taskTitle.selectionStart <= val.length
+        ? taskTitle.selectionStart
+        : val.length);
+
+    let end = (typeof savedSelectionEnd === 'number' && savedSelectionEnd >= 0 && savedSelectionEnd <= val.length)
+      ? savedSelectionEnd
+      : (typeof taskTitle.selectionEnd === 'number' && taskTitle.selectionEnd >= 0 && taskTitle.selectionEnd <= val.length
+        ? taskTitle.selectionEnd
+        : val.length);
+
+    if (start > end) {
+      const tmp = start;
+      start = end;
+      end = tmp;
+    }
+
+    let insertText = emoji;
+    // If inserting at the very end of existing text, add a space after words
+    if (start === val.length && val.length > 0) {
       const endsWithSpace = /\s$/.test(val);
       let endsWithEmoji = false;
       try {
@@ -121,24 +156,66 @@
       } catch (_) {
         endsWithEmoji = false;
       }
-      const prefix = (endsWithSpace || endsWithEmoji) ? '' : ' ';
-      taskTitle.value = val + prefix + emoji;
+      if (!endsWithSpace && !endsWithEmoji) {
+        insertText = ' ' + emoji;
+      }
     }
 
-    const newPos = taskTitle.value.length;
+    const before = val.substring(0, start);
+    const after = val.substring(end);
+    taskTitle.value = before + insertText + after;
+
+    const newPos = start + insertText.length;
     taskTitle.selectionStart = taskTitle.selectionEnd = newPos;
+    savedSelectionStart = savedSelectionEnd = newPos;
+
+    // Preserve expanded vs. closed state:
+    // If textarea was expanded, keep it expanded with autoResizeTextarea().
+    // If it was closed/single-line, do nothing to expand it — keep it closed and single-line.
+    const isExpanded = isManualTextareaExpanded || (slidingInputView && slidingInputView.classList.contains('actions-collapsed'));
+
+    if (isExpanded) {
+      isManualTextareaExpanded = true;
+      setCollapsedState(true);
+      autoResizeTextarea();
+    } else {
+      isManualTextareaExpanded = false;
+      setCollapsedState(false);
+      collapseTextareaToSingleLine();
+      taskTitle.scrollLeft = taskTitle.scrollWidth;
+    }
 
     // Do NOT focus taskTitle so the mobile virtual keyboard does NOT show up
-    autoResizeTextarea();
-    taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
+    const inputEvt = new Event('input', { bubbles: true });
+    inputEvt.isEmojiInsert = true;
+    taskTitle.dispatchEvent(inputEvt);
   }
 
   function openEmojiTray() {
     if (!dynamicEmojiTray || !slidingInputView) return;
+
+    updateSavedSelection();
+
+    const wasExpanded = wasExpandedBeforeEmoji ||
+                        (document.activeElement === taskTitle) ||
+                        isManualTextareaExpanded ||
+                        (slidingInputView && slidingInputView.classList.contains('actions-collapsed'));
+
     // Dismiss virtual keyboard if active so emoji tray has clear view
     if (document.activeElement === taskTitle) {
       taskTitle.blur();
     }
+
+    if (wasExpanded) {
+      isManualTextareaExpanded = true;
+      setCollapsedState(true);
+      autoResizeTextarea();
+    } else {
+      isManualTextareaExpanded = false;
+      setCollapsedState(false);
+      collapseTextareaToSingleLine();
+    }
+
     isEmojiTrayOpen = true;
     renderEmojiGrid();
     dynamicEmojiTray.classList.remove('hidden');
@@ -152,9 +229,17 @@
   function closeEmojiTray() {
     if (!dynamicEmojiTray || !slidingInputView) return;
     isEmojiTrayOpen = false;
+    wasExpandedBeforeEmoji = false;
     dynamicEmojiTray.classList.add('hidden');
     slidingInputView.classList.remove('emoji-tray-active');
     if (btnEmojiPicker) btnEmojiPicker.classList.remove('active');
+
+    // If closing tray and textarea is not actively focused, return to resting state
+    if (document.activeElement !== taskTitle) {
+      isManualTextareaExpanded = false;
+      updateCollapseLogic();
+    }
+
     if (typeof window.syncTaskToolbarWithDrawer === 'function') {
       window.syncTaskToolbarWithDrawer();
     }
@@ -353,6 +438,7 @@
     if (isManualTextareaExpanded) {
       isManualTextareaExpanded = false;
     }
+    wasExpandedBeforeEmoji = false;
     if (isEmojiTrayOpen) {
       closeEmojiTray();
     }
@@ -509,8 +595,22 @@
     }
 
     if (btnEmojiPicker) {
+      const captureExpandState = () => {
+        updateSavedSelection();
+        wasExpandedBeforeEmoji = (document.activeElement === taskTitle) ||
+                                 isManualTextareaExpanded ||
+                                 (slidingInputView && slidingInputView.classList.contains('actions-collapsed'));
+      };
+      btnEmojiPicker.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        captureExpandState();
+      });
+      btnEmojiPicker.addEventListener('touchstart', () => {
+        captureExpandState();
+      }, { passive: true });
       btnEmojiPicker.addEventListener('mousedown', (e) => {
         e.preventDefault();
+        captureExpandState();
       });
       btnEmojiPicker.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -535,6 +635,9 @@
           taskTitle.blur();
         }
         isManualTextareaExpanded = false;
+        wasExpandedBeforeEmoji = false;
+        savedSelectionStart = null;
+        savedSelectionEnd = null;
         updateCollapseLogic();
       });
     }
@@ -546,6 +649,9 @@
           taskTitle.blur();
         }
         isManualTextareaExpanded = false;
+        wasExpandedBeforeEmoji = false;
+        savedSelectionStart = null;
+        savedSelectionEnd = null;
         setTimeout(updateCollapseLogic, 50);
       });
     }
@@ -591,7 +697,9 @@
           e.preventDefault();
           e.stopPropagation();
           taskTitle.blur();
+          return;
         }
+        updateSavedSelection();
       }, true);
 
       taskTitle.addEventListener('focus', () => {
@@ -602,15 +710,28 @@
         isManualTextareaExpanded = false;
         autoResizeTextarea();
         updateCollapseLogic();
+        updateSavedSelection();
       });
 
       taskTitle.addEventListener('blur', () => {
+        updateSavedSelection();
         setTimeout(() => {
+          // If emoji tray is open and was kept expanded, don't collapse on blur
+          if (isEmojiTrayOpen && isManualTextareaExpanded) {
+            return;
+          }
           updateCollapseLogic();
         }, 50);
       });
 
-      taskTitle.addEventListener('input', () => {
+      taskTitle.addEventListener('keyup', updateSavedSelection);
+      taskTitle.addEventListener('select', updateSavedSelection);
+
+      taskTitle.addEventListener('input', (e) => {
+        if (e && e.isEmojiInsert) {
+          return;
+        }
+        updateSavedSelection();
         isManualTextareaExpanded = false;
         autoResizeTextarea();
         updateCollapseLogic();
@@ -618,7 +739,10 @@
 
       taskTitle.addEventListener('touchstart', handleTouchStart, { passive: true });
       taskTitle.addEventListener('touchmove', handleTouchMove, { passive: false });
-      taskTitle.addEventListener('touchend', handleTouchEnd, { passive: true });
+      taskTitle.addEventListener('touchend', (e) => {
+        handleTouchEnd(e);
+        setTimeout(updateSavedSelection, 50);
+      }, { passive: true });
       taskTitle.addEventListener('touchcancel', handleTouchCancel, { passive: true });
     }
 
