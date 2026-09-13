@@ -7878,53 +7878,6 @@ ic {
     border-color: rgba(204, 230, 255, 0.95) transparent transparent transparent;
 }
 
-/* Voice Recording Mode:
-   When active, only the Mic button is shown at the far left.
-   All other left tools (Counter, Template Strip, Add button) and the collapse chevron are hidden.
-   The center input pill smoothly takes up the remaining width and receives real-time speech.
-   The only way to return to the normal arrangement is clicking the mic button off. */
-.sliding-input-view.dynamic-bar-active.voice-recording-mode #btnCollapseActions {
-    opacity: 0 !important;
-    pointer-events: none !important;
-    display: none !important;
-}
-
-.sliding-input-view.dynamic-bar-active.voice-recording-mode .dynamic-collapsible-tools {
-    max-width: 32px !important;
-    opacity: 1 !important;
-    transform: none !important;
-    gap: 0 !important;
-    overflow: visible !important;
-    pointer-events: auto !important;
-}
-
-.sliding-input-view.dynamic-bar-active.voice-recording-mode .dynamic-collapsible-tools .selected-task,
-.sliding-input-view.dynamic-bar-active.voice-recording-mode .dynamic-collapsible-tools .btn-toggle-template-strip,
-.sliding-input-view.dynamic-bar-active.voice-recording-mode .dynamic-collapsible-tools .add-task-wrapper {
-    max-width: 0 !important;
-    width: 0 !important;
-    min-width: 0 !important;
-    opacity: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    pointer-events: none !important;
-    overflow: hidden !important;
-    display: none !important;
-}
-
-.sliding-input-view.dynamic-bar-active.voice-recording-mode .btn-voice-input {
-    display: flex !important;
-    margin: 0 !important;
-    flex-shrink: 0 !important;
-}
-
-.sliding-input-view.dynamic-bar-active.voice-recording-mode .input-task-template {
-    height: auto !important;
-    max-height: 60px !important;
-    overflow-y: auto !important;
-}
-
 /* Compact Add Task (+) Button in Dynamic Mode (Idle / No selection: bare blue add sign, no circle) */
 .sliding-input-view.dynamic-bar-active #addTask {
     width: 28px !important;
@@ -8067,60 +8020,6 @@ ic {
     border: none !important;
     color: #ffffff !important;
     box-shadow: 0 0 8px rgba(0, 120, 255, 0.6) !important;
-}
-
-/* Compact Voice Input Button (mic) - Idle: transparent, blue FILLED icon */
-.sliding-input-view.dynamic-bar-active .btn-voice-input {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    max-width: 28px !important;
-    box-sizing: border-box !important;
-    border-radius: 50%;
-    background: transparent;
-    border: none;
-    color: #0078FF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
-    transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
-}
-
-.sliding-input-view.dynamic-bar-active .btn-voice-input:hover {
-    background-color: rgba(0, 120, 255, 0.12);
-}
-
-.sliding-input-view.dynamic-bar-active .btn-voice-input .material-symbols-outlined {
-    font-size: 22px;
-    color: #0078FF;
-    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
-}
-
-/* Active Voice Recording: In solid blue circle with white OUTLINED mic inside (exact 28px, strictly no size change) */
-.sliding-input-view.dynamic-bar-active .btn-voice-input.recording {
-    background-color: #0078FF !important;
-    box-shadow: 0 1px 4px rgba(0, 120, 255, 0.45);
-    animation: micPulse 1.2s infinite ease-in-out;
-}
-
-.sliding-input-view.dynamic-bar-active .btn-voice-input.recording .material-symbols-outlined {
-    color: white !important;
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
-}
-
-@keyframes micPulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(0, 120, 255, 0.6);
-    }
-    50% {
-        box-shadow: 0 0 0 6px rgba(0, 120, 255, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(0, 120, 255, 0);
-    }
 }
 
 /* Center Pill Container (Contains Flower Paw, Input Textarea, and Emoji Trigger) */
