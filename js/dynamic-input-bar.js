@@ -253,6 +253,41 @@
     }
   }
 
+  let textareaRuler = null;
+  function getPredictedScrollHeight(text, targetWidth) {
+    if (!textareaRuler) {
+      textareaRuler = document.createElement('div');
+      textareaRuler.style.cssText = [
+        'position: fixed',
+        'top: -9999px',
+        'left: -9999px',
+        'visibility: hidden',
+        'pointer-events: none',
+        'white-space: pre-wrap',
+        'word-break: break-word',
+        'box-sizing: border-box',
+        'padding: 0',
+        'margin: 0',
+        'border: none',
+        'overflow: hidden'
+      ].join(';');
+      document.body.appendChild(textareaRuler);
+    }
+
+    if (taskTitle) {
+      const computed = window.getComputedStyle(taskTitle);
+      textareaRuler.style.fontFamily = computed.fontFamily;
+      textareaRuler.style.fontSize = computed.fontSize;
+      textareaRuler.style.fontWeight = computed.fontWeight;
+      textareaRuler.style.letterSpacing = computed.letterSpacing;
+      textareaRuler.style.lineHeight = computed.lineHeight;
+    }
+
+    textareaRuler.style.width = `${Math.max(50, Math.round(targetWidth))}px`;
+    textareaRuler.textContent = text.endsWith('\n') ? (text + ' ') : text;
+    return textareaRuler.scrollHeight;
+  }
+
   // --- Auto-Resize Textarea (Max 3 lines: 22px, 44px, 66px) ---
   function autoResizeTextarea() {
     if (!taskTitle) return;
@@ -270,10 +305,24 @@
       return;
     }
 
-    // Reset height to 22px and scrollLeft to 0 so scrollHeight reflects true wrapped lines
-    taskTitle.style.height = '22px';
-    taskTitle.scrollLeft = 0;
-    const scrollH = taskTitle.scrollHeight;
+    // Determine target width: during expansion transition (actions-collapsed),
+    // dynamicCollapsibleTools is transitioning to 0 width.
+    // Calculate the true full expanded width so 1-liners are never measured as wrapped 2-liners:
+    let targetWidth = taskTitle.clientWidth;
+    if (slidingInputView.classList.contains('actions-collapsed')) {
+      if (templateTitleSubmitContainer) {
+        const containerW = templateTitleSubmitContainer.clientWidth;
+        const submitW = (submitTask && submitTask.offsetWidth > 0) ? submitTask.offsetWidth : 34;
+        // Non-textarea items: 30px chevron + 16px outer gaps + submitW + 18px pill padding + 20px flower + 26px emoji + 14px inner gaps = 124px + submitW
+        const nonTextareaW = 30 + 16 + submitW + 18 + 20 + 26 + 14;
+        const expandedW = containerW - nonTextareaW;
+        if (expandedW > targetWidth) {
+          targetWidth = expandedW;
+        }
+      }
+    }
+
+    const scrollH = getPredictedScrollHeight(val, targetWidth);
 
     // Stepped line heights based on real DOM content wrapping:
     // 1 line:  scrollH <= 28px -> 22px
