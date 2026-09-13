@@ -334,6 +334,9 @@
     if (isManualTextareaExpanded) {
       isManualTextareaExpanded = false;
     }
+    if (isEmojiTrayOpen) {
+      closeEmojiTray();
+    }
     updateCollapseLogic();
   }
 
@@ -468,6 +471,9 @@
         if (document.activeElement === taskTitle) {
           taskTitle.blur();
         }
+        if (isEmojiTrayOpen) {
+          closeEmojiTray();
+        }
         isManualTextareaExpanded = false;
         updateCollapseLogic();
       });
@@ -549,6 +555,9 @@
         if (document.activeElement === taskTitle) {
           taskTitle.blur();
         }
+        if (isEmojiTrayOpen) {
+          closeEmojiTray();
+        }
         isManualTextareaExpanded = false;
         updateCollapseLogic();
       };
@@ -578,8 +587,13 @@
 
       taskTitle.addEventListener('blur', () => {
         setTimeout(() => {
+          if (document.activeElement !== taskTitle && (!dynamicEmojiTray || !dynamicEmojiTray.contains(document.activeElement))) {
+            if (isEmojiTrayOpen) {
+              closeEmojiTray();
+            }
+          }
           updateCollapseLogic();
-        }, 50);
+        }, 120);
       });
 
       taskTitle.addEventListener('input', () => {

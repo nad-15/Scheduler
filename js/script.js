@@ -2776,18 +2776,27 @@ function updateSlidingTemplatesPeekHeight() {
 function applySlidingTemplatesRowState(visible) {
     const container = document.getElementById('slidingTemplatesContainer');
     const slidingInput = document.getElementById('slidingInputView');
-    if (container) {
-        if (slidingInput && slidingInput.classList.contains('dynamic-bar-active')) {
-            // Keep display flex in dynamic mode so CSS max-height/opacity can smoothly animate
-            container.style.display = 'flex';
-        } else {
-            container.style.display = visible ? 'flex' : 'none';
+
+    // Check if there are actually any template items to display
+    let hasItems = Array.isArray(taskClipboard) && taskClipboard.length > 0;
+    if (!hasItems) {
+        try {
+            const saved = JSON.parse(localStorage.getItem('taskClipboard')) || [];
+            hasItems = Array.isArray(saved) && saved.length > 0;
+        } catch (_) {
+            hasItems = false;
         }
     }
-    if (slidingInput) {
-        slidingInput.classList.toggle('has-templates-row', visible);
+
+    const shouldShow = visible && hasItems;
+
+    if (container) {
+        container.style.display = shouldShow ? 'flex' : 'none';
     }
-    if (visible) {
+    if (slidingInput) {
+        slidingInput.classList.toggle('has-templates-row', shouldShow);
+    }
+    if (shouldShow) {
         renderSlidingTemplates();
     }
     const btnToggleTemplateStrip = document.getElementById('btnToggleTemplateStrip');
@@ -2805,7 +2814,11 @@ function syncTaskToolbarWithDrawer() {
 
     if (slidingInput.classList.contains('show')) {
         slidingInput.classList.remove('peek-mode');
-        const drawerHeight = slidingInput.offsetHeight || (slidingInput.classList.contains('has-templates-row') ? 156 : 130);
+        const isDynamic = slidingInput.classList.contains('dynamic-bar-active');
+        const fallbackHeight = isDynamic
+            ? (slidingInput.classList.contains('has-templates-row') ? 164 : 138)
+            : (slidingInput.classList.contains('has-templates-row') ? 156 : 130);
+        const drawerHeight = slidingInput.offsetHeight || fallbackHeight;
         taskToolbar.style.bottom = `calc(${drawerHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
     } else {
         const isTemplatesRowActive = typeof isSlidingTemplatesEnabled === 'function' ? isSlidingTemplatesEnabled() : false;
