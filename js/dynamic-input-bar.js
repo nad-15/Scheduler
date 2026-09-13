@@ -74,10 +74,22 @@
     addTaskWrapper = document.querySelector('.add-task-wrapper');
   }
 
-  // --- Voice-to-Text (Native Web Speech API - Single Clean Session, No Loops) ---
-  let voiceBaseText = '';
+  // --- Voice-to-Text (Native Web Speech API - Cursor-Anchored Insertion) ---
+  let voicePrefixText = '';
+  let voiceSuffixText = '';
+  let lastCursorStart = -1;
+  let lastCursorEnd = -1;
   let originalTaskPlaceholder = '';
   let lastVoiceToggleTime = 0;
+
+  function updateSavedCursor() {
+    if (taskTitle) {
+      if (typeof taskTitle.selectionStart === 'number' && taskTitle.selectionStart >= 0) {
+        lastCursorStart = taskTitle.selectionStart;
+        lastCursorEnd = taskTitle.selectionEnd;
+      }
+    }
+  }
 
   function setVoiceRecordingMode(active) {
     if (!slidingInputView) return;
@@ -113,15 +125,31 @@
     };
   }
 
-  function combineVoiceText(baseText, sessionFinal, sessionInterim) {
-    let text = baseText ? baseText.trim() : '';
-    if (sessionFinal) {
-      text += (text ? ' ' : '') + sessionFinal.trim();
+  function combineVoiceText(prefix, suffix, sessionFinal, sessionInterim) {
+    let speech = (sessionFinal || '') + (sessionFinal && sessionInterim ? ' ' : '') + (sessionInterim || '');
+    speech = speech.trim();
+
+    if (!speech) {
+      return {
+        text: prefix + suffix,
+        cursorPos: prefix.length
+      };
     }
-    if (sessionInterim) {
-      text += (text ? ' ' : '') + sessionInterim.trim();
-    }
-    return text;
+
+    // Smart leading space: if prefix exists and does not end with whitespace, insert a space before speech
+    const needsLeadSpace = prefix.length > 0 && !/\s$/.test(prefix);
+    const leadSpace = needsLeadSpace ? ' ' : '';
+
+    // Smart trailing space: if suffix exists and does not start with whitespace, insert a space after speech
+    const needsTrailSpace = suffix.length > 0 && !/^\s/.test(suffix);
+    const trailSpace = needsTrailSpace ? ' ' : '';
+
+    const insertedText = leadSpace + speech + trailSpace;
+    const text = prefix + insertedText + suffix;
+    // Cursor position immediately after the spoken words
+    const cursorPos = prefix.length + leadSpace.length + speech.length;
+
+    return { text, cursorPos };
   }
 
   function cleanupRecognitionInstance() {
@@ -157,7 +185,34 @@
     if (taskTitle) {
       originalTaskPlaceholder = taskTitle.placeholder;
       taskTitle.placeholder = 'Listening... speak now';
-      voiceBaseText = taskTitle.value ? taskTitle.value.trim() : '';
+
+      const val = taskTitle.value || '';
+      let selStart = taskTitle.selectionStart;
+      let selEnd = taskTitle.selectionEnd;
+
+      // Fallback to saved cursor if textarea is currently blurred
+      if (selStart === null || selStart === undefined || selStart < 0) {
+        selStart = (lastCursorStart >= 0) ? lastCursorStart : val.length;
+        selEnd = (lastCursorEnd >= 0) ? lastCursorEnd : selStart;
+      }
+
+      if (selStart > selEnd) {
+        const tmp = selStart;
+        selStart = selEnd;
+        selEnd = tmp;
+      }
+
+      selStart = Math.max(0, Math.min(selStart, val.length));
+      selEnd = Math.max(selStart, Math.min(selEnd, val.length));
+
+      // Capture prefix and suffix at cursor/selection anchor
+      voicePrefixText = val.slice(0, selStart);
+      voiceSuffixText = val.slice(selEnd);
+
+      taskTitle.focus();
+      taskTitle.setSelectionRange(selStart, selStart);
+      lastCursorStart = selStart;
+      lastCursorEnd = selStart;
     }
 
     setVoiceRecordingMode(true);
@@ -189,8 +244,11 @@
           return;
         }
         const { finalText, interimText } = extractSessionTranscript(event.results);
-        const fullText = combineVoiceText(voiceBaseText, finalText, interimText);
-        taskTitle.value = fullText;
+        const { text, cursorPos } = combineVoiceText(voicePrefixText, voiceSuffixText, finalText, interimText);
+        taskTitle.value = text;
+        taskTitle.setSelectionRange(cursorPos, cursorPos);
+        lastCursorStart = cursorPos;
+        lastCursorEnd = cursorPos;
         autoResizeTextarea();
         taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
       };
@@ -234,9 +292,15 @@
     cleanupRecognitionInstance();
 
     if (taskTitle) {
-      taskTitle.value = taskTitle.value.trim();
+      const curPos = (lastCursorStart >= 0) ? lastCursorStart : taskTitle.selectionStart;
       autoResizeTextarea();
       taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
+      if (curPos !== null && curPos !== undefined && curPos >= 0) {
+        taskTitle.focus();
+        taskTitle.setSelectionRange(curPos, curPos);
+        lastCursorStart = curPos;
+        lastCursorEnd = curPos;
+      }
     }
   }
 
@@ -522,6 +586,14 @@
     }
 
     if (btnVoiceInput) {
+      btnVoiceInput.addEventListener('mousedown', (e) => {
+        // Prevent button click from unfocusing taskTitle and clearing cursor position
+        e.preventDefault();
+        updateSavedCursor();
+      });
+      btnVoiceInput.addEventListener('touchstart', () => {
+        updateSavedCursor();
+      }, { passive: true });
       btnVoiceInput.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleSpeechRecognition();
@@ -560,6 +632,10 @@
     });
 
     if (taskTitle) {
+      ['keyup', 'mouseup', 'touchend', 'select', 'input', 'focus'].forEach((evt) => {
+        taskTitle.addEventListener(evt, updateSavedCursor);
+      });
+
       taskTitle.addEventListener('focus', () => {
         isManualExpanded = false;
         autoResizeTextarea();
@@ -568,8 +644,8 @@
 
       taskTitle.addEventListener('blur', () => {
         isManualExpanded = false;
-        // Snap back to compact single line when unfocused unless emoji tray is open
-        if (!isEmojiTrayOpen) {
+        // Snap back to compact single line when unfocused unless emoji tray or voice recording is active
+        if (!isEmojiTrayOpen && !isVoiceRecording) {
           collapseTextareaToSingleLine();
         }
         // Delay slightly in case user clicked on an action button
@@ -582,6 +658,12 @@
         updateCollapseLogic();
       });
     }
+
+    document.addEventListener('selectionchange', () => {
+      if (document.activeElement === taskTitle) {
+        updateSavedCursor();
+      }
+    });
 
     // Automatically turn off voice recording if the drawer is closed or hidden
     if (slidingInputView) {
