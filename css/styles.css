@@ -7867,6 +7867,17 @@ ic {
     left: 0;
 }
 
+.sliding-input-view.dynamic-bar-active .add-task-dropdown::before {
+    top: 100%;
+    bottom: auto;
+    left: 14px;
+    right: auto;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: rgba(204, 230, 255, 0.95) transparent transparent transparent;
+}
+
 /* Voice Recording Mode:
    When active, only the Mic button is shown at the far left.
    All other left tools (Counter, Template Strip, Add button) and the collapse chevron are hidden.
@@ -7914,7 +7925,7 @@ ic {
     overflow-y: auto !important;
 }
 
-/* Compact Add Task (+) Button in Dynamic Mode (Idle: bare blue add sign, no circle) */
+/* Compact Add Task (+) Button in Dynamic Mode (Idle / No selection: bare blue add sign, no circle) */
 .sliding-input-view.dynamic-bar-active #addTask {
     width: 28px !important;
     height: 28px !important;
@@ -7946,17 +7957,24 @@ ic {
     transition: color 0.15s;
 }
 
-/* Add Task Active: When dropdown is open or pressed, placed in blue circle with white + (exact 28px, never gets bigger) */
+/* Add Task Active: When divs are selected (active), or dropdown is open, or button pressed:
+   transforms into solid blue circle with white + */
+.sliding-input-view.dynamic-bar-active #addTask:not(.disabled-btn),
 .sliding-input-view.dynamic-bar-active .add-task-wrapper:has(#add-task-dropdown:not(.hidden)) #addTask,
 .sliding-input-view.dynamic-bar-active #addTask.active,
-.sliding-input-view.dynamic-bar-active #addTask:active {
+.sliding-input-view.dynamic-bar-active #addTask:not(.disabled-btn):active {
     background-color: #0078FF !important;
     box-shadow: 0 1px 4px rgba(0, 120, 255, 0.4);
 }
 
+.sliding-input-view.dynamic-bar-active #addTask:not(.disabled-btn):hover {
+    background-color: #0066dc !important;
+}
+
+.sliding-input-view.dynamic-bar-active #addTask:not(.disabled-btn) .add-btn,
 .sliding-input-view.dynamic-bar-active .add-task-wrapper:has(#add-task-dropdown:not(.hidden)) #addTask .add-btn,
 .sliding-input-view.dynamic-bar-active #addTask.active .add-btn,
-.sliding-input-view.dynamic-bar-active #addTask:active .add-btn {
+.sliding-input-view.dynamic-bar-active #addTask:not(.disabled-btn):active .add-btn {
     color: white !important;
 }
 
