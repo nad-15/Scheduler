@@ -8241,6 +8241,28 @@ ic {
     box-shadow: 0 0 8px rgba(0, 120, 255, 0.6) !important;
 }
 
+/* Option 1: Haptic Pop & Bounce on number change */
+.selected-task.counter-pop,
+.btn-clear.counter-pop {
+    animation: counterPop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+@keyframes counterPop {
+    0% {
+        transform: scale(1);
+    }
+    40% {
+        transform: scale(1.22);
+        box-shadow: 0 0 12px rgba(0, 120, 255, 0.75) !important;
+    }
+    75% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 /* Center Pill Container (Contains Flower Paw, Input Textarea, and Emoji Trigger) */
 .sliding-input-view.dynamic-bar-active .title-submit-container {
     flex: 1;

@@ -2057,8 +2057,23 @@ function handleSubtaskGroupToggle(event) {
 
 
 
+let lastObservedCounterValue = 0;
+
+function triggerCounterPop() {
+    [selectedTaskCounter, deselectTemplateBtn].forEach(el => {
+        if (!el) return;
+        el.classList.remove('counter-pop');
+        void el.offsetWidth; // Force reflow to allow consecutive animations
+        el.classList.add('counter-pop');
+        el.addEventListener('animationend', () => {
+            el.classList.remove('counter-pop');
+        }, { once: true });
+    });
+}
+
 const counterObserver = new MutationObserver(() => {
-    if (parseInt(selectedTaskCounter.textContent) > 0) {
+    const currentCount = parseInt(selectedTaskCounter.textContent) || 0;
+    if (currentCount > 0) {
 
         if (hasSuggestionContent) {
             const suggestionWrapper = document.querySelector('.suggestion-wrapper');
@@ -2076,8 +2091,11 @@ const counterObserver = new MutationObserver(() => {
         addTaskBtn.classList.remove('disabled-btn'); // Remove 
         selectedTaskCounter.classList.add(`selection-true`);
         if (deselectTemplateBtn) deselectTemplateBtn.classList.add('has-selection');
-        // submitTaskBtn.disabled = false;
-        // selectedTaskCounter.classList.remove('shake-btn'); // Remove shake effect when counter is > 0
+
+        if (currentCount !== lastObservedCounterValue) {
+            triggerCounterPop();
+        }
+        lastObservedCounterValue = currentCount;
     } else {
 
         const suggestionWrapper = document.querySelector('.suggestion-wrapper');
@@ -2085,22 +2103,20 @@ const counterObserver = new MutationObserver(() => {
         jumpingTextBox.style.display = "flex";
         suggestionWrapper.style.display = "none";
 
-
-        // taskInput.value = "";
-
         submitTaskBtn.classList.add('disabled-btn'); // Add 
         addTaskBtn.classList.add('disabled-btn'); // Remove 
-        // disabled styling
-        // submitTaskBtn.disabled = true;
         selectedTaskCounter.classList.remove(`selection-true`);
         if (deselectTemplateBtn) deselectTemplateBtn.classList.remove('has-selection');
-        triggerShakeEffect();
+        if (lastObservedCounterValue > 0) {
+            triggerShakeEffect();
+        }
+        lastObservedCounterValue = 0;
     }
 });
 
 // Start observing changes in the text of selectedTaskCounter
 //learn
-counterObserver.observe(selectedTaskCounter, { childList: true });
+counterObserver.observe(selectedTaskCounter, { childList: true, characterData: true, subtree: true });
 //for task template
 let taskClipboard = [];
 
