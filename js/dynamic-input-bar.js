@@ -121,11 +121,9 @@
   function insertEmoji(emoji) {
     if (!taskTitle) return;
 
-    // Dismiss virtual keyboard if active without losing caret selection
-    if (document.activeElement === taskTitle) {
-      updateSavedSelection();
-      taskTitle.blur();
-    }
+    // Track whether keyboard is currently active (taskTitle focused)
+    const wasFocused = (document.activeElement === taskTitle);
+    updateSavedSelection();
 
     const val = taskTitle.value || '';
     let start = (typeof savedSelectionStart === 'number' && savedSelectionStart >= 0 && savedSelectionStart <= val.length)
@@ -169,10 +167,15 @@
     taskTitle.selectionStart = taskTitle.selectionEnd = newPos;
     savedSelectionStart = savedSelectionEnd = newPos;
 
+    // If keyboard was already on, ensure focus remains so keyboard is NOT hidden
+    if (wasFocused && document.activeElement !== taskTitle) {
+      taskTitle.focus({ preventScroll: true });
+    }
+
     // Preserve expanded vs. closed state:
-    // If textarea was expanded, keep it expanded with autoResizeTextarea().
+    // If textarea was expanded (or focused), keep it expanded with autoResizeTextarea().
     // If it was closed/single-line, do nothing to expand it — keep it closed and single-line.
-    const isExpanded = isManualTextareaExpanded || (slidingInputView && slidingInputView.classList.contains('actions-collapsed'));
+    const isExpanded = wasFocused || isManualTextareaExpanded || (slidingInputView && slidingInputView.classList.contains('actions-collapsed'));
 
     if (isExpanded) {
       isManualTextareaExpanded = true;
@@ -185,7 +188,7 @@
       taskTitle.scrollLeft = taskTitle.scrollWidth;
     }
 
-    // Do NOT focus taskTitle so the mobile virtual keyboard does NOT show up
+    // Dispatch input event marked with isEmojiInsert
     const inputEvt = new Event('input', { bubbles: true });
     inputEvt.isEmojiInsert = true;
     taskTitle.dispatchEvent(inputEvt);
@@ -201,10 +204,7 @@
                         isManualTextareaExpanded ||
                         (slidingInputView && slidingInputView.classList.contains('actions-collapsed'));
 
-    // Dismiss virtual keyboard if active so emoji tray has clear view
-    if (document.activeElement === taskTitle) {
-      taskTitle.blur();
-    }
+    // Do NOT blur taskTitle: keep keyboard on if it was active, or keep it hidden if inactive
 
     if (wasExpanded) {
       isManualTextareaExpanded = true;
