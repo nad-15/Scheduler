@@ -2791,7 +2791,7 @@ function applySlidingTemplatesRowState(visible) {
     const shouldShow = visible && hasItems;
 
     if (container) {
-        container.style.display = shouldShow ? 'flex' : 'none';
+        container.style.display = '';
     }
     if (slidingInput) {
         slidingInput.classList.toggle('has-templates-row', shouldShow);
@@ -2815,11 +2815,17 @@ function syncTaskToolbarWithDrawer() {
     if (slidingInput.classList.contains('show')) {
         slidingInput.classList.remove('peek-mode');
         const isDynamic = slidingInput.classList.contains('dynamic-bar-active');
-        const fallbackHeight = isDynamic
+        const targetHeight = isDynamic
             ? (slidingInput.classList.contains('has-templates-row') ? 164 : 138)
             : (slidingInput.classList.contains('has-templates-row') ? 156 : 130);
-        const drawerHeight = slidingInput.offsetHeight || fallbackHeight;
-        taskToolbar.style.bottom = `calc(${drawerHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
+
+        const taskTitle = document.getElementById('taskTitle');
+        const extraTextareaHeight = (taskTitle && taskTitle.offsetHeight > 22)
+            ? (taskTitle.offsetHeight - 22)
+            : 0;
+
+        const finalHeight = targetHeight + extraTextareaHeight;
+        taskToolbar.style.bottom = `calc(${finalHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
     } else {
         const isTemplatesRowActive = typeof isSlidingTemplatesEnabled === 'function' ? isSlidingTemplatesEnabled() : false;
         const isPeekActive = isTemplatesRowActive && typeof isSlidingTemplatesPeekEnabled === 'function' && isSlidingTemplatesPeekEnabled();

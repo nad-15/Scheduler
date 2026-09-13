@@ -3359,9 +3359,8 @@ h2 {
     right: 10px;
     gap: 10px;
     /* border: 1px solid red; */
-    transition: transform 1.5s ease, bottom 0.3s ease-in-out;
+    transition: transform 1.5s ease, bottom 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 999;
-
 }
 
 .todo-button {
@@ -4173,6 +4172,7 @@ input[type="radio"]:checked::after {
     min-width: 28px;
     padding: 0 7px 0 6px;
     border-radius: 3px;
+    border: 1.5px solid transparent;
     border-left: 4px solid transparent;
     font-size: 11px;
     font-weight: bold;
@@ -4186,7 +4186,8 @@ input[type="radio"]:checked::after {
     flex-shrink: 0;
     box-sizing: border-box;
     line-height: 1;
-    transition: transform 0.1s ease, filter 0.1s ease;
+    transform: none !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
 .sliding-template-text {
@@ -4200,15 +4201,17 @@ input[type="radio"]:checked::after {
 
 .sliding-template-item:hover {
     filter: brightness(0.95);
+    transform: none !important;
 }
 
 .sliding-template-item:active {
-    transform: scale(0.95);
+    transform: none !important;
+    box-shadow: inset 0 0 0 1.5px #0078FF;
 }
 
 .sliding-template-item.dropdown-active {
-    box-shadow: 0 0 0 2px #0078FF, 0 2px 8px rgba(0, 120, 255, 0.35);
-    transform: translateY(-1px);
+    transform: none !important;
+    box-shadow: inset 0 0 0 2px #0078FF, 0 0 4px rgba(0, 120, 255, 0.4);
 }
 
 .sliding-input-view.peek-mode {
@@ -7726,7 +7729,7 @@ ic {
     height: auto !important;
     min-height: 138px !important;
     max-height: 182px;
-    transition: transform 0.3s ease-in-out;
+    transition: min-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease-in-out;
 }
 
 .sliding-input-view.dynamic-bar-active.has-templates-row {
@@ -7745,26 +7748,35 @@ ic {
     box-sizing: border-box;
 }
 
-/* Dynamic mode template strip: instant clean toggle without drawer jumping */
+/* Dynamic mode template strip: smooth slide down / slide up transition */
 .sliding-input-view.dynamic-bar-active .sliding-templates-container {
     display: flex;
     width: 100%;
     height: 22px;
-    max-height: 22px;
+    max-height: 24px;
     box-sizing: border-box;
     align-items: center;
     overflow: hidden;
     margin-bottom: 2px;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                margin-bottom 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.2s ease,
+                transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sliding-input-view.dynamic-bar-active:not(.has-templates-row) .sliding-templates-container,
 .sliding-input-view.dynamic-bar-active .sliding-templates-container:empty {
-    display: none !important;
     max-height: 0 !important;
     height: 0 !important;
     margin: 0 !important;
-    margin-top: 0 !important;
+    margin-bottom: 0 !important;
     padding: 0 !important;
+    opacity: 0 !important;
+    transform: translateY(-8px) !important;
     pointer-events: none !important;
     overflow: hidden !important;
 }
