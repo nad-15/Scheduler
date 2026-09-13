@@ -7687,6 +7687,10 @@ ic {
 
 .sliding-input-view.dynamic-bar-active.emoji-tray-active .dynamic-emoji-tray.dynamic-bar-only {
     display: flex !important;
+    height: 78px !important;
+    min-height: 78px !important;
+    max-height: 78px !important;
+    margin: 0 !important;
 }
 
 .sliding-input-view.dynamic-bar-active.emoji-tray-active .color-button-options {
@@ -7697,6 +7701,20 @@ ic {
     display: none !important;
 }
 
+/* When emoji tray is NOT active, ensure color row + jumping-text equals exact 78px */
+.sliding-input-view.dynamic-bar-active:not(.emoji-tray-active) .color-button-options {
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+    margin: 0 !important;
+}
+
+.sliding-input-view.dynamic-bar-active:not(.emoji-tray-active) .jumping-text-box {
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+    margin: 0 !important;
+}
 
 /* Dynamic mode drawer sizing: auto-expands upward with content (capped at 3 lines) */
 .sliding-input-view.dynamic-bar-active {
@@ -7704,14 +7722,14 @@ ic {
     flex-direction: column;
     justify-content: flex-end; /* Anchor drawer content firmly to viewport bottom */
     height: auto !important;
-    min-height: 130px !important;
-    max-height: 170px;
+    min-height: 138px !important;
+    max-height: 182px;
     transition: transform 0.3s ease-in-out, min-height 0.22s ease-in-out, max-height 0.22s ease-in-out;
 }
 
 .sliding-input-view.dynamic-bar-active.has-templates-row {
-    min-height: 156px !important;
-    max-height: 196px;
+    min-height: 164px !important;
+    max-height: 208px;
 }
 
 .sliding-input-view.dynamic-bar-active .taskinput-color-container {
@@ -7775,7 +7793,7 @@ ic {
     position: relative;
     padding: 2px 0;
     box-sizing: border-box;
-    min-height: 40px;
+    min-height: 42px;
 }
 
 /* Left action cluster */
@@ -7786,8 +7804,8 @@ ic {
     flex-shrink: 0;
     align-self: flex-end;
     margin-bottom: 2px;
-    height: 32px;
-    min-width: 28px;
+    height: 34px;
+    min-width: 30px;
     transition: width 0.26s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -7800,8 +7818,8 @@ ic {
     display: flex !important;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: none;
     background: rgba(0, 120, 255, 0.1);
@@ -7880,10 +7898,10 @@ ic {
 
 /* Compact Add Task (+) Button in Dynamic Mode (Idle / No selection: bare blue add sign, no circle) */
 .sliding-input-view.dynamic-bar-active #addTask {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    max-width: 28px !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
     box-sizing: border-box !important;
     border-radius: 50% !important;
     background-color: transparent !important;
@@ -7904,7 +7922,7 @@ ic {
 }
 
 .sliding-input-view.dynamic-bar-active #addTask .add-btn {
-    font-size: 24px;
+    font-size: 25px;
     color: #0078FF !important;
     line-height: 1;
     transition: color 0.15s;
@@ -7938,10 +7956,10 @@ ic {
 
 /* Compact Template Strip Toggle Button (view_carousel) - Idle: transparent, blue FILLED icon */
 .sliding-input-view.dynamic-bar-active .btn-toggle-template-strip {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    max-width: 28px !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
     box-sizing: border-box !important;
     border-radius: 50%;
     background: transparent;
@@ -7961,12 +7979,12 @@ ic {
 }
 
 .sliding-input-view.dynamic-bar-active .btn-toggle-template-strip .material-symbols-outlined {
-    font-size: 22px;
+    font-size: 23px;
     color: #0078FF;
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
 }
 
-/* Active Template Strip: Inside blue circle with WHITE OUTLINED icon (exact 28px, strictly no size change) */
+/* Active Template Strip: Inside blue circle with WHITE OUTLINED icon (exact 30px, strictly no size change) */
 .sliding-input-view.dynamic-bar-active .btn-toggle-template-strip.active {
     background-color: #0078FF !important;
     box-shadow: 0 1px 4px rgba(0, 120, 255, 0.45);
@@ -7977,18 +7995,18 @@ ic {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
 }
 
-/* Selected Task Counter - Solid blue circle matching the send button size (32px) */
+/* Selected Task Counter - Solid blue circle matching the send button size */
 .sliding-input-view.dynamic-bar-active .selected-task {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
     box-sizing: border-box !important;
     border-radius: 50% !important;
     background-color: #0078FF !important;
     border: none !important;
     color: #ffffff !important;
-    font-size: 14px !important;
+    font-size: 15px !important;
     font-weight: 700;
     line-height: 1 !important;
     display: flex;
@@ -8026,16 +8044,16 @@ ic {
 .sliding-input-view.dynamic-bar-active .title-submit-container {
     flex: 1;
     min-width: 0;
-    min-height: 36px;
+    min-height: 38px;
     height: auto;
-    max-height: 76px; /* Capped at exactly 3 lines */
+    max-height: 82px; /* Capped at exactly 3 lines */
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    border-radius: 18px;
-    padding: 7px 10px 7px 8px;
+    border-radius: 19px;
+    padding: 8px 10px 8px 8px;
     background-color: #e5e5e5;
-    gap: 6px;
+    gap: 7px;
     position: relative;
     box-sizing: border-box;
     border: none;
@@ -8049,8 +8067,8 @@ ic {
 }
 
 .sliding-input-view.dynamic-bar-active .flower-container {
-    width: 18px;
-    height: 20px;
+    width: 20px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -8060,20 +8078,20 @@ ic {
 }
 
 .sliding-input-view.dynamic-bar-active .flower-container .flower {
-    font-size: 16px;
+    font-size: 18px;
 }
 
-/* Compact Auto-Resizing Textarea (Capped at exactly 3 lines = 60px) */
+/* Compact Auto-Resizing Textarea (Capped at exactly 3 lines = 66px) */
 .sliding-input-view.dynamic-bar-active .input-task-template {
     flex: 1;
     min-width: 0;
-    font-size: 14.5px;
+    font-size: 15.5px;
     padding: 0;
     margin: 0;
-    line-height: 20px;
-    height: 20px;
-    min-height: 20px;
-    max-height: 60px; /* Exactly 3 lines max */
+    line-height: 22px;
+    height: 22px;
+    min-height: 22px;
+    max-height: 66px; /* Exactly 3 lines max */
     overflow-y: auto;
     border: none !important;
     background: transparent;
@@ -8090,9 +8108,9 @@ ic {
     display: none;
 }
 
-/* When unfocused and actions are NOT collapsed (left tools visible), clamp textarea height to 20px single line */
+/* When unfocused and actions are NOT collapsed (left tools visible), clamp textarea height to 22px single line */
 .sliding-input-view.dynamic-bar-active:not(.actions-collapsed) .input-task-template:not(:focus) {
-    height: 20px !important;
+    height: 22px !important;
     overflow-y: hidden !important;
 }
 
@@ -8104,10 +8122,10 @@ ic {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px !important;
-    height: 24px !important;
-    min-width: 24px !important;
-    max-width: 24px !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    max-width: 26px !important;
     box-sizing: border-box !important;
     border-radius: 50% !important;
     padding: 0 !important;
@@ -8133,7 +8151,7 @@ ic {
 }
 
 .sliding-input-view.dynamic-bar-active .dynamic-emoji-trigger .emoji-trigger-icon {
-    font-size: 20px;
+    font-size: 22px;
     color: #0078FF;
     line-height: 1;
     display: flex;
@@ -8149,9 +8167,9 @@ ic {
 
 /* Submit Task Button (Outside the pill on the far right, matching Messenger reaction/send button) */
 .sliding-input-view.dynamic-bar-active #submitTask {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
     border-radius: 50%;
     background-color: #0078FF;
     border: none;
@@ -8177,8 +8195,9 @@ ic {
 }
 
 .sliding-input-view.dynamic-bar-active #submitTask .arrow-upward {
-    font-size: 18px;
+    font-size: 20px;
     color: white;
+    margin-bottom: 2px;
 }
 
 /* Inline Curated Dynamic Emoji Tray (Replaces color options row AND skhayeduler jumping text, zero drawer resizing) */
@@ -8186,10 +8205,11 @@ ic {
     display: none;
     width: 100%;
     min-width: 0;
-    height: 70px;
-    max-height: 72px;
-    padding: 3px 4px;
-    margin: 0;
+    height: 78px !important;
+    min-height: 78px !important;
+    max-height: 78px !important;
+    padding: 4px 6px;
+    margin: 0 !important;
     box-sizing: border-box;
     background: #ffffff;
     border: 1px solid #d0d7de;
@@ -8214,9 +8234,9 @@ ic {
     display: grid;
     grid-template-rows: repeat(3, 1fr);
     grid-auto-flow: column;
-    grid-auto-columns: 34px;
-    gap: 2px 4px;
-    padding: 1px 4px;
+    grid-auto-columns: 36px;
+    gap: 3px 6px;
+    padding: 2px 4px;
     width: 100%;
     height: 100%;
     max-height: 100%;
@@ -8244,7 +8264,7 @@ ic {
     justify-content: center;
     width: 100%;
     height: 100%;
-    font-size: 18px;
+    font-size: 19px;
     line-height: 1;
     background: transparent;
     border: none;

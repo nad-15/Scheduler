@@ -154,7 +154,7 @@
     if (!taskTitle) return;
     if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
     if (!taskTitle.value || taskTitle.value.length === 0) {
-      taskTitle.style.height = '20px';
+      taskTitle.style.height = '22px';
       taskTitle.style.overflowY = 'hidden';
       if (typeof window.syncTaskToolbarWithDrawer === 'function') {
         window.syncTaskToolbarWithDrawer();
@@ -162,12 +162,12 @@
       return;
     }
     // Reset to single-line height so scrollHeight recalculates accurately on backspace/paste
-    taskTitle.style.height = '20px';
+    taskTitle.style.height = '22px';
     const scrollH = taskTitle.scrollHeight;
-    // Exactly 3 lines max: 3 lines * 20px line-height = 60px
-    const newHeight = Math.min(scrollH, 60);
-    taskTitle.style.height = `${Math.max(newHeight, 20)}px`;
-    taskTitle.style.overflowY = scrollH > 60 ? 'auto' : 'hidden';
+    // Exactly 3 lines max: 3 lines * 22px line-height = 66px
+    const newHeight = Math.min(scrollH, 66);
+    taskTitle.style.height = `${Math.max(newHeight, 22)}px`;
+    taskTitle.style.overflowY = scrollH > 66 ? 'auto' : 'hidden';
     if (typeof window.syncTaskToolbarWithDrawer === 'function') {
       window.syncTaskToolbarWithDrawer();
     }
@@ -176,8 +176,9 @@
   function collapseTextareaToSingleLine() {
     if (!taskTitle) return;
     if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
-    taskTitle.style.height = '20px';
+    taskTitle.style.height = '22px';
     taskTitle.scrollTop = 0;
+    taskTitle.style.overflowY = 'hidden';
     if (typeof window.syncTaskToolbarWithDrawer === 'function') {
       window.syncTaskToolbarWithDrawer();
     }
