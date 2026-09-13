@@ -74,11 +74,10 @@
     addTaskWrapper = document.querySelector('.add-task-wrapper');
   }
 
-  // --- Voice-to-Text (Native Web Speech API with Real-Time Transcription) ---
+  // --- Voice-to-Text (Native Web Speech API - Single Clean Session, No Loops) ---
   let voiceBaseText = '';
-  let isExplicitlyStopped = false;
-  let voiceRestartTimer = null;
   let originalTaskPlaceholder = '';
+  let lastVoiceToggleTime = 0;
 
   function setVoiceRecordingMode(active) {
     if (!slidingInputView) return;
@@ -91,14 +90,80 @@
     }
   }
 
-  function setupSpeechRecognition() {
+  // Assemble transcripts directly from event.results faithfully as spoken by the user
+  function extractSessionTranscript(results) {
+    let finalText = '';
+    let interimText = '';
+
+    for (let i = 0; i < results.length; ++i) {
+      const res = results[i];
+      const text = res[0] && res[0].transcript ? res[0].transcript : '';
+      if (!text) continue;
+
+      if (res.isFinal) {
+        finalText += (finalText ? ' ' : '') + text.trim();
+      } else {
+        interimText += text;
+      }
+    }
+
+    return {
+      finalText: finalText.trim(),
+      interimText: interimText.trim()
+    };
+  }
+
+  function combineVoiceText(baseText, sessionFinal, sessionInterim) {
+    let text = baseText ? baseText.trim() : '';
+    if (sessionFinal) {
+      text += (text ? ' ' : '') + sessionFinal.trim();
+    }
+    if (sessionInterim) {
+      text += (text ? ' ' : '') + sessionInterim.trim();
+    }
+    return text;
+  }
+
+  function cleanupRecognitionInstance() {
+    if (recognitionInstance) {
+      try {
+        recognitionInstance.onstart = null;
+        recognitionInstance.onresult = null;
+        recognitionInstance.onerror = null;
+        recognitionInstance.onend = null;
+        recognitionInstance.abort();
+      } catch (e) {
+        // ignore
+      }
+      recognitionInstance = null;
+    }
+  }
+
+  function startSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      if (btnVoiceInput) {
-        btnVoiceInput.title = 'Voice input not supported on this browser';
-        btnVoiceInput.style.opacity = '0.5';
-      }
-      return null;
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    // Do not start if drawer is closed
+    if (slidingInputView && !slidingInputView.classList.contains('show')) {
+      return;
+    }
+
+    cleanupRecognitionInstance();
+    isVoiceRecording = true;
+
+    if (taskTitle) {
+      originalTaskPlaceholder = taskTitle.placeholder;
+      taskTitle.placeholder = 'Listening... speak now';
+      voiceBaseText = taskTitle.value ? taskTitle.value.trim() : '';
+    }
+
+    setVoiceRecordingMode(true);
+    if (btnVoiceInput) {
+      btnVoiceInput.classList.add('recording');
+      btnVoiceInput.title = 'Listening... Tap mic to stop';
     }
 
     try {
@@ -117,105 +182,44 @@
       };
 
       rec.onresult = (event) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
-
-        for (let i = 0; i < event.results.length; ++i) {
-          const res = event.results[i];
-          if (res.isFinal) {
-            finalTranscript += (finalTranscript ? ' ' : '') + res[0].transcript.trim();
-          } else {
-            interimTranscript += res[0].transcript;
-          }
+        if (!taskTitle) return;
+        // If drawer has been closed in the meantime, stop immediately
+        if (slidingInputView && !slidingInputView.classList.contains('show')) {
+          stopSpeechRecognition();
+          return;
         }
-
-        if (taskTitle) {
-          let fullText = voiceBaseText;
-          if (finalTranscript) {
-            fullText += (fullText ? ' ' : '') + finalTranscript;
-          }
-          if (interimTranscript) {
-            const separator = fullText && !fullText.endsWith(' ') ? ' ' : '';
-            fullText += separator + interimTranscript.trimStart();
-          }
-          taskTitle.value = fullText;
-          autoResizeTextarea();
-          taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+        const { finalText, interimText } = extractSessionTranscript(event.results);
+        const fullText = combineVoiceText(voiceBaseText, finalText, interimText);
+        taskTitle.value = fullText;
+        autoResizeTextarea();
+        taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
       };
 
       rec.onerror = (event) => {
         console.warn('SpeechRecognition event/error:', event.error);
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           alert('Microphone access was not allowed. Please grant microphone permission in your browser settings.');
-          stopSpeechRecognition();
         }
+        stopSpeechRecognition();
       };
 
       rec.onend = () => {
-        // As long as user has NOT clicked mic off, keep recognition alive
-        if (isVoiceRecording && !isExplicitlyStopped) {
-          if (taskTitle) {
-            voiceBaseText = taskTitle.value.trim();
-          }
-          clearTimeout(voiceRestartTimer);
-          voiceRestartTimer = setTimeout(() => {
-            if (isVoiceRecording && !isExplicitlyStopped) {
-              try {
-                rec.start();
-              } catch (e) {
-                // Ignore if already running
-              }
-            }
-          }, 120);
-        } else {
-          stopSpeechRecognition();
-        }
+        // Speech ended naturally - stop cleanly without restarting
+        stopSpeechRecognition();
       };
 
-      return rec;
+      recognitionInstance = rec;
+      rec.start();
     } catch (err) {
-      console.warn('SpeechRecognition initialization error:', err);
-      return null;
-    }
-  }
-
-  function startSpeechRecognition() {
-    if (!recognitionInstance) {
-      recognitionInstance = setupSpeechRecognition();
-    }
-    if (!recognitionInstance) {
-      alert('Speech recognition is not supported in this browser.');
-      return;
-    }
-
-    isExplicitlyStopped = false;
-    isVoiceRecording = true;
-    clearTimeout(voiceRestartTimer);
-
-    if (taskTitle) {
-      originalTaskPlaceholder = taskTitle.placeholder;
-      taskTitle.placeholder = 'Listening... speak now';
-      voiceBaseText = taskTitle.value ? taskTitle.value.trim() : '';
-    }
-
-    setVoiceRecordingMode(true);
-    if (btnVoiceInput) {
-      btnVoiceInput.classList.add('recording');
-      btnVoiceInput.title = 'Listening... Tap mic to stop';
-    }
-
-    try {
-      recognitionInstance.start();
-    } catch (err) {
-      console.warn('Recognition start caught:', err);
+      console.warn('SpeechRecognition creation/start error:', err);
+      stopSpeechRecognition();
     }
   }
 
   function stopSpeechRecognition() {
-    isExplicitlyStopped = true;
+    if (!isVoiceRecording && !recognitionInstance) return;
+
     isVoiceRecording = false;
-    clearTimeout(voiceRestartTimer);
 
     if (btnVoiceInput) {
       btnVoiceInput.classList.remove('recording');
@@ -227,14 +231,7 @@
     }
 
     setVoiceRecordingMode(false);
-
-    if (recognitionInstance) {
-      try {
-        recognitionInstance.stop();
-      } catch (err) {
-        // ignore
-      }
-    }
+    cleanupRecognitionInstance();
 
     if (taskTitle) {
       taskTitle.value = taskTitle.value.trim();
@@ -244,12 +241,18 @@
   }
 
   function toggleSpeechRecognition() {
+    const now = Date.now();
+    if (now - lastVoiceToggleTime < 300) return;
+    lastVoiceToggleTime = now;
+
     if (isVoiceRecording) {
       stopSpeechRecognition();
     } else {
       startSpeechRecognition();
     }
   }
+
+  window.stopSpeechRecognition = stopSpeechRecognition;
 
   // --- Curated Emoji Picker Rendering & Insertion ---
   function renderEmojiGrid() {
@@ -579,6 +582,49 @@
         updateCollapseLogic();
       });
     }
+
+    // Automatically turn off voice recording if the drawer is closed or hidden
+    if (slidingInputView) {
+      const drawerObserver = new MutationObserver(() => {
+        if (!slidingInputView.classList.contains('show')) {
+          if (isVoiceRecording) {
+            stopSpeechRecognition();
+          }
+          if (isEmojiTrayOpen) {
+            closeEmojiTray();
+          }
+        }
+      });
+      drawerObserver.observe(slidingInputView, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    const floatingAddBtn = document.getElementById('floatingAddBtn');
+    if (floatingAddBtn) {
+      floatingAddBtn.addEventListener('click', () => {
+        if (slidingInputView && slidingInputView.classList.contains('show') && isVoiceRecording) {
+          stopSpeechRecognition();
+        }
+      });
+    }
+
+    // Turn off voice recording if app is in background, minimized, or closed
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && isVoiceRecording) {
+        stopSpeechRecognition();
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      if (isVoiceRecording) {
+        stopSpeechRecognition();
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (isVoiceRecording) {
+        stopSpeechRecognition();
+      }
+    });
   }
 
   // --- Initialization ---
