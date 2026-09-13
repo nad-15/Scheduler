@@ -2795,29 +2795,32 @@ function applySlidingTemplatesRowState(visible) {
         btnToggleTemplateStrip.classList.toggle('active', visible);
         btnToggleTemplateStrip.title = visible ? 'Hide Template Strip' : 'Show Template Strip';
     }
-    const isDrawerOpen = slidingInput && slidingInput.classList.contains('show');
-    if (isDrawerOpen) {
-        if (slidingInput) slidingInput.classList.remove('peek-mode');
-        if (taskToolbar) {
-            const drawerHeight = visible ? 156 : 130;
-            taskToolbar.style.bottom = `calc(${drawerHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
-        }
+    syncTaskToolbarWithDrawer();
+}
+
+function syncTaskToolbarWithDrawer() {
+    if (!taskToolbar) return;
+    const slidingInput = document.getElementById('slidingInputView');
+    if (!slidingInput) return;
+
+    if (slidingInput.classList.contains('show')) {
+        slidingInput.classList.remove('peek-mode');
+        const drawerHeight = slidingInput.offsetHeight || (slidingInput.classList.contains('has-templates-row') ? 156 : 130);
+        taskToolbar.style.bottom = `calc(${drawerHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
     } else {
-        const isPeekActive = visible && isSlidingTemplatesPeekEnabled();
+        const isTemplatesRowActive = typeof isSlidingTemplatesEnabled === 'function' ? isSlidingTemplatesEnabled() : false;
+        const isPeekActive = isTemplatesRowActive && typeof isSlidingTemplatesPeekEnabled === 'function' && isSlidingTemplatesPeekEnabled();
         if (isPeekActive) {
-            const peekHeight = updateSlidingTemplatesPeekHeight();
-            if (slidingInput) slidingInput.classList.add('peek-mode');
-            if (taskToolbar) {
-                taskToolbar.style.bottom = `calc(${peekHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
-            }
+            const peekHeight = typeof updateSlidingTemplatesPeekHeight === 'function' ? updateSlidingTemplatesPeekHeight() : 45;
+            slidingInput.classList.add('peek-mode');
+            taskToolbar.style.bottom = `calc(${peekHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
         } else {
-            if (slidingInput) slidingInput.classList.remove('peek-mode');
-            if (taskToolbar) {
-                taskToolbar.style.bottom = `calc(20px + env(safe-area-inset-bottom, 0px))`;
-            }
+            slidingInput.classList.remove('peek-mode');
+            taskToolbar.style.bottom = `calc(20px + env(safe-area-inset-bottom, 0px))`;
         }
     }
 }
+window.syncTaskToolbarWithDrawer = syncTaskToolbarWithDrawer;
 window.updateSlidingTemplatesPeekHeight = updateSlidingTemplatesPeekHeight;
 window.applySlidingTemplatesRowState = applySlidingTemplatesRowState;
 window.renderSlidingTemplates = renderSlidingTemplates;
@@ -2965,46 +2968,35 @@ floatingAddBtn.addEventListener('click', () => {
 
         const isTemplatesRowActive = isSlidingTemplatesEnabled();
         applySlidingTemplatesRowState(isTemplatesRowActive);
+        syncTaskToolbarWithDrawer();
     } else {
         slidingInputView.classList.remove("show");
 
         floatingAddBtn.style.transform = 'rotate(0)'; // Reset button position and rotation
         floatingAddBtn.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Reset button color to green
 
-        const isTemplatesRowActive = isSlidingTemplatesEnabled();
-        const isPeekActive = isTemplatesRowActive && isSlidingTemplatesPeekEnabled();
-        if (isPeekActive) {
-            const peekHeight = updateSlidingTemplatesPeekHeight();
-            slidingInputView.classList.add("peek-mode");
-            taskToolbar.style.bottom = `calc(${peekHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
-        } else {
-            slidingInputView.classList.remove("peek-mode");
-            taskToolbar.style.bottom = `calc(20px + env(safe-area-inset-bottom, 0px))`;
-        }
+        syncTaskToolbarWithDrawer();
     }
 });
 
 window.addEventListener('resize', () => {
-    const slidingInput = document.getElementById('slidingInputView');
-    if (slidingInput && slidingInput.classList.contains('peek-mode')) {
-        const peekHeight = updateSlidingTemplatesPeekHeight();
-        if (taskToolbar && !slidingInput.classList.contains('show')) {
-            taskToolbar.style.bottom = `calc(${peekHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
-        }
-    }
+    syncTaskToolbarWithDrawer();
 });
 
 window.addEventListener('orientationchange', () => {
     setTimeout(() => {
-        const slidingInput = document.getElementById('slidingInputView');
-        if (slidingInput && slidingInput.classList.contains('peek-mode')) {
-            const peekHeight = updateSlidingTemplatesPeekHeight();
-            if (taskToolbar && !slidingInput.classList.contains('show')) {
-                taskToolbar.style.bottom = `calc(${peekHeight + 10}px + env(safe-area-inset-bottom, 0px))`;
-            }
-        }
+        syncTaskToolbarWithDrawer();
     }, 100);
 });
+
+if (window.ResizeObserver && slidingInputView) {
+    const drawerResizeObserver = new ResizeObserver(() => {
+        if (slidingInputView.classList.contains('show')) {
+            syncTaskToolbarWithDrawer();
+        }
+    });
+    drawerResizeObserver.observe(slidingInputView);
+}
 
 
 closeButton.addEventListener('click', () => {

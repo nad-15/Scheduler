@@ -118,6 +118,9 @@
     dynamicEmojiTray.classList.remove('hidden');
     slidingInputView.classList.add('emoji-tray-active');
     if (btnEmojiPicker) btnEmojiPicker.classList.add('active');
+    if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+      window.syncTaskToolbarWithDrawer();
+    }
   }
 
   function closeEmojiTray() {
@@ -126,6 +129,9 @@
     dynamicEmojiTray.classList.add('hidden');
     slidingInputView.classList.remove('emoji-tray-active');
     if (btnEmojiPicker) btnEmojiPicker.classList.remove('active');
+    if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+      window.syncTaskToolbarWithDrawer();
+    }
   }
 
   function toggleEmojiTray() {
@@ -143,6 +149,9 @@
     if (!taskTitle.value || taskTitle.value.length === 0) {
       taskTitle.style.height = '20px';
       taskTitle.style.overflowY = 'hidden';
+      if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+        window.syncTaskToolbarWithDrawer();
+      }
       return;
     }
     // Reset to single-line height so scrollHeight recalculates accurately on backspace/paste
@@ -152,6 +161,9 @@
     const newHeight = Math.min(scrollH, 60);
     taskTitle.style.height = `${Math.max(newHeight, 20)}px`;
     taskTitle.style.overflowY = scrollH > 60 ? 'auto' : 'hidden';
+    if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+      window.syncTaskToolbarWithDrawer();
+    }
   }
 
   function collapseTextareaToSingleLine() {
@@ -159,6 +171,9 @@
     if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
     taskTitle.style.height = '20px';
     taskTitle.scrollTop = 0;
+    if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+      window.syncTaskToolbarWithDrawer();
+    }
   }
 
   // --- Dynamic Collapse / Expand (Messenger Style) ---
@@ -183,13 +198,24 @@
     if (isManualExpanded) {
       // User tapped [ > ] to reveal actions manually
       setCollapsedState(false);
+      collapseTextareaToSingleLine();
+      if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+        window.syncTaskToolbarWithDrawer();
+      }
       return;
     }
 
     if (hasText || isFocused) {
       setCollapsedState(true);
+      // When left tools are collapsed, textarea should always be expanded if it has multi-line content
+      autoResizeTextarea();
     } else {
       setCollapsedState(false);
+      collapseTextareaToSingleLine();
+    }
+
+    if (typeof window.syncTaskToolbarWithDrawer === 'function') {
+      window.syncTaskToolbarWithDrawer();
     }
   }
 
@@ -321,7 +347,7 @@
       btnCollapseActions.addEventListener('click', (e) => {
         e.stopPropagation();
         isManualExpanded = true;
-        setCollapsedState(false);
+        updateCollapseLogic();
       });
     }
 
@@ -364,6 +390,7 @@
     if (submitTask) {
       submitTask.addEventListener('click', () => {
         if (isEmojiTrayOpen) closeEmojiTray();
+        setTimeout(updateCollapseLogic, 50);
       });
     }
 
@@ -383,10 +410,6 @@
 
       taskTitle.addEventListener('blur', () => {
         isManualExpanded = false;
-        // Snap back to compact single line when unfocused unless emoji tray is active
-        if (!isEmojiTrayOpen) {
-          collapseTextareaToSingleLine();
-        }
         // Delay slightly in case user clicked on an action button
         setTimeout(updateCollapseLogic, 180);
       });

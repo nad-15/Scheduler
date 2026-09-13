@@ -8088,8 +8088,8 @@ ic {
     display: none;
 }
 
-/* When unfocused, strictly clamp textarea height to 20px single line */
-.sliding-input-view.dynamic-bar-active .input-task-template:not(:focus) {
+/* When unfocused and actions are NOT collapsed (left tools visible), clamp textarea height to 20px single line */
+.sliding-input-view.dynamic-bar-active:not(.actions-collapsed) .input-task-template:not(:focus) {
     height: 20px !important;
     overflow-y: hidden !important;
 }
