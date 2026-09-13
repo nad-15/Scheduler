@@ -7839,7 +7839,7 @@ ic {
     align-items: center;
     gap: 6px;
     flex-shrink: 0;
-    max-width: 140px;
+    max-width: 150px;
     opacity: 1;
     overflow: visible;
     transform: translateX(0);
@@ -8006,19 +8006,20 @@ ic {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
 }
 
-/* Compact Selected Task Counter - Solid blue circle with white count (exact 28px, strictly no size change) */
+/* Selected Task Counter - Solid blue circle matching the send button size (32px) */
 .sliding-input-view.dynamic-bar-active .selected-task {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    max-width: 28px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
     box-sizing: border-box !important;
     border-radius: 50% !important;
     background-color: #0078FF !important;
     border: none !important;
     color: #ffffff !important;
-    font-size: 13px !important;
+    font-size: 14px !important;
     font-weight: 700;
+    line-height: 1 !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -8029,13 +8030,17 @@ ic {
     margin: 0;
     flex-shrink: 0;
     box-shadow: 0 1px 4px rgba(0, 120, 255, 0.35) !important;
-    transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+    transition: background-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
 
 .sliding-input-view.dynamic-bar-active .selected-task:hover {
     background-color: #0066dc !important;
+}
+
+.sliding-input-view.dynamic-bar-active .selected-task:active {
+    transform: scale(0.92);
 }
 
 /* Active Selected Task Counter: When tasks are selected (> 0) */
