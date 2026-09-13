@@ -495,7 +495,10 @@ document.addEventListener('keydown', (e) => {
 
 // Default behavior: Appends task to the bottom of the selected container
 function executeDefaultAddTask() {
-    if (selectedDivs.length === 0) return;
+    if (selectedDivs.length === 0) {
+        triggerShakeEffect();
+        return;
+    }
 
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
     const uniqueParents = new Set();
@@ -992,6 +995,7 @@ addTaskBtn.addEventListener('click', (e) => {
     // If "on-click" mode is selected, bypass default bottom addition and toggle the modal
     if (currentMode === 'on-click') {
         if (selectedDivs.length === 0 || addTaskBtn.classList.contains('disabled-btn')) {
+            triggerShakeEffect();
             return;
         }
 
@@ -1007,6 +1011,11 @@ addTaskBtn.addEventListener('click', (e) => {
     // If dropdown was open, toggle/close it
     if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
         closeAddTaskDropdown();
+        return;
+    }
+
+    if (selectedDivs.length === 0 || addTaskBtn.classList.contains('disabled-btn')) {
+        triggerShakeEffect();
         return;
     }
 
@@ -3460,16 +3469,14 @@ function normalizeHex(color) {
 
 // Function to trigger the shake effect
 function triggerShakeEffect() {
-    deselectTemplateBtn.classList.add('shake-btn');
-    selectedTaskCounter.classList.add('shake-btn'); // Add shake effect
-
-    // Remove the class after the animation ends to allow for future shakes
-    selectedTaskCounter.addEventListener('animationend', () => {
-        selectedTaskCounter.classList.remove('shake-btn');
-    });
-
-    deselectTemplateBtn.addEventListener('animationend', () => {
-        deselectTemplateBtn.classList.remove('shake-btn');
+    [selectedTaskCounter, deselectTemplateBtn].forEach(el => {
+        if (!el) return;
+        el.classList.remove('shake-btn');
+        void el.offsetWidth; // Force reflow to allow consecutive shakes
+        el.classList.add('shake-btn');
+        el.addEventListener('animationend', () => {
+            el.classList.remove('shake-btn');
+        }, { once: true });
     });
 }
 
