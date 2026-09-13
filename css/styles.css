@@ -6192,129 +6192,319 @@ html.hide-all-buttons-active #slidingInputView {
 
 
 
-/* cloned elements */
+/* ==========================================================================
+   ADD TEMPLATE POPUP (CLONED SLIDING VIEW)
+   ========================================================================== */
 
 .cloned-sliding-view {
-    box-sizing: content-box;
-    gap: 5px;
-    /* border:2px solid red; */
+    box-sizing: border-box !important;
     display: none;
-    /* display: flex; */
-    padding: 10px;
-    position: fixed;
-    top: 35%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 6px;
-    width: 80%;
-    /* height: auto; */
-    z-index: 3001;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    position: fixed !important;
+    top: 38% !important;
+    left: 50% !important;
+    bottom: auto !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(92vw, 360px) !important;
+    max-width: calc(100vw - 28px) !important;
+    max-height: calc(100vh - 48px) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 16px 14px 12px 14px !important;
+    margin: 0 !important;
+    background-color: rgba(255, 255, 255, 0.97) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 44px -6px rgba(0, 0, 0, 0.36),
+                0 0 0 1px rgba(0, 0, 0, 0.08),
+                0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    z-index: 3001 !important;
+    overflow: visible !important;
+    animation: popupFadeScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes popupFadeScaleIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -46%) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.cloned-sliding-view .taskinput-color-container {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    background: transparent !important;
+    justify-content: flex-start !important;
+    overflow: visible !important;
+}
+
+.cloned-sliding-view .template-title-submit-container {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-top: 10px !important;
+}
+
+.cloned-sliding-view .title-submit-container {
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 22px !important;
+    background-color: #f1f3f5 !important;
+    padding: 4px 6px 4px 10px !important;
+    gap: 6px !important;
+    border: 1.5px solid transparent !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+}
+
+.cloned-sliding-view .title-submit-container:focus-within {
+    border-color: #0078FF !important;
+    box-shadow: 0 0 0 2.5px rgba(0, 120, 255, 0.15) !important;
+    background-color: #ffffff !important;
+}
+
+.cloned-sliding-view .flower-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin-right: 2px !important;
+}
+
+.cloned-sliding-view .flower-container .flower {
+    font-size: 20px !important;
+    color: #6a5044;
+    transition: color 0.2s ease !important;
+}
+
+.cloned-sliding-view .input-task-template {
+    box-sizing: border-box !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    height: 22px !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: #1a1a1a !important;
+    resize: none !important;
+    font-family: inherit !important;
+    padding: 1px 0 !important;
+    white-space: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+}
+
+.cloned-sliding-view .input-task-template::-webkit-scrollbar {
+    display: none !important;
+}
+
+.cloned-sliding-view .color-button-options {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: visible !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 8px !important;
+}
+
+.cloned-sliding-view .palette-wrapper {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+
+.cloned-sliding-view .palette-button {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background-color: #0078FF !important;
+    border: none !important;
+    height: 32px !important;
+    width: 32px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    transition: transform 0.15s ease, background-color 0.2s ease !important;
+}
+
+.cloned-sliding-view .palette-button:active {
+    transform: scale(0.92) !important;
+}
+
+.cloned-sliding-view .palette-button span {
+    color: white !important;
+    font-size: 18px !important;
+}
+
+.cloned-sliding-view .color-mode-dropdown {
+    position: absolute !important;
+    bottom: calc(100% + 8px) !important;
+    left: 0 !important;
+    top: auto !important;
+    transform: none !important;
+    z-index: 3010 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.cloned-sliding-view .color-mode-dropdown::before {
+    display: none !important;
+}
+
+.cloned-sliding-view .shade-submenu {
+    position: absolute !important;
+    bottom: calc(100% + 4px) !important;
+    left: 0 !important;
+    z-index: 3015 !important;
+    max-height: 180px !important;
+    overflow-y: auto !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+.cloned-sliding-view .color-picker {
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 12px !important;
+    padding: 6px 8px !important;
+}
+
+.cloned-sliding-view .color-picker::-webkit-scrollbar {
+    display: none !important;
+}
+
+.cloned-sliding-view .jumping-text-box {
+    box-sizing: border-box !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 18px !important;
+    min-height: 18px !important;
+    overflow: hidden !important;
+    margin: 2px 0 0 0 !important;
+}
+
+.cloned-sliding-view .suggestion-wrapper {
+    display: none !important;
 }
 
 .overlay {
     display: none;
-    /* Hide the overlay by default */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
+    height: 100%;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
     z-index: 3000;
-    /* Ensure it is above other elements */
     pointer-events: all;
-    /* Enable interaction with overlay */
+    cursor: pointer;
 }
 
 .submit-btn-cloned {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 35px;
-    font-weight: normal;
-    padding: 0px;
-    padding-top: 0;
-    background-color: #0078FF;
-    /* border: 2px solid red; */
-    height: 30px;
-    width: 30px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    cursor: pointer;
-
-    border: none;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    color: white !important;
+    background-color: #0078FF !important;
+    height: 28px !important;
+    width: 28px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    border: none !important;
+    transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.15s ease !important;
 }
 
-
-.submit-btn-cloned:active {
-    transform: scale(0.9);
+.submit-btn-cloned:not(.disabled-btn):hover {
+    background-color: #005FCC !important;
 }
 
-.submit-btn-cloned:hover {
-    background-color: #005FCC;
+.submit-btn-cloned:not(.disabled-btn):active {
+    transform: scale(0.92) !important;
 }
 
 .submit-btn-cloned.disabled-btn {
-    background-color: gray;
-    border: gray;
-    color: white;
-    opacity: 0.5;
-    cursor: not-allowed;
+    background-color: #c4ccd4 !important;
+    color: #ffffff !important;
+    opacity: 0.65 !important;
+    cursor: not-allowed !important;
 }
 
 .material-icons.add-template-btn-icon {
-    font-size: 25px;
+    font-size: 20px !important;
+    line-height: 1 !important;
 }
 
 .close-btn-cloned {
-    /* border: 2px solid red; */
-    border: none;
-    background-color: transparent;
-    display: flex;
-    position: absolute;
-    top: 3px;
-    /* Adjust to your needs */
-    right: 3px;
-    /* Adjust to your needs */
-    /* background-color: #ff0000;   */
-    padding: 5px;
-    cursor: pointer;
-    border-radius: 50%;
+    position: absolute !important;
+    top: 8px !important;
+    right: 8px !important;
+    width: 26px !important;
+    height: 26px !important;
+    border: none !important;
+    background-color: rgba(0, 0, 0, 0.06) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    border-radius: 50% !important;
+    transition: background-color 0.2s ease, transform 0.15s ease !important;
+    z-index: 10 !important;
+}
+
+.close-btn-cloned:hover {
+    background-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+.close-btn-cloned:active {
+    transform: scale(0.92) !important;
 }
 
 .material-icons.close-btn-cloned-icon {
-    font-size: 20px;
-    color: #ccc;
-}
-
-
-.color-option-template {
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-    flex-grow: 0;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border 0.25s ease, width 0.25s ease, height 0.25s ease;
-    background-color: transparent;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.color-option-template:not(.selected-color):hover {
-    transform: scale(1.06);
-}
-
-.color-option-template.selected-color {
-    border: 2px solid transparent;
-    width: 26px;
-    height: 26px;
+    font-size: 17px !important;
+    color: #555 !important;
+    line-height: 1 !important;
 }
 
 
@@ -7782,7 +7972,7 @@ ic {
 }
 
 /* When templates row is not active, closed drawer must ALWAYS hide completely (never peek input bar) */
-.sliding-input-view:not(.has-templates-row):not(.show) {
+.sliding-input-view:not(.cloned-sliding-view):not(.has-templates-row):not(.show) {
     transform: translateY(100%) !important;
 }
 

@@ -3248,6 +3248,8 @@ updateTemplateUndoRedoButtons();
 //start of TEMPALTE ADD POP UP
 // Clone the container
 const clonedSlidingInputView = slidingInputView.cloneNode(true);
+clonedSlidingInputView.id = 'clonedSlidingInputView';
+clonedSlidingInputView.classList.remove('sliding-input-view', 'dynamic-bar-active', 'has-templates-row', 'show', 'peek-mode');
 clonedSlidingInputView.classList.add('cloned-sliding-view');
 
 // Remove template strip from cloned view
@@ -3262,11 +3264,78 @@ if (selectedTask) {
     selectedTask.remove();  // Remove the selected-task button
 }
 
-const cloneColorMenu = clonedSlidingInputView.querySelector(".palette-button");
-if (cloneColorMenu) {
-    cloneColorMenu.remove();
-}
+// Keep and wire up the palette button & dropdown in cloned template popup
+const clonedPaletteWrapper = clonedSlidingInputView.querySelector('.palette-wrapper');
+const clonedPaletteBtn = clonedSlidingInputView.querySelector('.palette-button');
+const clonedDropdown = clonedSlidingInputView.querySelector('.color-mode-dropdown');
+const clonedShadeSubmenu = clonedSlidingInputView.querySelector('.shade-submenu');
 
+if (clonedPaletteBtn && clonedDropdown) {
+    clonedPaletteBtn.id = 'templatePaletteBtn';
+    clonedDropdown.id = 'templateColorModeDropdown';
+    if (clonedShadeSubmenu) clonedShadeSubmenu.id = 'templateShadeSubmenu';
+
+    // Toggle dropdown on palette button click
+    clonedPaletteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clonedDropdown.classList.toggle('hidden');
+        if (clonedShadeSubmenu) clonedShadeSubmenu.classList.add('hidden');
+    });
+
+    // "All" mode click
+    const clonedAllModeBtn = clonedDropdown.querySelector('.dropdown-option[data-mode="all"]');
+    if (clonedAllModeBtn) {
+        clonedAllModeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            applyColorMode("all");
+            cloneMainDrawerColors();
+            clonedDropdown.classList.add('hidden');
+        });
+    }
+
+    // "Favorites" mode click
+    const clonedRecentModeBtn = clonedDropdown.querySelector('.dropdown-option[data-mode="recent"]');
+    if (clonedRecentModeBtn) {
+        clonedRecentModeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            applyColorMode("recent");
+            cloneMainDrawerColors();
+            clonedDropdown.classList.add('hidden');
+        });
+    }
+
+    // "Shades" submenu toggle
+    const clonedShadesBtn = clonedDropdown.querySelector('.dropdown-option[data-mode="shades"]');
+    if (clonedShadesBtn && clonedShadeSubmenu) {
+        clonedShadesBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clonedShadeSubmenu.classList.toggle('hidden');
+        });
+    }
+
+    // Individual shade color buttons
+    const clonedShadeButtons = clonedDropdown.querySelectorAll('.shade-color-btn');
+    clonedShadeButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const shadeColor = btn.dataset.color;
+            if (shadeColor) {
+                applyColorMode("shades", shadeColor);
+                cloneMainDrawerColors();
+            }
+            clonedDropdown.classList.add('hidden');
+            if (clonedShadeSubmenu) clonedShadeSubmenu.classList.add('hidden');
+        });
+    });
+
+    // Close cloned dropdown when clicking elsewhere in popup
+    clonedSlidingInputView.addEventListener('click', (e) => {
+        if (clonedPaletteWrapper && !clonedPaletteWrapper.contains(e.target)) {
+            clonedDropdown.classList.add('hidden');
+            if (clonedShadeSubmenu) clonedShadeSubmenu.classList.add('hidden');
+        }
+    });
+}
 
 // Remove addTask wrapper / button from cloned template view
 const addTaskWrapperCloned = clonedSlidingInputView.querySelector('.add-task-wrapper') || clonedSlidingInputView.querySelector('#addTask');
@@ -3274,108 +3343,180 @@ if (addTaskWrapperCloned) {
     addTaskWrapperCloned.remove();
 }
 
-
-
-//remove the template button toggle
+// Remove the template button toggle
 const templateTaskBtnCloned = clonedSlidingInputView.querySelector('.template-task-btn');
 if (templateTaskBtnCloned) {
     templateTaskBtnCloned.remove();  // Remove the template-task-btn div
 }
 
+// Remove dynamic bar items from clone to prevent duplicate IDs or layout interference
+const cloneEmojiPicker = clonedSlidingInputView.querySelector('#btnEmojiPicker');
+if (cloneEmojiPicker) cloneEmojiPicker.remove();
+const cloneEmojiTray = clonedSlidingInputView.querySelector('#dynamicEmojiTray');
+if (cloneEmojiTray) cloneEmojiTray.remove();
+const cloneLeftCluster = clonedSlidingInputView.querySelector('#dynamicLeftCluster');
+if (cloneLeftCluster) cloneLeftCluster.remove();
+const cloneSuggestions = clonedSlidingInputView.querySelector('.suggestion-wrapper');
+if (cloneSuggestions) cloneSuggestions.remove();
+
 const colorIndicatorTemplate = clonedSlidingInputView.querySelector(`.flower`);
 
-//change id of submittask to submittemplate 
+// Change id of submittask to submittemplate 
 const inputTemplate = clonedSlidingInputView.querySelector(`#taskTitle`);
 inputTemplate.id = `templateTitle`;
 inputTemplate.placeholder = `Add new template.`;
 
-//get new id for submit button
+// Rename other IDs to prevent DOM duplicates
+const clonedColorPicker = clonedSlidingInputView.querySelector('#colorPicker');
+if (clonedColorPicker) clonedColorPicker.id = 'templateColorPicker';
+const clonedTitleSubmit = clonedSlidingInputView.querySelector('#titleSubmitContainer');
+if (clonedTitleSubmit) clonedTitleSubmit.id = 'templateTitleSubmitContainer';
+const clonedTtsContainer = clonedSlidingInputView.querySelector('#templateTitleSubmitContainer');
+if (clonedTtsContainer) clonedTtsContainer.id = 'clonedTemplateTitleSubmitContainer';
+
+// Get new id for submit button
 const addTemplateButton = clonedSlidingInputView.querySelector('#submitTask');
 addTemplateButton.id = `submitTemplate`;
 addTemplateButton.classList.remove(`buttons`);
 addTemplateButton.classList.add(`submit-btn-cloned`);
 const addTemplateButtonIcon = addTemplateButton.querySelector(`.arrow-upward`);
-// console.log(addTemplateButtonIcon.classList);
 addTemplateButtonIcon.classList.remove(`arrow-upward`);
 addTemplateButtonIcon.classList.add(`add-template-btn-icon`);
 addTemplateButtonIcon.textContent = `add`;
 
-//get unique access to color-option
-const colorOptionTemplate = clonedSlidingInputView.querySelectorAll('.color-option');
-colorOptionTemplate.forEach(option => {
-    option.classList.remove('color-option');
-    option.classList.add('color-option-template');
-});
-
-
 let chosenColorTemplate = `#6a5044`;
-//add click listener to colors
-colorOptionTemplate.forEach(button => {
-    button.addEventListener('click', () => {
-        // Get the selected color
-        chosenColorTemplate = button.getAttribute('data-color');
-        // Highlight the selected button
-        colorOptionTemplate.forEach(btn => {
-            btn.classList.remove('selected-color');
-            btn.parentElement?.classList.remove('selected-container');
+
+// Directly clone the color picker from the main drawer
+function cloneMainDrawerColors() {
+    const mainPicker = document.getElementById('colorPicker');
+    const popupPicker = clonedSlidingInputView.querySelector('#templateColorPicker') || clonedSlidingInputView.querySelector('.color-picker');
+    if (!mainPicker || !popupPicker) return;
+
+    // Directly clone the main colorPicker's inner HTML
+    popupPicker.innerHTML = mainPicker.innerHTML;
+
+    // Sync palette icon and title with main drawer
+    const mainPaletteIcon = document.getElementById('recentcolors-icon');
+    const clonedPaletteIcon = clonedSlidingInputView.querySelector('#templatePaletteBtn span') || clonedSlidingInputView.querySelector('.palette-button span');
+    if (mainPaletteIcon && clonedPaletteIcon) {
+        clonedPaletteIcon.textContent = mainPaletteIcon.textContent;
+    }
+    if (paletteBtn && clonedPaletteBtn) {
+        clonedPaletteBtn.title = paletteBtn.title;
+    }
+
+    // Attach click listeners to the cloned color buttons
+    const clonedButtons = popupPicker.querySelectorAll('.color-option');
+    clonedButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            chosenColorTemplate = btn.getAttribute('data-color') || btn.style.backgroundColor;
+
+            clonedButtons.forEach(b => {
+                b.classList.remove('selected-color');
+                b.parentElement?.classList.remove('selected-container');
+            });
+            btn.classList.add('selected-color');
+            btn.parentElement?.classList.add('selected-container');
+
+            if (colorIndicatorTemplate) {
+                colorIndicatorTemplate.style.color = chosenColorTemplate;
+            }
         });
-        button.classList.add('selected-color');
-        button.parentElement?.classList.add('selected-container');
-        console.log(`color option for template color is ${chosenColorTemplate}`);
-        colorIndicatorTemplate.style.color = chosenColorTemplate;
     });
-});
 
+    // Keep active color matching main drawer or select the first one
+    const selectedBtn = popupPicker.querySelector('.color-option.selected-color');
+    if (selectedBtn) {
+        chosenColorTemplate = selectedBtn.getAttribute('data-color') || selectedBtn.style.backgroundColor;
+        if (colorIndicatorTemplate) {
+            colorIndicatorTemplate.style.color = chosenColorTemplate;
+        }
+    } else if (clonedButtons.length > 0) {
+        clonedButtons[0].click();
+    }
+}
 
+// Initial clone
+cloneMainDrawerColors();
 
 addTemplateButton.addEventListener(`click`, () => {
-    // console.log(inputTemplate.value);
-    addTemplate(inputTemplate.value, chosenColorTemplate);
-    inputTemplate.value = '';
-    addTemplateButton.classList.add(`disabled-btn`);
-
-
-    // alert('Development on-going/ functionality unstable yet. Please sleep.');
+    const val = inputTemplate.value.trim();
+    if (val !== '') {
+        addTemplate(val, chosenColorTemplate);
+        inputTemplate.value = '';
+        addTemplateButton.classList.add(`disabled-btn`);
+        clonedSlidingInputView.style.display = 'none';
+        const overlay = document.getElementById('overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
 });
+
 inputTemplate.addEventListener(`input`, () => {
-    console.log(inputTemplate.value);
-    if (inputTemplate.value !== '') {
+    if (inputTemplate.value.trim() !== '') {
         addTemplateButton.classList.remove(`disabled-btn`);
-    } else if (inputTemplate.value === ``) {
+    } else {
         addTemplateButton.classList.add(`disabled-btn`);
     }
 });
 
+inputTemplate.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (inputTemplate.value.trim() !== '') {
+            addTemplateButton.click();
+        }
+    }
+});
 
 document.body.appendChild(clonedSlidingInputView);
 
-
-
 const closeButtonCloned = document.createElement('button');
 closeButtonCloned.classList.add('close-btn-cloned');
+closeButtonCloned.title = 'Close';
 clonedSlidingInputView.appendChild(closeButtonCloned);
 const closeButtonClonedIcon = document.createElement('span');
 closeButtonClonedIcon.classList.add('material-icons', 'close-btn-cloned-icon');
 closeButtonClonedIcon.textContent = `close`;
-
 closeButtonCloned.appendChild(closeButtonClonedIcon);
-
 
 closeButtonCloned.addEventListener(`click`, () => {
     clonedSlidingInputView.style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
+    if (clonedDropdown) clonedDropdown.classList.add('hidden');
+    if (clonedShadeSubmenu) clonedShadeSubmenu.classList.add('hidden');
+    const overlay = document.getElementById('overlay');
+    if (overlay) overlay.style.display = 'none';
 });
 
+// Close popup if user clicks overlay background
+const overlayElement = document.getElementById('overlay');
+if (overlayElement) {
+    overlayElement.addEventListener('click', () => {
+        if (clonedSlidingInputView.style.display === 'flex') {
+            clonedSlidingInputView.style.display = 'none';
+            if (clonedDropdown) clonedDropdown.classList.add('hidden');
+            if (clonedShadeSubmenu) clonedShadeSubmenu.classList.add('hidden');
+            overlayElement.style.display = 'none';
+        }
+    });
+}
 
-//end of TEMPALTE ADD POP UP
+// End of TEMPLATE ADD POP UP
 
-
-//the add button in movable template
+// The add button in movable template
 addButton.addEventListener('click', () => {
+    inputTemplate.value = '';
+    addTemplateButton.classList.add('disabled-btn');
+    if (clonedDropdown) clonedDropdown.classList.add('hidden');
+    if (clonedShadeSubmenu) clonedShadeSubmenu.classList.add('hidden');
+    cloneMainDrawerColors();
     clonedSlidingInputView.style.display = 'flex';
-    document.getElementById('overlay').style.display = 'block';
-    // alert('This button is under construction. Please bear with the developer. You can eat popcorn for now');
+    const overlay = document.getElementById('overlay');
+    if (overlay) overlay.style.display = 'block';
     console.log('Add button clicked');
+    setTimeout(() => {
+        if (inputTemplate) inputTemplate.focus();
+    }, 60);
 });
 
 
