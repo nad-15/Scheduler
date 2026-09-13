@@ -102,31 +102,82 @@
     }
   }
 
-  // Assemble transcripts directly from event.results faithfully as spoken by the user
+  // Assemble transcripts cleanly from event.results, preventing browser repetition or interim echoes
   function extractSessionTranscript(results) {
     let finalText = '';
     let interimText = '';
 
     for (let i = 0; i < results.length; ++i) {
       const res = results[i];
-      const text = res[0] && res[0].transcript ? res[0].transcript : '';
+      const text = (res[0] && res[0].transcript) ? res[0].transcript.trim() : '';
       if (!text) continue;
 
       if (res.isFinal) {
-        finalText += (finalText ? ' ' : '') + text.trim();
+        if (!finalText) {
+          finalText = text;
+        } else {
+          const lowerFinal = finalText.toLowerCase();
+          const lowerText = text.toLowerCase();
+          // If browser speech recognizer returns cumulative text in subsequent results
+          if (lowerText.startsWith(lowerFinal)) {
+            finalText = text;
+          } else if (lowerFinal.endsWith(lowerText)) {
+            // Duplicate echo from browser bug: ignore
+          } else {
+            finalText += ' ' + text;
+          }
+        }
       } else {
-        interimText += text;
+        // Interim text
+        interimText += (interimText ? ' ' : '') + text;
+      }
+    }
+
+    finalText = finalText.trim();
+    interimText = interimText.trim();
+
+    // Deduplicate interim if it echoes or overlaps what was already finalized!
+    if (finalText && interimText) {
+      const lowerFinal = finalText.toLowerCase();
+      const lowerInterim = interimText.toLowerCase();
+
+      if (lowerInterim === lowerFinal || lowerFinal.endsWith(lowerInterim)) {
+        // The interim is just an echo of the finalized text
+        interimText = '';
+      } else if (lowerInterim.startsWith(lowerFinal)) {
+        // Interim contains the whole finalized string + new words
+        interimText = interimText.slice(finalText.length).trim();
+      } else {
+        // Check if the last word(s) of finalText match the start of interimText
+        const finalWords = finalText.split(/\s+/);
+        const interimWords = interimText.split(/\s+/);
+        let overlapCount = 0;
+        const maxCheck = Math.min(finalWords.length, interimWords.length);
+        for (let len = maxCheck; len > 0; len--) {
+          const finalTail = finalWords.slice(-len).join(' ').toLowerCase();
+          const interimHead = interimWords.slice(0, len).join(' ').toLowerCase();
+          if (finalTail === interimHead) {
+            overlapCount = len;
+            break;
+          }
+        }
+        if (overlapCount > 0) {
+          interimText = interimWords.slice(overlapCount).join(' ');
+        }
       }
     }
 
     return {
-      finalText: finalText.trim(),
-      interimText: interimText.trim()
+      finalText,
+      interimText
     };
   }
 
   function combineVoiceText(prefix, suffix, sessionFinal, sessionInterim) {
-    let speech = (sessionFinal || '') + (sessionFinal && sessionInterim ? ' ' : '') + (sessionInterim || '');
+    let speech = (sessionFinal || '');
+    if (sessionInterim) {
+      speech += (speech ? ' ' : '') + sessionInterim;
+    }
     speech = speech.trim();
 
     if (!speech) {
@@ -159,6 +210,7 @@
         recognitionInstance.onresult = null;
         recognitionInstance.onerror = null;
         recognitionInstance.onend = null;
+        recognitionInstance.stop();
         recognitionInstance.abort();
       } catch (e) {
         // ignore
@@ -566,7 +618,10 @@
   }
 
   // --- Event Bindings ---
+  let isEventsBound = false;
   function bindEvents() {
+    if (isEventsBound) return;
+    isEventsBound = true;
     if (btnCollapseActions) {
       btnCollapseActions.addEventListener('click', (e) => {
         e.stopPropagation();

@@ -7773,7 +7773,7 @@ ic {
     gap: 8px;
     width: 100%;
     position: relative;
-    padding: 2px 4px;
+    padding: 2px 0;
     box-sizing: border-box;
     min-height: 40px;
 }
