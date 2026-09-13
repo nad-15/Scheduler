@@ -31,8 +31,15 @@
     '💼', '📄', '🔍', '🎯', '📌', '✅', '📝', '💡', '🔔', '⭐', '🔥', '❗'
   ];
 
-  let isManualExpanded = false;
+  let isManualTextareaExpanded = false;
   let isEmojiTrayOpen = false;
+
+  // Touch gesture tracking for swipe-to-expand without keyboard
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  let isHorizontalSwipe = false;
+  let justSwiped = false;
 
   // DOM Elements
   let slidingInputView = null;
@@ -192,22 +199,12 @@
     if (!taskTitle || !slidingInputView) return;
     if (!slidingInputView.classList.contains('dynamic-bar-active')) return;
 
-    const hasText = taskTitle.value.trim().length > 0;
+    // The textarea should ONLY be extended for two actions: focused and swipe left
     const isFocused = document.activeElement === taskTitle;
+    const shouldExtend = isFocused || isManualTextareaExpanded;
 
-    if (isManualExpanded) {
-      // User tapped [ > ] to reveal actions manually
-      setCollapsedState(false);
-      collapseTextareaToSingleLine();
-      if (typeof window.syncTaskToolbarWithDrawer === 'function') {
-        window.syncTaskToolbarWithDrawer();
-      }
-      return;
-    }
-
-    if (hasText || isFocused) {
+    if (shouldExtend) {
       setCollapsedState(true);
-      // When left tools are collapsed, textarea should always be expanded if it has multi-line content
       autoResizeTextarea();
     } else {
       setCollapsedState(false);
@@ -217,6 +214,126 @@
     if (typeof window.syncTaskToolbarWithDrawer === 'function') {
       window.syncTaskToolbarWithDrawer();
     }
+  }
+
+  // --- Horizontal Swipe Detection on Textarea / Pill (Preview text without Virtual Keyboard) ---
+  function handleTouchStart(e) {
+    if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
+    if (e._handledDynamicSwipe) return;
+    e._handledDynamicSwipe = true;
+
+    // If taskTitle is currently focused, do not intercept touches.
+    // Preserves native caret positioning, text selection, and vertical scrolling while editing.
+    if (document.activeElement === taskTitle) {
+      isHorizontalSwipe = false;
+      return;
+    }
+
+    // Ignore touches on the emoji trigger or flower container
+    if (btnEmojiPicker && btnEmojiPicker.contains(e.target)) return;
+    if (flowerContainer && flowerContainer.contains(e.target)) return;
+
+    if (e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+    isHorizontalSwipe = false;
+  }
+
+  function handleTouchMove(e) {
+    if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
+    if (e._handledDynamicSwipe) return;
+    e._handledDynamicSwipe = true;
+
+    if (document.activeElement === taskTitle) return;
+    if (e.touches.length !== 1) return;
+
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const dx = currentX - touchStartX;
+    const dy = currentY - touchStartY;
+
+    // Detect if horizontal displacement is clearly dominant
+    if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      isHorizontalSwipe = true;
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+    }
+  }
+
+  function handleTouchEnd(e) {
+    if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
+    if (e._handledDynamicSwipe) return;
+    e._handledDynamicSwipe = true;
+
+    if (document.activeElement === taskTitle) return;
+
+    const touchEndTime = Date.now();
+    const duration = touchEndTime - touchStartTime;
+    const touch = e.changedTouches ? e.changedTouches[0] : null;
+    if (!touch) return;
+
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+
+    const isValidSwipe = (isHorizontalSwipe && Math.abs(dx) >= 25) ||
+                         (Math.abs(dx) >= 30 && Math.abs(dx) > Math.abs(dy) * 1.2 && duration < 600);
+
+    if (isValidSwipe) {
+      justSwiped = true;
+      setTimeout(() => {
+        justSwiped = false;
+      }, 350);
+
+      // Keep textarea blurred so virtual keyboard does NOT show up
+      if (document.activeElement === taskTitle) {
+        taskTitle.blur();
+      }
+
+      if (dx < -25) {
+        // SWIPE LEFT (Action 2): Expand textarea without keyboard, collapse left tools
+        isManualTextareaExpanded = true;
+        updateCollapseLogic();
+        requestAnimationFrame(() => {
+          autoResizeTextarea();
+        });
+      } else if (dx > 25) {
+        // SWIPE RIGHT: Uncollapse left tools, contract textarea to single line
+        isManualTextareaExpanded = false;
+        if (document.activeElement === taskTitle) {
+          taskTitle.blur();
+        }
+        updateCollapseLogic();
+      }
+    }
+
+    isHorizontalSwipe = false;
+  }
+
+  function handleTouchCancel() {
+    isHorizontalSwipe = false;
+  }
+
+  function handleOutsideInteraction(e) {
+    if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
+
+    // Tapping directly on taskTitle allows native focus & typing to proceed (Action 1)
+    if (e.target === taskTitle) return;
+
+    // Allow emoji picker button and emoji tray interactions
+    if (btnEmojiPicker && btnEmojiPicker.contains(e.target)) return;
+    if (dynamicEmojiTray && dynamicEmojiTray.contains(e.target)) return;
+
+    // For any other interaction anywhere on the screen (colors, calendar, toolbar, counter, add task, chevron, etc.):
+    // Neither action (focus or swipe-left) is active, so textarea MUST NOT be extended:
+    if (document.activeElement === taskTitle) {
+      taskTitle.blur();
+    }
+    if (isManualTextareaExpanded) {
+      isManualTextareaExpanded = false;
+    }
+    updateCollapseLogic();
   }
 
   // --- Template Strip Quick Toggler ---
@@ -299,7 +416,7 @@
         window.applySlidingTemplatesRowState(isTemplatesEnabled);
       }
 
-      isManualExpanded = false;
+      isManualTextareaExpanded = false;
       autoResizeTextarea();
       updateCollapseLogic();
     } else {
@@ -334,6 +451,7 @@
       }
 
       closeEmojiTray();
+      isManualTextareaExpanded = false;
       if (taskTitle) taskTitle.style.height = '';
     }
   }
@@ -346,7 +464,10 @@
     if (btnCollapseActions) {
       btnCollapseActions.addEventListener('click', (e) => {
         e.stopPropagation();
-        isManualExpanded = true;
+        if (document.activeElement === taskTitle) {
+          taskTitle.blur();
+        }
+        isManualTextareaExpanded = false;
         updateCollapseLogic();
       });
     }
@@ -380,45 +501,103 @@
       }, { passive: false });
     }
 
-    // Tapping flower paw or submit button returns to color view
+    // Tapping flower paw or submit button returns to color view and uncollapses
     if (flowerContainer) {
       flowerContainer.addEventListener('click', () => {
         if (isEmojiTrayOpen) closeEmojiTray();
+        if (document.activeElement === taskTitle) {
+          taskTitle.blur();
+        }
+        isManualTextareaExpanded = false;
+        updateCollapseLogic();
       });
     }
 
     if (submitTask) {
       submitTask.addEventListener('click', () => {
         if (isEmojiTrayOpen) closeEmojiTray();
+        if (document.activeElement === taskTitle) {
+          taskTitle.blur();
+        }
+        isManualTextareaExpanded = false;
         setTimeout(updateCollapseLogic, 50);
       });
     }
 
-    // Close emoji tray on Escape key
+    // Close emoji tray or exit preview on Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isEmojiTrayOpen) {
-        closeEmojiTray();
+      if (e.key === 'Escape') {
+        if (isEmojiTrayOpen) closeEmojiTray();
+        if (isManualTextareaExpanded) {
+          isManualTextareaExpanded = false;
+          updateCollapseLogic();
+        }
       }
     });
 
+    // Global capture listener: Any interaction outside taskTitle (colors, calendar, toolbar, counter, etc.)
+    // guarantees tools immediately uncollapse and textarea contracts
+    document.addEventListener('pointerdown', handleOutsideInteraction, true);
+    document.addEventListener('touchstart', handleOutsideInteraction, { capture: true, passive: true });
+    document.addEventListener('click', handleOutsideInteraction, true);
+
+    // Direct listener on color options container for instant response
+    const colorOptionsContainer = document.querySelector('.color-button-options');
+    if (colorOptionsContainer) {
+      const handleColorInteraction = () => {
+        if (document.activeElement === taskTitle) {
+          taskTitle.blur();
+        }
+        isManualTextareaExpanded = false;
+        updateCollapseLogic();
+      };
+      colorOptionsContainer.addEventListener('pointerdown', handleColorInteraction, true);
+      colorOptionsContainer.addEventListener('click', handleColorInteraction, true);
+    }
+
     if (taskTitle) {
+      // Suppress synthetic click/focus after a swipe gesture
+      taskTitle.addEventListener('click', (e) => {
+        if (justSwiped) {
+          e.preventDefault();
+          e.stopPropagation();
+          taskTitle.blur();
+        }
+      }, true);
+
       taskTitle.addEventListener('focus', () => {
-        isManualExpanded = false;
+        if (justSwiped) {
+          taskTitle.blur();
+          return;
+        }
+        isManualTextareaExpanded = false;
         autoResizeTextarea();
         updateCollapseLogic();
       });
 
       taskTitle.addEventListener('blur', () => {
-        isManualExpanded = false;
-        // Delay slightly in case user clicked on an action button
-        setTimeout(updateCollapseLogic, 180);
+        setTimeout(() => {
+          updateCollapseLogic();
+        }, 50);
       });
 
       taskTitle.addEventListener('input', () => {
-        isManualExpanded = false;
+        isManualTextareaExpanded = false;
         autoResizeTextarea();
         updateCollapseLogic();
       });
+
+      taskTitle.addEventListener('touchstart', handleTouchStart, { passive: true });
+      taskTitle.addEventListener('touchmove', handleTouchMove, { passive: false });
+      taskTitle.addEventListener('touchend', handleTouchEnd, { passive: true });
+      taskTitle.addEventListener('touchcancel', handleTouchCancel, { passive: true });
+    }
+
+    if (titleSubmitContainer) {
+      titleSubmitContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+      titleSubmitContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+      titleSubmitContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+      titleSubmitContainer.addEventListener('touchcancel', handleTouchCancel, { passive: true });
     }
 
     // Automatically close emoji tray if the drawer is closed or hidden

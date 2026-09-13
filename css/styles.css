@@ -8040,6 +8040,7 @@ ic {
     box-sizing: border-box;
     border: none;
     transition: background-color 0.2s, box-shadow 0.2s;
+    touch-action: pan-y;
 }
 
 .sliding-input-view.dynamic-bar-active .title-submit-container:focus-within {
@@ -8082,6 +8083,7 @@ ic {
     resize: none;
     scrollbar-width: thin;
     word-break: break-word;
+    touch-action: pan-y;
 }
 
 .sliding-input-view.dynamic-bar-active .input-task-template::-webkit-scrollbar {
