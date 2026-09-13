@@ -2196,24 +2196,91 @@ function submitTask() {
     }
 }
 
+function sortTemplatesByFavorite() {
+    if (!Array.isArray(taskClipboard) || taskClipboard.length === 0) return;
+    const favorites = [];
+    const nonFavorites = [];
+    taskClipboard.forEach(task => {
+        if (task && task.favorite) {
+            favorites.push(task);
+        } else if (task) {
+            nonFavorites.push(task);
+        }
+    });
+    taskClipboard = [...favorites, ...nonFavorites];
+}
+
 function bumpTemplateToTop(text, color) {
     if (!text || !color) return;
     const normColor = normalizeHex(color);
 
-    // 1. Move to index 0 in taskClipboard and save
     const index = taskClipboard.findIndex(task => 
         task.text === text && normalizeHex(task.color) === normColor
     );
 
     if (index !== -1) {
         const [matched] = taskClipboard.splice(index, 1);
-        taskClipboard.unshift(matched);
+        if (matched.favorite) {
+            // Favorites tier: move to index 0 (top of favorites)
+            taskClipboard.unshift(matched);
+        } else {
+            // Regular tier: move to top of non-favorites (right after all favorites)
+            const firstNonFavIndex = taskClipboard.findIndex(task => !task.favorite);
+            if (firstNonFavIndex === -1) {
+                taskClipboard.push(matched);
+            } else {
+                taskClipboard.splice(firstNonFavIndex, 0, matched);
+            }
+        }
         saveTemplate();
+        renderJobTemplates();
+        renderSlidingTemplates();
+    }
+}
+
+function toggleTemplateFavorite(taskText, taskColor) {
+    if (!taskText || !taskColor) return;
+    const normColor = normalizeHex(taskColor);
+    const index = taskClipboard.findIndex(task => 
+        task.text === taskText && normalizeHex(task.color) === normColor
+    );
+    if (index === -1) return;
+
+    saveTemplateStateForUndo();
+
+    const task = taskClipboard[index];
+    const isNowFav = !task.favorite;
+    if (isNowFav) {
+        task.favorite = true;
+    } else {
+        delete task.favorite;
+    }
+
+    // Reposition within taskClipboard:
+    taskClipboard.splice(index, 1);
+    if (isNowFav) {
+        // Move to top of favorites (index 0)
+        taskClipboard.unshift(task);
+    } else {
+        // Move to top of non-favorites (after remaining favorites)
+        const firstNonFavIndex = taskClipboard.findIndex(t => !t.favorite);
+        if (firstNonFavIndex === -1) {
+            taskClipboard.push(task);
+        } else {
+            taskClipboard.splice(firstNonFavIndex, 0, task);
+        }
+    }
+
+    saveTemplate();
+    renderJobTemplates();
+    renderSlidingTemplates();
+    updateTemplateUndoRedoButtons();
+    if (typeof updateMovableMasonry === 'function') {
+        requestAnimationFrame(updateMovableMasonry);
     }
 }
 
 function addTemplate(taskTitle, color) {
-
     //save task template here
     if (taskTitle !== ``) {
         const normColor = normalizeHex(color);
@@ -2228,29 +2295,23 @@ function addTemplate(taskTitle, color) {
         );
 
         if (existingIndex !== -1) {
-            // Already exists -> pull it to position #1 (front of list & top of dock)
+            // Already exists -> bump according to favorite tier
             bumpTemplateToTop(taskTitle, color);
         } else {
             // Save undo state before modifying taskClipboard
             saveTemplateStateForUndo();
 
-            // If the task doesn't exist, push to front of the array (position #1)
-            taskClipboard.unshift(taskTemplate);
+            // Insert at top of non-favorites (after any favorites)
+            const firstNonFavIndex = taskClipboard.findIndex(task => !task.favorite);
+            if (firstNonFavIndex === -1) {
+                taskClipboard.push(taskTemplate);
+            } else {
+                taskClipboard.splice(firstNonFavIndex, 0, taskTemplate);
+            }
 
-            // Create the div and append it to the container
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('items'); // Add the 'items' class
-
-            // Set the background color of the div based on the task's color
-            itemDiv.style.backgroundColor = taskTemplate.color;
-
-            // Set the text content of the div based on the task's title
-            itemDiv.textContent = taskTemplate.text;
-
-            // Append the created item div to the container
-            jobTemplateContainer.prepend(itemDiv);
             // Save the updated taskClipboard to localStorage
             saveTemplate();
+            renderJobTemplates();
             renderSlidingTemplates();
             if (typeof updateMovableMasonry === 'function') {
                 requestAnimationFrame(updateMovableMasonry);
@@ -2308,8 +2369,8 @@ const startMovableLongPress = (item, clientX, clientY) => {
         if (navigator.vibrate) {
             try { navigator.vibrate(40); } catch (_) {}
         }
-        const taskText = item.textContent ? item.textContent.trim() : '';
-        const taskColor = rgbToHex(item.style.backgroundColor) || '#6a5044';
+        const taskText = item.dataset.taskText || (item.textContent ? item.textContent.trim() : '');
+        const taskColor = item.dataset.taskColor || rgbToHex(item.style.backgroundColor) || '#6a5044';
         openTemplateStripDropdown(item, taskText, taskColor);
     }, 400);
 };
@@ -2336,7 +2397,7 @@ if (jobTemplateContainer) {
     jobTemplateContainer.addEventListener('touchend', (e) => {
         cancelMovableLongPress();
         if (isMovableLongPressTriggered) {
-            if (e.cancelable) e.preventDefault();
+            if (e.cancelable) event.preventDefault();
         }
     });
 
@@ -2402,13 +2463,32 @@ if (jobTemplateContainer) {
             return;
         }
 
+        const taskText = item.dataset.taskText || item.querySelector('.item-text')?.textContent || item.textContent;
+        const taskColor = item.dataset.taskColor || rgbToHex(item.style.backgroundColor) || '#6a5044';
+
         if (isTemplateEditMode) {
-            item.style.transform = 'scale(0.7)';
-            item.style.opacity = '0';
-            setTimeout(() => {
-                removeTemplate(item);
-                renderSlidingTemplates();
-            }, 150);
+            // Check if user clicked the Favorite Star button
+            const favBtn = event.target.closest('.template-fav-btn');
+            if (favBtn) {
+                event.stopPropagation();
+                toggleTemplateFavorite(taskText, taskColor);
+                return;
+            }
+
+            // Check if user clicked the Delete button
+            const delBtn = event.target.closest('.template-del-btn');
+            if (delBtn) {
+                event.stopPropagation();
+                item.style.transform = 'scale(0.7)';
+                item.style.opacity = '0';
+                setTimeout(() => {
+                    removeTemplate(item);
+                    renderSlidingTemplates();
+                }, 150);
+                return;
+            }
+
+            // Clicking elsewhere on the item in edit mode does nothing
             return;
         }
 
@@ -2418,8 +2498,8 @@ if (jobTemplateContainer) {
 
 
 function submitTemplate(item) {
-    const taskText = item.textContent;
-    const taskColor = rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
+    const taskText = item.dataset.taskText || item.querySelector('.item-text')?.textContent || item.textContent;
+    const taskColor = item.dataset.taskColor || rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
 
     // Move to position #1 in array and storage (will show at top next time dock is opened)
     bumpTemplateToTop(taskText, taskColor);
@@ -2499,8 +2579,8 @@ function removeTemplate(item) {
     saveTemplateStateForUndo();
 
     // Get task text and color from the clicked item
-    const taskText = item.textContent;
-    const taskColor = normalizeHex(item.style.backgroundColor);
+    const taskText = item.dataset.taskText || item.querySelector('.item-text')?.textContent || item.textContent;
+    const taskColor = item.dataset.taskColor || normalizeHex(item.style.backgroundColor);
 
     console.log(taskText, taskColor);
 
@@ -2534,14 +2614,39 @@ function renderJobTemplates() {
     if (!jobTemplateContainer) return;
     jobTemplateContainer.innerHTML = '';
     taskClipboard.forEach(task => {
+        if (!task || !task.text) return;
         const itemDiv = document.createElement('div');
-        itemDiv.classList.add('items'); // Add the 'items' class
+        itemDiv.classList.add('items');
+        if (task.favorite) {
+            itemDiv.classList.add('is-favorite');
+        }
+        itemDiv.dataset.taskText = task.text;
+        itemDiv.dataset.taskColor = task.color;
 
         // Set the background color of the div based on the task's color
         itemDiv.style.backgroundColor = task.color;
 
-        // Set the text content of the div based on the task's title
-        itemDiv.textContent = task.text;
+        // Favorite star button (always interactive in edit mode, gold star indicator in normal mode)
+        const favBtn = document.createElement('button');
+        favBtn.type = 'button';
+        favBtn.className = 'template-fav-btn';
+        favBtn.title = task.favorite ? 'Remove from favorites' : 'Mark as favorite';
+        favBtn.innerHTML = `<span class="material-symbols-outlined fav-star-icon">${task.favorite ? 'star' : 'star'}</span>`;
+        itemDiv.appendChild(favBtn);
+
+        // Text content span
+        const textSpan = document.createElement('span');
+        textSpan.className = 'item-text';
+        textSpan.textContent = task.text;
+        itemDiv.appendChild(textSpan);
+
+        // Delete button in edit mode
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'template-del-btn';
+        delBtn.title = 'Delete template';
+        delBtn.textContent = '×';
+        itemDiv.appendChild(delBtn);
 
         // Append the created item div to the container
         jobTemplateContainer.appendChild(itemDiv);
@@ -2556,8 +2661,9 @@ function loadTemplate() {
     const savedTemplate = JSON.parse(localStorage.getItem('taskClipboard'));
 
     // If there are tasks saved in localStorage, load them into taskClipboard
-    if (savedTemplate) {
+    if (savedTemplate && Array.isArray(savedTemplate)) {
         taskClipboard = savedTemplate;
+        sortTemplatesByFavorite();
     }
     renderJobTemplates();
     renderSlidingTemplates();

@@ -6091,6 +6091,22 @@ input[type="radio"]:checked::after {
     transform: scale(1.02);
 }
 
+.movable-template:not(.is-editing) .items.is-favorite {
+    border: 1.5px solid #FFD700;
+}
+
+.template-fav-btn,
+.template-del-btn {
+    display: none !important;
+}
+
+.items .item-text {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    pointer-events: none;
+}
+
 .movable-template.is-expanded .items {
     width: 100%;
     min-width: 0;
@@ -6100,7 +6116,8 @@ input[type="radio"]:checked::after {
 .movable-template.is-editing .items {
     position: relative;
     border: 1.5px dashed rgba(255, 255, 255, 0.95);
-    cursor: pointer;
+    cursor: default;
+    padding-left: 14px;
     padding-right: 22px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
     transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
@@ -6115,23 +6132,89 @@ input[type="radio"]:checked::after {
 }
 
 .movable-template.is-editing .items::after {
-    content: '×';
+    display: none !important;
+}
+
+.movable-template.is-editing .items .template-fav-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
     position: absolute;
-    right: 4px;
+    left: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.48);
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    z-index: 2;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.movable-template.is-editing .items .template-fav-btn:hover {
+    transform: scale(1.22);
+    background: rgba(0, 0, 0, 0.72);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.movable-template.is-editing .items .template-fav-btn:active {
+    transform: scale(0.92);
+}
+
+.movable-template.is-editing .items .template-fav-btn .fav-star-icon {
+    font-size: 12px;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.72);
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    transition: color 0.18s ease;
+}
+
+.movable-template.is-editing .items .template-fav-btn:hover .fav-star-icon {
+    color: #ffffff;
+}
+
+.movable-template.is-editing .items.is-favorite .template-fav-btn {
+    background: rgba(0, 0, 0, 0.65);
+    box-shadow: 0 0 6px rgba(255, 184, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.movable-template.is-editing .items.is-favorite .template-fav-btn .fav-star-icon {
+    color: #FFB800;
+    text-shadow: 0 0 5px rgba(255, 184, 0, 0.7);
+    font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 20;
+}
+
+.movable-template.is-editing .items .template-del-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 3px;
     top: 50%;
     transform: translateY(-50%);
-    width: 15px;
-    height: 15px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.52);
+    border: none;
+    padding: 0;
+    margin: 0;
     color: #ffffff;
     font-size: 13px;
     font-weight: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     line-height: 1;
-    pointer-events: none;
+    cursor: pointer;
+    z-index: 2;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
     transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -6142,11 +6225,14 @@ input[type="radio"]:checked::after {
     transform: scale(1.03);
 }
 
-.movable-template.is-editing .items:hover::after {
+.movable-template.is-editing .items .template-del-btn:hover {
     transform: translateY(-50%) scale(1.18);
     background: rgba(0, 0, 0, 0.75);
-    color: #ffffff;
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.9);
+}
+
+.movable-template.is-editing .items .template-del-btn:active {
+    transform: translateY(-50%) scale(0.92);
 }
 
 .items:active {
