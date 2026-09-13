@@ -219,6 +219,92 @@
     }
   }
 
+  function startListeningSession() {
+    if (!isVoiceRecording) return;
+    if (slidingInputView && !slidingInputView.classList.contains('show')) {
+      stopSpeechRecognition();
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    cleanupRecognitionInstance();
+
+    try {
+      const rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = navigator.language || 'en-CA';
+
+      rec.onstart = () => {
+        if (!isVoiceRecording) {
+          cleanupRecognitionInstance();
+        }
+      };
+
+      rec.onresult = (event) => {
+        if (!taskTitle || !isVoiceRecording) return;
+        // If drawer has been closed in the meantime, stop immediately
+        if (slidingInputView && !slidingInputView.classList.contains('show')) {
+          stopSpeechRecognition();
+          return;
+        }
+        const { finalText, interimText } = extractSessionTranscript(event.results);
+        const { text, cursorPos } = combineVoiceText(voicePrefixText, voiceSuffixText, finalText, interimText);
+        taskTitle.value = text;
+        taskTitle.setSelectionRange(cursorPos, cursorPos);
+        lastCursorStart = cursorPos;
+        lastCursorEnd = cursorPos;
+        autoResizeTextarea();
+        taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+
+      rec.onerror = (event) => {
+        console.warn('SpeechRecognition event/error:', event.error);
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          alert('Microphone access was not allowed. Please grant microphone permission in your browser settings.');
+          stopSpeechRecognition();
+          return;
+        }
+        // Silence timeouts ('no-speech') are normal during pauses: ignore so keep-alive continues
+        if (event.error === 'no-speech') {
+          return;
+        }
+      };
+
+      rec.onend = () => {
+        // If user explicitly turned off mic, or drawer closed, stop completely
+        if (!isVoiceRecording) return;
+        if (slidingInputView && !slidingInputView.classList.contains('show')) {
+          stopSpeechRecognition();
+          return;
+        }
+
+        // Commit current text to voicePrefixText so subsequent words append smoothly
+        if (taskTitle) {
+          const val = taskTitle.value || '';
+          const curPos = (lastCursorStart >= 0 && lastCursorStart <= val.length) ? lastCursorStart : val.length;
+          voicePrefixText = val.slice(0, curPos);
+          voiceSuffixText = val.slice(curPos);
+        }
+
+        // Keep the mic alive! Restart seamlessly
+        setTimeout(() => {
+          if (isVoiceRecording) {
+            startListeningSession();
+          }
+        }, 80);
+      };
+
+      recognitionInstance = rec;
+      rec.start();
+    } catch (err) {
+      console.warn('SpeechRecognition creation/start error:', err);
+      stopSpeechRecognition();
+    }
+  }
+
   function startSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -231,7 +317,6 @@
       return;
     }
 
-    cleanupRecognitionInstance();
     isVoiceRecording = true;
 
     if (taskTitle) {
@@ -274,57 +359,7 @@
       btnVoiceInput.title = 'Listening... Tap mic to stop';
     }
 
-    try {
-      const rec = new SpeechRecognition();
-      rec.continuous = true;
-      rec.interimResults = true;
-      rec.lang = navigator.language || 'en-CA';
-
-      rec.onstart = () => {
-        isVoiceRecording = true;
-        setVoiceRecordingMode(true);
-        if (btnVoiceInput) {
-          btnVoiceInput.classList.add('recording');
-          btnVoiceInput.title = 'Listening... Tap mic to stop';
-        }
-      };
-
-      rec.onresult = (event) => {
-        if (!taskTitle) return;
-        // If drawer has been closed in the meantime, stop immediately
-        if (slidingInputView && !slidingInputView.classList.contains('show')) {
-          stopSpeechRecognition();
-          return;
-        }
-        const { finalText, interimText } = extractSessionTranscript(event.results);
-        const { text, cursorPos } = combineVoiceText(voicePrefixText, voiceSuffixText, finalText, interimText);
-        taskTitle.value = text;
-        taskTitle.setSelectionRange(cursorPos, cursorPos);
-        lastCursorStart = cursorPos;
-        lastCursorEnd = cursorPos;
-        autoResizeTextarea();
-        taskTitle.dispatchEvent(new Event('input', { bubbles: true }));
-      };
-
-      rec.onerror = (event) => {
-        console.warn('SpeechRecognition event/error:', event.error);
-        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-          alert('Microphone access was not allowed. Please grant microphone permission in your browser settings.');
-        }
-        stopSpeechRecognition();
-      };
-
-      rec.onend = () => {
-        // Speech ended naturally - stop cleanly without restarting
-        stopSpeechRecognition();
-      };
-
-      recognitionInstance = rec;
-      rec.start();
-    } catch (err) {
-      console.warn('SpeechRecognition creation/start error:', err);
-      stopSpeechRecognition();
-    }
+    startListeningSession();
   }
 
   function stopSpeechRecognition() {
