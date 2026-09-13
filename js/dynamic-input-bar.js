@@ -665,6 +665,15 @@
       });
     }
 
+    if (emojiGridContainer) {
+      emojiGridContainer.addEventListener('wheel', (e) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          emojiGridContainer.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    }
+
     // Tapping flower paw or submit button returns to color view
     if (flowerContainer) {
       flowerContainer.addEventListener('click', () => {
