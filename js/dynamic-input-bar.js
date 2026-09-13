@@ -13,6 +13,7 @@
 
   // --- Curated Emojis tailored for Nurse in Canada (Health, Outdoors, Home, Errands, Church, Social, Work) ---
   const CURATED_EMOJIS = [
+    '💩',
     // Row 1: Clinical Essentials, Daily Laundry & Cooking
     '👩‍⚕️', '🩺', '🏥', '📋', '💊', '🌡️', '🧺', '🍳',
     // Row 2: Laptop Charting, Shift Alarm, Rest, Shopping & Canadian Outdoors
