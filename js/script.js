@@ -3050,12 +3050,27 @@ function clearSelection() {
 
 
 
-clearButton.addEventListener('dblclick', deleteFunction);
-clearButton.addEventListener('touchend', () => {
-    handleTouchEnd(deleteFunction);
-});
+if (clearButton) {
+    clearButton.addEventListener('click', () => {
+        if (selectedDivs.length === 0) {
+            triggerShakeEffect();
+        }
+    });
+    clearButton.addEventListener('dblclick', deleteFunction);
+    clearButton.addEventListener('touchend', () => {
+        if (selectedDivs.length === 0) {
+            triggerShakeEffect();
+            return;
+        }
+        handleTouchEnd(deleteFunction);
+    });
+}
 
 function deleteFunction() {
+    if (selectedDivs.length === 0) {
+        triggerShakeEffect();
+        return;
+    }
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
     selectedDivs.forEach(selectedDiv => {
@@ -3694,11 +3709,26 @@ addButton.addEventListener('click', (e) => {
 
 
 
-deleteButton.addEventListener('dblclick', deleteFunction);
-deleteButton.addEventListener('touchend', () => {
-    handleTouchEnd(deleteFunction);
-    console.log(`deleteButton`);
-});
+if (deleteButton) {
+    deleteButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (selectedDivs.length === 0) {
+            triggerShakeEffect();
+        }
+    });
+    deleteButton.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        deleteFunction();
+    });
+    deleteButton.addEventListener('touchend', (e) => {
+        e.stopPropagation();
+        if (selectedDivs.length === 0) {
+            triggerShakeEffect();
+            return;
+        }
+        handleTouchEnd(deleteFunction);
+    });
+}
 
 deselectTemplateBtn.addEventListener('dblclick', clearSelection);
 deselectTemplateBtn.addEventListener('touchend', () => {
@@ -3793,7 +3823,11 @@ function normalizeHex(color) {
 }
 
 // Function to trigger the shake effect
+let lastShakeTime = 0;
 function triggerShakeEffect() {
+    const now = Date.now();
+    if (now - lastShakeTime < 350) return;
+    lastShakeTime = now;
     [selectedTaskCounter, deselectTemplateBtn].forEach(el => {
         if (!el) return;
         el.classList.remove('shake-btn');
