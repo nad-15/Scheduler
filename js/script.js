@@ -2233,8 +2233,6 @@ function bumpTemplateToTop(text, color) {
             }
         }
         saveTemplate();
-        renderJobTemplates();
-        renderSlidingTemplates();
     }
 }
 
@@ -2501,9 +2499,6 @@ function submitTemplate(item) {
     const taskText = item.dataset.taskText || item.querySelector('.item-text')?.textContent || item.textContent;
     const taskColor = item.dataset.taskColor || rgbToHex(item.style.backgroundColor); // Convert RGB to HEX
 
-    // Move to position #1 in array and storage (will show at top next time dock is opened)
-    bumpTemplateToTop(taskText, taskColor);
-
     if (taskColor) {
         const colorBtn = document.querySelector(`button.color-option[data-color="${taskColor}"]`);
         if (colorBtn) {
@@ -2526,6 +2521,9 @@ function submitTemplate(item) {
     }
 
     if (selectedDivs.length > 0) {
+        // Only bump template in array/storage when actually inserted/stamped into selected divs
+        bumpTemplateToTop(taskText, taskColor);
+
         const storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
         selectedDivs.forEach(div => {
@@ -2809,10 +2807,7 @@ function renderSlidingTemplates() {
                 return;
             }
 
-            // 1. Recency bump in data/storage (remains stationary while drawer is open)
-            bumpTemplateToTop(task.text, hexColor);
-
-            // 2. Select & scroll color in color picker
+            // 1. Select & scroll color in color picker
             const normHex = normalizeHex(hexColor);
             const colorBtn = document.querySelector(`button.color-option[data-color="${normHex}"]`)
                           || document.querySelector(`button.color-option[data-color="${hexColor}"]`);
@@ -2831,15 +2826,16 @@ function renderSlidingTemplates() {
                 }
             }
 
-            // 3. Load text into taskTitle input and dispatch input event
+            // 2. Load text into taskTitle input and dispatch input event
             const taskTitleInput = document.getElementById('taskTitle');
             if (taskTitleInput) {
                 taskTitleInput.value = task.text;
                 taskTitleInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
 
-            // 4. If selectedDivs exist, stamp directly into them
+            // 3. If selectedDivs exist, stamp directly into them AND bump recency in data/storage
             if (selectedDivs.length > 0) {
+                bumpTemplateToTop(task.text, hexColor);
                 selectedDivs.forEach(div => {
                     const span = document.createElement('span');
                     span.className = 'clamp-text';
