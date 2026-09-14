@@ -3290,6 +3290,8 @@ let templateUndoStack = [];
 let templateRedoStack = [];
 
 function saveTemplateStateForUndo() {
+    // Only track history when actively inside Template Edit Mode
+    if (!isTemplateEditMode) return;
     templateUndoStack.push(JSON.stringify(taskClipboard));
     if (templateUndoStack.length > 50) {
         templateUndoStack.shift();
@@ -3299,20 +3301,23 @@ function saveTemplateStateForUndo() {
 }
 
 function updateTemplateUndoRedoButtons() {
+    const canUndo = isTemplateEditMode && templateUndoStack.length > 0;
+    const canRedo = isTemplateEditMode && templateRedoStack.length > 0;
+
     if (btnTemplateUndo) {
-        const canUndo = templateUndoStack.length > 0;
         btnTemplateUndo.disabled = !canUndo;
         btnTemplateUndo.classList.toggle('disabled-btn', !canUndo);
+        btnTemplateUndo.setAttribute('aria-disabled', String(!canUndo));
     }
     if (btnTemplateRedo) {
-        const canRedo = templateRedoStack.length > 0;
         btnTemplateRedo.disabled = !canRedo;
         btnTemplateRedo.classList.toggle('disabled-btn', !canRedo);
+        btnTemplateRedo.setAttribute('aria-disabled', String(!canRedo));
     }
 }
 
 function undoTemplateAction() {
-    if (templateUndoStack.length === 0) return;
+    if (!isTemplateEditMode || templateUndoStack.length === 0) return;
     templateRedoStack.push(JSON.stringify(taskClipboard));
     const previousState = templateUndoStack.pop();
     taskClipboard = JSON.parse(previousState);
@@ -3323,7 +3328,7 @@ function undoTemplateAction() {
 }
 
 function redoTemplateAction() {
-    if (templateRedoStack.length === 0) return;
+    if (!isTemplateEditMode || templateRedoStack.length === 0) return;
     templateUndoStack.push(JSON.stringify(taskClipboard));
     const nextState = templateRedoStack.pop();
     taskClipboard = JSON.parse(nextState);
@@ -3335,6 +3340,11 @@ function redoTemplateAction() {
 
 function setTemplateEditMode(enable) {
     isTemplateEditMode = !!enable;
+
+    // Reset undo/redo history for each editing session so it starts clean
+    templateUndoStack = [];
+    templateRedoStack = [];
+
     if (movableTemplate) {
         movableTemplate.classList.toggle('is-editing', isTemplateEditMode);
     }
@@ -3351,31 +3361,44 @@ function setTemplateEditMode(enable) {
 window.setTemplateEditMode = setTemplateEditMode;
 
 if (btnTemplateMore) {
-    btnTemplateMore.addEventListener('click', () => {
+    btnTemplateMore.addEventListener('click', (e) => {
+        e.stopPropagation();
         setTemplateEditMode(true);
     });
 }
 
 if (btnTemplateDone) {
-    btnTemplateDone.addEventListener('click', () => {
+    btnTemplateDone.addEventListener('click', (e) => {
+        e.stopPropagation();
         setTemplateEditMode(false);
     });
 }
 
 if (btnTemplateUndo) {
-    btnTemplateUndo.addEventListener('click', () => {
+    btnTemplateUndo.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!isTemplateEditMode || btnTemplateUndo.disabled || templateUndoStack.length === 0) {
+            e.preventDefault();
+            return;
+        }
         undoTemplateAction();
     });
 }
 
 if (btnTemplateRedo) {
-    btnTemplateRedo.addEventListener('click', () => {
+    btnTemplateRedo.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!isTemplateEditMode || btnTemplateRedo.disabled || templateRedoStack.length === 0) {
+            e.preventDefault();
+            return;
+        }
         redoTemplateAction();
     });
 }
 
 if (btnDeleteAllTemplates) {
-    btnDeleteAllTemplates.addEventListener('click', () => {
+    btnDeleteAllTemplates.addEventListener('click', (e) => {
+        e.stopPropagation();
         if (!taskClipboard || taskClipboard.length === 0) return;
         if (confirm('Delete all templates? You can use Undo to restore them.')) {
             saveTemplateStateForUndo();
@@ -3653,7 +3676,8 @@ if (overlayElement) {
 // End of TEMPLATE ADD POP UP
 
 // The add button in movable template
-addButton.addEventListener('click', () => {
+addButton.addEventListener('click', (e) => {
+    e.stopPropagation();
     inputTemplate.value = '';
     addTemplateButton.classList.add('disabled-btn');
     if (clonedDropdown) clonedDropdown.classList.add('hidden');

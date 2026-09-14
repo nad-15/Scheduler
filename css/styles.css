@@ -5813,7 +5813,29 @@ input[type="radio"]:checked::after {
 .btn-template-redo.disabled-btn {
     opacity: 0.35 !important;
     cursor: not-allowed !important;
-    pointer-events: none;
+    pointer-events: auto !important;
+}
+
+.btn-template-undo:disabled *,
+.btn-template-redo:disabled *,
+.btn-template-undo.disabled-btn *,
+.btn-template-redo.disabled-btn * {
+    pointer-events: none !important;
+}
+
+.btn-template-undo:disabled:hover,
+.btn-template-redo:disabled:hover,
+.btn-template-undo.disabled-btn:hover,
+.btn-template-redo.disabled-btn:hover {
+    transform: none !important;
+    filter: none !important;
+}
+
+.btn-template-undo:disabled:active,
+.btn-template-redo:disabled:active,
+.btn-template-undo.disabled-btn:active,
+.btn-template-redo.disabled-btn:active {
+    transform: none !important;
 }
 
 .btn-template-undo:not(:disabled):hover .template-btn,
@@ -5921,6 +5943,8 @@ input[type="radio"]:checked::after {
     align-items: center;
     justify-content: center;
     background-color: transparent;
+    width: 28px;
+    height: 28px;
     margin: 0;
     padding: 0;
     border: none;
@@ -5931,14 +5955,14 @@ input[type="radio"]:checked::after {
     transition: transform 0.12s ease;
 }
 
-/* Invisible hit-area expansion: captures edge clicks without shifting container layout by even 1px */
+/* Invisible hit-area expansion: horizontal only, zero vertical overlap to prevent adjacent tool collisions */
 .button-template::before {
     content: '';
     position: absolute;
-    top: -5px;
-    bottom: -5px;
-    left: -5px;
-    right: -5px;
+    top: 0;
+    bottom: 0;
+    left: -4px;
+    right: -4px;
 }
 
 /* Ensure inner icons do not separate event targeting from the button */
@@ -5946,7 +5970,7 @@ input[type="radio"]:checked::after {
     pointer-events: none;
 }
 
-.button-template:active {
+.button-template:not(:disabled):not(.disabled-btn):active {
     transform: scale(0.92);
 }
 
