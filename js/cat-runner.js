@@ -240,13 +240,16 @@
     // Player Variable Jump Physics (Authentic Chrome Dino Parabolic Arc)
     let isJumping = false;
     let isHoldingJump = false;
+    let isLongJump = false;            // True when hold threshold is met
     let jumpTime = 0;                  // Elapsed time of current jump in seconds
-    let currentJumpDuration = 0.72;    // Tap: 0.72s, extends up to 0.84s on hold
-    let currentJumpApexHeight = 11.0;  // Tap: 11.0px (easily clears 1 cactus), extends up to 14.2px on hold
-    let catOffsetY = 0;                // 0 on ground, up to 14.2px at apex
+    let currentJumpDuration = 0.50;    // Short Jump: 0.50s, Long Jump: 0.84s
+    let currentJumpApexHeight = 9.2;   // Short Jump: 9.2px, Long Jump: 14.8px
+    let catOffsetY = 0;                // 0 on ground, up to 14.8px at apex
     let jumpVy = 0;                    // Instantaneous vertical velocity in px/s
     let justPoppedTimer = 0;           // Claw slash spark effect when popping
-    const START_SPEED = 48;            // 48 px/s starting speed (generous reaction time)
+    const START_SPEED = 48;            // 48 px/s starting speed
+    const HOLD_THRESHOLD = 0.18;       // Holding past 180ms activates Long Jump!
+    let jumpPressStartTime = 0;        // Timestamp when pointer/touch was pressed
 
     // Dynamic Speed & Game States
     let currentSpeed = START_SPEED;    // Current running speed
@@ -775,8 +778,7 @@
         canvas.setAttribute('title', 'Click to make the cat jump and pop balloons!');
 
         // Layout: Spans 100% width of row, anchored at bottom = 0
-        // Aligns with the exact padding of all other rows above it!
-        canvas.style.display = 'block';
+        canvas.style.display = 'none'; // Hidden until mini-game explicitly starts!
         canvas.style.position = 'absolute';
         canvas.style.bottom = '0';
         canvas.style.left = '0';
@@ -790,7 +792,7 @@
         canvas.style.imageRendering = 'pixelated';
         canvas.style.imageRendering = 'crisp-edges';
         canvas.style.overflow = 'visible';
-        canvas.style.pointerEvents = 'auto';
+        canvas.style.pointerEvents = 'none'; // Only interactive when game is actively shown!
 
         const dpr = Math.min(window.devicePixelRatio || 1, 3);
         currentLogicalWidth = DEFAULT_WIDTH;
@@ -802,11 +804,14 @@
         ctx.scale(dpr, dpr);
         ctx.imageSmoothingEnabled = false;
 
-        // Unified pointer handling for precise tap vs hold jump height
+        // Interaction listeners on canvas
         canvas.addEventListener('mousedown', onPointerDown);
         canvas.addEventListener('touchstart', onPointerDown, { passive: false });
-        window.addEventListener('mouseup', onPointerUp);
-        window.addEventListener('touchend', onPointerUp, { passive: false });
+
+        // Safe global release listeners with passive: true (only active when game is visible)
+        window.addEventListener('mouseup', onPointerUp, { passive: true });
+        window.addEventListener('touchend', onPointerUp, { passive: true });
+        window.addEventListener('touchcancel', onPointerUp, { passive: true });
 
         return canvas;
     }
@@ -831,9 +836,20 @@
         };
     }
 
+    let isTouchActive = false;
+
     function onPointerDown(e) {
+        if (e.type === 'touchstart') {
+            isTouchActive = true;
+        } else if (e.type === 'mousedown' && isTouchActive) {
+            // Suppress synthetic mousedown that mobile browsers fire after touch
+            return;
+        }
         if (e && e.cancelable) {
             e.preventDefault();
+        }
+        if (canvas && e.pointerId && canvas.setPointerCapture) {
+            try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
         }
         initAudio();
 
@@ -868,33 +884,41 @@
             idlePlayTimer = 0;
             startJump();
         }
-
-        const taskInput = document.getElementById('task');
-        if (taskInput) {
-            taskInput.value = '';
-        }
     }
 
     function onPointerUp(e) {
-        if (isDinoMode) {
-            endJump();
+        if (!isVisible || !isDinoMode) return;
+        if (e && (e.type === 'touchend' || e.type === 'touchcancel')) {
+            setTimeout(() => { isTouchActive = false; }, 350);
         }
+        endJump();
     }
 
     function startJump() {
         if (!isJumping && isDinoMode && !isGameOver) {
             isJumping = true;
             isHoldingJump = true;
+            isLongJump = false;
             jumpTime = 0;
-            currentJumpDuration = 0.48; // Base Short Jump duration (air travel = 23px: clears 1 cactus, fails on 3!)
-            currentJumpApexHeight = 10.5; // Base Short Jump apex (clears 7px short cactus with 3.5px margin)
-            jumpVy = (4 * 10.5) / 0.48;
+            jumpPressStartTime = performance.now();
+            currentJumpDuration = 0.50; // Short Jump (tap): 0.50s duration
+            currentJumpApexHeight = 9.2; // Short Jump (tap): 9.2px apex (clears 1, fails on 3!)
+            jumpVy = (4 * 9.2) / 0.50;
             playRetroJumpSound();
+            console.log('[Cat Runner] 🐾 Jump started! (Tap = Short Jump [apex 9.2px, 0.50s] | Hold > 180ms = Long Jump [apex 14.8px, 0.84s])');
         }
     }
 
     function endJump() {
-        isHoldingJump = false;
+        if (isHoldingJump) {
+            isHoldingJump = false;
+            const holdMs = Math.round(performance.now() - jumpPressStartTime);
+            if (!isLongJump) {
+                console.log(`%c[Cat Runner] 🐇 SHORT JUMP EXECUTED! (Tap: ${holdMs}ms < 180ms | Apex: 9.2px | Air Distance: ~24px | Clears 1 Cactus)`, 'color: #84cc16; font-weight: bold;');
+            } else {
+                console.log(`%c[Cat Runner] 🚀 LONG JUMP RELEASED! (Held: ${holdMs}ms >= 180ms | Apex: ${currentJumpApexHeight.toFixed(1)}px | Air Distance: ~40px | Sails Over 3 Cacti)`, 'color: #38bdf8; font-weight: bold;');
+            }
+        }
     }
 
     function triggerPrepJump() {
@@ -970,6 +994,8 @@
 
         const cvs = createMovieCanvas();
         cvs.style.display = 'block';
+        cvs.style.pointerEvents = 'auto';
+        try { cvs.focus(); } catch (_) {}
         resizeCanvasToContainer();
 
         catRunnerHighScore = getSavedHighScore();
@@ -989,8 +1015,9 @@
         catOffsetY = 0;
         jumpVy = 0;
         jumpTime = 0;
-        currentJumpDuration = 0.72;
-        currentJumpApexHeight = 11.0;
+        currentJumpDuration = 0.50;
+        currentJumpApexHeight = 9.2;
+        isLongJump = false;
         isJumping = false;
         isHoldingJump = false;
         confettiParticles = [];
@@ -1019,8 +1046,9 @@
         catOffsetY = 0;
         jumpVy = 0;
         jumpTime = 0;
-        currentJumpDuration = 0.72;
-        currentJumpApexHeight = 11.0;
+        currentJumpDuration = 0.50;
+        currentJumpApexHeight = 9.2;
+        isLongJump = false;
         isJumping = false;
         isHoldingJump = false;
         confettiParticles = [];
@@ -1050,6 +1078,7 @@
 
         if (canvas) {
             canvas.style.display = 'none';
+            canvas.style.pointerEvents = 'none';
         }
         const jumpingTextContainer = document.querySelector('.jumping-text-container');
         if (jumpingTextContainer) {
@@ -1105,15 +1134,20 @@
             catWorldX = (catWorldX + currentSpeed * dt) % WORLD_WIDTH;
 
             // 1. Variable Jump Physics (Authentic Chrome Dino Parabolic Arc)
-            // Short Jump: Tap -> 0.48s, 10.5px apex, air travel 23px (clears 1 cactus, fails on 3!)
-            // Long Jump: Hold -> 0.82s, 14.5px apex, air travel 39.4px (cleanly sails over all 3 cacti!)
+            // Short Jump (Tap): 9.2px apex, 0.50s duration, 24px air travel (clears 1 cactus, fails on 3!)
+            // Long Jump (Hold): 14.8px apex, 0.84s duration, 40.3px air travel (cleanly sails over all 3 cacti!)
             if (isJumping) {
                 jumpTime += dt;
 
-                // When jump is held, smoothly extend towards full Long Jump
-                if (isHoldingJump && jumpTime < 0.20) {
-                    currentJumpApexHeight = Math.min(14.5, currentJumpApexHeight + dt * (14.5 - 10.5) / 0.15);
-                    currentJumpDuration = Math.min(0.82, currentJumpDuration + dt * (0.82 - 0.48) / 0.15);
+                // Holding finger past 180ms threshold triggers soaring Long Jump!
+                if (isHoldingJump && jumpTime >= HOLD_THRESHOLD && !isLongJump) {
+                    isLongJump = true;
+                    console.log('%c[Cat Runner] 🚀 LONG JUMP ACTIVATED! (Hold > 180ms reached -> Soaring over 3 cacti!)', 'color: #0284c7; font-weight: bold;');
+                }
+
+                if (isLongJump) {
+                    currentJumpApexHeight = Math.min(14.8, currentJumpApexHeight + dt * (14.8 - 9.2) / 0.14);
+                    currentJumpDuration = Math.min(0.84, currentJumpDuration + dt * (0.84 - 0.50) / 0.14);
                 }
 
                 const progress = jumpTime / currentJumpDuration;
@@ -1122,6 +1156,7 @@
                     jumpVy = 0;
                     isJumping = false;
                     isHoldingJump = false;
+                    isLongJump = false;
                     jumpTime = 0;
                 } else {
                     catOffsetY = 4 * currentJumpApexHeight * progress * (1 - progress);
@@ -1718,6 +1753,9 @@
 
     function onKeyDown(e) {
         if (!isVisible) return;
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
+
         if (e.code === 'Space' || e.key === ' ' || e.code === 'ArrowUp' || e.key === 'ArrowUp') {
             e.preventDefault();
             initAudio();
@@ -1736,6 +1774,9 @@
 
     function onKeyUp(e) {
         if (!isVisible) return;
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
+
         if (e.code === 'Space' || e.key === ' ' || e.code === 'ArrowUp' || e.key === 'ArrowUp') {
             e.preventDefault();
             if (isDinoMode) {
@@ -1783,12 +1824,13 @@
             if (isVisible && isDrawerOpen()) resizeCanvasToContainer();
         });
 
-        // Desktop keyboard shortcuts (Space/Up to jump/restart, Esc to exit)
+        // Safe desktop keyboard shortcuts (Space/Up to jump/restart, Esc to exit)
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('keyup', onKeyUp);
 
         // Always jumping text by default!
         cvs.style.display = 'none';
+        cvs.style.pointerEvents = 'none';
         if (jumpingTextContainer) jumpingTextContainer.style.display = '';
         if (triggerBtn) triggerBtn.style.display = '';
     }
