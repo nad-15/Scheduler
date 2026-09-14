@@ -15,7 +15,7 @@ const DEFAULT_SETTINGS = {
   "sliding-templates-peek": false,
   "movable-template-expanded": false,
   "dynamic-input-bar": false,
-  "banner-mode": "jumping-text"
+  "catrunner-highscore": 0
 };
 
 
@@ -34,6 +34,15 @@ if (localStorage.getItem("movableTemplateExpanded") !== null) {
 
 // load from localStorage or use defaults
 let appSettings = JSON.parse(localStorage.getItem("appSettings")) || { ...DEFAULT_SETTINGS };
+
+// Clean up bottom banner setting from localStorage
+if (appSettings && "banner-mode" in appSettings) {
+  delete appSettings["banner-mode"];
+  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+}
+if (localStorage.getItem("banner-mode") !== null) {
+  localStorage.removeItem("banner-mode");
+}
 
 // Clean up unused / deprecated settings from localStorage
 if ("sliding-templates-row" in appSettings) {
@@ -249,36 +258,7 @@ if (dynamicInputBarToggle) {
   });
 }
 
-// ===== Bottom Banner (Jumping Text vs Pixel Cat) =====
-function setBannerMode(mode) {
-  if (typeof appSettings === "undefined") {
-    window.appSettings = JSON.parse(localStorage.getItem("appSettings")) || { ...DEFAULT_SETTINGS };
-  } else {
-    window.appSettings = appSettings;
-  }
-  appSettings["banner-mode"] = mode;
-  localStorage.setItem("appSettings", JSON.stringify(appSettings));
 
-  // Sync radio buttons in UI
-  document.querySelectorAll("input[name='banner-mode']").forEach(radio => {
-    radio.checked = (radio.value === mode);
-  });
-
-  if (window.PixelMovie) {
-    if (mode === "pixel-cat") {
-      window.PixelMovie.show();
-    } else {
-      window.PixelMovie.hide();
-    }
-  }
-}
-window.setBannerMode = setBannerMode;
-
-document.addEventListener("change", (e) => {
-  if (e.target && e.target.name === "banner-mode" && e.target.checked) {
-    setBannerMode(e.target.value);
-  }
-});
 
 
 

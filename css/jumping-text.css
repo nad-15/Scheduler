@@ -514,3 +514,44 @@
     80% { transform: translate3d(4px, 0, 0) rotate(1deg); }
     100% { transform: translate3d(0, 0, 0) rotate(0deg); }
 }
+
+/* ==========================================================================
+   SUBTLE CAT RUNNER TRIGGER BUTTON (Far Right of Jumping Text Row)
+   ========================================================================== */
+.cat-runner-trigger-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 2px 4px;
+    margin: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary, #94a3b8);
+    opacity: 0.35;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 5;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cat-runner-trigger-btn:hover {
+    opacity: 0.85;
+    transform: translateY(-50%) scale(1.08);
+}
+
+.cat-runner-trigger-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.cat-runner-trigger-btn .material-symbols-outlined {
+    font-size: 16px;
+    user-select: none;
+    pointer-events: none;
+}
+
