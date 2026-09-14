@@ -6117,8 +6117,7 @@ input[type="radio"]:checked::after {
     position: relative;
     border: 1.5px dashed rgba(255, 255, 255, 0.95);
     cursor: default;
-    padding-left: 14px;
-    padding-right: 22px;
+    padding: 5px 4px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
     transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
     animation: template-wiggle 1.2s ease-in-out infinite alternate;
@@ -6197,11 +6196,10 @@ input[type="radio"]:checked::after {
     align-items: center;
     justify-content: center;
     position: absolute;
-    right: 3px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 17px;
-    height: 17px;
+    right: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.52);
     border: none;
@@ -6216,7 +6214,7 @@ input[type="radio"]:checked::after {
     pointer-events: auto;
     -webkit-tap-highlight-color: transparent;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .movable-template.is-editing .items:hover {
@@ -6226,13 +6224,13 @@ input[type="radio"]:checked::after {
 }
 
 .movable-template.is-editing .items .template-del-btn:hover {
-    transform: translateY(-50%) scale(1.18);
+    transform: scale(1.22);
     background: rgba(0, 0, 0, 0.75);
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.9);
 }
 
 .movable-template.is-editing .items .template-del-btn:active {
-    transform: translateY(-50%) scale(0.92);
+    transform: scale(0.92);
 }
 
 .items:active {
