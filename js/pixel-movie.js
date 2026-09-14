@@ -55,10 +55,15 @@
     const CAT_SCREEN_X = 75;  // Cat anchored at left-center
     const WORLD_WIDTH = 1600; // Continuous loop length in pixels
 
-    // Sprite Scale (Enlarged cat for clear, vibrant visibility: 42x34)
+    // Sprite Scale: Player Mode Runner (42x34)
     const CAT_DEST_W = 42;
     const CAT_DEST_H = 34;
     const CAT_BASE_Y = 9.5;   // 9.5 + (48 * 34 / 64) = 35 (exact ground alignment)
+
+    // Sprite Scale: Normal Mode Virtual Pet (Extra Big & Fluffy: 60x48)
+    const PET_DEST_W = 60;
+    const PET_DEST_H = 48;
+    const PET_BASE_Y = -1;    // -1 + (48 * 48 / 64) = 35 (exact ground alignment)
 
     let currentLogicalWidth = DEFAULT_WIDTH;
 
@@ -253,6 +258,15 @@
     let hurtTimer = 0;           // Cat stumble state after tripping on obstacle
     let invulnerableTimer = 0;   // Post-hurt recovery grace period (flashing)
     let idlePlayTimer = 0;       // Inactivity timer to return to calm ambient mode
+    let hasAnnouncedSprint = false; // Flag to pop SPRINT announcement at 200 pts
+
+    // Free-Roaming Virtual Pet Companion States (Normal Mode)
+    let petX = 60;               // Screen X position of wandering cat
+    let petFacing = 1;           // 1 = facing right, -1 = facing left
+    let petState = 'walk';       // 'walk', 'idle', 'eat', 'sleep', 'pounce'
+    let petTimer = 3.5;          // Duration until next activity decision
+    let petAnimTime = 0;         // Animation progress in current activity
+    let petBowlX = null;         // Screen X of food bowl during 'eat'
 
     function popBalloon(x, y, color, isUserPop = false) {
         // Sound plays ONLY if the balloon was popped as a result of a player tap!
@@ -430,7 +444,7 @@
     // ------------------------------------------------------------------------
     // 9. Drawing Helpers: Sprites, Scenery, Balloons
     // ------------------------------------------------------------------------
-    function drawCatSprite(ctx, spriteKey, frameIndex, drawX, drawY, flipRight = true) {
+    function drawCatSprite(ctx, spriteKey, frameIndex, drawX, drawY, flipRight = true, customW = CAT_DEST_W, customH = CAT_DEST_H) {
         const sprite = SPRITES[spriteKey];
         if (!sprite || !sprite.img || !sprite.img.complete || sprite.img.naturalWidth === 0) {
             return;
@@ -447,11 +461,11 @@
         ctx.imageSmoothingEnabled = false;
 
         if (flipRight) {
-            ctx.translate(Math.round(drawX + CAT_DEST_W), Math.round(drawY));
+            ctx.translate(Math.round(drawX + customW), Math.round(drawY));
             ctx.scale(-1, 1);
-            ctx.drawImage(sprite.img, sx, sy, fw, fh, 0, 0, CAT_DEST_W, CAT_DEST_H);
+            ctx.drawImage(sprite.img, sx, sy, fw, fh, 0, 0, customW, customH);
         } else {
-            ctx.drawImage(sprite.img, sx, sy, fw, fh, Math.round(drawX), Math.round(drawY), CAT_DEST_W, CAT_DEST_H);
+            ctx.drawImage(sprite.img, sx, sy, fw, fh, Math.round(drawX), Math.round(drawY), customW, customH);
         }
 
         ctx.restore();
@@ -517,6 +531,28 @@
         ctx.font = `bold ${size}px monospace, sans-serif`;
         ctx.textBaseline = 'top';
         ctx.fillText(text, Math.round(x), Math.round(y));
+    }
+
+    // Cute 11x5 pixel ceramic cat bowl with food for Normal Mode eating action
+    function drawPixelFoodBowl(ctx, x, y) {
+        const bx = Math.round(x);
+        const by = Math.round(y);
+        // Outer bowl border
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(bx, by + 1, 11, 4);
+        // Ceramic bowl body (pastel turquoise)
+        ctx.fillStyle = '#2dd4bf';
+        ctx.fillRect(bx + 1, by + 1, 9, 3);
+        // Highlight
+        ctx.fillStyle = '#99f6e4';
+        ctx.fillRect(bx + 2, by + 2, 7, 1);
+        // Tasty food (golden salmon/kibble)
+        ctx.fillStyle = '#d97706';
+        ctx.fillRect(bx + 2, by, 7, 2);
+        ctx.fillStyle = '#f59e0b';
+        ctx.fillRect(bx + 3, by - 1, 5, 2);
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(bx + 4, by - 1, 3, 1);
     }
 
     // ------------------------------------------------------------------------
@@ -796,7 +832,7 @@
                 }
             }
         } catch (e) {}
-        return 'jumping-text';
+        return 'pixel-cat';
     }
 
     let isVisible = (getSavedBannerMode() === 'pixel-cat');
@@ -886,6 +922,7 @@
             dinoScore = 0;
             hurtTimer = 0;
             invulnerableTimer = 1.0;
+            hasAnnouncedSprint = false;
             popNotifications.push({
                 text: '✦ CAT RUN! ✦',
                 x: CAT_SCREEN_X + 22,
@@ -917,6 +954,161 @@
     }
 
     // ------------------------------------------------------------------------
+    // 12b. Free-Roaming Virtual Pet AI Decision Engine (Normal Mode)
+    // ------------------------------------------------------------------------
+    function chooseNextPetState() {
+        const minX = 12;
+        const maxX = Math.max(minX + 50, currentLogicalWidth - PET_DEST_W - 6);
+
+        const rand = Math.random();
+
+        if (rand < 0.30) {
+            // 1. Walk / Wander across the screen (WALK.png, 12 frames)
+            petState = 'walk';
+            petAnimTime = 0;
+            petBowlX = null;
+            petTimer = 2.5 + Math.random() * 3.5;
+
+            if (petX < minX + 25) {
+                petFacing = 1;
+            } else if (petX > maxX - 25) {
+                petFacing = -1;
+            } else {
+                petFacing = Math.random() < 0.5 ? 1 : -1;
+            }
+        } else if (rand < 0.48) {
+            // 2. Zoomies! Rapid sprint across the screen (RUN.png, 8 frames)
+            petState = 'run';
+            petAnimTime = 0;
+            petBowlX = null;
+            petTimer = 1.6 + Math.random() * 2.0;
+
+            if (petX < minX + 30) {
+                petFacing = 1;
+            } else if (petX > maxX - 30) {
+                petFacing = -1;
+            } else {
+                petFacing = Math.random() < 0.5 ? 1 : -1;
+            }
+        } else if (rand < 0.64) {
+            // 3. Loaf / Sit peacefully (IDLE.png, 8 frames)
+            petState = 'idle';
+            petAnimTime = 0;
+            petBowlX = null;
+            petTimer = 2.0 + Math.random() * 3.0;
+        } else if (rand < 0.78) {
+            // 4. Eat tasty food from bowl (ATTACK.png, 8 frames)
+            petState = 'eat';
+            petAnimTime = 0;
+            petTimer = 3.5 + Math.random() * 2.5;
+            if (petFacing === 1) {
+                petBowlX = Math.min(maxX + 6, petX + 44);
+            } else {
+                petBowlX = Math.max(minX - 4, petX + 4);
+            }
+        } else if (rand < 0.88) {
+            // 5. Cozy nap with z Z snore bubbles (IDLE.png frame 0)
+            petState = 'sleep';
+            petAnimTime = 0;
+            petBowlX = null;
+            petTimer = 4.0 + Math.random() * 4.0;
+        } else if (rand < 0.93) {
+            // 6. Playful pounce / hop (JUMP.png, 3 frames)
+            petState = 'pounce';
+            petAnimTime = 0;
+            petBowlX = null;
+            petTimer = 0.75;
+            if (petX < minX + 20) petFacing = 1;
+            if (petX > maxX - 20) petFacing = -1;
+        } else if (rand < 0.97) {
+            // 7. Dynamic running leap (RUNNING_JUMP.png, 3 frames)
+            petState = 'leap';
+            petAnimTime = 0;
+            petBowlX = null;
+            petTimer = 0.8;
+            if (petX < minX + 25) petFacing = 1;
+            if (petX > maxX - 25) petFacing = -1;
+        } else {
+            // 8. Goofy comic slip / tumble with dizzy stars (HURT.png, 4 frames)
+            petState = 'slip';
+            petAnimTime = 0;
+            petBowlX = null;
+            petTimer = 1.3;
+        }
+    }
+
+    function updatePetCompanion(dt) {
+        const minX = 12;
+        const maxX = Math.max(minX + 50, currentLogicalWidth - PET_DEST_W - 6);
+
+        petTimer -= dt;
+        petAnimTime += dt;
+
+        if (petState === 'walk') {
+            petX += petFacing * 26 * dt;
+
+            // Turn around smoothly at screen boundaries
+            if (petX <= minX) {
+                petX = minX;
+                petFacing = 1;
+                if (Math.random() < 0.5) {
+                    petState = 'idle';
+                    petAnimTime = 0;
+                    petTimer = 2.0 + Math.random() * 2.5;
+                }
+            } else if (petX >= maxX) {
+                petX = maxX;
+                petFacing = -1;
+                if (Math.random() < 0.5) {
+                    petState = 'idle';
+                    petAnimTime = 0;
+                    petTimer = 2.0 + Math.random() * 2.5;
+                }
+            }
+        } else if (petState === 'run') {
+            // Energetic zoomies sprint!
+            petX += petFacing * 68 * dt;
+
+            if (petX <= minX) {
+                petX = minX;
+                petFacing = 1;
+                // Wall parkour leap or calm down to walk
+                if (Math.random() < 0.45) {
+                    petState = 'leap';
+                    petAnimTime = 0;
+                    petTimer = 0.8;
+                } else {
+                    petState = 'walk';
+                    petAnimTime = 0;
+                    petTimer = 2.0;
+                }
+            } else if (petX >= maxX) {
+                petX = maxX;
+                petFacing = -1;
+                if (Math.random() < 0.45) {
+                    petState = 'leap';
+                    petAnimTime = 0;
+                    petTimer = 0.8;
+                } else {
+                    petState = 'walk';
+                    petAnimTime = 0;
+                    petTimer = 2.0;
+                }
+            }
+        } else if (petState === 'pounce') {
+            petX += petFacing * 14 * dt;
+            petX = Math.max(minX, Math.min(maxX, petX));
+        } else if (petState === 'leap') {
+            petX += petFacing * 42 * dt;
+            petX = Math.max(minX, Math.min(maxX, petX));
+        }
+
+        if (petTimer <= 0) {
+            chooseNextPetState();
+        }
+    }
+
+    // ------------------------------------------------------------------------
     // 13. Narrative & Balloon Progression
     // ------------------------------------------------------------------------
     function updateJourney(dt) {
@@ -938,10 +1130,24 @@
             invulnerableTimer = Math.max(0, invulnerableTimer - dt);
         }
 
+        const beat = STORY_BEATS[currentBeatIndex];
+
         if (isDinoMode) {
             idlePlayTimer += dt;
             if (hurtTimer <= 0) {
                 dinoScore += dt * 18; // Survival score
+            }
+
+            // Milestone: Sprint Announcement at 200 pts
+            if (dinoScore >= 200 && !hasAnnouncedSprint) {
+                hasAnnouncedSprint = true;
+                popNotifications.push({
+                    text: '✦ SPRINT! ✦',
+                    x: CAT_SCREEN_X + 22,
+                    y: GROUND_Y - 16,
+                    life: 0.9,
+                    maxLife: 0.9
+                });
             }
 
             // Inactivity timeout: If player abandoned game for 10 seconds, or tripped without tapping for 3.5s,
@@ -953,14 +1159,19 @@
                 userJumpTimer = 0;
                 dinoScore = 0;
                 idlePlayTimer = 0;
+                hasAnnouncedSprint = false;
+                // Transition cat smoothly to virtual pet companion
+                petX = CAT_SCREEN_X;
+                petFacing = 1;
+                petState = 'idle';
+                petTimer = 2.0;
+                petAnimTime = 0;
+                petBowlX = null;
             }
-        }
 
-        // Standard narrative progression (Cat walks, runs, loafs naturally)
-        const beat = STORY_BEATS[currentBeatIndex];
-        if (beat) {
-            // Authentic cat pacing: cat preserves all its own speeds (stopping, walking, sprinting)
-            let effectiveSpeed = beat.speed;
+            // Player Mode pacing:
+            // Walking speed (< 200 score) is 38 px/s, Running speed (>= 200 score) is 72 px/s
+            let effectiveSpeed = (dinoScore < 200) ? 38 : 72;
             if (hurtTimer > 0) {
                 effectiveSpeed = 0; // Pause forward movement while stumbling
             }
@@ -968,24 +1179,15 @@
             if (effectiveSpeed > 0) {
                 const distStep = effectiveSpeed * dt;
                 catWorldX = (catWorldX + distStep) % WORLD_WIDTH;
-                beatProgress += distStep;
-
-                if (beatProgress >= beat.targetDist) {
-                    beatProgress = 0;
-                    currentBeatIndex = (currentBeatIndex + 1) % STORY_BEATS.length;
-                }
-            } else if (hurtTimer <= 0) {
-                beatProgress += dt;
-                if (beatProgress >= beat.duration) {
-                    beatProgress = 0;
-                    currentBeatIndex = (currentBeatIndex + 1) % STORY_BEATS.length;
-                }
             }
+        } else {
+            // Normal Mode: Free-roaming ambient virtual pet AI
+            updatePetCompanion(dt);
         }
 
-        const cameraX = catWorldX - CAT_SCREEN_X;
+        const cameraX = isDinoMode ? (catWorldX - CAT_SCREEN_X) : 0;
 
-        // Calculate current cat height (either from user jump or narrative leap)
+        // Calculate current cat height (either from user jump or pet pounce)
         let activeJumpHeight = 0;
         let isJumping = false;
 
@@ -993,10 +1195,11 @@
             const phase = (0.95 - userJumpTimer) / 0.95; // 0 -> 1
             activeJumpHeight = Math.sin(phase * Math.PI) * 15.5; // High, floaty, satisfying arc!
             isJumping = true;
-        } else if (!isDinoMode && beat && (beat.action === 'jump' || beat.action === 'runningJump')) {
-            // Narrative automatic small jumps ONLY occur in peaceful ambient mode when user is NOT playing!
-            const jumpPhase = beatProgress / beat.targetDist;
-            activeJumpHeight = Math.sin(jumpPhase * Math.PI) * 8.5;
+        } else if (!isDinoMode && petState === 'pounce') {
+            activeJumpHeight = Math.sin((petAnimTime / 0.75) * Math.PI) * 9.0;
+            isJumping = true;
+        } else if (!isDinoMode && petState === 'leap') {
+            activeJumpHeight = Math.sin((petAnimTime / 0.8) * Math.PI) * 13.5;
             isJumping = true;
         }
 
@@ -1032,40 +1235,38 @@
             });
         }
 
-        // 2. Balloon Collision Detection
-        WORLD_BALLOONS.forEach(b => {
-            if (b.popped) {
-                b.popTimer += dt;
-                if (b.popTimer > 3.5) { // Fast 3.5s respawn so player always has balloons to pop!
-                    b.popped = false;
-                    b.popTimer = 0;
-                }
-            } else {
-                const sx = worldToScreenX(b.worldX, cameraX, 1.0);
-                const bobY = b.baseY + Math.sin(movieTime * 3 + b.worldX) * 1.5;
+        // 2. Balloon Collision Detection (Dino Run Mode ONLY)
+        if (isDinoMode) {
+            WORLD_BALLOONS.forEach(b => {
+                if (b.popped) {
+                    b.popTimer += dt;
+                    if (b.popTimer > 3.5) {
+                        b.popped = false;
+                        b.popTimer = 0;
+                    }
+                } else {
+                    const sx = worldToScreenX(b.worldX, cameraX, 1.0);
+                    const bobY = b.baseY + Math.sin(movieTime * 3 + b.worldX) * 1.5;
 
-                // Check collision if cat is jumping
-                if (isJumping && sx >= -10 && sx <= currentLogicalWidth + 10) {
-                    const catCenterScreenX = CAT_SCREEN_X + 20;
-                    const balloonCenterScreenX = sx + 3;
-                    const hDist = Math.abs(catCenterScreenX - balloonCenterScreenX);
+                    // Check collision if cat is jumping
+                    if (isJumping && sx >= -10 && sx <= currentLogicalWidth + 10) {
+                        const catCenterScreenX = CAT_SCREEN_X + 20;
+                        const balloonCenterScreenX = sx + 3;
+                        const hDist = Math.abs(catCenterScreenX - balloonCenterScreenX);
 
-                    // Generous hit detection for responsive arcade feel
-                    if (hDist < 20) {
-                        // Cat vertical paws/head reach is within balloon body
-                        if (catClawsY <= bobY + 12 && catClawsY >= bobY - 6) {
-                            b.popped = true;
-                            b.popTimer = 0;
-                            justPoppedTimer = 0.35; // Trigger claw attack sparks on hit!
-                            if (isDinoMode) {
-                                dinoScore += 100; // Bonus score for popping balloon!
+                        if (hDist < 20) {
+                            if (catClawsY <= bobY + 12 && catClawsY >= bobY - 6) {
+                                b.popped = true;
+                                b.popTimer = 0;
+                                justPoppedTimer = 0.35;
+                                dinoScore += 100;
+                                popBalloon(sx + 3, bobY + 3, b.color, isUserJump);
                             }
-                            popBalloon(sx + 3, bobY + 3, b.color, isUserJump);
                         }
                     }
                 }
-            }
-        });
+            });
+        }
 
         // Confetti Particles Physics
         for (let i = confettiParticles.length - 1; i >= 0; i--) {
@@ -1103,24 +1304,26 @@
         movieTime += dt;
         updateJourney(dt);
 
-        const cameraX = catWorldX - CAT_SCREEN_X;
+        const cameraX = isDinoMode ? (catWorldX - CAT_SCREEN_X) : 0;
 
-        // 1. Transparent Canvas (Clean minimalist Chrome Dino aesthetic - zero background clutter)
+        // 1. Transparent Canvas (Clean minimalist aesthetic - zero background clutter)
         ctx.clearRect(0, 0, currentLogicalWidth, CANVAS_HEIGHT);
 
-        // 2. World Balloons (Drifting peacefully unless popped)
-        WORLD_BALLOONS.forEach(b => {
-            if (!b.popped) {
-                const sx = worldToScreenX(b.worldX, cameraX, 1.0);
-                if (sx >= -20 && sx <= currentLogicalWidth + 20) {
-                    const bobY = b.baseY + Math.sin(movieTime * 3 + b.worldX) * 1.5;
-                    const sway = Math.sin(movieTime * 2.5 + b.worldX) * 1.2;
-                    drawPixelBalloon(ctx, sx, bobY, b.color, b.highlight, sway);
+        // 2. World Balloons (Drifting in Dino Mode only)
+        if (isDinoMode) {
+            WORLD_BALLOONS.forEach(b => {
+                if (!b.popped) {
+                    const sx = worldToScreenX(b.worldX, cameraX, 1.0);
+                    if (sx >= -20 && sx <= currentLogicalWidth + 20) {
+                        const bobY = b.baseY + Math.sin(movieTime * 3 + b.worldX) * 1.5;
+                        const sway = Math.sin(movieTime * 2.5 + b.worldX) * 1.2;
+                        drawPixelBalloon(ctx, sx, bobY, b.color, b.highlight, sway);
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        // 3. Continuous Ground
+        // 3. Continuous Ground (Static baseline in Normal Mode, scrolling texture in Player Mode)
         drawContinuousGround(ctx, cameraX, currentLogicalWidth, GROUND_Y);
 
         // 4. Dino Ground Obstacles (Drawn ONLY when Dino Mode is active!)
@@ -1145,142 +1348,156 @@
         });
 
         // 7. Cat Animation & Action Handler
-        const beat = STORY_BEATS[currentBeatIndex];
-        const action = beat.action;
-        let catDrawY = CAT_BASE_Y; // Feet land right on GROUND_Y = 25
+        if (isDinoMode) {
+            const catDrawY = CAT_BASE_Y;
 
-        // A. HURT STATE (Cat tripped on an obstacle in Dino Mode)
-        if (hurtTimer > 0) {
-            const frameIndex = Math.min(3, Math.floor((1.5 - hurtTimer) * 4));
-            drawCatSprite(ctx, 'hurt', frameIndex, CAT_SCREEN_X - 2, catDrawY, true);
+            // A. HURT STATE (Cat tripped on an obstacle in Dino Mode)
+            if (hurtTimer > 0) {
+                const frameIndex = Math.min(3, Math.floor((1.5 - hurtTimer) * 4));
+                drawCatSprite(ctx, 'hurt', frameIndex, CAT_SCREEN_X - 2, catDrawY, true);
 
-            // Comic dizzy stars circling above head
-            const starAngle = movieTime * 9;
-            const sX1 = CAT_SCREEN_X + 18 + Math.cos(starAngle) * 8;
-            const sY1 = catDrawY - 4 + Math.sin(starAngle) * 3;
-            const sX2 = CAT_SCREEN_X + 18 + Math.cos(starAngle + Math.PI) * 8;
-            const sY2 = catDrawY - 4 + Math.sin(starAngle + Math.PI) * 3;
-            ctx.fillStyle = '#fde047';
-            ctx.fillRect(Math.round(sX1), Math.round(sY1), 2, 2);
-            ctx.fillStyle = '#fda4af';
-            ctx.fillRect(Math.round(sX2), Math.round(sY2), 2, 2);
-        } else if (invulnerableTimer > 0 && Math.floor(movieTime * 14) % 2 === 0) {
-            // Retro blink during post-hurt invulnerability (skip drawing cat sprite this frame)
-        } else if (userJumpTimer > 0) {
-            // C. PLAYER-TRIGGERED JUMP (Mini-game action!)
-            const phase = (0.95 - userJumpTimer) / 0.95; // 0 -> 1
-            const jumpHeight = Math.sin(phase * Math.PI) * 15.5;
+                // Comic dizzy stars circling above head
+                const starAngle = movieTime * 9;
+                const sX1 = CAT_SCREEN_X + 18 + Math.cos(starAngle) * 8;
+                const sY1 = catDrawY - 4 + Math.sin(starAngle) * 3;
+                const sX2 = CAT_SCREEN_X + 18 + Math.cos(starAngle + Math.PI) * 8;
+                const sY2 = catDrawY - 4 + Math.sin(starAngle + Math.PI) * 3;
+                ctx.fillStyle = '#fde047';
+                ctx.fillRect(Math.round(sX1), Math.round(sY1), 2, 2);
+                ctx.fillStyle = '#fda4af';
+                ctx.fillRect(Math.round(sX2), Math.round(sY2), 2, 2);
+            } else if (invulnerableTimer > 0 && Math.floor(movieTime * 14) % 2 === 0) {
+                // Retro blink during post-hurt invulnerability
+            } else if (userJumpTimer > 0) {
+                // C. PLAYER-TRIGGERED JUMP (Mini-game action!)
+                const phase = (0.95 - userJumpTimer) / 0.95; // 0 -> 1
+                const jumpHeight = Math.sin(phase * Math.PI) * 15.5;
 
-            // If a balloon was just hit, show ATTACK claw swipe at apex
-            if (justPoppedTimer > 0 || (phase > 0.3 && phase < 0.7)) {
-                const attackFrame = Math.floor(phase * 8) % 8;
-                drawCatSprite(ctx, 'attack', attackFrame, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
+                // If a balloon was just hit, show ATTACK claw swipe at apex
+                if (justPoppedTimer > 0 || (phase > 0.3 && phase < 0.7)) {
+                    const attackFrame = Math.floor(phase * 8) % 8;
+                    drawCatSprite(ctx, 'attack', attackFrame, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
 
-                if (justPoppedTimer > 0) {
-                    ctx.fillStyle = '#fde047';
-                    ctx.fillRect(CAT_SCREEN_X + 34, catDrawY - Math.round(jumpHeight) + 6, 2, 2);
+                    if (justPoppedTimer > 0) {
+                        ctx.fillStyle = '#fde047';
+                        ctx.fillRect(CAT_SCREEN_X + 34, catDrawY - Math.round(jumpHeight) + 6, 2, 2);
+                    }
+                } else if (phase < 0.3) {
+                    // Rising leap frame (JUMP frame 0, or RUNNING_JUMP if sprinting)
+                    const jumpSprite = (dinoScore >= 200) ? 'runningJump' : 'jump';
+                    drawCatSprite(ctx, jumpSprite, 0, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
+                } else {
+                    // Landing frame (JUMP frame 2, or RUNNING_JUMP if sprinting)
+                    const jumpSprite = (dinoScore >= 200) ? 'runningJump' : 'jump';
+                    drawCatSprite(ctx, jumpSprite, 2, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
                 }
-            } else if (phase < 0.3) {
-                // Rising leap frame (JUMP frame 0)
-                drawCatSprite(ctx, 'jump', 0, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
             } else {
-                // Landing frame (JUMP frame 2)
-                drawCatSprite(ctx, 'jump', 2, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
-            }
-        } else {
-            // D. STANDARD NARRATIVE ACTIONS (Cat lives its own journey!)
-            switch (action) {
-                case 'walk': {
+                // D. PLAYER RUNNER MODE: Walking (<200) -> Running (>=200)
+                if (dinoScore < 200) {
+                    // Stage 1: Walking using WALK.png (12 frames)
                     const frameIndex = Math.floor(movieTime * 9) % 12;
                     drawCatSprite(ctx, 'walk', frameIndex, CAT_SCREEN_X, catDrawY, true);
+                } else {
+                    // Stage 2: Running using RUN.png (8 frames)
+                    const frameIndex = Math.floor(movieTime * 14) % 8;
+                    drawCatSprite(ctx, 'run', frameIndex, CAT_SCREEN_X, catDrawY, true);
+                    // Subtle dust puffs when sprinting
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.fillRect(CAT_SCREEN_X - 2, GROUND_Y - 3, 2, 1);
+                }
+            }
+        } else {
+            // E. NORMAL MODE: FREE-ROAMING VIRTUAL PET COMPANION
+            // Static frame, cat wanders left to right, eats from bowl, loafs, naps, hops
+            const flipRight = (petFacing === 1);
+            const catDrawY = PET_BASE_Y; // Feet land right on GROUND_Y = 35 for 60x48 cat!
+
+            // Draw food bowl if cat is eating
+            if (petState === 'eat' && petBowlX !== null) {
+                drawPixelFoodBowl(ctx, petBowlX, GROUND_Y - 5);
+            }
+
+            switch (petState) {
+                case 'walk': {
+                    const frameIndex = Math.floor(petAnimTime * 9) % 12;
+                    drawCatSprite(ctx, 'walk', frameIndex, petX, catDrawY, flipRight, PET_DEST_W, PET_DEST_H);
                     break;
                 }
 
                 case 'run': {
-                    const frameIndex = Math.floor(movieTime * 13) % 8;
-                    drawCatSprite(ctx, 'run', frameIndex, CAT_SCREEN_X, catDrawY, true);
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                    ctx.fillRect(CAT_SCREEN_X - 2, GROUND_Y - 3, 2, 1);
+                    const frameIndex = Math.floor(petAnimTime * 14) % 8;
+                    drawCatSprite(ctx, 'run', frameIndex, petX, catDrawY, flipRight, PET_DEST_W, PET_DEST_H);
+                    // Dust puff behind paws during zoomies
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+                    const dustX = (petFacing === 1) ? petX - 4 : petX + PET_DEST_W + 1;
+                    ctx.fillRect(Math.round(dustX), GROUND_Y - 2, 3, 1);
                     break;
                 }
 
                 case 'idle': {
-                    if (beat.prop === 'sleeping_zzz') {
-                        const breathe = Math.sin(beatProgress * Math.PI * 1.5) > 0.5 ? -1 : 0;
-                        drawCatSprite(ctx, 'idle', 0, CAT_SCREEN_X, catDrawY + breathe, true);
+                    const frameIndex = Math.floor(petAnimTime * 6) % 8;
+                    drawCatSprite(ctx, 'idle', frameIndex, petX, catDrawY, flipRight, PET_DEST_W, PET_DEST_H);
+                    break;
+                }
 
-                        const zProg1 = (beatProgress % 1.4) / 1.4;
-                        const zProg2 = ((beatProgress + 0.7) % 1.4) / 1.4;
-                        drawPixelText(ctx, 'z', CAT_SCREEN_X + 24 + zProg1 * 5, catDrawY + 2 - zProg1 * 8, '#94a3b8', 6);
-                        drawPixelText(ctx, 'Z', CAT_SCREEN_X + 28 + zProg2 * 6, catDrawY - 2 - zProg2 * 8, '#f43f5e', 7);
-                    } else {
-                        const frameIndex = Math.floor(beatProgress * 6) % 8;
-                        drawCatSprite(ctx, 'idle', frameIndex, CAT_SCREEN_X, catDrawY, true);
+                case 'eat': {
+                    // Nibbling / pawing animation using attack frames
+                    const frameIndex = Math.floor(petAnimTime * 7) % 8;
+                    drawCatSprite(ctx, 'attack', frameIndex, petX, catDrawY, flipRight, PET_DEST_W, PET_DEST_H);
 
-                        if (beat.prop === 'leaf') {
-                            const leafY = 8 + (beatProgress / beat.duration) * 20;
-                            const leafX = CAT_SCREEN_X + 30 + Math.sin(beatProgress * 4) * 4;
-                            ctx.fillStyle = '#4ade80';
-                            ctx.fillRect(Math.round(leafX), Math.round(leafY), 2, 1);
-                        } else if (beat.prop === 'lamp_heart') {
-                            const heartProg = beatProgress / beat.duration;
-                            const heartY = 16 - heartProg * 14;
-                            const heartX = CAT_SCREEN_X + 26 + Math.sin(heartProg * Math.PI * 2) * 2;
-                            if (heartY >= 0) {
-                                ctx.fillStyle = '#f43f5e';
-                                ctx.fillRect(Math.round(heartX), Math.round(heartY), 3, 3);
-                            }
-                        }
+                    // Happy floating heart above bowl
+                    const heartCycle = (petAnimTime % 1.5) / 1.5;
+                    if (heartCycle < 0.8) {
+                        const heartX = (petFacing === 1) ? petX + 46 : petX + 10;
+                        const heartY = GROUND_Y - 14 - heartCycle * 8;
+                        ctx.fillStyle = '#f43f5e';
+                        ctx.fillRect(Math.round(heartX), Math.round(heartY), 2, 2);
+                        ctx.fillRect(Math.round(heartX - 1), Math.round(heartY - 1), 4, 1);
                     }
                     break;
                 }
 
-                case 'hurt': {
-                    if (isDinoMode) {
-                        const frameIndex = Math.floor(movieTime * 9) % 12;
-                        drawCatSprite(ctx, 'walk', frameIndex, CAT_SCREEN_X, catDrawY, true);
-                    } else {
-                        const frameIndex = Math.floor(beatProgress * 6) % 4;
-                        drawCatSprite(ctx, 'hurt', frameIndex, CAT_SCREEN_X - 2, catDrawY, true);
-                        drawSpeechBubble(ctx, '!', CAT_SCREEN_X + 22, catDrawY + 2);
-                    }
+                case 'sleep': {
+                    const breathe = Math.sin(petAnimTime * 2.2) > 0.5 ? -1 : 0;
+                    drawCatSprite(ctx, 'idle', 0, petX, catDrawY + breathe, flipRight, PET_DEST_W, PET_DEST_H);
+
+                    const z1 = (petAnimTime % 1.6) / 1.6;
+                    const z2 = ((petAnimTime + 0.8) % 1.6) / 1.6;
+                    const zBaseX = (petFacing === 1) ? petX + 38 : petX + 14;
+                    drawPixelText(ctx, 'z', zBaseX + z1 * 4, 12 - z1 * 7, '#94a3b8', 6);
+                    drawPixelText(ctx, 'Z', zBaseX + 6 + z2 * 5, 8 - z2 * 7, '#f43f5e', 7);
                     break;
                 }
 
-                case 'attack': {
-                    const frameIndex = Math.floor(beatProgress * 10) % 8;
-                    drawCatSprite(ctx, 'attack', frameIndex, CAT_SCREEN_X, catDrawY, true);
-
-                    if (beat.prop === 'sparks') {
-                        ctx.fillStyle = '#fde047';
-                        ctx.fillRect(CAT_SCREEN_X + 36, GROUND_Y - 6, 2, 2);
-                        ctx.fillRect(CAT_SCREEN_X + 40, GROUND_Y - 4, 2, 1);
-                    } else if (beat.prop === 'shooting_star') {
-                        const starProg = beatProgress / beat.duration;
-                        const starX = 230 - starProg * 150;
-                        const starY = 3 + starProg * 4;
-                        ctx.fillStyle = '#fef08a';
-                        ctx.fillRect(Math.round(starX), Math.round(starY), 3, 1);
-                        ctx.fillStyle = 'rgba(254, 240, 138, 0.4)';
-                        ctx.fillRect(Math.round(starX + 3), Math.round(starY), 5, 1);
-                    }
+                case 'pounce': {
+                    const jumpH = Math.sin((petAnimTime / 0.75) * Math.PI) * 7.5;
+                    const frameIndex = (petAnimTime < 0.25) ? 0 : ((petAnimTime < 0.55) ? 1 : 2);
+                    drawCatSprite(ctx, 'jump', frameIndex, petX, catDrawY - Math.round(jumpH), flipRight, PET_DEST_W, PET_DEST_H);
                     break;
                 }
 
-                case 'jump':
-                case 'runningJump': {
-                    if (isDinoMode) {
-                        // In Cat Run mode, all jumping is 100% user-controlled
-                        const frameIndex = Math.floor(movieTime * 13) % 8;
-                        drawCatSprite(ctx, 'run', frameIndex, CAT_SCREEN_X, catDrawY, true);
-                    } else {
-                        const spriteKey = action === 'runningJump' ? 'runningJump' : 'jump';
-                        const jumpPhase = beatProgress / beat.targetDist;
-                        const jumpHeight = Math.sin(jumpPhase * Math.PI) * 8.5;
-                        const frameIndex = jumpPhase < 0.35 ? 0 : (jumpPhase < 0.75 ? 1 : 2);
+                case 'leap': {
+                    const jumpH = Math.sin((petAnimTime / 0.8) * Math.PI) * 9.5;
+                    const frameIndex = (petAnimTime < 0.25) ? 0 : ((petAnimTime < 0.55) ? 1 : 2);
+                    drawCatSprite(ctx, 'runningJump', frameIndex, petX, catDrawY - Math.round(jumpH), flipRight, PET_DEST_W, PET_DEST_H);
+                    break;
+                }
 
-                        drawCatSprite(ctx, spriteKey, frameIndex, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
-                    }
+                case 'slip': {
+                    const frameIndex = Math.min(3, Math.floor(petAnimTime * 3));
+                    drawCatSprite(ctx, 'hurt', frameIndex, petX, catDrawY, flipRight, PET_DEST_W, PET_DEST_H);
+
+                    // Comic dizzy stars
+                    const starAngle = petAnimTime * 10;
+                    const starCenterX = (petFacing === 1) ? petX + 34 : petX + 22;
+                    const sX1 = starCenterX + Math.cos(starAngle) * 9;
+                    const sY1 = 11 + Math.sin(starAngle) * 3;
+                    const sX2 = starCenterX + Math.cos(starAngle + Math.PI) * 9;
+                    const sY2 = 11 + Math.sin(starAngle + Math.PI) * 3;
+                    ctx.fillStyle = '#fde047';
+                    ctx.fillRect(Math.round(sX1), Math.round(sY1), 2, 2);
+                    ctx.fillStyle = '#fda4af';
+                    ctx.fillRect(Math.round(sX2), Math.round(sY2), 2, 2);
                     break;
                 }
             }
@@ -1359,7 +1576,14 @@
                     userJumpTimer = 0;
                     dinoScore = 0;
                     idlePlayTimer = 0;
+                    hasAnnouncedSprint = false;
                 }
+                petX = 60;
+                petFacing = 1;
+                petState = 'idle';
+                petTimer = 2.0;
+                petAnimTime = 0;
+                petBowlX = null;
             }
         };
 
