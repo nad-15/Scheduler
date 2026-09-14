@@ -47,18 +47,18 @@
     });
 
     // ------------------------------------------------------------------------
-    // 2. Constants & Proportions (30px Height Claiming Violet Space)
+    // 2. Constants & Proportions (Enlarged Cat Sprite)
     // ------------------------------------------------------------------------
     const DEFAULT_WIDTH = 380;
-    const CANVAS_HEIGHT = 30; // Claims 10px upward into the violet gap above
-    const GROUND_Y = 25;      // Feet land on ground line at y = 25
+    const CANVAS_HEIGHT = 40; // 40px height for larger cat and balloons
+    const GROUND_Y = 35;      // Feet land on ground line at y = 35
     const CAT_SCREEN_X = 75;  // Cat anchored at left-center
     const WORLD_WIDTH = 1600; // Continuous loop length in pixels
 
-    // Sprite Scale (Cat ~13x10px, paws align with GROUND_Y = 25)
-    const CAT_DEST_W = 28;
-    const CAT_DEST_H = 22;
-    const CAT_BASE_Y = 8.5;   // 8.5 + (48 * 22 / 64) = 25 (exact ground alignment)
+    // Sprite Scale (Enlarged cat for clear, vibrant visibility: 42x34)
+    const CAT_DEST_W = 42;
+    const CAT_DEST_H = 34;
+    const CAT_BASE_Y = 9.5;   // 9.5 + (48 * 34 / 64) = 35 (exact ground alignment)
 
     let currentLogicalWidth = DEFAULT_WIDTH;
 
@@ -166,27 +166,75 @@
         }
     }
 
+    // Soft comic 8-bit tumble sound when the cat trips on an obstacle
+    function playRetroHurtSound() {
+        try {
+            const ctx = initAudio();
+            if (!ctx) return;
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(75, ctx.currentTime + 0.12);
+
+            gain.gain.setValueAtTime(0.04, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.13);
+        } catch (e) {
+            // Fails silently if browser blocks audio
+        }
+    }
+
     // ------------------------------------------------------------------------
     // 4. World Balloons Mini-Game System
     // ------------------------------------------------------------------------
     // 12 colorful balloons drifting across the 1600px ribbon at guaranteed reachable heights
     const WORLD_BALLOONS = [
         // Forest (0 - 400px)
-        { id: 'b_f1', worldX: 110, baseY: 7, color: '#f43f5e', highlight: '#fda4af', popped: false, popTimer: 0 },
-        { id: 'b_f2', worldX: 240, baseY: 6, color: '#10b981', highlight: '#6ee7b7', popped: false, popTimer: 0 },
-        { id: 'b_f3', worldX: 370, baseY: 7, color: '#38bdf8', highlight: '#bae6fd', popped: false, popTimer: 0 },
+        { id: 'b_f1', worldX: 110, baseY: 11, color: '#f43f5e', highlight: '#fda4af', popped: false, popTimer: 0 },
+        { id: 'b_f2', worldX: 240, baseY: 10, color: '#10b981', highlight: '#6ee7b7', popped: false, popTimer: 0 },
+        { id: 'b_f3', worldX: 370, baseY: 11, color: '#38bdf8', highlight: '#bae6fd', popped: false, popTimer: 0 },
         // Desert (400 - 800px)
-        { id: 'b_d1', worldX: 510, baseY: 6, color: '#eab308', highlight: '#fef08a', popped: false, popTimer: 0 },
-        { id: 'b_d2', worldX: 650, baseY: 7, color: '#fb923c', highlight: '#fed7aa', popped: false, popTimer: 0 },
-        { id: 'b_d3', worldX: 780, baseY: 6, color: '#f43f5e', highlight: '#fda4af', popped: false, popTimer: 0 },
+        { id: 'b_d1', worldX: 510, baseY: 10, color: '#eab308', highlight: '#fef08a', popped: false, popTimer: 0 },
+        { id: 'b_d2', worldX: 650, baseY: 11, color: '#fb923c', highlight: '#fed7aa', popped: false, popTimer: 0 },
+        { id: 'b_d3', worldX: 780, baseY: 10, color: '#f43f5e', highlight: '#fda4af', popped: false, popTimer: 0 },
         // City Streets (800 - 1200px)
-        { id: 'b_c1', worldX: 910, baseY: 7, color: '#0ea5e9', highlight: '#7dd3fc', popped: false, popTimer: 0 },
-        { id: 'b_c2', worldX: 1040, baseY: 6, color: '#ec4899', highlight: '#fbcfe8', popped: false, popTimer: 0 },
-        { id: 'b_c3', worldX: 1170, baseY: 7, color: '#22c55e', highlight: '#bbf7d0', popped: false, popTimer: 0 },
+        { id: 'b_c1', worldX: 910, baseY: 11, color: '#0ea5e9', highlight: '#7dd3fc', popped: false, popTimer: 0 },
+        { id: 'b_c2', worldX: 1040, baseY: 10, color: '#ec4899', highlight: '#fbcfe8', popped: false, popTimer: 0 },
+        { id: 'b_c3', worldX: 1170, baseY: 11, color: '#22c55e', highlight: '#bbf7d0', popped: false, popTimer: 0 },
         // Rooftops (1200 - 1600px)
-        { id: 'b_r1', worldX: 1300, baseY: 6, color: '#a855f7', highlight: '#d8b4fe', popped: false, popTimer: 0 },
-        { id: 'b_r2', worldX: 1430, baseY: 7, color: '#6366f1', highlight: '#c7d2fe', popped: false, popTimer: 0 },
-        { id: 'b_r3', worldX: 1560, baseY: 6, color: '#fbbf24', highlight: '#fde68a', popped: false, popTimer: 0 }
+        { id: 'b_r1', worldX: 1300, baseY: 10, color: '#a855f7', highlight: '#d8b4fe', popped: false, popTimer: 0 },
+        { id: 'b_r2', worldX: 1430, baseY: 11, color: '#6366f1', highlight: '#c7d2fe', popped: false, popTimer: 0 },
+        { id: 'b_r3', worldX: 1560, baseY: 10, color: '#fbbf24', highlight: '#fde68a', popped: false, popTimer: 0 }
+    ];
+
+    // ------------------------------------------------------------------------
+    // 4b. Dino Runner Ground Obstacles (Carefully Spaced - Never Impossible!)
+    // Minimum distance between obstacles is 170px (Cat jump length is ~55px)
+    // ------------------------------------------------------------------------
+    const WORLD_OBSTACLES = [
+        // Zone 1: Forest (Placed in active movement, away from resting spots)
+        { id: 'obs_f1', worldX: 90, width: 7, height: 8, type: 'stump' },
+        { id: 'obs_f2', worldX: 290, width: 8, height: 8, type: 'log' },
+
+        // Zone 2: Desert (In active movement stretches)
+        { id: 'obs_d1', worldX: 475, width: 7, height: 9, type: 'cactus' },
+        { id: 'obs_d2', worldX: 680, width: 8, height: 9, type: 'cactus_pair' },
+
+        // Zone 3: City Streets (During active street walk and run)
+        { id: 'obs_c1', worldX: 900, width: 7, height: 8, type: 'hydrant' },
+        { id: 'obs_c2', worldX: 1110, width: 8, height: 8, type: 'cone' },
+
+        // Zone 4: Rooftops & Dawn Walk (Safely after sleep beat)
+        { id: 'obs_r1', worldX: 1380, width: 8, height: 8, type: 'vent' },
+        { id: 'obs_r2', worldX: 1520, width: 7, height: 8, type: 'pipe' }
     ];
 
     // Confetti particles when a balloon pops
@@ -198,6 +246,13 @@
     // Player Mini-Game Control States
     let userJumpTimer = 0;   // Player-triggered jump countdown
     let justPoppedTimer = 0; // Claw slash spark effect when popping
+
+    // Dino Runner Mode Active States
+    let isDinoMode = false;       // Active only when player taps to play
+    let dinoScore = 0;           // Points earned in active run
+    let hurtTimer = 0;           // Cat stumble state after tripping on obstacle
+    let invulnerableTimer = 0;   // Post-hurt recovery grace period (flashing)
+    let idlePlayTimer = 0;       // Inactivity timer to return to calm ambient mode
 
     function popBalloon(x, y, color, isUserPop = false) {
         // Sound plays ONLY if the balloon was popped as a result of a player tap!
@@ -465,54 +520,22 @@
     }
 
     // ------------------------------------------------------------------------
-    // 10. Continuous Ground Renderer
+    // 10. Continuous Ground Renderer (Thin 1px Minimalist Baseline)
     // ------------------------------------------------------------------------
     function drawContinuousGround(ctx, cameraX, width, groundY) {
-        const sliceWidth = 4;
-        for (let sx = 0; sx < width; sx += sliceWidth) {
+        // Crisp 1px thin ground baseline (Chrome Dino style - zero bulky thickness)
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(0, groundY, width, 1);
+
+        // Subtle 1px ground texture specks that scroll to give a sense of motion
+        for (let sx = 0; sx < width; sx += 8) {
             const wx = (((cameraX + sx) % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
-
-            let groundColor = '#16a34a';
-            let subColor = '#15803d';
-
-            if (wx < 380) {
-                groundColor = '#16a34a';
-                subColor = '#14532d';
-            } else if (wx < 420) {
-                groundColor = (wx % 8 < 4) ? '#16a34a' : '#d97706';
-                subColor = '#b45309';
-            } else if (wx < 780) {
-                groundColor = '#d97706';
-                subColor = '#92400e';
-            } else if (wx < 820) {
-                groundColor = (wx % 8 < 4) ? '#d97706' : '#64748b';
-                subColor = '#334155';
-            } else if (wx < 1180) {
-                groundColor = '#64748b';
-                subColor = '#334155';
-            } else if (wx < 1220) {
-                groundColor = (wx % 8 < 4) ? '#64748b' : '#334155';
-                subColor = '#1e293b';
-            } else if (wx < 1580) {
-                groundColor = '#334155';
-                subColor = '#1e293b';
-            } else {
-                groundColor = (wx % 8 < 4) ? '#334155' : '#16a34a';
-                subColor = '#14532d';
-            }
-
-            ctx.fillStyle = groundColor;
-            ctx.fillRect(sx, groundY, sliceWidth, 2);
-            ctx.fillStyle = subColor;
-            ctx.fillRect(sx, groundY + 2, sliceWidth, CANVAS_HEIGHT - (groundY + 2));
-        }
-
-        // Cobblestone detail lines in City zone (820 to 1180)
-        for (let sx = 0; sx < width; sx += 10) {
-            const wx = (((cameraX + sx) % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
-            if (wx >= 820 && wx <= 1180) {
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillRect(sx, groundY, 1, 2);
+            if (wx % 32 === 0) {
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillRect(sx, groundY + 2, 3, 1);
+            } else if (wx % 48 === 16) {
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fillRect(sx, groundY + 3, 2, 1);
             }
         }
     }
@@ -586,6 +609,10 @@
         });
 
         // C. Foreground / Midground Scenery (Parallax 1.0)
+        // Soften background scenery in Dino Mode so player can immediately spot obstacles!
+        if (isDinoMode) {
+            ctx.globalAlpha = 0.35;
+        }
         SCENERY.items.forEach(item => {
             const sx = worldToScreenX(item.worldX, cameraX, 1.0);
             if (sx < -60 || sx > currentLogicalWidth + 60) return;
@@ -688,6 +715,66 @@
                     break;
             }
         });
+        ctx.globalAlpha = 1.0;
+    }
+
+    // ------------------------------------------------------------------------
+    // 11b. Dino Obstacle Pixel Renderer (High Contrast + Danger Beacons!)
+    // ------------------------------------------------------------------------
+    function drawObstacle(ctx, obs, sx) {
+        const ox = Math.round(sx);
+
+        // 1. Floating Pulsing Danger Beacon (Red & Yellow Warning Marker!)
+        // Guarantees player spots obstacles from across the screen
+        const markerX = Math.round(sx + obs.width / 2);
+        const markerY = GROUND_Y - obs.height - 4;
+        const blink = Math.sin(movieTime * 11) > 0;
+
+        ctx.fillStyle = blink ? '#ef4444' : '#fbbf24';
+        ctx.fillRect(markerX - 1, markerY, 3, 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(markerX, markerY, 1, 1);
+
+        // 2. High-Contrast Pixel Cacti with Dark Outlines & Neon Spines (Chrome Dino Style)
+        if (obs.type === 'cactus' || obs.type === 'stump' || obs.type === 'vent' || obs.type === 'pipe') {
+            // Single Tall Desert Cactus: dark border + vivid emerald green body + neon spines
+            // Dark silhouette outline
+            ctx.fillStyle = '#052e16';
+            ctx.fillRect(ox + 1, GROUND_Y - 10, 5, 10);
+            ctx.fillRect(ox - 1, GROUND_Y - 8, 4, 6);
+            ctx.fillRect(ox + 3, GROUND_Y - 6, 4, 5);
+
+            // Vivid emerald green body
+            ctx.fillStyle = '#16a34a';
+            ctx.fillRect(ox + 2, GROUND_Y - 9, 3, 9);
+            ctx.fillRect(ox, GROUND_Y - 7, 2, 4);
+            ctx.fillRect(ox + 4, GROUND_Y - 5, 2, 3);
+
+            // Neon lime spines
+            ctx.fillStyle = '#86efac';
+            ctx.fillRect(ox + 3, GROUND_Y - 8, 1, 3);
+            ctx.fillRect(ox, GROUND_Y - 7, 1, 1);
+            ctx.fillRect(ox + 5, GROUND_Y - 5, 1, 1);
+        } else {
+            // Double Cacti Pair: small cactus + tall cactus with bold outlines
+            // Left small cactus
+            ctx.fillStyle = '#052e16';
+            ctx.fillRect(ox - 1, GROUND_Y - 7, 4, 7);
+            ctx.fillStyle = '#16a34a';
+            ctx.fillRect(ox, GROUND_Y - 6, 2, 6);
+            ctx.fillStyle = '#86efac';
+            ctx.fillRect(ox, GROUND_Y - 5, 1, 2);
+
+            // Right tall cactus
+            ctx.fillStyle = '#052e16';
+            ctx.fillRect(ox + 3, GROUND_Y - 9, 5, 9);
+            ctx.fillRect(ox + 6, GROUND_Y - 6, 3, 4);
+            ctx.fillStyle = '#22c55e';
+            ctx.fillRect(ox + 4, GROUND_Y - 8, 3, 8);
+            ctx.fillRect(ox + 6, GROUND_Y - 5, 2, 2);
+            ctx.fillStyle = '#bbf7d0';
+            ctx.fillRect(ox + 5, GROUND_Y - 7, 1, 3);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -792,6 +879,29 @@
         lastTapTime = now;
 
         initAudio(); // Unlocks Web Audio API directly on user gesture
+
+        // Activate Dino Runner Mode when player clicks to play!
+        if (!isDinoMode) {
+            isDinoMode = true;
+            dinoScore = 0;
+            hurtTimer = 0;
+            invulnerableTimer = 1.0;
+            popNotifications.push({
+                text: '✦ CAT RUN! ✦',
+                x: CAT_SCREEN_X + 22,
+                y: GROUND_Y - 16,
+                life: 0.9,
+                maxLife: 0.9
+            });
+        }
+        idlePlayTimer = 0; // Reset inactivity timer
+
+        // Quick recovery if tapped while stumbling
+        if (hurtTimer > 0) {
+            hurtTimer = 0;
+            invulnerableTimer = 1.2;
+        }
+
         triggerUserJump();
 
         const taskInput = document.getElementById('task');
@@ -802,7 +912,7 @@
 
     function triggerUserJump() {
         // Player command: Jump!
-        userJumpTimer = 0.85; // Snappy athletic jump arc
+        userJumpTimer = 0.95; // Floaty, comfortable arcade jump with ample hangtime
         playRetroJumpSound();  // Soft cute 8-bit hop feedback
     }
 
@@ -820,11 +930,43 @@
             justPoppedTimer = Math.max(0, justPoppedTimer - dt);
         }
 
+        // Dino Mode State Machine
+        if (hurtTimer > 0) {
+            hurtTimer = Math.max(0, hurtTimer - dt);
+        }
+        if (invulnerableTimer > 0) {
+            invulnerableTimer = Math.max(0, invulnerableTimer - dt);
+        }
+
+        if (isDinoMode) {
+            idlePlayTimer += dt;
+            if (hurtTimer <= 0) {
+                dinoScore += dt * 18; // Survival score
+            }
+
+            // Inactivity timeout: If player abandoned game for 10 seconds, or tripped without tapping for 3.5s,
+            // immediately halt Dino Mode, clear cacti obstacles, and return cat to calm ambient default!
+            const isAfkStumble = (hurtTimer > 0 && idlePlayTimer > 3.5);
+            if (idlePlayTimer > 10.0 || isAfkStumble) {
+                isDinoMode = false;
+                hurtTimer = 0;
+                userJumpTimer = 0;
+                dinoScore = 0;
+                idlePlayTimer = 0;
+            }
+        }
+
         // Standard narrative progression (Cat walks, runs, loafs naturally)
         const beat = STORY_BEATS[currentBeatIndex];
         if (beat) {
-            if (beat.speed > 0) {
-                const distStep = beat.speed * dt;
+            // Authentic cat pacing: cat preserves all its own speeds (stopping, walking, sprinting)
+            let effectiveSpeed = beat.speed;
+            if (hurtTimer > 0) {
+                effectiveSpeed = 0; // Pause forward movement while stumbling
+            }
+
+            if (effectiveSpeed > 0) {
+                const distStep = effectiveSpeed * dt;
                 catWorldX = (catWorldX + distStep) % WORLD_WIDTH;
                 beatProgress += distStep;
 
@@ -832,7 +974,7 @@
                     beatProgress = 0;
                     currentBeatIndex = (currentBeatIndex + 1) % STORY_BEATS.length;
                 }
-            } else {
+            } else if (hurtTimer <= 0) {
                 beatProgress += dt;
                 if (beatProgress >= beat.duration) {
                     beatProgress = 0;
@@ -848,19 +990,49 @@
         let isJumping = false;
 
         if (userJumpTimer > 0) {
-            const phase = (0.85 - userJumpTimer) / 0.85; // 0 -> 1
-            activeJumpHeight = Math.sin(phase * Math.PI) * 11.5;
+            const phase = (0.95 - userJumpTimer) / 0.95; // 0 -> 1
+            activeJumpHeight = Math.sin(phase * Math.PI) * 15.5; // High, floaty, satisfying arc!
             isJumping = true;
-        } else if (beat && (beat.action === 'jump' || beat.action === 'runningJump')) {
+        } else if (!isDinoMode && beat && (beat.action === 'jump' || beat.action === 'runningJump')) {
+            // Narrative automatic small jumps ONLY occur in peaceful ambient mode when user is NOT playing!
             const jumpPhase = beatProgress / beat.targetDist;
-            activeJumpHeight = Math.sin(jumpPhase * Math.PI) * 7.5;
+            activeJumpHeight = Math.sin(jumpPhase * Math.PI) * 8.5;
             isJumping = true;
         }
 
-        const catClawsY = GROUND_Y - activeJumpHeight - 4;
+        const catClawsY = GROUND_Y - activeJumpHeight - 5;
 
-        // Balloon Collision Detection:
-        // Cat pops balloons when jumping (either player-timed jump or coincidental narrative leap)
+        // 1. Cat Runner Obstacle Collision Detection (Cat Run Mode ONLY)
+        if (isDinoMode && hurtTimer <= 0 && invulnerableTimer <= 0) {
+            WORLD_OBSTACLES.forEach(obs => {
+                const sx = worldToScreenX(obs.worldX, cameraX, 1.0);
+                // Fair, generous arcade collision hitbox: core cactus stem vs paws
+                const obsLeft = sx + 2;
+                const obsRight = sx + obs.width - 2;
+                const catLeft = CAT_SCREEN_X + 17;
+                const catRight = CAT_SCREEN_X + 23;
+
+                if (obsRight >= catLeft && obsLeft <= catRight) {
+                    // Vertical collision: paws must clear cactus with 2px forgiving margin
+                    if (activeJumpHeight < obs.height - 2) {
+                        hurtTimer = 1.5; // Cat tumbles for 1.5s
+                        invulnerableTimer = 2.8; // 1.5s hurt + 1.3s recovery grace period
+                        userJumpTimer = 0;
+                        playRetroHurtSound();
+
+                        popNotifications.push({
+                            text: '✦ OUCH! ✦',
+                            x: CAT_SCREEN_X + 20,
+                            y: GROUND_Y - 16,
+                            life: 0.9,
+                            maxLife: 0.9
+                        });
+                    }
+                }
+            });
+        }
+
+        // 2. Balloon Collision Detection
         WORLD_BALLOONS.forEach(b => {
             if (b.popped) {
                 b.popTimer += dt;
@@ -874,17 +1046,20 @@
 
                 // Check collision if cat is jumping
                 if (isJumping && sx >= -10 && sx <= currentLogicalWidth + 10) {
-                    const catCenterScreenX = CAT_SCREEN_X + 16;
+                    const catCenterScreenX = CAT_SCREEN_X + 20;
                     const balloonCenterScreenX = sx + 3;
                     const hDist = Math.abs(catCenterScreenX - balloonCenterScreenX);
 
                     // Generous hit detection for responsive arcade feel
-                    if (hDist < 16) {
+                    if (hDist < 20) {
                         // Cat vertical paws/head reach is within balloon body
-                        if (catClawsY <= bobY + 10 && catClawsY >= bobY - 5) {
+                        if (catClawsY <= bobY + 12 && catClawsY >= bobY - 6) {
                             b.popped = true;
                             b.popTimer = 0;
                             justPoppedTimer = 0.35; // Trigger claw attack sparks on hit!
+                            if (isDinoMode) {
+                                dinoScore += 100; // Bonus score for popping balloon!
+                            }
                             popBalloon(sx + 3, bobY + 3, b.color, isUserJump);
                         }
                     }
@@ -930,14 +1105,10 @@
 
         const cameraX = catWorldX - CAT_SCREEN_X;
 
-        // 1. Dynamic Day/Night Sky
-        ctx.fillStyle = getSkyColor(catWorldX);
-        ctx.fillRect(0, 0, currentLogicalWidth, CANVAS_HEIGHT);
+        // 1. Transparent Canvas (Clean minimalist Chrome Dino aesthetic - zero background clutter)
+        ctx.clearRect(0, 0, currentLogicalWidth, CANVAS_HEIGHT);
 
-        // 2. Scenery & Landmarks
-        drawScenery(ctx, cameraX, movieTime);
-
-        // 3. World Balloons (Drifting peacefully unless popped)
+        // 2. World Balloons (Drifting peacefully unless popped)
         WORLD_BALLOONS.forEach(b => {
             if (!b.popped) {
                 const sx = worldToScreenX(b.worldX, cameraX, 1.0);
@@ -949,8 +1120,18 @@
             }
         });
 
-        // 4. Continuous Ground
+        // 3. Continuous Ground
         drawContinuousGround(ctx, cameraX, currentLogicalWidth, GROUND_Y);
+
+        // 4. Dino Ground Obstacles (Drawn ONLY when Dino Mode is active!)
+        if (isDinoMode) {
+            WORLD_OBSTACLES.forEach(obs => {
+                const sx = worldToScreenX(obs.worldX, cameraX, 1.0);
+                if (sx >= -15 && sx <= currentLogicalWidth + 15) {
+                    drawObstacle(ctx, obs, sx);
+                }
+            });
+        }
 
         // 5. Confetti Burst Particles
         confettiParticles.forEach(p => {
@@ -968,10 +1149,27 @@
         const action = beat.action;
         let catDrawY = CAT_BASE_Y; // Feet land right on GROUND_Y = 25
 
-        // A. PLAYER-TRIGGERED JUMP (Mini-game action!)
-        if (userJumpTimer > 0) {
-            const phase = (0.85 - userJumpTimer) / 0.85; // 0 -> 1
-            const jumpHeight = Math.sin(phase * Math.PI) * 11.5;
+        // A. HURT STATE (Cat tripped on an obstacle in Dino Mode)
+        if (hurtTimer > 0) {
+            const frameIndex = Math.min(3, Math.floor((1.5 - hurtTimer) * 4));
+            drawCatSprite(ctx, 'hurt', frameIndex, CAT_SCREEN_X - 2, catDrawY, true);
+
+            // Comic dizzy stars circling above head
+            const starAngle = movieTime * 9;
+            const sX1 = CAT_SCREEN_X + 18 + Math.cos(starAngle) * 8;
+            const sY1 = catDrawY - 4 + Math.sin(starAngle) * 3;
+            const sX2 = CAT_SCREEN_X + 18 + Math.cos(starAngle + Math.PI) * 8;
+            const sY2 = catDrawY - 4 + Math.sin(starAngle + Math.PI) * 3;
+            ctx.fillStyle = '#fde047';
+            ctx.fillRect(Math.round(sX1), Math.round(sY1), 2, 2);
+            ctx.fillStyle = '#fda4af';
+            ctx.fillRect(Math.round(sX2), Math.round(sY2), 2, 2);
+        } else if (invulnerableTimer > 0 && Math.floor(movieTime * 14) % 2 === 0) {
+            // Retro blink during post-hurt invulnerability (skip drawing cat sprite this frame)
+        } else if (userJumpTimer > 0) {
+            // C. PLAYER-TRIGGERED JUMP (Mini-game action!)
+            const phase = (0.95 - userJumpTimer) / 0.95; // 0 -> 1
+            const jumpHeight = Math.sin(phase * Math.PI) * 15.5;
 
             // If a balloon was just hit, show ATTACK claw swipe at apex
             if (justPoppedTimer > 0 || (phase > 0.3 && phase < 0.7)) {
@@ -980,7 +1178,7 @@
 
                 if (justPoppedTimer > 0) {
                     ctx.fillStyle = '#fde047';
-                    ctx.fillRect(CAT_SCREEN_X + 26, catDrawY - Math.round(jumpHeight) + 4, 2, 2);
+                    ctx.fillRect(CAT_SCREEN_X + 34, catDrawY - Math.round(jumpHeight) + 6, 2, 2);
                 }
             } else if (phase < 0.3) {
                 // Rising leap frame (JUMP frame 0)
@@ -989,101 +1187,140 @@
                 // Landing frame (JUMP frame 2)
                 drawCatSprite(ctx, 'jump', 2, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
             }
-            return;
-        }
+        } else {
+            // D. STANDARD NARRATIVE ACTIONS (Cat lives its own journey!)
+            switch (action) {
+                case 'walk': {
+                    const frameIndex = Math.floor(movieTime * 9) % 12;
+                    drawCatSprite(ctx, 'walk', frameIndex, CAT_SCREEN_X, catDrawY, true);
+                    break;
+                }
 
-        // B. STANDARD NARRATIVE ACTIONS (Cat lives its own journey!)
-        switch (action) {
-            case 'walk': {
-                const frameIndex = Math.floor(movieTime * 9) % 12;
-                drawCatSprite(ctx, 'walk', frameIndex, CAT_SCREEN_X, catDrawY, true);
-                break;
-            }
+                case 'run': {
+                    const frameIndex = Math.floor(movieTime * 13) % 8;
+                    drawCatSprite(ctx, 'run', frameIndex, CAT_SCREEN_X, catDrawY, true);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.fillRect(CAT_SCREEN_X - 2, GROUND_Y - 3, 2, 1);
+                    break;
+                }
 
-            case 'run': {
-                const frameIndex = Math.floor(movieTime * 13) % 8;
-                drawCatSprite(ctx, 'run', frameIndex, CAT_SCREEN_X, catDrawY, true);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                ctx.fillRect(CAT_SCREEN_X - 2, GROUND_Y - 3, 2, 1);
-                break;
-            }
+                case 'idle': {
+                    if (beat.prop === 'sleeping_zzz') {
+                        const breathe = Math.sin(beatProgress * Math.PI * 1.5) > 0.5 ? -1 : 0;
+                        drawCatSprite(ctx, 'idle', 0, CAT_SCREEN_X, catDrawY + breathe, true);
 
-            case 'idle': {
-                if (beat.prop === 'sleeping_zzz') {
-                    const breathe = Math.sin(beatProgress * Math.PI * 1.5) > 0.5 ? -1 : 0;
-                    drawCatSprite(ctx, 'idle', 0, CAT_SCREEN_X, catDrawY + breathe, true);
+                        const zProg1 = (beatProgress % 1.4) / 1.4;
+                        const zProg2 = ((beatProgress + 0.7) % 1.4) / 1.4;
+                        drawPixelText(ctx, 'z', CAT_SCREEN_X + 24 + zProg1 * 5, catDrawY + 2 - zProg1 * 8, '#94a3b8', 6);
+                        drawPixelText(ctx, 'Z', CAT_SCREEN_X + 28 + zProg2 * 6, catDrawY - 2 - zProg2 * 8, '#f43f5e', 7);
+                    } else {
+                        const frameIndex = Math.floor(beatProgress * 6) % 8;
+                        drawCatSprite(ctx, 'idle', frameIndex, CAT_SCREEN_X, catDrawY, true);
 
-                    const zProg1 = (beatProgress % 1.4) / 1.4;
-                    const zProg2 = ((beatProgress + 0.7) % 1.4) / 1.4;
-                    drawPixelText(ctx, 'z', CAT_SCREEN_X + 16 + zProg1 * 4, catDrawY + 1 - zProg1 * 7, '#94a3b8', 6);
-                    drawPixelText(ctx, 'Z', CAT_SCREEN_X + 20 + zProg2 * 5, catDrawY - 1 - zProg2 * 7, '#f43f5e', 7);
-                } else {
-                    const frameIndex = Math.floor(beatProgress * 6) % 8;
-                    drawCatSprite(ctx, 'idle', frameIndex, CAT_SCREEN_X, catDrawY, true);
-
-                    if (beat.prop === 'leaf') {
-                        const leafY = 5 + (beatProgress / beat.duration) * 14;
-                        const leafX = CAT_SCREEN_X + 22 + Math.sin(beatProgress * 4) * 3;
-                        ctx.fillStyle = '#4ade80';
-                        ctx.fillRect(Math.round(leafX), Math.round(leafY), 2, 1);
-                    } else if (beat.prop === 'lamp_heart') {
-                        const heartProg = beatProgress / beat.duration;
-                        const heartY = 10 - heartProg * 9;
-                        const heartX = CAT_SCREEN_X + 18 + Math.sin(heartProg * Math.PI * 2) * 2;
-                        if (heartY >= 0) {
-                            ctx.fillStyle = '#f43f5e';
-                            ctx.fillRect(Math.round(heartX), Math.round(heartY), 3, 3);
+                        if (beat.prop === 'leaf') {
+                            const leafY = 8 + (beatProgress / beat.duration) * 20;
+                            const leafX = CAT_SCREEN_X + 30 + Math.sin(beatProgress * 4) * 4;
+                            ctx.fillStyle = '#4ade80';
+                            ctx.fillRect(Math.round(leafX), Math.round(leafY), 2, 1);
+                        } else if (beat.prop === 'lamp_heart') {
+                            const heartProg = beatProgress / beat.duration;
+                            const heartY = 16 - heartProg * 14;
+                            const heartX = CAT_SCREEN_X + 26 + Math.sin(heartProg * Math.PI * 2) * 2;
+                            if (heartY >= 0) {
+                                ctx.fillStyle = '#f43f5e';
+                                ctx.fillRect(Math.round(heartX), Math.round(heartY), 3, 3);
+                            }
                         }
                     }
+                    break;
                 }
-                break;
-            }
 
-            case 'hurt': {
-                const frameIndex = Math.floor(beatProgress * 6) % 4;
-                drawCatSprite(ctx, 'hurt', frameIndex, CAT_SCREEN_X - 2, catDrawY, true);
-                drawSpeechBubble(ctx, '!', CAT_SCREEN_X + 16, catDrawY + 2);
-                break;
-            }
-
-            case 'attack': {
-                const frameIndex = Math.floor(beatProgress * 10) % 8;
-                drawCatSprite(ctx, 'attack', frameIndex, CAT_SCREEN_X, catDrawY, true);
-
-                if (beat.prop === 'sparks') {
-                    ctx.fillStyle = '#fde047';
-                    ctx.fillRect(CAT_SCREEN_X + 27, GROUND_Y - 6, 2, 2);
-                    ctx.fillRect(CAT_SCREEN_X + 31, GROUND_Y - 4, 2, 1);
-                } else if (beat.prop === 'shooting_star') {
-                    const starProg = beatProgress / beat.duration;
-                    const starX = 230 - starProg * 150;
-                    const starY = 3 + starProg * 4;
-                    ctx.fillStyle = '#fef08a';
-                    ctx.fillRect(Math.round(starX), Math.round(starY), 3, 1);
-                    ctx.fillStyle = 'rgba(254, 240, 138, 0.4)';
-                    ctx.fillRect(Math.round(starX + 3), Math.round(starY), 5, 1);
+                case 'hurt': {
+                    if (isDinoMode) {
+                        const frameIndex = Math.floor(movieTime * 9) % 12;
+                        drawCatSprite(ctx, 'walk', frameIndex, CAT_SCREEN_X, catDrawY, true);
+                    } else {
+                        const frameIndex = Math.floor(beatProgress * 6) % 4;
+                        drawCatSprite(ctx, 'hurt', frameIndex, CAT_SCREEN_X - 2, catDrawY, true);
+                        drawSpeechBubble(ctx, '!', CAT_SCREEN_X + 22, catDrawY + 2);
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case 'jump':
-            case 'runningJump': {
-                const spriteKey = action === 'runningJump' ? 'runningJump' : 'jump';
-                const jumpPhase = beatProgress / beat.targetDist;
-                const jumpHeight = Math.sin(jumpPhase * Math.PI) * 7.5;
-                const frameIndex = jumpPhase < 0.35 ? 0 : (jumpPhase < 0.75 ? 1 : 2);
+                case 'attack': {
+                    const frameIndex = Math.floor(beatProgress * 10) % 8;
+                    drawCatSprite(ctx, 'attack', frameIndex, CAT_SCREEN_X, catDrawY, true);
 
-                drawCatSprite(ctx, spriteKey, frameIndex, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
-                break;
+                    if (beat.prop === 'sparks') {
+                        ctx.fillStyle = '#fde047';
+                        ctx.fillRect(CAT_SCREEN_X + 36, GROUND_Y - 6, 2, 2);
+                        ctx.fillRect(CAT_SCREEN_X + 40, GROUND_Y - 4, 2, 1);
+                    } else if (beat.prop === 'shooting_star') {
+                        const starProg = beatProgress / beat.duration;
+                        const starX = 230 - starProg * 150;
+                        const starY = 3 + starProg * 4;
+                        ctx.fillStyle = '#fef08a';
+                        ctx.fillRect(Math.round(starX), Math.round(starY), 3, 1);
+                        ctx.fillStyle = 'rgba(254, 240, 138, 0.4)';
+                        ctx.fillRect(Math.round(starX + 3), Math.round(starY), 5, 1);
+                    }
+                    break;
+                }
+
+                case 'jump':
+                case 'runningJump': {
+                    if (isDinoMode) {
+                        // In Cat Run mode, all jumping is 100% user-controlled
+                        const frameIndex = Math.floor(movieTime * 13) % 8;
+                        drawCatSprite(ctx, 'run', frameIndex, CAT_SCREEN_X, catDrawY, true);
+                    } else {
+                        const spriteKey = action === 'runningJump' ? 'runningJump' : 'jump';
+                        const jumpPhase = beatProgress / beat.targetDist;
+                        const jumpHeight = Math.sin(jumpPhase * Math.PI) * 8.5;
+                        const frameIndex = jumpPhase < 0.35 ? 0 : (jumpPhase < 0.75 ? 1 : 2);
+
+                        drawCatSprite(ctx, spriteKey, frameIndex, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
+                    }
+                    break;
+                }
             }
+        }
+
+        // 8. Dino Runner Mode HUD (Sleek retro score badge properly centered)
+        if (isDinoMode) {
+            const scoreText = `★ ${Math.floor(dinoScore)}`;
+            const boxW = 48;
+            const boxH = 11;
+            const boxX = currentLogicalWidth - boxW - 4;
+            const boxY = 2;
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+
+            ctx.fillStyle = '#fde047';
+            ctx.font = 'bold 7px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(scoreText, Math.round(boxX + boxW / 2), Math.round(boxY + boxH / 2));
+            ctx.restore();
         }
     }
 
     // ------------------------------------------------------------------------
-    // 15. Animation Loop
+    // 15. Animation Loop & Resource Management
     // ------------------------------------------------------------------------
+    function isDrawerOpen() {
+        const drawer = document.getElementById('slidingInputView');
+        if (!drawer) return false;
+        return drawer.classList.contains('show') && drawer.style.display !== 'none';
+    }
+
     function loop(timestamp) {
-        if (!isRunning) return;
+        if (!isRunning || !isVisible || !isDrawerOpen() || document.hidden) {
+            stop();
+            return;
+        }
 
         if (!lastTime) lastTime = timestamp;
         const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
@@ -1096,6 +1333,43 @@
     // ------------------------------------------------------------------------
     // 16. Mount & Lifecycle Management
     // ------------------------------------------------------------------------
+    let drawerObserver = null;
+
+    function setupDrawerObserver() {
+        if (drawerObserver) return;
+        const drawer = document.getElementById('slidingInputView');
+        if (!drawer) {
+            setTimeout(setupDrawerObserver, 150);
+            return;
+        }
+
+        const handleDrawerChange = () => {
+            const open = isDrawerOpen();
+            if (open) {
+                if (isVisible) {
+                    resizeCanvasToContainer();
+                    start();
+                }
+            } else {
+                stop();
+                // When drawer closes, exit Dino mode so next open starts in calm default
+                if (isDinoMode) {
+                    isDinoMode = false;
+                    hurtTimer = 0;
+                    userJumpTimer = 0;
+                    dinoScore = 0;
+                    idlePlayTimer = 0;
+                }
+            }
+        };
+
+        drawerObserver = new MutationObserver(handleDrawerChange);
+        drawerObserver.observe(drawer, {
+            attributes: true,
+            attributeFilter: ['class', 'style']
+        });
+    }
+
     function mount() {
         const box = document.querySelector('.jumping-text-box');
         if (!box) {
@@ -1110,15 +1384,17 @@
             box.appendChild(cvs);
         }
 
+        setupDrawerObserver();
+
         // Responsive ResizeObserver
         if (window.ResizeObserver && !resizeObserver) {
             resizeObserver = new ResizeObserver(() => {
-                if (isVisible) resizeCanvasToContainer();
+                if (isVisible && isDrawerOpen()) resizeCanvasToContainer();
             });
             resizeObserver.observe(box);
         }
         window.addEventListener('resize', () => {
-            if (isVisible) resizeCanvasToContainer();
+            if (isVisible && isDrawerOpen()) resizeCanvasToContainer();
         });
 
         if (isVisible) {
@@ -1127,7 +1403,9 @@
             if (jumpingTextContainer) jumpingTextContainer.style.display = 'none';
             cvs.style.display = 'block';
             resizeCanvasToContainer();
-            start();
+            if (isDrawerOpen()) {
+                start();
+            }
         } else {
             cvs.style.display = 'none';
             if (jumpingTextContainer) jumpingTextContainer.style.display = '';
@@ -1135,7 +1413,7 @@
     }
 
     function start() {
-        if (isRunning) return;
+        if (isRunning || !isVisible || !isDrawerOpen() || document.hidden) return;
         isRunning = true;
         lastTime = 0;
         animationFrameId = requestAnimationFrame(loop);
