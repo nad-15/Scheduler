@@ -4138,6 +4138,10 @@ input[type="radio"]:checked::after {
     align-items: center;
     overflow: hidden;
     margin-bottom: 2px;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .sliding-templates-scroll {
@@ -4156,6 +4160,10 @@ input[type="radio"]:checked::after {
     -webkit-overflow-scrolling: touch;
     padding: 1px 2px;
     box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .sliding-templates-scroll::-webkit-scrollbar {
@@ -4181,6 +4189,7 @@ input[type="radio"]:checked::after {
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
     touch-action: pan-x;
     overflow: hidden;
     white-space: nowrap;
@@ -4198,6 +4207,10 @@ input[type="radio"]:checked::after {
     white-space: nowrap;
     min-width: 0;
     max-width: 100%;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .sliding-template-item:hover {
@@ -8117,6 +8130,10 @@ ic {
     height: 34px;
     min-width: 30px;
     transition: width 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Messenger collapse chevron button (Overlayed smoothly without pushing flex flow) */
@@ -8139,6 +8156,8 @@ ic {
     pointer-events: none;
     transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
     padding: 0;
     flex-shrink: 0;
@@ -8172,6 +8191,10 @@ ic {
     overflow: visible;
     transform: translateX(0);
     transition: max-width 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Prevent ANY squishing of the tool buttons during transition */
@@ -8206,6 +8229,14 @@ ic {
     border-color: rgba(204, 230, 255, 0.95) transparent transparent transparent;
 }
 
+/* Dynamic action button common rule */
+.dynamic-action-btn {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
 /* Compact Add Task (+) Button in Dynamic Mode (Idle / No selection: bare blue add sign, no circle) */
 .sliding-input-view.dynamic-bar-active #addTask {
     width: 30px !important;
@@ -8225,6 +8256,17 @@ ic {
     padding: 0 !important;
     flex-shrink: 0;
     transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sliding-input-view.dynamic-bar-active #addTask * {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .sliding-input-view.dynamic-bar-active #addTask:hover {
@@ -8282,6 +8324,17 @@ ic {
     padding: 0;
     flex-shrink: 0;
     transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sliding-input-view.dynamic-bar-active .btn-toggle-template-strip * {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .sliding-input-view.dynamic-bar-active .btn-toggle-template-strip:hover {

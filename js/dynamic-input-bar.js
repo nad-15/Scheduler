@@ -653,10 +653,16 @@
         isManualTextareaExpanded = false;
         updateCollapseLogic();
       });
+      btnCollapseActions.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
     }
 
     if (btnToggleTemplateStrip) {
       btnToggleTemplateStrip.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+      });
+      btnToggleTemplateStrip.addEventListener('contextmenu', (e) => {
         e.preventDefault();
       });
       btnToggleTemplateStrip.addEventListener('click', (e) => {
