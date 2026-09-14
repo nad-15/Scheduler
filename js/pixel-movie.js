@@ -197,6 +197,34 @@
         }
     }
 
+    // Retro arcade countdown beep (480Hz for 3-2-1, bright 880->1320Hz chime for GO!)
+    function playRetroCountdownBeep(isGo = false) {
+        try {
+            const ctx = initAudio();
+            if (!ctx) return;
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = isGo ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(isGo ? 880 : 480, ctx.currentTime);
+            if (isGo) {
+                osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.12);
+            }
+
+            gain.gain.setValueAtTime(0.06, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (isGo ? 0.22 : 0.09));
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + (isGo ? 0.23 : 0.10));
+        } catch (e) {
+            // Fails silently if browser blocks audio
+        }
+    }
+
     // ------------------------------------------------------------------------
     // 4. World Balloons Mini-Game System
     // ------------------------------------------------------------------------
@@ -225,32 +253,35 @@
     // Minimum distance between obstacles is 170px (Cat jump length is ~55px)
     // ------------------------------------------------------------------------
     const WORLD_OBSTACLES = [
-        // Zone 1: Forest (Placed in active movement, away from resting spots)
-        { id: 'obs_f1', worldX: 90, width: 7, height: 8, type: 'stump' },
-        { id: 'obs_f2', worldX: 290, width: 8, height: 8, type: 'log' },
+        // Zone 1: Forest (210px rhythm perfectly balanced for high-speed runs!)
+        { id: 'obs_f1', worldX: 220, width: 7, height: 8, type: 'stump' },
+        { id: 'obs_f2', worldX: 430, width: 8, height: 8, type: 'log' },
 
         // Zone 2: Desert (In active movement stretches)
-        { id: 'obs_d1', worldX: 475, width: 7, height: 9, type: 'cactus' },
-        { id: 'obs_d2', worldX: 680, width: 8, height: 9, type: 'cactus_pair' },
+        { id: 'obs_d1', worldX: 640, width: 7, height: 9, type: 'cactus' },
+        { id: 'obs_d2', worldX: 850, width: 8, height: 9, type: 'cactus_pair' },
 
         // Zone 3: City Streets (During active street walk and run)
-        { id: 'obs_c1', worldX: 900, width: 7, height: 8, type: 'hydrant' },
-        { id: 'obs_c2', worldX: 1110, width: 8, height: 8, type: 'cone' },
+        { id: 'obs_c1', worldX: 1060, width: 7, height: 8, type: 'hydrant' },
+        { id: 'obs_c2', worldX: 1270, width: 8, height: 8, type: 'cone' },
 
-        // Zone 4: Rooftops & Dawn Walk (Safely after sleep beat)
-        { id: 'obs_r1', worldX: 1380, width: 8, height: 8, type: 'vent' },
-        { id: 'obs_r2', worldX: 1520, width: 7, height: 8, type: 'pipe' }
+        // Zone 4: Rooftops & Dawn Walk (Safely spaced)
+        { id: 'obs_r1', worldX: 1480, width: 8, height: 8, type: 'vent' }
     ];
 
     // Confetti particles when a balloon pops
     let confettiParticles = [];
 
-    // Floating text notifications (e.g. "✦ POP! ✦")
+    // Floating notifications (strictly for "✦ OUCH! ✦" when hitting an obstacle)
     let popNotifications = [];
 
     // Player Mini-Game Control States
     let userJumpTimer = 0;   // Player-triggered jump countdown
     let justPoppedTimer = 0; // Claw slash spark effect when popping
+
+    // Dynamic Speed & Jump Scaling (From relaxing jog to don't-blink hyperspeed!)
+    let currentSpeed = 38;         // 38 px/s escalating to 290+ px/s
+    let currentMaxJumpTime = 0.88; // Dynamic jump duration tuned to currentSpeed
 
     // Dino Runner Mode Active States
     let isDinoMode = false;       // Active only when player taps to play
@@ -259,6 +290,11 @@
     let invulnerableTimer = 0;   // Post-hurt recovery grace period (flashing)
     let idlePlayTimer = 0;       // Inactivity timer to return to calm ambient mode
     let hasAnnouncedSprint = false; // Flag to pop SPRINT announcement at 200 pts
+
+    // Countdown State before Player Mode Starts (3, 2, 1, GO!)
+    let countdownTimer = 0;      // > 0 when counting down (3.0 -> 0.0)
+    let lastBeepSec = -1;        // Tracks 3, 2, 1 beeps
+    let goBannerTimer = 0;       // > 0 when flashing 'GO!'
 
     // Free-Roaming Virtual Pet Companion States (Normal Mode)
     let petX = 60;               // Screen X position of wandering cat
@@ -290,15 +326,6 @@
                 maxLife: 0.6
             });
         }
-
-        // Pop badge notification in clear view
-        popNotifications.push({
-            text: '✦ POP! ✦',
-            x: x,
-            y: 11, // Positioned at y = 11 to 23, clearly on screen
-            life: 0.85,
-            maxLife: 0.85
-        });
     }
 
     // ------------------------------------------------------------------------
@@ -916,28 +943,45 @@
 
         initAudio(); // Unlocks Web Audio API directly on user gesture
 
-        // Activate Dino Runner Mode when player clicks to play!
-        if (!isDinoMode) {
-            isDinoMode = true;
-            dinoScore = 0;
-            hurtTimer = 0;
-            invulnerableTimer = 1.0;
-            hasAnnouncedSprint = false;
-            popNotifications.push({
-                text: '✦ CAT RUN! ✦',
-                x: CAT_SCREEN_X + 22,
-                y: GROUND_Y - 16,
-                life: 0.9,
-                maxLife: 0.9
-            });
-        }
-        idlePlayTimer = 0; // Reset inactivity timer
-
-        // Quick recovery if tapped while stumbling
+        // If dead/stumbling from crash, tapping immediately resets distance to 0 and starts 3-2-1 countdown!
         if (hurtTimer > 0) {
             hurtTimer = 0;
-            invulnerableTimer = 1.2;
+            isDinoMode = false;
+            dinoScore = 0;
+            currentSpeed = 38;
+            catWorldX = CAT_SCREEN_X;
+            countdownTimer = 3.0;
+            lastBeepSec = 3;
+            goBannerTimer = 0;
+            playRetroCountdownBeep(false); // First countdown beep for '3'
+            petFacing = 1;
+            petState = 'idle';
+            petBowlX = null;
+            return;
         }
+
+        // If in Normal Mode and not yet counting down: Start 3-2-1 countdown with distance 0!
+        if (!isDinoMode && countdownTimer <= 0) {
+            dinoScore = 0;
+            currentSpeed = 38;
+            catWorldX = CAT_SCREEN_X;
+            countdownTimer = 3.0;
+            lastBeepSec = 3;
+            goBannerTimer = 0;
+            playRetroCountdownBeep(false); // First countdown beep for '3'
+            petFacing = 1;
+            petState = 'idle';
+            petBowlX = null;
+            return;
+        }
+
+        // If currently in countdown, allow cute preparatory jump
+        if (countdownTimer > 0) {
+            triggerUserJump();
+            return;
+        }
+
+        idlePlayTimer = 0; // Reset inactivity timer
 
         triggerUserJump();
 
@@ -947,9 +991,15 @@
         }
     }
 
+    function getJumpDuration(speed) {
+        // Smooth linear curve: 0.88s at 38 px/s down to 0.44s at 280 px/s
+        return Math.max(0.44, 0.88 - Math.max(0, speed - 38) * 0.0018);
+    }
+
     function triggerUserJump() {
-        // Player command: Jump!
-        userJumpTimer = 0.95; // Floaty, comfortable arcade jump with ample hangtime
+        // Player command: Jump! Snappy and athletic as speed climbs!
+        currentMaxJumpTime = getJumpDuration(currentSpeed);
+        userJumpTimer = currentMaxJumpTime;
         playRetroJumpSound();  // Soft cute 8-bit hop feedback
     }
 
@@ -1134,20 +1184,22 @@
 
         if (isDinoMode) {
             idlePlayTimer += dt;
-            if (hurtTimer <= 0) {
-                dinoScore += dt * 18; // Survival score
+
+            // Steady, Gradual Linear Acceleration System:
+            // Walk (38-48) -> Fast Walk (48-62) -> Faster Walk (62-78) ->
+            // Run (78-110) -> Fast Run (110-150) -> Faster Run (150-205) -> Fastest Run (205-280)
+            // Completely seamless progression without sudden jumps or exponential runaway bursts!
+            const targetSpeed = 38 + Math.min(242, dinoScore * 0.055);
+            currentSpeed += (targetSpeed - currentSpeed) * Math.min(1.0, dt * 2.5);
+
+            let effectiveSpeed = currentSpeed;
+            if (hurtTimer > 0) {
+                effectiveSpeed = 0; // Pause forward movement while stumbling
             }
 
-            // Milestone: Sprint Announcement at 200 pts
-            if (dinoScore >= 200 && !hasAnnouncedSprint) {
-                hasAnnouncedSprint = true;
-                popNotifications.push({
-                    text: '✦ SPRINT! ✦',
-                    x: CAT_SCREEN_X + 22,
-                    y: GROUND_Y - 16,
-                    life: 0.9,
-                    maxLife: 0.9
-                });
+            if (hurtTimer <= 0) {
+                // Steady score/distance accumulation: 20 points per second
+                dinoScore += dt * 20;
             }
 
             // Inactivity timeout: If player abandoned game for 10 seconds, or tripped without tapping for 3.5s,
@@ -1158,8 +1210,12 @@
                 hurtTimer = 0;
                 userJumpTimer = 0;
                 dinoScore = 0;
+                currentSpeed = 38;
                 idlePlayTimer = 0;
                 hasAnnouncedSprint = false;
+                countdownTimer = 0;
+                goBannerTimer = 0;
+                lastBeepSec = -1;
                 // Transition cat smoothly to virtual pet companion
                 petX = CAT_SCREEN_X;
                 petFacing = 1;
@@ -1169,20 +1225,42 @@
                 petBowlX = null;
             }
 
-            // Player Mode pacing:
-            // Walking speed (< 200 score) is 38 px/s, Running speed (>= 200 score) is 72 px/s
-            let effectiveSpeed = (dinoScore < 200) ? 38 : 72;
-            if (hurtTimer > 0) {
-                effectiveSpeed = 0; // Pause forward movement while stumbling
-            }
-
             if (effectiveSpeed > 0) {
                 const distStep = effectiveSpeed * dt;
                 catWorldX = (catWorldX + distStep) % WORLD_WIDTH;
             }
+        } else if (countdownTimer > 0) {
+            // Pre-Game Countdown (3, 2, 1, GO!)
+            countdownTimer = Math.max(0, countdownTimer - dt);
+
+            const sec = Math.ceil(countdownTimer);
+            if (sec > 0 && sec !== lastBeepSec) {
+                lastBeepSec = sec;
+                playRetroCountdownBeep(false); // Beep on 2, 1
+            }
+
+            // Smoothly ease cat into starting position
+            petX += (CAT_SCREEN_X - petX) * Math.min(1.0, dt * 10);
+
+            if (countdownTimer <= 0) {
+                isDinoMode = true;
+                catWorldX = CAT_SCREEN_X; // Aligns camera at 0
+                dinoScore = 0;
+                currentSpeed = 38;
+                hurtTimer = 0;
+                invulnerableTimer = 1.2;
+                idlePlayTimer = 0;
+                hasAnnouncedSprint = false;
+                goBannerTimer = 0.7; // Flash 'GO!'
+                playRetroCountdownBeep(true); // Bright chime!
+            }
         } else {
             // Normal Mode: Free-roaming ambient virtual pet AI
             updatePetCompanion(dt);
+        }
+
+        if (goBannerTimer > 0) {
+            goBannerTimer = Math.max(0, goBannerTimer - dt);
         }
 
         const cameraX = isDinoMode ? (catWorldX - CAT_SCREEN_X) : 0;
@@ -1192,7 +1270,8 @@
         let isJumping = false;
 
         if (userJumpTimer > 0) {
-            const phase = (0.95 - userJumpTimer) / 0.95; // 0 -> 1
+            const maxT = currentMaxJumpTime || 0.88;
+            const phase = (maxT - userJumpTimer) / maxT; // 0 -> 1
             activeJumpHeight = Math.sin(phase * Math.PI) * 15.5; // High, floaty, satisfying arc!
             isJumping = true;
         } else if (!isDinoMode && petState === 'pounce') {
@@ -1218,17 +1297,23 @@
                 if (obsRight >= catLeft && obsLeft <= catRight) {
                     // Vertical collision: paws must clear cactus with 2px forgiving margin
                     if (activeJumpHeight < obs.height - 2) {
-                        hurtTimer = 1.5; // Cat tumbles for 1.5s
-                        invulnerableTimer = 2.8; // 1.5s hurt + 1.3s recovery grace period
+                        // CRASH / DEAD: Reset distance to start over from 0!
+                        hurtTimer = 1.4; // Cat stumbles for 1.4s
+                        dinoScore = 0;   // Distance reset to 0!
+                        currentSpeed = 38; // Speed reset to starting walk speed!
+                        isDinoMode = false; // Run ends
+                        catWorldX = CAT_SCREEN_X; // Reset world camera back to start
                         userJumpTimer = 0;
+                        invulnerableTimer = 0;
+                        hasAnnouncedSprint = false;
                         playRetroHurtSound();
 
                         popNotifications.push({
                             text: '✦ OUCH! ✦',
                             x: CAT_SCREEN_X + 20,
                             y: GROUND_Y - 16,
-                            life: 0.9,
-                            maxLife: 0.9
+                            life: 1.0,
+                            maxLife: 1.0
                         });
                     }
                 }
@@ -1348,29 +1433,42 @@
         });
 
         // 7. Cat Animation & Action Handler
-        if (isDinoMode) {
+        if (hurtTimer > 0) {
+            // A. HURT / CRASH STATE (Cat tripped on obstacle - distance reset to 0!)
+            const catDrawY = CAT_BASE_Y;
+            const frameIndex = Math.min(3, Math.floor((1.4 - hurtTimer) * 4));
+            drawCatSprite(ctx, 'hurt', frameIndex, CAT_SCREEN_X - 2, catDrawY, true, CAT_DEST_W, CAT_DEST_H);
+
+            // Comic dizzy stars circling above head
+            const starAngle = movieTime * 9;
+            const sX1 = CAT_SCREEN_X + 18 + Math.cos(starAngle) * 8;
+            const sY1 = catDrawY - 4 + Math.sin(starAngle) * 3;
+            const sX2 = CAT_SCREEN_X + 18 + Math.cos(starAngle + Math.PI) * 8;
+            const sY2 = catDrawY - 4 + Math.sin(starAngle + Math.PI) * 3;
+            ctx.fillStyle = '#fde047';
+            ctx.fillRect(Math.round(sX1), Math.round(sY1), 2, 2);
+            ctx.fillStyle = '#fda4af';
+            ctx.fillRect(Math.round(sX2), Math.round(sY2), 2, 2);
+        } else if (countdownTimer > 0) {
+            // Pre-Game Countdown (Cat is standing ready at starting line)
+            const catDrawY = CAT_BASE_Y;
+            if (userJumpTimer > 0) {
+                const phase = (0.95 - userJumpTimer) / 0.95;
+                const jumpHeight = Math.sin(phase * Math.PI) * 12.0;
+                drawCatSprite(ctx, 'jump', phase < 0.5 ? 0 : 2, Math.round(petX), catDrawY - Math.round(jumpHeight), true, CAT_DEST_W, CAT_DEST_H);
+            } else {
+                const frameIndex = Math.floor(movieTime * 6) % 8;
+                drawCatSprite(ctx, 'idle', frameIndex, Math.round(petX), catDrawY, true, CAT_DEST_W, CAT_DEST_H);
+            }
+        } else if (isDinoMode) {
             const catDrawY = CAT_BASE_Y;
 
-            // A. HURT STATE (Cat tripped on an obstacle in Dino Mode)
-            if (hurtTimer > 0) {
-                const frameIndex = Math.min(3, Math.floor((1.5 - hurtTimer) * 4));
-                drawCatSprite(ctx, 'hurt', frameIndex, CAT_SCREEN_X - 2, catDrawY, true);
-
-                // Comic dizzy stars circling above head
-                const starAngle = movieTime * 9;
-                const sX1 = CAT_SCREEN_X + 18 + Math.cos(starAngle) * 8;
-                const sY1 = catDrawY - 4 + Math.sin(starAngle) * 3;
-                const sX2 = CAT_SCREEN_X + 18 + Math.cos(starAngle + Math.PI) * 8;
-                const sY2 = catDrawY - 4 + Math.sin(starAngle + Math.PI) * 3;
-                ctx.fillStyle = '#fde047';
-                ctx.fillRect(Math.round(sX1), Math.round(sY1), 2, 2);
-                ctx.fillStyle = '#fda4af';
-                ctx.fillRect(Math.round(sX2), Math.round(sY2), 2, 2);
-            } else if (invulnerableTimer > 0 && Math.floor(movieTime * 14) % 2 === 0) {
+            if (invulnerableTimer > 0 && Math.floor(movieTime * 14) % 2 === 0) {
                 // Retro blink during post-hurt invulnerability
             } else if (userJumpTimer > 0) {
                 // C. PLAYER-TRIGGERED JUMP (Mini-game action!)
-                const phase = (0.95 - userJumpTimer) / 0.95; // 0 -> 1
+                const maxT = currentMaxJumpTime || 0.88;
+                const phase = (maxT - userJumpTimer) / maxT; // 0 -> 1
                 const jumpHeight = Math.sin(phase * Math.PI) * 15.5;
 
                 // If a balloon was just hit, show ATTACK claw swipe at apex
@@ -1383,27 +1481,64 @@
                         ctx.fillRect(CAT_SCREEN_X + 34, catDrawY - Math.round(jumpHeight) + 6, 2, 2);
                     }
                 } else if (phase < 0.3) {
-                    // Rising leap frame (JUMP frame 0, or RUNNING_JUMP if sprinting)
-                    const jumpSprite = (dinoScore >= 200) ? 'runningJump' : 'jump';
+                    // Rising leap frame (JUMP frame 0, or RUNNING_JUMP if running)
+                    const jumpSprite = (currentSpeed >= 78) ? 'runningJump' : 'jump';
                     drawCatSprite(ctx, jumpSprite, 0, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
                 } else {
-                    // Landing frame (JUMP frame 2, or RUNNING_JUMP if sprinting)
-                    const jumpSprite = (dinoScore >= 200) ? 'runningJump' : 'jump';
+                    // Landing frame (JUMP frame 2, or RUNNING_JUMP if running)
+                    const jumpSprite = (currentSpeed >= 78) ? 'runningJump' : 'jump';
                     drawCatSprite(ctx, jumpSprite, 2, CAT_SCREEN_X, catDrawY - Math.round(jumpHeight), true);
                 }
             } else {
-                // D. PLAYER RUNNER MODE: Walking (<200) -> Running (>=200)
-                if (dinoScore < 200) {
-                    // Stage 1: Walking using WALK.png (12 frames)
-                    const frameIndex = Math.floor(movieTime * 9) % 12;
+                // D. PLAYER RUNNER MODE:
+                // Walk -> Fast Walk -> Faster Walk -> Run -> Fast Run -> Faster Run -> Fastest Run
+                if (currentSpeed < 78) {
+                    // STAGES 1, 2, 3: WALKING PHASES (WALK.png, 12 frames)
+                    // Walk (38-48 px/s): ~7.5 - 9.8 fps (relaxed casual walk)
+                    // Fast Walk (48-62 px/s): ~9.8 - 12.9 fps (brisk walking pace)
+                    // Faster Walk (62-78 px/s): ~12.9 - 16.5 fps (rapid power walk stride)
+                    const walkFps = 7.5 + ((currentSpeed - 38) / 40) * 9.0;
+                    const frameIndex = Math.floor(movieTime * walkFps) % 12;
                     drawCatSprite(ctx, 'walk', frameIndex, CAT_SCREEN_X, catDrawY, true);
+
+                    // Light dust puff when fast/faster walking
+                    if (currentSpeed > 60) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                        ctx.fillRect(CAT_SCREEN_X - 2, GROUND_Y - 2, 2, 1);
+                    }
                 } else {
-                    // Stage 2: Running using RUN.png (8 frames)
-                    const frameIndex = Math.floor(movieTime * 14) % 8;
+                    // STAGES 4, 5, 6, 7: RUNNING PHASES (RUN.png, 8 frames)
+                    // Run (78-110 px/s): 11.5 - 14.4 fps (fluid jog/run)
+                    // Fast Run (110-150 px/s): 14.4 - 18.1 fps (energetic fast run + double dust)
+                    // Faster Run (150-205 px/s): 18.1 - 23.1 fps (blistering sprint + wind streaks)
+                    // Fastest Run (205-280 px/s): 23.1 - 30.0 fps (hyper-speed sprint + friction sparks!)
+                    const runFps = Math.min(30, 11.5 + ((currentSpeed - 78) / 202) * 18.5);
+                    const frameIndex = Math.floor(movieTime * runFps) % 8;
                     drawCatSprite(ctx, 'run', frameIndex, CAT_SCREEN_X, catDrawY, true);
-                    // Subtle dust puffs when sprinting
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                    ctx.fillRect(CAT_SCREEN_X - 2, GROUND_Y - 3, 2, 1);
+
+                    // Dynamic multi-tier dust & speed streaks based on velocity!
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+                    ctx.fillRect(CAT_SCREEN_X - 3, GROUND_Y - 3, 3, 1);
+
+                    if (currentSpeed > 110) {
+                        // Fast Run: secondary dust puff behind cat
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+                        ctx.fillRect(CAT_SCREEN_X - 8, GROUND_Y - 2, 4, 1);
+                    }
+                    if (currentSpeed > 150) {
+                        // Faster Run: Wind speed streaks rushing past behind the cat
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+                        ctx.fillRect(CAT_SCREEN_X - 16, GROUND_Y - 14, 12, 1);
+                        ctx.fillRect(CAT_SCREEN_X - 12, GROUND_Y - 7, 8, 1);
+                    }
+                    if (currentSpeed > 205) {
+                        // Fastest Run: Golden friction sparks trailing the hyper-running paws!
+                        ctx.fillStyle = '#fde047';
+                        const sparkY = GROUND_Y - 3 - (Math.floor(movieTime * 30) % 4);
+                        ctx.fillRect(CAT_SCREEN_X - 6, sparkY, 2, 2);
+                        ctx.fillStyle = '#fb923c';
+                        ctx.fillRect(CAT_SCREEN_X - 14, sparkY + 1, 2, 1);
+                    }
                 }
             }
         } else {
@@ -1504,7 +1639,7 @@
         }
 
         // 8. Dino Runner Mode HUD (Sleek retro score badge properly centered)
-        if (isDinoMode) {
+        if (isDinoMode || hurtTimer > 0) {
             const scoreText = `★ ${Math.floor(dinoScore)}`;
             const boxW = 48;
             const boxH = 11;
@@ -1512,14 +1647,59 @@
             const boxY = 2;
 
             ctx.save();
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+            ctx.fillStyle = (currentSpeed > 220) ? 'rgba(30, 20, 10, 0.92)' : 'rgba(15, 23, 42, 0.88)';
             ctx.fillRect(boxX, boxY, boxW, boxH);
 
-            ctx.fillStyle = '#fde047';
+            if (currentSpeed > 220) {
+                // Golden danger glow border in hyper-speed mode!
+                ctx.fillStyle = (Math.floor(movieTime * 10) % 2 === 0) ? '#fde047' : '#f97316';
+                ctx.fillRect(boxX, boxY, boxW, 1);
+                ctx.fillRect(boxX, boxY + boxH - 1, boxW, 1);
+            }
+
+            ctx.fillStyle = (currentSpeed > 220) ? '#fef08a' : '#fde047';
             ctx.font = 'bold 7px monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(scoreText, Math.round(boxX + boxW / 2), Math.round(boxY + boxH / 2));
+            ctx.restore();
+        }
+
+        // 9. Countdown Display (3, 2, 1) & GO! Notification Badge
+        if (countdownTimer > 0) {
+            const sec = Math.ceil(countdownTimer); // 3, 2, 1
+            const cx = Math.round(currentLogicalWidth / 2);
+            const cy = 13;
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+            ctx.fillRect(cx - 16, cy - 8, 32, 16);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(cx - 16, cy - 8, 32, 1);
+            ctx.fillRect(cx - 16, cy + 7, 32, 1);
+
+            ctx.fillStyle = '#fde047';
+            ctx.font = 'bold 11px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${sec}`, cx, cy);
+            ctx.restore();
+        } else if (goBannerTimer > 0 && isDinoMode) {
+            const cx = Math.round(currentLogicalWidth / 2);
+            const cy = 13;
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+            ctx.fillRect(cx - 20, cy - 8, 40, 16);
+            ctx.fillStyle = '#4ade80';
+            ctx.fillRect(cx - 20, cy - 8, 40, 1);
+            ctx.fillRect(cx - 20, cy + 7, 40, 1);
+
+            ctx.fillStyle = '#4ade80';
+            ctx.font = 'bold 10px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('GO!', cx, cy);
             ctx.restore();
         }
     }
@@ -1570,13 +1750,16 @@
             } else {
                 stop();
                 // When drawer closes, exit Dino mode so next open starts in calm default
-                if (isDinoMode) {
+                if (isDinoMode || countdownTimer > 0) {
                     isDinoMode = false;
                     hurtTimer = 0;
                     userJumpTimer = 0;
                     dinoScore = 0;
                     idlePlayTimer = 0;
                     hasAnnouncedSprint = false;
+                    countdownTimer = 0;
+                    goBannerTimer = 0;
+                    lastBeepSec = -1;
                 }
                 petX = 60;
                 petFacing = 1;
