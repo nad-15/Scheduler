@@ -3651,7 +3651,8 @@ h2 {
 .month-radio,
 .list-radio,
 .todo-radio,
-.add-task-radio {
+.add-task-radio,
+.banner-radio {
     margin-left: auto;
 }
 
