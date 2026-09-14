@@ -61,7 +61,9 @@
 
 .jumping-text-container[data-jumping-theme="classic"] .jumping-text,
 .theme-classic .jumping-text {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 1ch;
     letter-spacing: normal;
     font-family: monospace;
     font-size: 12px;
@@ -105,7 +107,7 @@
 .jumping-text-container[data-jumping-theme="origami-flip"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace;
     font-weight: 800;
     font-size: 13px;
@@ -153,7 +155,7 @@
 .jumping-text-container[data-jumping-theme="elastic-stretch"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace;
     font-weight: 900;
     font-size: 13px;
@@ -209,7 +211,7 @@
 .jumping-text-container[data-jumping-theme="domino-topple"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace;
     font-weight: 800;
     font-size: 13px;
@@ -261,7 +263,7 @@
 .jumping-text-container[data-jumping-theme="stadium-wave"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace;
     font-weight: 900;
     font-size: 13px;
@@ -313,7 +315,7 @@
 .jumping-text-container[data-jumping-theme="floating-magnet"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace;
     font-weight: 800;
     font-size: 13px;
@@ -360,7 +362,7 @@
 .jumping-text-container[data-jumping-theme="gradient-wave"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace, sans-serif;
     font-weight: 900;
     font-size: 13px;
@@ -406,7 +408,7 @@
 .jumping-text-container[data-jumping-theme="neon-glow"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace;
     font-weight: 800;
     font-size: 13px;
@@ -443,7 +445,7 @@
 .jumping-text-container[data-jumping-theme="minimal-pill"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace, sans-serif;
     font-size: 12px;
     font-weight: 700;
@@ -473,7 +475,7 @@
 .jumping-text-container[data-jumping-theme="retro-terminal"] .jumping-text {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 1ch;
     font-family: monospace;
     font-size: 13px;
     font-weight: bold;
