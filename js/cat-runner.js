@@ -53,7 +53,7 @@
     const CANVAS_HEIGHT = 40; // 40px height for larger cat and balloons
     const GROUND_Y = 35;      // Feet land on ground line at y = 35
     const CAT_SCREEN_X = 75;  // Cat anchored at left-center
-    const WORLD_WIDTH = 2700; // Continuous loop length in pixels (3 worlds x 900px)
+    const WORLD_WIDTH = 4500; // Continuous loop length in pixels (5 worlds x 900px)
 
     // Sprite Scale: Player Mode Runner (42x34)
     const CAT_DEST_W = 42;
@@ -386,7 +386,19 @@
             { type: 'city_distant', worldX: 2270, w: 30, h: 20, color: '#1e293b' },
             { type: 'city_distant', worldX: 2380, w: 36, h: 22, color: '#0f172a' },
             { type: 'city_distant', worldX: 2500, w: 28, h: 19, color: '#1e293b' },
-            { type: 'city_distant', worldX: 2610, w: 32, h: 17, color: '#0f172a' }
+            { type: 'city_distant', worldX: 2610, w: 32, h: 17, color: '#0f172a' },
+
+            // Zone 4: Distant Arctic Glaciers (2700 - 3600px - ZERO GREEN!)
+            { type: 'ice_peak', worldX: 2750, w: 90, h: 14, color: '#38bdf8' },
+            { type: 'ice_peak', worldX: 2980, w: 110, h: 16, color: '#0284c7' },
+            { type: 'ice_peak', worldX: 3200, w: 95, h: 13, color: '#38bdf8' },
+            { type: 'ice_peak', worldX: 3420, w: 105, h: 15, color: '#0284c7' },
+
+            // Zone 5: Distant Volcanic Peaks & Calderas (3600 - 4500px - ZERO GREEN!)
+            { type: 'volcano', worldX: 3680, w: 100, h: 13, color: '#1e293b' },
+            { type: 'volcano', worldX: 3900, w: 120, h: 15, color: '#0f172a' },
+            { type: 'volcano', worldX: 4140, w: 95, h: 12, color: '#1e293b' },
+            { type: 'volcano', worldX: 4360, w: 110, h: 14, color: '#0f172a' }
         ],
 
         // Midground Landmarks (Parallax factor 0.40 - STRICTLY ZERO GREEN!)
@@ -400,7 +412,19 @@
             // Zone 2: Near Sand Dunes
             { type: 'dune', worldX: 1120, w: 90, h: 8, color: '#fed7aa' },
             { type: 'dune', worldX: 1360, w: 105, h: 9, color: '#fde68a' },
-            { type: 'dune', worldX: 1580, w: 95, h: 8, color: '#fed7aa' }
+            { type: 'dune', worldX: 1580, w: 95, h: 8, color: '#fed7aa' },
+
+            // Zone 4: Jagged Ice Spires & Crystal Crags (2700 - 3600px - ZERO GREEN!)
+            { type: 'ice_spire', worldX: 2840, w: 75, h: 12, color: '#bae6fd' },
+            { type: 'ice_spire', worldX: 3070, w: 85, h: 14, color: '#e0f2fe' },
+            { type: 'ice_spire', worldX: 3290, w: 80, h: 11, color: '#bae6fd' },
+            { type: 'ice_spire', worldX: 3510, w: 70, h: 13, color: '#e0f2fe' },
+
+            // Zone 5: Basalt Crags & Glowing Lava Vents (3600 - 4500px - ZERO GREEN!)
+            { type: 'volcanic_crag', worldX: 3760, w: 80, h: 11, color: '#334155' },
+            { type: 'volcanic_crag', worldX: 3980, w: 90, h: 12, color: '#1e293b' },
+            { type: 'volcanic_crag', worldX: 4220, w: 85, h: 10, color: '#334155' },
+            { type: 'volcanic_crag', worldX: 4430, w: 75, h: 12, color: '#1e293b' }
         ],
 
         // Grand Tall Buildings in City World (Parallax factor 0.40, WorldX: 1800 - 2700px - STRICTLY ZERO GREEN!)
@@ -584,11 +608,21 @@
             baselineColor = isNight ? '#b45309' : '#fed7aa';
             speckColor1 = isNight ? '#92400e' : '#fde68a';
             speckColor2 = isNight ? '#78350f' : '#f59e0b';
-        } else if (wx >= 1800) {
+        } else if (wx >= 1800 && wx < 2700) {
             // Zone 3: City Street Asphalt
             baselineColor = isNight ? '#334155' : '#475569';
             speckColor1 = isNight ? '#1e293b' : '#cbd5e1';
             speckColor2 = isNight ? '#0f172a' : '#64748b';
+        } else if (wx >= 2700 && wx < 3600) {
+            // Zone 4: Arctic Glacier / Frost Ice
+            baselineColor = isNight ? '#1e3a8a' : '#7dd3fc';
+            speckColor1 = isNight ? '#0284c7' : '#ffffff';
+            speckColor2 = isNight ? '#38bdf8' : '#e0f2fe';
+        } else if (wx >= 3600) {
+            // Zone 5: Volcanic Basalt & Glowing Embers
+            baselineColor = isNight ? '#0f172a' : '#1e293b';
+            speckColor1 = isNight ? '#ef4444' : '#f97316';
+            speckColor2 = isNight ? '#ea580c' : '#fbbf24';
         }
 
         ctx.fillStyle = baselineColor;
@@ -930,11 +964,41 @@
                         ctx.fillRect(sx + 4, blockY + 4, 1, 1);
                         ctx.fillRect(sx + lm.w - 5, blockY + 7, 1, 1);
                     }
+                } else if (lm.type === 'ice_peak') {
+                    const hw = Math.round(lm.w / 2);
+                    const topY = GROUND_Y - lm.h;
+                    ctx.beginPath();
+                    ctx.moveTo(sx - hw, GROUND_Y);
+                    ctx.lineTo(sx - Math.round(hw * 0.15), topY);
+                    ctx.lineTo(sx + Math.round(hw * 0.25), topY + 2);
+                    ctx.lineTo(sx + hw, GROUND_Y);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Frost crystalline summit highlight
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(sx - 3, topY, 6, 2);
+                } else if (lm.type === 'volcano') {
+                    const hw = Math.round(lm.w / 2);
+                    const topY = GROUND_Y - lm.h;
+                    ctx.beginPath();
+                    ctx.moveTo(sx - hw, GROUND_Y);
+                    ctx.lineTo(sx - 5, topY);
+                    ctx.lineTo(sx + 5, topY);
+                    ctx.lineTo(sx + hw, GROUND_Y);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Glowing molten lava caldera rim
+                    ctx.fillStyle = '#f97316';
+                    ctx.fillRect(sx - 4, topY, 8, 1);
+                    if (Math.floor(movieTime * 3) % 2 === 0) {
+                        ctx.fillStyle = '#ef4444';
+                        ctx.fillRect(sx - 1, topY - 1, 2, 1);
+                    }
                 }
             }
         });
 
-        // 5. Midground Landmarks (Near Mountains & Dunes - Parallax 0.40 - STRICTLY ZERO GREEN!)
+        // 5. Midground Landmarks (Near Mountains, Dunes, Ice Spires, Volcanic Crags - Parallax 0.40)
         SCENERY.midLandmarks.forEach(lm => {
             const sx = worldToScreenX(lm.worldX, cameraX, 0.40);
             if (sx >= -120 && sx <= currentLogicalWidth + 120) {
@@ -952,6 +1016,34 @@
                     ctx.beginPath();
                     ctx.ellipse(sx, GROUND_Y, lm.w / 2, lm.h, 0, Math.PI, 0);
                     ctx.fill();
+                } else if (lm.type === 'ice_spire') {
+                    const hw = Math.round(lm.w / 2);
+                    const topY = GROUND_Y - lm.h;
+                    ctx.beginPath();
+                    ctx.moveTo(sx - hw, GROUND_Y);
+                    ctx.lineTo(sx - 2, topY);
+                    ctx.lineTo(sx + 3, topY - 1);
+                    ctx.lineTo(sx + hw, GROUND_Y);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Crystal glint
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(sx, topY, 2, Math.min(6, lm.h));
+                } else if (lm.type === 'volcanic_crag') {
+                    const hw = Math.round(lm.w / 2);
+                    const topY = GROUND_Y - lm.h;
+                    ctx.beginPath();
+                    ctx.moveTo(sx - hw, GROUND_Y);
+                    ctx.lineTo(sx - 4, topY + 1);
+                    ctx.lineTo(sx + 2, topY);
+                    ctx.lineTo(sx + hw, GROUND_Y);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Molten magma seam
+                    ctx.fillStyle = '#f97316';
+                    ctx.fillRect(sx - 1, topY + 3, 2, Math.max(2, lm.h - 5));
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.fillRect(sx, topY + 4, 1, 2);
                 }
             }
         });
