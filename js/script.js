@@ -2869,6 +2869,8 @@ function renderSlidingTemplates() {
                 [selectedTaskCounter, deselectTemplateBtn].forEach(el => {
                     if (el) el.textContent = selectedDivs.length;
                 });
+            } else {
+                triggerShakeEffect();
             }
         });
 
