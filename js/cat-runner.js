@@ -377,7 +377,8 @@
     let currentSpeed = START_SPEED;    // Current running speed
     let isDinoMode = false;        // Active during run
     let isGameOver = false;        // True on collision (screen freeze + Game Over UI)
-    let dinoScore = 0;             // Points earned in active run
+    let dinoScore = 0;             // Points earned in active run (distance + snack collectibles)
+    let dinoDistanceTraveled = 0;  // Track distance traveled (drives gradual speed curve & obstacle tiers)
     let invulnerableTimer = 0;     // Post-start grace period
     let idlePlayTimer = 0;         // Inactivity timer
     let milestoneFlashTimer = 0;   // Milestone flash every 100 points
@@ -1597,64 +1598,77 @@
         activeBalloons = [];
         activeFishBones = [];
 
-        // 1. Immediate visible runway right in front of the cat:
-        // A. Line of 3 golden fish snacks on the ground (X = 140, 156, 172)
-        activeFishBones.push({ id: 'fb_0a', x: 140, type: 'fish' });
-        activeFishBones.push({ id: 'fb_0b', x: 156, type: 'fish' });
-        activeFishBones.push({ id: 'fb_0c', x: 172, type: 'fish' });
+        // 1. OBSTACLE-FREE OPENING SNACK PLAYGROUND:
+        // A. Immediate Ground Fish Snack Run (X = 90, 108, 126, 144, 162) -> x1 to x5 combo!
+        activeFishBones.push({ id: 'fb_0a', x: 90, type: 'fish' });
+        activeFishBones.push({ id: 'fb_0b', x: 108, type: 'fish' });
+        activeFishBones.push({ id: 'fb_0c', x: 126, type: 'fish' });
+        activeFishBones.push({ id: 'fb_0d', x: 144, type: 'fish' });
+        activeFishBones.push({ id: 'fb_0e', x: 162, type: 'fish' });
 
-        // B. First high air balloon floating above (X = 210)
+        // B. High Air Balloons Trio (X = 200, 222, 244) -> x6 to x8 combo!
         activeBalloons.push({
-            id: 'b_init1',
-            x: 210,
+            id: 'b_init1a',
+            x: 200,
             baseY: 7,
             color: '#38bdf8',
             highlight: '#bae6fd',
             seed: 1.2
         });
-
-        // C. First short single cactus (X = 265)
-        activeObstacles.push({
-            x: 265,
-            type: 'short_single',
-            width: 6,
-            height: 7
-        });
-
-        // D. Line of 3 fish bones lined up on the ground after the jump (X = 335, 351, 367)
-        activeFishBones.push({ id: 'fb_1a', x: 335, type: 'bone' });
-        activeFishBones.push({ id: 'fb_1b', x: 351, type: 'bone' });
-        activeFishBones.push({ id: 'fb_1c', x: 367, type: 'bone' });
-
-        // E. Pair of high balloons in the air (X = 415, 435)
         activeBalloons.push({
-            id: 'b_init2a',
-            x: 415,
+            id: 'b_init1b',
+            x: 222,
             baseY: 6,
+            color: '#fbbf24',
+            highlight: '#fde68a',
+            seed: 2.3
+        });
+        activeBalloons.push({
+            id: 'b_init1c',
+            x: 244,
+            baseY: 8,
             color: '#f43f5e',
             highlight: '#fda4af',
-            seed: 2.1
+            seed: 3.5
+        });
+
+        // C. Ground Toasted Golden Fish Bones Run (X = 285, 303, 321, 339, 357) -> x9 to x13 combo!
+        activeFishBones.push({ id: 'fb_1a', x: 285, type: 'bone' });
+        activeFishBones.push({ id: 'fb_1b', x: 303, type: 'bone' });
+        activeFishBones.push({ id: 'fb_1c', x: 321, type: 'bone' });
+        activeFishBones.push({ id: 'fb_1d', x: 339, type: 'bone' });
+        activeFishBones.push({ id: 'fb_1e', x: 357, type: 'bone' });
+
+        // D. High Air Balloons Pair (X = 395, 418) -> x14 to x15 combo!
+        activeBalloons.push({
+            id: 'b_init2a',
+            x: 395,
+            baseY: 7,
+            color: '#c084fc',
+            highlight: '#e9d5ff',
+            seed: 4.1
         });
         activeBalloons.push({
             id: 'b_init2b',
-            x: 435,
-            baseY: 8,
-            color: '#fbbf24',
-            highlight: '#fde68a',
-            seed: 3.4
+            x: 418,
+            baseY: 5,
+            color: '#38bdf8',
+            highlight: '#bae6fd',
+            seed: 5.2
         });
 
-        // F. Second short cactus (X = 495)
+        // E. Ground Golden Fish Trio (X = 460, 478, 496) -> x16 to x18 combo!
+        activeFishBones.push({ id: 'fb_2a', x: 460, type: 'fish' });
+        activeFishBones.push({ id: 'fb_2b', x: 478, type: 'fish' });
+        activeFishBones.push({ id: 'fb_2c', x: 496, type: 'fish' });
+
+        // F. First Single Cactus obstacle starts safely after the opening fiesta (X = 570)
         activeObstacles.push({
-            x: 495,
+            x: 570,
             type: 'short_single',
             width: 6,
             height: 7
         });
-
-        // G. Line of 2 golden fish snacks on ground after cactus (X = 565, 581)
-        activeFishBones.push({ id: 'fb_2a', x: 565, type: 'fish' });
-        activeFishBones.push({ id: 'fb_2b', x: 581, type: 'fish' });
     }
 
     // ------------------------------------------------------------------------
@@ -1684,6 +1698,7 @@
         isDinoMode = false;
         isGameOver = false;
         dinoScore = 0;
+        dinoDistanceTraveled = 0;
         currentSpeed = START_SPEED;
         catWorldX = CAT_SCREEN_X;
         countdownTimer = 3.0;
@@ -1718,6 +1733,7 @@
         isDinoMode = true;
         isGameOver = false;
         dinoScore = 0;
+        dinoDistanceTraveled = 0;
         currentSpeed = START_SPEED;
         catWorldX = CAT_SCREEN_X;
         countdownTimer = 0;
@@ -1806,25 +1822,30 @@
         if (isDinoMode) {
             idlePlayTimer += dt;
 
-            // Option 1 Gentle Progression + Flattening Plateau + Periodic Breather Waves:
-            // 1. Base gentle ramp (0.018) that smoothly caps at a comfortable plateau (~86 px/s)
-            const baseBonus = Math.min(38, dinoScore * 0.018);
+            // Track continuous distance traveled (20 units per second) for steady, predictable speed progression
+            dinoDistanceTraveled += dt * 20;
 
-            // 2. Periodic Relaxation Wave: Once warmed up, gives a gentle breathing break (-10 px/s) every ~30s
+            // Extended Gradual High-Speed Progression + Late-Game Plateau + Smooth Breather Waves:
+            // 1. Gentle continuous ramp (0.017) based on distance traveled, scaling smoothly from 48 px/s to 160 px/s over ~4.5 - 5 mins
+            const baseBonus = Math.min(112, dinoDistanceTraveled * 0.017);
+
+            // 2. Periodic Relaxation Wave: Gentle breathing dip (-12 to -18 px/s) every ~35-40s for ~12 seconds
             let waveOffset = 0;
-            if (dinoScore >= 400) {
-                const waveProgress = ((dinoScore - 400) % 600) / 600;
-                // Peak cruise from 0.0 to 0.65 (~20s), smooth relaxation dip from 0.65 to 1.0 (~10s)
-                if (waveProgress > 0.65) {
-                    const relaxFactor = Math.sin(((waveProgress - 0.65) / 0.35) * Math.PI);
-                    waveOffset = -10 * relaxFactor;
+            if (dinoDistanceTraveled >= 400) {
+                const waveProgress = ((dinoDistanceTraveled - 400) % 800) / 800;
+                // Peak cruise from 0.0 to 0.70 (~25s), smooth relaxation dip from 0.70 to 1.0 (~12s)
+                if (waveProgress > 0.70) {
+                    const relaxFactor = Math.sin(((waveProgress - 0.70) / 0.30) * Math.PI);
+                    const dipAmount = Math.min(18, 10 + baseBonus * 0.08);
+                    waveOffset = -dipAmount * relaxFactor;
                 }
             }
 
             const targetSpeed = Math.max(START_SPEED, START_SPEED + baseBonus + waveOffset);
-            currentSpeed += (targetSpeed - currentSpeed) * Math.min(1.0, dt * 1.5);
+            // Smooth gradual interpolation prevents abrupt acceleration or deceleration
+            currentSpeed += (targetSpeed - currentSpeed) * Math.min(1.0, dt * 1.0);
 
-            // Steady score/distance accumulation: 20 points per second
+            // Steady score accumulation: 20 points per second
             dinoScore += dt * 20;
             const currentFloor = Math.floor(dinoScore);
             if (currentFloor > catRunnerHighScore) {
@@ -1911,23 +1932,23 @@
                 const calculatedGap = Math.round(baseGap * speedFactor);
                 const nextX = Math.max(currentLogicalWidth + 20, lastObsX + calculatedGap);
 
-                // Progressive difficulty selection:
+                // Progressive difficulty selection based on distance traveled:
                 const availableTypes = ['short_single'];
-                if (dinoScore >= 80) {
+                if (dinoDistanceTraveled >= 80) {
                     availableTypes.push('tall_single');
                 }
                 // If tight consecutive gap, prefer single cacti so the rapid hop rhythm is fair & exciting
                 if (!isConsecutive) {
-                    if (dinoScore >= 200) {
+                    if (dinoDistanceTraveled >= 200) {
                         availableTypes.push('short_double');
                     }
-                    if (dinoScore >= 400) {
+                    if (dinoDistanceTraveled >= 400) {
                         availableTypes.push('tall_double');
                     }
-                    if (dinoScore >= 600) {
+                    if (dinoDistanceTraveled >= 600) {
                         availableTypes.push('short_triple');
                     }
-                    if (dinoScore >= 850) {
+                    if (dinoDistanceTraveled >= 850) {
                         availableTypes.push('tall_triple');
                     }
                 }
