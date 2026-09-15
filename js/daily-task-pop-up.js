@@ -71,9 +71,11 @@ function safeDateFromPopUpDate(str) {
 
 
 yearContainer.addEventListener('click', (e) => {
-  // Don't open popup if the sliding drawer is open (both modes use 'show' for visibility)
+  // Don't open popup if the sliding drawer or movable template is open
   const drawer = document.getElementById('slidingInputView');
   if (drawer && drawer.classList.contains('show')) return;
+  const movable = document.getElementById('movable-template');
+  if (movable && movable.style.display === 'flex') return;
 
   const dateEl = e.target.closest('.date');
 
