@@ -497,7 +497,10 @@
     if (btnEmojiPicker && btnEmojiPicker.contains(e.target)) return;
     if (dynamicEmojiTray && dynamicEmojiTray.contains(e.target)) return;
 
-    // For any other interaction anywhere on the screen (colors, calendar, toolbar, counter, add task, chevron, etc.):
+    // Allow chevron collapse button interactions (its own click handler manages collapse upon lifting)
+    if (btnCollapseActions && btnCollapseActions.contains(e.target)) return;
+
+    // For any other interaction anywhere on the screen (colors, calendar, toolbar, counter, add task, etc.):
     // Neither action (focus or swipe-left) is active, so textarea MUST NOT be extended:
     if (document.activeElement === taskTitle) {
       taskTitle.blur();
@@ -642,6 +645,16 @@
     if (isEventsBound) return;
     isEventsBound = true;
     if (btnCollapseActions) {
+      btnCollapseActions.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+      });
+      btnCollapseActions.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+      });
+      btnCollapseActions.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+      }, { passive: true });
+
       btnCollapseActions.addEventListener('click', (e) => {
         e.stopPropagation();
         if (document.activeElement === taskTitle) {
@@ -651,6 +664,15 @@
           closeEmojiTray();
         }
         isManualTextareaExpanded = false;
+
+        // Prevent accidental click-through / double-tap reaching counter tools during the collapse transition
+        if (dynamicCollapsibleTools) {
+          dynamicCollapsibleTools.style.pointerEvents = 'none';
+          setTimeout(() => {
+            if (dynamicCollapsibleTools) dynamicCollapsibleTools.style.pointerEvents = '';
+          }, 260);
+        }
+
         updateCollapseLogic();
       });
       btnCollapseActions.addEventListener('contextmenu', (e) => {
