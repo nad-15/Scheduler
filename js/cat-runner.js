@@ -419,42 +419,46 @@
     };
 
     // ------------------------------------------------------------------------
-    // 7. Sky Color Palette & Dynamic Interpolation
+    // 7. Dynamic Day/Night Cycle & Sky Color System (Dawn -> Day -> Sunset -> Dusk -> Night)
     // ------------------------------------------------------------------------
-    const SKY_STOPS = [
-        { wx: 0, color: [224, 242, 254] },      // Mountain: Crisp morning sky
-        { wx: 400, color: [186, 230, 253] },    // Mountain: Bright blue daylight
-        { wx: 750, color: [210, 230, 250] },    // Mountain -> Desert transition
-        { wx: 900, color: [254, 215, 170] },    // Desert: Warm peach
-        { wx: 1200, color: [251, 146, 60] },   // Desert: Glowing golden amber sunset
-        { wx: 1500, color: [234, 88, 12] },    // Desert: Deep sunset orange
-        { wx: 1750, color: [130, 65, 110] },   // Desert -> City twilight violet
-        { wx: 1900, color: [49, 46, 129] },    // City: Twilight indigo (#312e81)
-        { wx: 2150, color: [15, 23, 42] },     // City: Midnight slate (#0f172a)
-        { wx: 2450, color: [30, 27, 75] },     // City: Deep night navy (#1e1b4b)
-        { wx: 2600, color: [75, 85, 120] },    // City -> Dawn transition
-        { wx: 2700, color: [224, 242, 254] }   // Dawn back to Mountain morning!
+    const DAY_CYCLE = 1800; // Continuous day/night cycle distance in pixels (~35s full day cycle)
+
+    const DAY_STOPS = [
+        { t: 0.00, color: [248, 165, 140] }, // 🌅 Dawn (soft rose-gold sunrise)
+        { t: 0.12, color: [224, 242, 254] }, // ☀️ Early Morning (fresh pale blue)
+        { t: 0.32, color: [186, 230, 253] }, // ☀️ Bright Midday Daylight (vibrant cyan-blue)
+        { t: 0.50, color: [254, 215, 170] }, // 🌤️ Late Afternoon (warm peach)
+        { t: 0.62, color: [251, 146, 60] },  // 🌇 Sunset / Golden Hour (fiery golden amber)
+        { t: 0.72, color: [124, 45, 115] },  // 🌆 Dusk / Twilight (rich royal violet)
+        { t: 0.82, color: [30, 27, 75] },    // 🌙 Evening (deep indigo #1e1b4b)
+        { t: 0.90, color: [15, 23, 42] },    // 🌙 Midnight (deep slate #0f172a)
+        { t: 0.96, color: [45, 35, 80] },    // 🌌 Pre-Dawn (navy violet)
+        { t: 1.00, color: [248, 165, 140] }  // 🌅 Smooth loop back to Dawn!
     ];
 
-    function getSkyColor(worldX) {
-        const wx = ((worldX % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
-        let c1 = SKY_STOPS[0];
-        let c2 = SKY_STOPS[1];
+    function getDayProgress() {
+        return ((catWorldX % DAY_CYCLE) + DAY_CYCLE) % DAY_CYCLE / DAY_CYCLE;
+    }
 
-        for (let i = 0; i < SKY_STOPS.length - 1; i++) {
-            if (wx >= SKY_STOPS[i].wx && wx <= SKY_STOPS[i + 1].wx) {
-                c1 = SKY_STOPS[i];
-                c2 = SKY_STOPS[i + 1];
+    function getSkyColor(worldX) {
+        const t = ((worldX % DAY_CYCLE) + DAY_CYCLE) % DAY_CYCLE / DAY_CYCLE;
+        let c1 = DAY_STOPS[0];
+        let c2 = DAY_STOPS[1];
+
+        for (let i = 0; i < DAY_STOPS.length - 1; i++) {
+            if (t >= DAY_STOPS[i].t && t <= DAY_STOPS[i + 1].t) {
+                c1 = DAY_STOPS[i];
+                c2 = DAY_STOPS[i + 1];
                 break;
             }
         }
 
-        const span = c2.wx - c1.wx;
-        const t = span === 0 ? 0 : (wx - c1.wx) / span;
+        const span = c2.t - c1.t;
+        const progress = span === 0 ? 0 : (t - c1.t) / span;
 
-        const r = Math.round(c1.color[0] + (c2.color[0] - c1.color[0]) * t);
-        const g = Math.round(c1.color[1] + (c2.color[1] - c1.color[1]) * t);
-        const b = Math.round(c1.color[2] + (c2.color[2] - c1.color[2]) * t);
+        const r = Math.round(c1.color[0] + (c2.color[0] - c1.color[0]) * progress);
+        const g = Math.round(c1.color[1] + (c2.color[1] - c1.color[1]) * progress);
+        const b = Math.round(c1.color[2] + (c2.color[2] - c1.color[2]) * progress);
 
         return `rgb(${r}, ${g}, ${b})`;
     }
@@ -563,26 +567,28 @@
     }
 
     // ------------------------------------------------------------------------
-    // 10. Continuous Ground Renderer (Thin 1px Minimalist Baseline - STRICTLY ZERO GREEN!)
+    // 10. Continuous Ground Renderer (Adapts per World & Day/Night - ZERO GREEN!)
     // ------------------------------------------------------------------------
     function drawContinuousGround(ctx, cameraX, width, groundY) {
         const wx = ((catWorldX % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
+        const dayProgress = getDayProgress();
+        const isNight = (dayProgress >= 0.70 || dayProgress <= 0.06);
 
-        // Ground baseline and specks adapt per world (NO GREEN ELEMENTS)
-        let baselineColor = '#94a3b8'; // Default Mountain
-        let speckColor1 = '#cbd5e1';
-        let speckColor2 = '#64748b';
+        // Ground baseline and specks adapt per world and time-of-day (STRICTLY ZERO GREEN)
+        let baselineColor = isNight ? '#475569' : '#94a3b8'; // Default Mountain
+        let speckColor1 = isNight ? '#334155' : '#cbd5e1';
+        let speckColor2 = isNight ? '#1e293b' : '#64748b';
 
         if (wx >= 900 && wx < 1800) {
             // Zone 2: Golden Desert
-            baselineColor = '#fed7aa';
-            speckColor1 = '#fde68a';
-            speckColor2 = '#f59e0b';
+            baselineColor = isNight ? '#b45309' : '#fed7aa';
+            speckColor1 = isNight ? '#92400e' : '#fde68a';
+            speckColor2 = isNight ? '#78350f' : '#f59e0b';
         } else if (wx >= 1800) {
             // Zone 3: City Street Asphalt
-            baselineColor = '#475569';
-            speckColor1 = '#cbd5e1';
-            speckColor2 = '#64748b';
+            baselineColor = isNight ? '#334155' : '#475569';
+            speckColor1 = isNight ? '#1e293b' : '#cbd5e1';
+            speckColor2 = isNight ? '#0f172a' : '#64748b';
         }
 
         ctx.fillStyle = baselineColor;
@@ -604,10 +610,14 @@
     // ------------------------------------------------------------------------
     // 11. Minimalist Dino Background (Dynamic Sky & Distant Silhouettes - ZERO GREEN!)
     // ------------------------------------------------------------------------
-    function drawDinoClouds(ctx, cameraX) {
-        // High-altitude gentle pixel clouds (Y: 2-5) for Mountain World
+    function drawDinoClouds(ctx, cameraX, dayProgress) {
+        // Clouds drift during daytime and sunset (fade out at night for clear stars/moon)
+        if (dayProgress > 0.68) return;
+
+        const isSunset = (dayProgress >= 0.50);
+        ctx.fillStyle = isSunset ? 'rgba(254, 215, 170, 0.40)' : 'rgba(255, 255, 255, 0.45)';
+
         const cloudPositions = [120, 320, 520, 720];
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
         cloudPositions.forEach(cwx => {
             const sx = worldToScreenX(cwx, cameraX, 0.15);
             if (sx >= -25 && sx <= currentLogicalWidth + 25) {
@@ -618,40 +628,44 @@
         });
     }
 
-    // Grand Tall Building Pixel Renderer (City World: 1800 - 2700px - STRICTLY ZERO GREEN!)
-    function drawTallBuilding(ctx, b, sx) {
+    // Grand Tall Building Pixel Renderer (Dynamic Day/Night Lighting - STRICTLY ZERO GREEN!)
+    function drawTallBuilding(ctx, b, sx, dayProgress) {
         if (sx < -40 || sx > currentLogicalWidth + 40) return;
+
+        const isDark = (dayProgress >= 0.65 || dayProgress <= 0.08);
+        const isSunset = (dayProgress >= 0.50 && dayProgress < 0.65);
 
         switch (b.type) {
             case 'art_deco': {
                 // Stepped Art Deco Skyscraper (33px tall with beacon)
-                // Base
                 ctx.fillStyle = b.baseColor || '#334155';
                 ctx.fillRect(sx, GROUND_Y - 17, 28, 17);
-                // Mid tier
                 ctx.fillStyle = b.tierColor || '#475569';
                 ctx.fillRect(sx + 4, GROUND_Y - 24, 20, 7);
-                // Top tier
                 ctx.fillStyle = '#64748b';
                 ctx.fillRect(sx + 9, GROUND_Y - 29, 10, 5);
-                // Needle spire
                 ctx.fillStyle = '#cbd5e1';
                 ctx.fillRect(sx + 13, GROUND_Y - 33, 2, 4);
-                // Flashing red aviation beacon
-                if (Math.floor(movieTime * 3) % 2 === 0) {
+
+                // Flashing red aviation beacon (active at night, dusk & dawn)
+                if ((isDark || isSunset) && Math.floor(movieTime * 3) % 2 === 0) {
                     ctx.fillStyle = '#ef4444';
                     ctx.fillRect(sx + 13, 1, 2, 1);
                 }
-                // Base windows (3 columns)
-                ctx.fillStyle = '#fef08a';
+
+                // Windows lighting adapts to day / sunset / night
+                const baseWinColor = isDark ? '#fef08a' : (isSunset ? '#fed7aa' : '#cbd5e1');
+                const midWinColor = isDark ? '#fde047' : (isSunset ? '#fed7aa' : '#94a3b8');
+
+                ctx.fillStyle = baseWinColor;
                 for (let r = 0; r < 3; r++) {
                     const wy = GROUND_Y - 14 + r * 5;
                     ctx.fillRect(sx + 4, wy, 3, 2);
                     ctx.fillRect(sx + 13, wy, 3, 2);
                     ctx.fillRect(sx + 21, wy, 3, 2);
                 }
-                // Mid windows
-                ctx.fillStyle = '#fde047';
+
+                ctx.fillStyle = midWinColor;
                 ctx.fillRect(sx + 7, GROUND_Y - 22, 2, 2);
                 ctx.fillRect(sx + 15, GROUND_Y - 22, 2, 2);
                 ctx.fillRect(sx + 7, GROUND_Y - 18, 2, 2);
@@ -664,22 +678,30 @@
                 ctx.fillRect(sx, GROUND_Y - 27, 24, 27);
                 ctx.fillStyle = '#475569';
                 ctx.fillRect(sx - 1, GROUND_Y - 27, 26, 1);
-                // Dual antennas
+
+                // Dual antennas with beacon
                 ctx.fillStyle = '#94a3b8';
                 ctx.fillRect(sx + 4, GROUND_Y - 31, 1, 4);
                 ctx.fillRect(sx + 19, GROUND_Y - 31, 1, 4);
-                if (Math.floor(movieTime * 3) % 2 === 0) {
+                if ((isDark || isSunset) && Math.floor(movieTime * 3) % 2 === 0) {
                     ctx.fillStyle = '#f87171';
                     ctx.fillRect(sx + 4, GROUND_Y - 32, 1, 1);
                     ctx.fillRect(sx + 19, GROUND_Y - 32, 1, 1);
                 }
-                // Vertical window columns (cyan & yellow)
+
+                // Vertical window columns (cyan & yellow at night, glass reflection in day)
                 for (let c = 0; c < 4; c++) {
                     const wx = sx + 3 + c * 5;
                     for (let r = 0; r < 5; r++) {
                         const wy = GROUND_Y - 24 + r * 4;
-                        ctx.fillStyle = ((c + r) % 2 === 0) ? '#7dd3fc' : '#fef08a';
-                        if ((c + r) % 5 === 0) ctx.fillStyle = '#0f172a'; // dark unlit window
+                        if (isDark) {
+                            ctx.fillStyle = ((c + r) % 2 === 0) ? '#7dd3fc' : '#fef08a';
+                            if ((c + r) % 5 === 0) ctx.fillStyle = '#0f172a';
+                        } else if (isSunset) {
+                            ctx.fillStyle = ((c + r) % 2 === 0) ? '#fed7aa' : '#fde047';
+                        } else {
+                            ctx.fillStyle = ((c + r) % 2 === 0) ? '#cbd5e1' : '#94a3b8';
+                        }
                         ctx.fillRect(wx, wy, 2, 2);
                     }
                 }
@@ -691,24 +713,24 @@
                 ctx.fillRect(sx, GROUND_Y - 22, 26, 22);
                 ctx.fillStyle = '#64748b';
                 ctx.fillRect(sx - 1, GROUND_Y - 22, 28, 1);
-                // Water tank stilts
+
+                // Wooden Water Tank on Steel Stilts
                 ctx.fillStyle = '#475569';
                 ctx.fillRect(sx + 15, GROUND_Y - 26, 1, 4);
                 ctx.fillRect(sx + 22, GROUND_Y - 26, 1, 4);
                 ctx.fillRect(sx + 16, GROUND_Y - 24, 6, 1);
-                // Wooden water tank
                 ctx.fillStyle = '#78350f';
                 ctx.fillRect(sx + 14, GROUND_Y - 31, 10, 5);
                 ctx.fillStyle = '#451a03';
                 ctx.fillRect(sx + 14, GROUND_Y - 30, 10, 1);
                 ctx.fillRect(sx + 14, GROUND_Y - 28, 10, 1);
-                // Conical metal cap
                 ctx.fillStyle = '#64748b';
                 ctx.fillRect(sx + 14, GROUND_Y - 32, 10, 1);
                 ctx.fillRect(sx + 16, GROUND_Y - 33, 6, 1);
                 ctx.fillRect(sx + 18, GROUND_Y - 34, 2, 1);
+
                 // Windows
-                ctx.fillStyle = '#fef08a';
+                ctx.fillStyle = isDark ? '#fef08a' : (isSunset ? '#fed7aa' : '#cbd5e1');
                 for (let r = 0; r < 3; r++) {
                     const wy = GROUND_Y - 18 + r * 6;
                     ctx.fillRect(sx + 3, wy, 3, 2);
@@ -725,23 +747,25 @@
                 ctx.fillRect(sx + 15, GROUND_Y - 20, 14, 20);
                 ctx.fillStyle = '#1e293b';
                 ctx.fillRect(sx, GROUND_Y - 6, 29, 6);
-                // Spires
+
+                // Spires with beacon
                 ctx.fillStyle = '#cbd5e1';
                 ctx.fillRect(sx + 6, GROUND_Y - 30, 2, 4);
-                if (Math.floor(movieTime * 3) % 2 === 0) {
+                if ((isDark || isSunset) && Math.floor(movieTime * 3) % 2 === 0) {
                     ctx.fillStyle = '#ef4444';
                     ctx.fillRect(sx + 6, GROUND_Y - 31, 2, 1);
                 }
                 ctx.fillStyle = '#94a3b8';
                 ctx.fillRect(sx + 21, GROUND_Y - 23, 1, 3);
-                // Windows in both towers
-                ctx.fillStyle = '#fef08a';
+
+                // Windows
+                ctx.fillStyle = isDark ? '#fef08a' : (isSunset ? '#fed7aa' : '#cbd5e1');
                 for (let r = 0; r < 4; r++) {
                     const wy = GROUND_Y - 22 + r * 5;
                     ctx.fillRect(sx + 3, wy, 2, 2);
                     ctx.fillRect(sx + 8, wy, 2, 2);
                 }
-                ctx.fillStyle = '#7dd3fc';
+                ctx.fillStyle = isDark ? '#7dd3fc' : (isSunset ? '#fde047' : '#94a3b8');
                 for (let r = 0; r < 3; r++) {
                     const wy = GROUND_Y - 16 + r * 5;
                     ctx.fillRect(sx + 18, wy, 2, 2);
@@ -755,14 +779,15 @@
                 ctx.fillRect(sx, GROUND_Y - 29, 22, 29);
                 ctx.fillStyle = '#cbd5e1';
                 ctx.fillRect(sx + 10, GROUND_Y - 33, 2, 4);
-                if (Math.floor(movieTime * 3) % 2 === 0) {
+                if ((isDark || isSunset) && Math.floor(movieTime * 3) % 2 === 0) {
                     ctx.fillStyle = '#f87171';
                     ctx.fillRect(sx + 10, 1, 2, 1);
                 }
-                // Horizontal window bands
+                // Horizontal window ribbons
+                const ribbonColor = isDark ? '#fde047' : (isSunset ? '#fed7aa' : '#cbd5e1');
                 for (let r = 0; r < 4; r++) {
                     const wy = GROUND_Y - 24 + r * 6;
-                    ctx.fillStyle = '#fde047';
+                    ctx.fillStyle = ribbonColor;
                     ctx.fillRect(sx + 2, wy, 18, 2);
                     ctx.fillStyle = '#1e293b';
                     ctx.fillRect(sx + 7, wy, 1, 2);
@@ -776,16 +801,15 @@
                 ctx.fillRect(sx, GROUND_Y - 20, 28, 20);
                 ctx.fillStyle = '#64748b';
                 ctx.fillRect(sx - 1, GROUND_Y - 20, 30, 1);
-                // HVAC Box
                 ctx.fillStyle = '#475569';
                 ctx.fillRect(sx + 3, GROUND_Y - 24, 7, 4);
                 ctx.fillStyle = '#1e293b';
                 ctx.fillRect(sx + 5, GROUND_Y - 23, 3, 2);
-                // Antenna
                 ctx.fillStyle = '#94a3b8';
                 ctx.fillRect(sx + 21, GROUND_Y - 25, 1, 5);
+
                 // Windows
-                ctx.fillStyle = '#fed7aa';
+                ctx.fillStyle = isDark ? '#fed7aa' : (isSunset ? '#fde047' : '#cbd5e1');
                 for (let r = 0; r < 3; r++) {
                     const wy = GROUND_Y - 16 + r * 5;
                     ctx.fillRect(sx + 3, wy, 3, 2);
@@ -800,69 +824,82 @@
     }
 
     function drawSimpleBackground(ctx, cameraX) {
-        // 1. Dynamic atmospheric sky color cycle (daylight -> peach sunset -> starry night)
+        const dayProgress = getDayProgress();
+
+        // 1. Dynamic atmospheric sky color cycle (Dawn -> Day -> Sunset -> Dusk -> Night)
         ctx.fillStyle = getSkyColor(catWorldX);
         ctx.fillRect(0, 0, currentLogicalWidth, CANVAS_HEIGHT);
 
-        const wx = ((catWorldX % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
+        // 2. Dynamic Celestial Bodies (Sun, Moon, Stars)
+        // A. Dynamic Sun: Arcs across the sky from Dawn (0.0), Midday (0.34) to Sunset (0.68)
+        if (dayProgress <= 0.68) {
+            const sunScreenX = Math.round((currentLogicalWidth + 40) * (dayProgress / 0.68)) - 20;
+            const arc = Math.sin((dayProgress / 0.68) * Math.PI);
+            const sunY = Math.round(12 - arc * 8); // Arches Y: 12 (horizon) -> 4 (zenith) -> 12 (horizon)
 
-        // 2. Celestial bodies
-        // Morning/Daytime Sun (Zone 1: Mountain Day, wx: 0 - 850)
-        if (wx <= 850) {
-            const sunSx = worldToScreenX(SCENERY.sun.worldX, cameraX, 0.06);
-            if (sunSx >= -20 && sunSx <= currentLogicalWidth + 20) {
-                ctx.fillStyle = '#fef08a';
-                ctx.fillRect(sunSx - 3, 3, 6, 6);
-                ctx.fillStyle = '#fde047';
-                ctx.fillRect(sunSx - 2, 4, 4, 4);
-            }
-        }
-
-        // Sunset Sun (Zone 2: Desert Sunset, wx: 850 - 1750)
-        if (wx >= 850 && wx <= 1750) {
-            const sunsetSx = worldToScreenX(SCENERY.sunsetSun.worldX, cameraX, 0.06);
-            if (sunsetSx >= -20 && sunsetSx <= currentLogicalWidth + 20) {
+            if (dayProgress < 0.15) {
+                // Dawn sun (warm peach-gold rising from horizon)
+                ctx.fillStyle = '#fed7aa';
+                ctx.fillRect(sunScreenX - 3, sunY - 1, 6, 6);
                 ctx.fillStyle = '#fb923c';
-                ctx.fillRect(sunsetSx - 4, 4, 8, 8);
+                ctx.fillRect(sunScreenX - 2, sunY, 4, 4);
+            } else if (dayProgress < 0.50) {
+                // Bright midday sun (golden yellow high in the sky)
+                ctx.fillStyle = '#fef08a';
+                ctx.fillRect(sunScreenX - 3, sunY - 1, 6, 6);
+                ctx.fillStyle = '#fde047';
+                ctx.fillRect(sunScreenX - 2, sunY, 4, 4);
+            } else {
+                // Sunset sun (large fiery orange-amber sinking into the horizon)
+                ctx.fillStyle = '#fb923c';
+                ctx.fillRect(sunScreenX - 4, sunY - 2, 8, 8);
                 ctx.fillStyle = '#ea580c';
-                ctx.fillRect(sunsetSx - 3, 5, 6, 6);
+                ctx.fillRect(sunScreenX - 3, sunY - 1, 6, 6);
             }
         }
 
-        // Crescent Moon (Zone 3: City Night, wx: 1750 - 2650)
-        if (wx >= 1750 && wx <= 2650) {
-            const moonSx = worldToScreenX(SCENERY.moon.worldX, cameraX, 0.06);
-            if (moonSx >= -20 && moonSx <= currentLogicalWidth + 20) {
-                ctx.fillStyle = '#f8fafc';
-                ctx.fillRect(moonSx - 2, 3, 5, 5);
-                ctx.fillStyle = getSkyColor(SCENERY.moon.worldX);
-                ctx.fillRect(moonSx - 1, 3, 3, 4);
-            }
+        // B. Dynamic Moon: Arcs across the sky from Dusk (0.68), Midnight (0.83) to Dawn (0.98)
+        if (dayProgress >= 0.68 && dayProgress <= 0.98) {
+            const moonNorm = (dayProgress - 0.68) / (0.98 - 0.68);
+            const moonScreenX = Math.round((currentLogicalWidth + 40) * moonNorm) - 20;
+            const arc = Math.sin(moonNorm * Math.PI);
+            const moonY = Math.round(11 - arc * 7); // Arches Y: 11 -> 4 -> 11
 
-            // Twinkling stars in night sky
-            ctx.fillStyle = '#ffffff';
-            SCENERY.stars.forEach((s, idx) => {
-                const starSx = worldToScreenX(s.worldX, cameraX, 0.05);
-                if (starSx >= 0 && starSx <= currentLogicalWidth) {
+            // Silver crescent moon
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(moonScreenX - 2, moonY, 5, 5);
+            ctx.fillStyle = getSkyColor(catWorldX);
+            ctx.fillRect(moonScreenX - 1, moonY, 3, 4);
+        }
+
+        // C. Twinkling Stars: Active during Dusk, Night, Pre-Dawn (0.64 to 0.08)
+        if (dayProgress >= 0.64 || dayProgress <= 0.08) {
+            const starAlpha = (dayProgress >= 0.74 && dayProgress <= 0.94) ? 1.0 : 0.6;
+            ctx.fillStyle = `rgba(255, 255, 255, ${starAlpha})`;
+            const starPositions = [
+                { x: 30, y: 3 }, { x: 80, y: 7 }, { x: 135, y: 4 },
+                { x: 195, y: 6 }, { x: 250, y: 3 }, { x: 310, y: 7 },
+                { x: 360, y: 4 }, { x: 410, y: 6 }
+            ];
+            starPositions.forEach((s, idx) => {
+                if (s.x <= currentLogicalWidth) {
                     if ((Math.floor(movieTime * 5) + idx) % 3 !== 0) {
-                        ctx.fillRect(starSx, s.y, 1, 1);
+                        ctx.fillRect(s.x, s.y, 1, 1);
                     }
                 }
             });
 
-            // High-altitude blinking aircraft beacon cruising over the city
-            const beaconSx = worldToScreenX(2100, cameraX, 0.03);
-            if (beaconSx >= -10 && beaconSx <= currentLogicalWidth + 10) {
+            // High-altitude blinking aircraft beacon cruising over the horizon at night
+            if (dayProgress >= 0.70 && dayProgress <= 0.95) {
+                const beaconX = Math.round((movieTime * 24) % (currentLogicalWidth + 40)) - 20;
                 const blink = Math.floor(movieTime * 4) % 2 === 0;
                 ctx.fillStyle = blink ? '#ef4444' : '#f8fafc';
-                ctx.fillRect(beaconSx, 2, 2, 1);
+                ctx.fillRect(beaconX, 2, 2, 1);
             }
         }
 
-        // 3. High-altitude clouds (Zone 1: Mountain Day)
-        if (wx <= 900) {
-            drawDinoClouds(ctx, cameraX);
-        }
+        // 3. Dynamic Clouds (Daylight & Sunset)
+        drawDinoClouds(ctx, cameraX, dayProgress);
 
         // 4. Distant Silhouettes (Parallax 0.22 - STRICTLY ZERO GREEN!)
         SCENERY.farLandmarks.forEach(lm => {
@@ -888,7 +925,7 @@
                     if (lm.h > 20) {
                         ctx.fillRect(sx + Math.floor(lm.w / 2), blockY - 3, 1, 3);
                     }
-                    if (lm.w > 22) {
+                    if (lm.w > 22 && (dayProgress >= 0.60 || dayProgress <= 0.10)) {
                         ctx.fillStyle = 'rgba(254, 240, 138, 0.35)';
                         ctx.fillRect(sx + 4, blockY + 4, 1, 1);
                         ctx.fillRect(sx + lm.w - 5, blockY + 7, 1, 1);
@@ -919,10 +956,10 @@
             }
         });
 
-        // 6. Grand Tall Buildings in City World (Parallax 0.40 - STRICTLY ZERO GREEN!)
+        // 6. Grand Tall Buildings in City World (Parallax 0.40, WorldX: 1800 - 2700px - STRICTLY ZERO GREEN!)
         SCENERY.tallBuildings.forEach(b => {
             const sx = worldToScreenX(b.worldX, cameraX, 0.40);
-            drawTallBuilding(ctx, b, sx);
+            drawTallBuilding(ctx, b, sx, dayProgress);
         });
     }
 
@@ -1025,9 +1062,6 @@
     let resizeObserver = null;
 
     let catWorldX = 0;
-    let lastWorldZone = -1;
-    let worldBannerText = '';
-    let worldBannerTimer = 0;
     let currentBeatIndex = 0;
     let beatProgress = 0;
 
@@ -1300,8 +1334,6 @@
         isHoldingJump = false;
         confettiParticles = [];
         popNotifications = [];
-        lastWorldZone = -1;
-        worldBannerTimer = 0;
 
         spawnInitialTrack();
         playRetroCountdownBeep(false); // First countdown beep for '3'
@@ -1333,8 +1365,6 @@
         isHoldingJump = false;
         confettiParticles = [];
         popNotifications = [];
-        lastWorldZone = -1;
-        worldBannerTimer = 0;
 
         spawnInitialTrack();
         playRetroCountdownBeep(true); // Bright chirp on restart!
@@ -1356,8 +1386,6 @@
         currentSpeed = START_SPEED;
         idlePlayTimer = 0;
         lastBeepSec = -1;
-        lastWorldZone = -1;
-        worldBannerTimer = 0;
         stop();
 
         if (canvas) {
@@ -1416,18 +1444,6 @@
 
             // Continuous background world loop sync
             catWorldX = (catWorldX + currentSpeed * dt) % WORLD_WIDTH;
-
-            // Automatic World Transition Announcement (Mountain -> Desert -> City)
-            const currentZone = Math.floor((((catWorldX % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH) / 900);
-            if (lastWorldZone === -1) {
-                lastWorldZone = currentZone;
-            } else if (currentZone !== lastWorldZone) {
-                lastWorldZone = currentZone;
-                if (currentZone === 0) worldBannerText = '✦ MOUNTAIN VALLEY ✦';
-                else if (currentZone === 1) worldBannerText = '✦ GOLDEN DESERT ✦';
-                else if (currentZone === 2) worldBannerText = '✦ METROPOLIS CITY ✦';
-                worldBannerTimer = 1.4;
-            }
 
             // 1. Variable Jump Physics (Authentic Chrome Dino Parabolic Arc)
             // Short Jump (Tap): 9.2px apex, 0.50s duration, 24px air travel (clears 1 cactus, fails on 3!)
@@ -1924,24 +1940,6 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('GO!', cx, cy);
-            ctx.restore();
-        } else if (worldBannerTimer > 0 && isDinoMode) {
-            const cx = Math.round(currentLogicalWidth / 2);
-            const cy = 13;
-
-            ctx.save();
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
-            const bannerW = 104;
-            ctx.fillRect(cx - bannerW / 2, cy - 8, bannerW, 16);
-            ctx.strokeStyle = (lastWorldZone === 2) ? '#fde047' : ((lastWorldZone === 1) ? '#fb923c' : '#38bdf8');
-            ctx.lineWidth = 1;
-            ctx.strokeRect(cx - bannerW / 2 + 0.5, cy - 8 + 0.5, bannerW - 1, 15);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 7px monospace';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(worldBannerText, cx, cy);
             ctx.restore();
         }
 
