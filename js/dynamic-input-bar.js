@@ -62,6 +62,7 @@
   let btnEmojiPicker = null;
   let dynamicEmojiTray = null;
   let emojiGridContainer = null;
+  let btnEmojiBackspace = null;
   let titleSubmitContainer = null;
   let taskTitle = null;
   let flowerContainer = null;
@@ -79,6 +80,7 @@
     btnEmojiPicker = document.getElementById('btnEmojiPicker');
     dynamicEmojiTray = document.getElementById('dynamicEmojiTray');
     emojiGridContainer = document.getElementById('emojiGridContainer');
+    btnEmojiBackspace = document.getElementById('btnEmojiBackspace');
     titleSubmitContainer = document.getElementById('titleSubmitContainer');
     taskTitle = document.getElementById('taskTitle');
     flowerContainer = document.querySelector('.flower-container');
@@ -192,6 +194,112 @@
     const inputEvt = new Event('input', { bubbles: true });
     inputEvt.isEmojiInsert = true;
     taskTitle.dispatchEvent(inputEvt);
+
+    updateEmojiBackspaceVisibility();
+  }
+
+  function updateEmojiBackspaceVisibility() {
+    if (!btnEmojiBackspace) return;
+    const hasText = Boolean(taskTitle && taskTitle.value && taskTitle.value.length > 0);
+    if (isEmojiTrayOpen && hasText) {
+      btnEmojiBackspace.classList.remove('hidden');
+    } else {
+      btnEmojiBackspace.classList.add('hidden');
+    }
+  }
+
+  function performBackspace() {
+    if (!taskTitle) return;
+
+    const val = taskTitle.value || '';
+    if (val.length === 0) {
+      updateEmojiBackspaceVisibility();
+      return;
+    }
+
+    const wasFocused = (document.activeElement === taskTitle);
+    updateSavedSelection();
+
+    let start = (typeof savedSelectionStart === 'number' && savedSelectionStart >= 0 && savedSelectionStart <= val.length)
+      ? savedSelectionStart
+      : (typeof taskTitle.selectionStart === 'number' && taskTitle.selectionStart >= 0 && taskTitle.selectionStart <= val.length
+        ? taskTitle.selectionStart
+        : val.length);
+
+    let end = (typeof savedSelectionEnd === 'number' && savedSelectionEnd >= 0 && savedSelectionEnd <= val.length)
+      ? savedSelectionEnd
+      : (typeof taskTitle.selectionEnd === 'number' && taskTitle.selectionEnd >= 0 && taskTitle.selectionEnd <= val.length
+        ? taskTitle.selectionEnd
+        : val.length);
+
+    if (start > end) {
+      const tmp = start;
+      start = end;
+      end = tmp;
+    }
+
+    let newPos = start;
+    if (start !== end) {
+      // Delete highlighted selection range
+      const before = val.substring(0, start);
+      const after = val.substring(end);
+      taskTitle.value = before + after;
+      newPos = start;
+    } else if (start > 0) {
+      // Delete one grapheme cluster (regular char or full multi-byte emoji) before caret
+      const textBefore = val.substring(0, start);
+      let deleteLen = 1;
+
+      if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+        try {
+          const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+          const segments = Array.from(segmenter.segment(textBefore));
+          if (segments.length > 0) {
+            deleteLen = segments[segments.length - 1].segment.length;
+          }
+        } catch (_) {
+          deleteLen = 1;
+        }
+      } else if (start >= 2) {
+        // Fallback for surrogate pairs
+        const prevChar = val.charCodeAt(start - 1);
+        const prevPrevChar = val.charCodeAt(start - 2);
+        if (prevChar >= 0xDC00 && prevChar <= 0xDFFF && prevPrevChar >= 0xD800 && prevPrevChar <= 0xDBFF) {
+          deleteLen = 2;
+        }
+      }
+
+      const before = val.substring(0, start - deleteLen);
+      const after = val.substring(end);
+      taskTitle.value = before + after;
+      newPos = start - deleteLen;
+    } else {
+      return;
+    }
+
+    taskTitle.selectionStart = taskTitle.selectionEnd = newPos;
+    savedSelectionStart = savedSelectionEnd = newPos;
+
+    if (wasFocused && document.activeElement !== taskTitle) {
+      taskTitle.focus({ preventScroll: true });
+    }
+
+    const isExpanded = wasFocused || isManualTextareaExpanded || (slidingInputView && slidingInputView.classList.contains('actions-collapsed'));
+    if (isExpanded) {
+      isManualTextareaExpanded = true;
+      setCollapsedState(true);
+      autoResizeTextarea();
+    } else {
+      isManualTextareaExpanded = false;
+      setCollapsedState(false);
+      collapseTextareaToSingleLine();
+    }
+
+    const inputEvt = new Event('input', { bubbles: true });
+    inputEvt.isBackspace = true;
+    taskTitle.dispatchEvent(inputEvt);
+
+    updateEmojiBackspaceVisibility();
   }
 
   function openEmojiTray() {
@@ -221,6 +329,7 @@
     dynamicEmojiTray.classList.remove('hidden');
     slidingInputView.classList.add('emoji-tray-active');
     if (btnEmojiPicker) btnEmojiPicker.classList.add('active');
+    updateEmojiBackspaceVisibility();
     if (typeof window.syncTaskToolbarWithDrawer === 'function') {
       window.syncTaskToolbarWithDrawer();
     }
@@ -233,6 +342,7 @@
     dynamicEmojiTray.classList.add('hidden');
     slidingInputView.classList.remove('emoji-tray-active');
     if (btnEmojiPicker) btnEmojiPicker.classList.remove('active');
+    updateEmojiBackspaceVisibility();
 
     // If closing tray and textarea is not actively focused, return to resting state
     if (document.activeElement !== taskTitle) {
@@ -726,6 +836,67 @@
       }, { passive: false });
     }
 
+    if (btnEmojiBackspace) {
+      let backspaceTimer = null;
+      let backspaceInterval = null;
+      let pointerHandled = false;
+
+      const stopRepeat = () => {
+        if (backspaceTimer) {
+          clearTimeout(backspaceTimer);
+          backspaceTimer = null;
+        }
+        if (backspaceInterval) {
+          clearInterval(backspaceInterval);
+          backspaceInterval = null;
+        }
+      };
+
+      const startRepeat = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        pointerHandled = true;
+        updateSavedSelection();
+        performBackspace();
+
+        stopRepeat();
+        backspaceTimer = setTimeout(() => {
+          backspaceInterval = setInterval(() => {
+            if (!taskTitle || !taskTitle.value || taskTitle.value.length === 0) {
+              stopRepeat();
+              return;
+            }
+            performBackspace();
+          }, 75);
+        }, 400);
+      };
+
+      btnEmojiBackspace.addEventListener('pointerdown', startRepeat);
+      btnEmojiBackspace.addEventListener('pointerup', stopRepeat);
+      btnEmojiBackspace.addEventListener('pointercancel', stopRepeat);
+      btnEmojiBackspace.addEventListener('pointerleave', stopRepeat);
+
+      btnEmojiBackspace.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+      });
+
+      btnEmojiBackspace.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        stopRepeat();
+        if (!pointerHandled) {
+          performBackspace();
+        }
+        setTimeout(() => {
+          pointerHandled = false;
+        }, 50);
+      });
+
+      btnEmojiBackspace.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
+    }
+
     // Tapping flower paw or submit button returns to color view and uncollapses
     if (flowerContainer) {
       flowerContainer.addEventListener('click', () => {
@@ -827,7 +998,8 @@
       taskTitle.addEventListener('select', updateSavedSelection);
 
       taskTitle.addEventListener('input', (e) => {
-        if (e && e.isEmojiInsert) {
+        updateEmojiBackspaceVisibility();
+        if (e && (e.isEmojiInsert || e.isBackspace)) {
           return;
         }
         updateSavedSelection();

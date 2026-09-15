@@ -8589,6 +8589,7 @@ ic {
 
 /* Inline Curated Dynamic Emoji Tray (Replaces color options row AND skhayeduler jumping text, zero drawer resizing) */
 .dynamic-emoji-tray {
+    position: relative;
     display: none;
     width: 100%;
     min-width: 0;
@@ -8623,7 +8624,7 @@ ic {
     grid-auto-flow: column;
     grid-auto-columns: 36px;
     gap: 3px 6px;
-    padding: 2px 4px;
+    padding: 2px 34px 2px 4px;
     width: 100%;
     height: 100%;
     max-height: 100%;
@@ -8671,4 +8672,54 @@ ic {
 .emoji-item-btn:active {
     transform: scale(0.88);
     background-color: rgba(0, 120, 255, 0.22);
+}
+
+/* Small circular transparent subtle black backspace button in bottom right of emoji tray */
+.btn-emoji-backspace {
+    position: absolute;
+    right: 7px;
+    bottom: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgb(0, 0, 0, 0.2);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: transform 0.12s ease, background-color 0.12s ease, color 0.12s ease, opacity 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-emoji-backspace:hover {
+    background: rgba(0, 0, 0, 0.32);
+    transform: scale(1.08);
+}
+
+.btn-emoji-backspace:active {
+    background: rgba(0, 0, 0, 0.45);
+    transform: scale(0.92);
+}
+
+.btn-emoji-backspace .material-symbols-outlined {
+    font-size: 16px;
+    line-height: 1;
+    margin-left: -1px;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.btn-emoji-backspace.hidden {
+    display: none !important;
 }
