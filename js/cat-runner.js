@@ -68,60 +68,101 @@
     let currentLogicalWidth = DEFAULT_WIDTH;
 
     // ------------------------------------------------------------------------
-    // 3. Audio Synth (Active strictly for User Interaction)
+    // 3. Ultra-Low-Latency Audio Engine (Pre-Warmed for Mobile & Older Devices)
     // ------------------------------------------------------------------------
     let audioCtx = null;
+    let masterGainNode = null;
+    let cachedNoiseBuffer = null;
+    let isAudioUnlocked = false;
 
     function initAudio() {
         try {
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             if (!AudioContextClass) return null;
-            if (!audioCtx) audioCtx = new AudioContextClass();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!audioCtx) {
+                audioCtx = new AudioContextClass({ latencyHint: 'interactive' });
+                masterGainNode = audioCtx.createGain();
+                masterGainNode.gain.value = 1.0;
+                masterGainNode.connect(audioCtx.destination);
+
+                // Pre-generate static noise buffer ONCE (0.08s of white noise)
+                const sampleRate = audioCtx.sampleRate || 44100;
+                const bufferSize = Math.floor(sampleRate * 0.08);
+                cachedNoiseBuffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
+                const data = cachedNoiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+            }
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (!isAudioUnlocked && audioCtx.state === 'running') {
+                // Play microscopic 1-sample silence to warm up mobile hardware audio pipeline
+                try {
+                    const silentBuffer = audioCtx.createBuffer(1, 1, 22050);
+                    const source = audioCtx.createBufferSource();
+                    source.buffer = silentBuffer;
+                    source.connect(audioCtx.destination);
+                    source.start(0);
+                    isAudioUnlocked = true;
+                } catch (_) {}
+            }
+
             return audioCtx;
         } catch (e) {
             return null;
         }
     }
 
-    // Swift aerodynamic whoosh sound when the cat leaps (single crisp swift leap)
+    // Global unlock listeners: Wakes the mobile audio DSP on the user's very first interaction
+    function setupAudioUnlocks() {
+        const unlockEvents = ['touchstart', 'touchend', 'mousedown', 'keydown', 'pointerdown'];
+        const unlockHandler = function () {
+            initAudio();
+            if (audioCtx && audioCtx.state === 'running' && isAudioUnlocked) {
+                unlockEvents.forEach(evt => window.removeEventListener(evt, unlockHandler, true));
+            }
+        };
+        unlockEvents.forEach(evt => window.addEventListener(evt, unlockHandler, { capture: true, passive: true }));
+    }
+    setupAudioUnlocks();
+
+    // Swift aerodynamic whoosh sound when the cat leaps (instant, zero-allocation)
     function playRetroJumpSound() {
         try {
             const ctx = initAudio();
-            if (!ctx) return;
+            if (!ctx || !masterGainNode) return;
 
             const t = ctx.currentTime;
             const duration = 0.08;
 
-            // 1. Aerodynamic air swoosh (bandpass filtered noise)
-            const bufferSize = Math.floor(ctx.sampleRate * duration);
-            const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const data = noiseBuffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
+            // 1. Aerodynamic air swoosh using pre-generated cached noise buffer (0ms CPU work!)
+            if (cachedNoiseBuffer) {
+                const noise = ctx.createBufferSource();
+                noise.buffer = cachedNoiseBuffer;
+
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.Q.setValueAtTime(2.0, t);
+                filter.frequency.setValueAtTime(380, t);
+                filter.frequency.exponentialRampToValueAtTime(1200, t + 0.035);
+                filter.frequency.exponentialRampToValueAtTime(300, t + duration);
+
+                const noiseGain = ctx.createGain();
+                noiseGain.gain.setValueAtTime(0.001, t);
+                noiseGain.gain.linearRampToValueAtTime(0.06, t + 0.025);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+                noise.connect(filter);
+                filter.connect(noiseGain);
+                noiseGain.connect(masterGainNode);
+
+                noise.start(t);
+                noise.stop(t + duration);
             }
-
-            const noise = ctx.createBufferSource();
-            noise.buffer = noiseBuffer;
-
-            const filter = ctx.createBiquadFilter();
-            filter.type = 'bandpass';
-            filter.Q.setValueAtTime(2.0, t);
-            filter.frequency.setValueAtTime(380, t);
-            filter.frequency.exponentialRampToValueAtTime(1200, t + 0.035);
-            filter.frequency.exponentialRampToValueAtTime(300, t + duration);
-
-            const noiseGain = ctx.createGain();
-            noiseGain.gain.setValueAtTime(0.001, t);
-            noiseGain.gain.linearRampToValueAtTime(0.06, t + 0.025);
-            noiseGain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-
-            noise.connect(filter);
-            filter.connect(noiseGain);
-            noiseGain.connect(ctx.destination);
-
-            noise.start(t);
-            noise.stop(t + duration);
 
             // 2. Soft swift upward tone for clean game feedback
             const osc = ctx.createOscillator();
@@ -136,7 +177,7 @@
             oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
 
             osc.connect(oscGain);
-            oscGain.connect(ctx.destination);
+            oscGain.connect(masterGainNode);
 
             osc.start(t);
             osc.stop(t + 0.07);
@@ -149,23 +190,24 @@
     function playRetroPopSound() {
         try {
             const ctx = initAudio();
-            if (!ctx) return;
+            if (!ctx || !masterGainNode) return;
 
+            const t = ctx.currentTime;
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(540, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
+            osc.frequency.setValueAtTime(540, t);
+            osc.frequency.exponentialRampToValueAtTime(1200, t + 0.08);
 
-            gain.gain.setValueAtTime(0.08, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.08, t);
+            gain.gain.linearRampToValueAtTime(0.001, t + 0.08);
 
             osc.connect(gain);
-            gain.connect(ctx.destination);
+            gain.connect(masterGainNode);
 
-            osc.start();
-            osc.stop(ctx.currentTime + 0.09);
+            osc.start(t);
+            osc.stop(t + 0.09);
         } catch (e) {
             // Fails silently if browser blocks audio
         }
@@ -175,23 +217,24 @@
     function playRetroHurtSound() {
         try {
             const ctx = initAudio();
-            if (!ctx) return;
+            if (!ctx || !masterGainNode) return;
 
+            const t = ctx.currentTime;
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(220, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(75, ctx.currentTime + 0.12);
+            osc.frequency.setValueAtTime(220, t);
+            osc.frequency.exponentialRampToValueAtTime(75, t + 0.12);
 
-            gain.gain.setValueAtTime(0.04, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.04, t);
+            gain.gain.linearRampToValueAtTime(0.001, t + 0.12);
 
             osc.connect(gain);
-            gain.connect(ctx.destination);
+            gain.connect(masterGainNode);
 
-            osc.start();
-            osc.stop(ctx.currentTime + 0.13);
+            osc.start(t);
+            osc.stop(t + 0.13);
         } catch (e) {
             // Fails silently if browser blocks audio
         }
@@ -201,25 +244,26 @@
     function playRetroCountdownBeep(isGo = false) {
         try {
             const ctx = initAudio();
-            if (!ctx) return;
+            if (!ctx || !masterGainNode) return;
 
+            const t = ctx.currentTime;
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
             osc.type = isGo ? 'triangle' : 'sine';
-            osc.frequency.setValueAtTime(isGo ? 880 : 480, ctx.currentTime);
+            osc.frequency.setValueAtTime(isGo ? 880 : 480, t);
             if (isGo) {
-                osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.12);
+                osc.frequency.exponentialRampToValueAtTime(1320, t + 0.12);
             }
 
-            gain.gain.setValueAtTime(0.06, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (isGo ? 0.22 : 0.09));
+            gain.gain.setValueAtTime(0.06, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + (isGo ? 0.22 : 0.09));
 
             osc.connect(gain);
-            gain.connect(ctx.destination);
+            gain.connect(masterGainNode);
 
-            osc.start();
-            osc.stop(ctx.currentTime + (isGo ? 0.23 : 0.10));
+            osc.start(t);
+            osc.stop(t + (isGo ? 0.23 : 0.10));
         } catch (e) {
             // Fails silently if browser blocks audio
         }
@@ -229,7 +273,7 @@
     function playRetroPassObstacleSound() {
         try {
             const ctx = initAudio();
-            if (!ctx) return;
+            if (!ctx || !masterGainNode) return;
 
             const t = ctx.currentTime;
             const osc = ctx.createOscillator();
@@ -245,7 +289,7 @@
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.065);
 
             osc.connect(gain);
-            gain.connect(ctx.destination);
+            gain.connect(masterGainNode);
 
             osc.start(t);
             osc.stop(t + 0.07);
