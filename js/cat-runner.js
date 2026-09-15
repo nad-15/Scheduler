@@ -53,7 +53,7 @@
     const CANVAS_HEIGHT = 40; // 40px height for larger cat and balloons
     const GROUND_Y = 35;      // Feet land on ground line at y = 35
     const CAT_SCREEN_X = 75;  // Cat anchored at left-center
-    const WORLD_WIDTH = 1600; // Continuous loop length in pixels
+    const WORLD_WIDTH = 2700; // Continuous loop length in pixels (3 worlds x 900px)
 
     // Sprite Scale: Player Mode Runner (42x34)
     const CAT_DEST_W = 42;
@@ -352,36 +352,69 @@
     // ------------------------------------------------------------------------
     const SCENERY = {
         // Celestial bodies
-        sun: { worldX: 120, y: 4, size: 9 },
-        sunsetSun: { worldX: 620, y: 5, size: 10 },
-        moon: { worldX: 1380, y: 4, size: 6 },
+        sun: { worldX: 180, y: 4, size: 8 },
+        sunsetSun: { worldX: 1350, y: 5, size: 10 },
+        moon: { worldX: 2250, y: 4, size: 6 },
 
-        // Stars (Rooftop & Night section: 1200 - 1600)
+        // Stars (Night City section: 1750 - 2650)
         stars: [
-            { worldX: 1230, y: 3 }, { worldX: 1270, y: 7 }, { worldX: 1315, y: 3 },
-            { worldX: 1360, y: 8 }, { worldX: 1410, y: 3 }, { worldX: 1460, y: 7 },
-            { worldX: 1510, y: 4 }, { worldX: 1560, y: 8 }
+            { worldX: 1820, y: 3 }, { worldX: 1890, y: 7 }, { worldX: 1970, y: 4 },
+            { worldX: 2060, y: 6 }, { worldX: 2160, y: 3 }, { worldX: 2260, y: 7 },
+            { worldX: 2350, y: 4 }, { worldX: 2440, y: 6 }, { worldX: 2530, y: 3 },
+            { worldX: 2620, y: 7 }
         ],
 
-        // Distant Mountains, Sand Dunes & Skylines (Parallax factor 0.25 - ZERO GREEN TREES!)
+        // Distant Silhouettes (Parallax factor 0.22 - STRICTLY ZERO GREEN!)
         farLandmarks: [
-            { type: 'mountain', worldX: 120, w: 70, h: 10, color: '#94a3b8' },
-            { type: 'mountain', worldX: 280, w: 85, h: 12, color: '#64748b' },
-            { type: 'dune', worldX: 520, w: 80, h: 8, color: '#fed7aa' },
-            { type: 'dune', worldX: 720, w: 95, h: 9, color: '#fde68a' },
-            { type: 'skyline', worldX: 950, w: 32, h: 12, color: '#475569' },
-            { type: 'skyline', worldX: 1100, w: 40, h: 15, color: '#334155' },
-            { type: 'skyline', worldX: 1270, w: 30, h: 12, color: '#1e293b' },
-            { type: 'skyline', worldX: 1440, w: 34, h: 16, color: '#1e293b' }
+            // Zone 1: Mountain Peaks (0 - 900px)
+            { type: 'mountain', worldX: 120, w: 85, h: 12, color: '#64748b' },
+            { type: 'mountain', worldX: 320, w: 100, h: 14, color: '#475569' },
+            { type: 'mountain', worldX: 540, w: 90, h: 11, color: '#64748b' },
+            { type: 'mountain', worldX: 740, w: 105, h: 13, color: '#475569' },
+
+            // Zone 2: Golden Dunes (900 - 1800px)
+            { type: 'dune', worldX: 1020, w: 95, h: 9, color: '#d97706' },
+            { type: 'dune', worldX: 1240, w: 115, h: 11, color: '#b45309' },
+            { type: 'dune', worldX: 1480, w: 105, h: 10, color: '#d97706' },
+            { type: 'dune', worldX: 1680, w: 110, h: 9, color: '#b45309' },
+
+            // Zone 3: Distant City Skyline Silhouettes (1800 - 2700px - ZERO GREEN!)
+            { type: 'city_distant', worldX: 1820, w: 28, h: 18, color: '#1e293b' },
+            { type: 'city_distant', worldX: 1930, w: 34, h: 23, color: '#0f172a' },
+            { type: 'city_distant', worldX: 2040, w: 26, h: 19, color: '#1e293b' },
+            { type: 'city_distant', worldX: 2150, w: 32, h: 24, color: '#0f172a' },
+            { type: 'city_distant', worldX: 2270, w: 30, h: 20, color: '#1e293b' },
+            { type: 'city_distant', worldX: 2380, w: 36, h: 22, color: '#0f172a' },
+            { type: 'city_distant', worldX: 2500, w: 28, h: 19, color: '#1e293b' },
+            { type: 'city_distant', worldX: 2610, w: 32, h: 17, color: '#0f172a' }
         ],
 
-        // Minimalist Ambient Features (ZERO GREEN TREES - Zero Cacti Camouflage!)
-        items: [
-            { type: 'rock', worldX: 180, w: 8, h: 3 },
-            { type: 'rock', worldX: 450, w: 10, h: 4 },
-            { type: 'rock', worldX: 720, w: 9, h: 4 },
-            { type: 'antenna', worldX: 1230 },
-            { type: 'skylight', worldX: 1350 }
+        // Midground Landmarks (Parallax factor 0.40 - STRICTLY ZERO GREEN!)
+        midLandmarks: [
+            // Zone 1: Near Mountain Ridges
+            { type: 'mountain', worldX: 200, w: 75, h: 10, color: '#94a3b8' },
+            { type: 'mountain', worldX: 420, w: 85, h: 11, color: '#cbd5e1' },
+            { type: 'mountain', worldX: 640, w: 80, h: 10, color: '#94a3b8' },
+            { type: 'mountain', worldX: 840, w: 70, h: 9, color: '#cbd5e1' },
+
+            // Zone 2: Near Sand Dunes
+            { type: 'dune', worldX: 1120, w: 90, h: 8, color: '#fed7aa' },
+            { type: 'dune', worldX: 1360, w: 105, h: 9, color: '#fde68a' },
+            { type: 'dune', worldX: 1580, w: 95, h: 8, color: '#fed7aa' }
+        ],
+
+        // Grand Tall Buildings in City World (Parallax factor 0.40, WorldX: 1800 - 2700px - STRICTLY ZERO GREEN!)
+        tallBuildings: [
+            { type: 'art_deco', worldX: 1840, w: 28, h: 30, baseColor: '#334155', tierColor: '#475569' },
+            { type: 'glass_tower', worldX: 1930, w: 24, h: 27, baseColor: '#1e293b' },
+            { type: 'water_tower', worldX: 2020, w: 26, h: 23, baseColor: '#334155' },
+            { type: 'twin_tower', worldX: 2110, w: 30, h: 26, baseColor: '#1e293b' },
+            { type: 'spire_monolith', worldX: 2200, w: 22, h: 29, baseColor: '#475569' },
+            { type: 'commercial_hvac', worldX: 2290, w: 28, h: 20, baseColor: '#3f3f46' },
+            { type: 'art_deco', worldX: 2380, w: 26, h: 31, baseColor: '#334155', tierColor: '#475569' },
+            { type: 'glass_tower', worldX: 2470, w: 24, h: 26, baseColor: '#1e293b' },
+            { type: 'water_tower', worldX: 2560, w: 28, h: 22, baseColor: '#334155' },
+            { type: 'twin_tower', worldX: 2640, w: 28, h: 24, baseColor: '#1e293b' }
         ]
     };
 
@@ -389,16 +422,18 @@
     // 7. Sky Color Palette & Dynamic Interpolation
     // ------------------------------------------------------------------------
     const SKY_STOPS = [
-        { wx: 0, color: [224, 242, 254] },
-        { wx: 300, color: [186, 230, 253] },
-        { wx: 550, color: [254, 215, 170] },
-        { wx: 750, color: [251, 146, 60] },
-        { wx: 900, color: [148, 115, 140] },
-        { wx: 1050, color: [51, 65, 85] },
-        { wx: 1250, color: [15, 23, 42] },
-        { wx: 1450, color: [8, 12, 24] },
-        { wx: 1550, color: [60, 60, 95] },
-        { wx: 1600, color: [224, 242, 254] }
+        { wx: 0, color: [224, 242, 254] },      // Mountain: Crisp morning sky
+        { wx: 400, color: [186, 230, 253] },    // Mountain: Bright blue daylight
+        { wx: 750, color: [210, 230, 250] },    // Mountain -> Desert transition
+        { wx: 900, color: [254, 215, 170] },    // Desert: Warm peach
+        { wx: 1200, color: [251, 146, 60] },   // Desert: Glowing golden amber sunset
+        { wx: 1500, color: [234, 88, 12] },    // Desert: Deep sunset orange
+        { wx: 1750, color: [130, 65, 110] },   // Desert -> City twilight violet
+        { wx: 1900, color: [49, 46, 129] },    // City: Twilight indigo (#312e81)
+        { wx: 2150, color: [15, 23, 42] },     // City: Midnight slate (#0f172a)
+        { wx: 2450, color: [30, 27, 75] },     // City: Deep night navy (#1e1b4b)
+        { wx: 2600, color: [75, 85, 120] },    // City -> Dawn transition
+        { wx: 2700, color: [224, 242, 254] }   // Dawn back to Mountain morning!
     ];
 
     function getSkyColor(worldX) {
@@ -425,16 +460,14 @@
     }
 
     // ------------------------------------------------------------------------
-    // 8. Coordinates & Parallax Helper
+    // 8. Coordinates & Parallax Helper (Seamless Infinite Modulo)
     // ------------------------------------------------------------------------
     function worldToScreenX(itemWorldX, cameraX, parallax = 1.0) {
-        const effectiveCamX = cameraX * parallax;
-        let dx = itemWorldX - (effectiveCamX % WORLD_WIDTH);
-        dx = ((dx % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
-        if (dx > WORLD_WIDTH - 250) {
-            dx -= WORLD_WIDTH;
-        }
-        return Math.round(dx);
+        const camRef = cameraX !== undefined ? (cameraX + CAT_SCREEN_X) : catWorldX;
+        let dX = itemWorldX - (((camRef % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH);
+        if (dX < -WORLD_WIDTH / 2) dX += WORLD_WIDTH;
+        if (dX > WORLD_WIDTH / 2) dX -= WORLD_WIDTH;
+        return Math.round(CAT_SCREEN_X + dX * parallax);
     }
 
     // ------------------------------------------------------------------------
@@ -530,21 +563,39 @@
     }
 
     // ------------------------------------------------------------------------
-    // 10. Continuous Ground Renderer (Thin 1px Minimalist Baseline)
+    // 10. Continuous Ground Renderer (Thin 1px Minimalist Baseline - STRICTLY ZERO GREEN!)
     // ------------------------------------------------------------------------
     function drawContinuousGround(ctx, cameraX, width, groundY) {
-        // Crisp 1px thin ground baseline (Chrome Dino style - zero bulky thickness)
-        ctx.fillStyle = '#94a3b8';
+        const wx = ((catWorldX % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
+
+        // Ground baseline and specks adapt per world (NO GREEN ELEMENTS)
+        let baselineColor = '#94a3b8'; // Default Mountain
+        let speckColor1 = '#cbd5e1';
+        let speckColor2 = '#64748b';
+
+        if (wx >= 900 && wx < 1800) {
+            // Zone 2: Golden Desert
+            baselineColor = '#fed7aa';
+            speckColor1 = '#fde68a';
+            speckColor2 = '#f59e0b';
+        } else if (wx >= 1800) {
+            // Zone 3: City Street Asphalt
+            baselineColor = '#475569';
+            speckColor1 = '#cbd5e1';
+            speckColor2 = '#64748b';
+        }
+
+        ctx.fillStyle = baselineColor;
         ctx.fillRect(0, groundY, width, 1);
 
         // Subtle 1px ground texture specks that scroll to give a sense of motion
         for (let sx = 0; sx < width; sx += 8) {
-            const wx = (((cameraX + sx) % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
-            if (wx % 32 === 0) {
-                ctx.fillStyle = '#cbd5e1';
+            const swx = (((cameraX + sx) % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
+            if (swx % 32 === 0) {
+                ctx.fillStyle = speckColor1;
                 ctx.fillRect(sx, groundY + 2, 3, 1);
-            } else if (wx % 48 === 16) {
-                ctx.fillStyle = '#e2e8f0';
+            } else if (swx % 48 === 16) {
+                ctx.fillStyle = speckColor2;
                 ctx.fillRect(sx, groundY + 3, 2, 1);
             }
         }
@@ -554,17 +605,198 @@
     // 11. Minimalist Dino Background (Dynamic Sky & Distant Silhouettes - ZERO GREEN!)
     // ------------------------------------------------------------------------
     function drawDinoClouds(ctx, cameraX) {
-        // High-altitude, gentle pixel clouds (Y: 2-5)
-        const cloudPositions = [140, 420, 720, 1040, 1380];
+        // High-altitude gentle pixel clouds (Y: 2-5) for Mountain World
+        const cloudPositions = [120, 320, 520, 720];
         ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-        cloudPositions.forEach(wx => {
-            const sx = worldToScreenX(wx, cameraX, 0.15);
+        cloudPositions.forEach(cwx => {
+            const sx = worldToScreenX(cwx, cameraX, 0.15);
             if (sx >= -25 && sx <= currentLogicalWidth + 25) {
                 ctx.fillRect(sx + 3, 3, 8, 1);
                 ctx.fillRect(sx + 1, 4, 12, 1);
                 ctx.fillRect(sx, 5, 14, 1);
             }
         });
+    }
+
+    // Grand Tall Building Pixel Renderer (City World: 1800 - 2700px - STRICTLY ZERO GREEN!)
+    function drawTallBuilding(ctx, b, sx) {
+        if (sx < -40 || sx > currentLogicalWidth + 40) return;
+
+        switch (b.type) {
+            case 'art_deco': {
+                // Stepped Art Deco Skyscraper (33px tall with beacon)
+                // Base
+                ctx.fillStyle = b.baseColor || '#334155';
+                ctx.fillRect(sx, GROUND_Y - 17, 28, 17);
+                // Mid tier
+                ctx.fillStyle = b.tierColor || '#475569';
+                ctx.fillRect(sx + 4, GROUND_Y - 24, 20, 7);
+                // Top tier
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(sx + 9, GROUND_Y - 29, 10, 5);
+                // Needle spire
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillRect(sx + 13, GROUND_Y - 33, 2, 4);
+                // Flashing red aviation beacon
+                if (Math.floor(movieTime * 3) % 2 === 0) {
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(sx + 13, 1, 2, 1);
+                }
+                // Base windows (3 columns)
+                ctx.fillStyle = '#fef08a';
+                for (let r = 0; r < 3; r++) {
+                    const wy = GROUND_Y - 14 + r * 5;
+                    ctx.fillRect(sx + 4, wy, 3, 2);
+                    ctx.fillRect(sx + 13, wy, 3, 2);
+                    ctx.fillRect(sx + 21, wy, 3, 2);
+                }
+                // Mid windows
+                ctx.fillStyle = '#fde047';
+                ctx.fillRect(sx + 7, GROUND_Y - 22, 2, 2);
+                ctx.fillRect(sx + 15, GROUND_Y - 22, 2, 2);
+                ctx.fillRect(sx + 7, GROUND_Y - 18, 2, 2);
+                ctx.fillRect(sx + 15, GROUND_Y - 18, 2, 2);
+                break;
+            }
+            case 'glass_tower': {
+                // Modern Glass High-Rise (27px tall)
+                ctx.fillStyle = b.baseColor || '#1e293b';
+                ctx.fillRect(sx, GROUND_Y - 27, 24, 27);
+                ctx.fillStyle = '#475569';
+                ctx.fillRect(sx - 1, GROUND_Y - 27, 26, 1);
+                // Dual antennas
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillRect(sx + 4, GROUND_Y - 31, 1, 4);
+                ctx.fillRect(sx + 19, GROUND_Y - 31, 1, 4);
+                if (Math.floor(movieTime * 3) % 2 === 0) {
+                    ctx.fillStyle = '#f87171';
+                    ctx.fillRect(sx + 4, GROUND_Y - 32, 1, 1);
+                    ctx.fillRect(sx + 19, GROUND_Y - 32, 1, 1);
+                }
+                // Vertical window columns (cyan & yellow)
+                for (let c = 0; c < 4; c++) {
+                    const wx = sx + 3 + c * 5;
+                    for (let r = 0; r < 5; r++) {
+                        const wy = GROUND_Y - 24 + r * 4;
+                        ctx.fillStyle = ((c + r) % 2 === 0) ? '#7dd3fc' : '#fef08a';
+                        if ((c + r) % 5 === 0) ctx.fillStyle = '#0f172a'; // dark unlit window
+                        ctx.fillRect(wx, wy, 2, 2);
+                    }
+                }
+                break;
+            }
+            case 'water_tower': {
+                // Downtown Tower with Rooftop Water Tank (22px building + 12px tank)
+                ctx.fillStyle = b.baseColor || '#334155';
+                ctx.fillRect(sx, GROUND_Y - 22, 26, 22);
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(sx - 1, GROUND_Y - 22, 28, 1);
+                // Water tank stilts
+                ctx.fillStyle = '#475569';
+                ctx.fillRect(sx + 15, GROUND_Y - 26, 1, 4);
+                ctx.fillRect(sx + 22, GROUND_Y - 26, 1, 4);
+                ctx.fillRect(sx + 16, GROUND_Y - 24, 6, 1);
+                // Wooden water tank
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(sx + 14, GROUND_Y - 31, 10, 5);
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(sx + 14, GROUND_Y - 30, 10, 1);
+                ctx.fillRect(sx + 14, GROUND_Y - 28, 10, 1);
+                // Conical metal cap
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(sx + 14, GROUND_Y - 32, 10, 1);
+                ctx.fillRect(sx + 16, GROUND_Y - 33, 6, 1);
+                ctx.fillRect(sx + 18, GROUND_Y - 34, 2, 1);
+                // Windows
+                ctx.fillStyle = '#fef08a';
+                for (let r = 0; r < 3; r++) {
+                    const wy = GROUND_Y - 18 + r * 6;
+                    ctx.fillRect(sx + 3, wy, 3, 2);
+                    ctx.fillRect(sx + 11, wy, 3, 2);
+                    ctx.fillRect(sx + 19, wy, 3, 2);
+                }
+                break;
+            }
+            case 'twin_tower': {
+                // Twin High-Rise Towers (26px & 20px)
+                ctx.fillStyle = b.baseColor || '#1e293b';
+                ctx.fillRect(sx, GROUND_Y - 26, 14, 26);
+                ctx.fillStyle = '#334155';
+                ctx.fillRect(sx + 15, GROUND_Y - 20, 14, 20);
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(sx, GROUND_Y - 6, 29, 6);
+                // Spires
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillRect(sx + 6, GROUND_Y - 30, 2, 4);
+                if (Math.floor(movieTime * 3) % 2 === 0) {
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(sx + 6, GROUND_Y - 31, 2, 1);
+                }
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillRect(sx + 21, GROUND_Y - 23, 1, 3);
+                // Windows in both towers
+                ctx.fillStyle = '#fef08a';
+                for (let r = 0; r < 4; r++) {
+                    const wy = GROUND_Y - 22 + r * 5;
+                    ctx.fillRect(sx + 3, wy, 2, 2);
+                    ctx.fillRect(sx + 8, wy, 2, 2);
+                }
+                ctx.fillStyle = '#7dd3fc';
+                for (let r = 0; r < 3; r++) {
+                    const wy = GROUND_Y - 16 + r * 5;
+                    ctx.fillRect(sx + 18, wy, 2, 2);
+                    ctx.fillRect(sx + 23, wy, 2, 2);
+                }
+                break;
+            }
+            case 'spire_monolith': {
+                // Monolith Skyscraper with Spire (29px + 4px spire)
+                ctx.fillStyle = b.baseColor || '#475569';
+                ctx.fillRect(sx, GROUND_Y - 29, 22, 29);
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillRect(sx + 10, GROUND_Y - 33, 2, 4);
+                if (Math.floor(movieTime * 3) % 2 === 0) {
+                    ctx.fillStyle = '#f87171';
+                    ctx.fillRect(sx + 10, 1, 2, 1);
+                }
+                // Horizontal window bands
+                for (let r = 0; r < 4; r++) {
+                    const wy = GROUND_Y - 24 + r * 6;
+                    ctx.fillStyle = '#fde047';
+                    ctx.fillRect(sx + 2, wy, 18, 2);
+                    ctx.fillStyle = '#1e293b';
+                    ctx.fillRect(sx + 7, wy, 1, 2);
+                    ctx.fillRect(sx + 14, wy, 1, 2);
+                }
+                break;
+            }
+            case 'commercial_hvac': {
+                // Commercial Block with Rooftop HVAC (20px)
+                ctx.fillStyle = b.baseColor || '#3f3f46';
+                ctx.fillRect(sx, GROUND_Y - 20, 28, 20);
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(sx - 1, GROUND_Y - 20, 30, 1);
+                // HVAC Box
+                ctx.fillStyle = '#475569';
+                ctx.fillRect(sx + 3, GROUND_Y - 24, 7, 4);
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(sx + 5, GROUND_Y - 23, 3, 2);
+                // Antenna
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillRect(sx + 21, GROUND_Y - 25, 1, 5);
+                // Windows
+                ctx.fillStyle = '#fed7aa';
+                for (let r = 0; r < 3; r++) {
+                    const wy = GROUND_Y - 16 + r * 5;
+                    ctx.fillRect(sx + 3, wy, 3, 2);
+                    ctx.fillRect(sx + 12, wy, 3, 2);
+                    ctx.fillRect(sx + 20, wy, 3, 2);
+                }
+                break;
+            }
+            default:
+                break;
+        }
     }
 
     function drawSimpleBackground(ctx, cameraX) {
@@ -574,56 +806,68 @@
 
         const wx = ((catWorldX % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH;
 
-        // 2. Celestial bodies (Sun, Sunset Sun, Crescent Moon, and Stars)
-        // Morning/Daytime Sun (worldX: 0 - 500)
-        const sunSx = worldToScreenX(160, cameraX, 0.05);
-        if (sunSx >= -20 && sunSx <= currentLogicalWidth + 20) {
-            ctx.fillStyle = '#fef08a';
-            ctx.fillRect(sunSx - 3, 3, 6, 6);
-            ctx.fillStyle = '#fde047';
-            ctx.fillRect(sunSx - 2, 4, 4, 4);
+        // 2. Celestial bodies
+        // Morning/Daytime Sun (Zone 1: Mountain Day, wx: 0 - 850)
+        if (wx <= 850) {
+            const sunSx = worldToScreenX(SCENERY.sun.worldX, cameraX, 0.06);
+            if (sunSx >= -20 && sunSx <= currentLogicalWidth + 20) {
+                ctx.fillStyle = '#fef08a';
+                ctx.fillRect(sunSx - 3, 3, 6, 6);
+                ctx.fillStyle = '#fde047';
+                ctx.fillRect(sunSx - 2, 4, 4, 4);
+            }
         }
 
-        // Sunset Sun (worldX: 550 - 950)
-        const sunsetSx = worldToScreenX(750, cameraX, 0.05);
-        if (sunsetSx >= -20 && sunsetSx <= currentLogicalWidth + 20) {
-            ctx.fillStyle = '#fb923c';
-            ctx.fillRect(sunsetSx - 4, 4, 8, 8);
-            ctx.fillStyle = '#ea580c';
-            ctx.fillRect(sunsetSx - 3, 5, 6, 6);
+        // Sunset Sun (Zone 2: Desert Sunset, wx: 850 - 1750)
+        if (wx >= 850 && wx <= 1750) {
+            const sunsetSx = worldToScreenX(SCENERY.sunsetSun.worldX, cameraX, 0.06);
+            if (sunsetSx >= -20 && sunsetSx <= currentLogicalWidth + 20) {
+                ctx.fillStyle = '#fb923c';
+                ctx.fillRect(sunsetSx - 4, 4, 8, 8);
+                ctx.fillStyle = '#ea580c';
+                ctx.fillRect(sunsetSx - 3, 5, 6, 6);
+            }
         }
 
-        // Crescent Moon (worldX: 1100 - 1600)
-        const moonSx = worldToScreenX(1380, cameraX, 0.05);
-        if (moonSx >= -20 && moonSx <= currentLogicalWidth + 20) {
-            ctx.fillStyle = '#f8fafc';
-            ctx.fillRect(moonSx - 2, 3, 5, 5);
-            ctx.fillStyle = getSkyColor(1380);
-            ctx.fillRect(moonSx - 1, 3, 3, 4);
-        }
+        // Crescent Moon (Zone 3: City Night, wx: 1750 - 2650)
+        if (wx >= 1750 && wx <= 2650) {
+            const moonSx = worldToScreenX(SCENERY.moon.worldX, cameraX, 0.06);
+            if (moonSx >= -20 && moonSx <= currentLogicalWidth + 20) {
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(moonSx - 2, 3, 5, 5);
+                ctx.fillStyle = getSkyColor(SCENERY.moon.worldX);
+                ctx.fillRect(moonSx - 1, 3, 3, 4);
+            }
 
-        // Twinkling stars in night sky
-        if (wx >= 1050 && wx <= 1580) {
+            // Twinkling stars in night sky
             ctx.fillStyle = '#ffffff';
-            const starCoords = [
-                { x: 30, y: 3 }, { x: 90, y: 6 }, { x: 150, y: 4 },
-                { x: 220, y: 7 }, { x: 290, y: 3 }, { x: 350, y: 5 }
-            ];
-            starCoords.forEach((s, idx) => {
-                if ((Math.floor(movieTime * 5) + idx) % 3 !== 0) {
-                    ctx.fillRect(s.x, s.y, 1, 1);
+            SCENERY.stars.forEach((s, idx) => {
+                const starSx = worldToScreenX(s.worldX, cameraX, 0.05);
+                if (starSx >= 0 && starSx <= currentLogicalWidth) {
+                    if ((Math.floor(movieTime * 5) + idx) % 3 !== 0) {
+                        ctx.fillRect(starSx, s.y, 1, 1);
+                    }
                 }
             });
+
+            // High-altitude blinking aircraft beacon cruising over the city
+            const beaconSx = worldToScreenX(2100, cameraX, 0.03);
+            if (beaconSx >= -10 && beaconSx <= currentLogicalWidth + 10) {
+                const blink = Math.floor(movieTime * 4) % 2 === 0;
+                ctx.fillStyle = blink ? '#ef4444' : '#f8fafc';
+                ctx.fillRect(beaconSx, 2, 2, 1);
+            }
         }
 
-        // 3. High-altitude clouds (Parallax 0.15)
-        drawDinoClouds(ctx, cameraX);
+        // 3. High-altitude clouds (Zone 1: Mountain Day)
+        if (wx <= 900) {
+            drawDinoClouds(ctx, cameraX);
+        }
 
-        // 4. Distant Silhouettes (Parallax 0.25 - ZERO GREEN TREES!)
-        // Lavender-slate mountains, warm peach dunes, and evening skylines
+        // 4. Distant Silhouettes (Parallax 0.22 - STRICTLY ZERO GREEN!)
         SCENERY.farLandmarks.forEach(lm => {
-            const sx = worldToScreenX(lm.worldX, cameraX, 0.25);
-            if (sx >= -100 && sx <= currentLogicalWidth + 100) {
+            const sx = worldToScreenX(lm.worldX, cameraX, 0.22);
+            if (sx >= -120 && sx <= currentLogicalWidth + 120) {
                 ctx.fillStyle = lm.color;
                 if (lm.type === 'mountain') {
                     const hw = Math.round(lm.w / 2);
@@ -638,16 +882,47 @@
                     ctx.beginPath();
                     ctx.ellipse(sx, GROUND_Y, lm.w / 2, lm.h, 0, Math.PI, 0);
                     ctx.fill();
-                } else if (lm.type === 'skyline') {
+                } else if (lm.type === 'city_distant') {
                     const blockY = GROUND_Y - lm.h;
                     ctx.fillRect(sx, blockY, lm.w, lm.h);
-                    ctx.fillStyle = '#fef08a';
-                    if (lm.w > 20) {
-                        ctx.fillRect(sx + 4, blockY + 3, 2, 2);
-                        ctx.fillRect(sx + lm.w - 6, blockY + 5, 2, 2);
+                    if (lm.h > 20) {
+                        ctx.fillRect(sx + Math.floor(lm.w / 2), blockY - 3, 1, 3);
+                    }
+                    if (lm.w > 22) {
+                        ctx.fillStyle = 'rgba(254, 240, 138, 0.35)';
+                        ctx.fillRect(sx + 4, blockY + 4, 1, 1);
+                        ctx.fillRect(sx + lm.w - 5, blockY + 7, 1, 1);
                     }
                 }
             }
+        });
+
+        // 5. Midground Landmarks (Near Mountains & Dunes - Parallax 0.40 - STRICTLY ZERO GREEN!)
+        SCENERY.midLandmarks.forEach(lm => {
+            const sx = worldToScreenX(lm.worldX, cameraX, 0.40);
+            if (sx >= -120 && sx <= currentLogicalWidth + 120) {
+                ctx.fillStyle = lm.color;
+                if (lm.type === 'mountain') {
+                    const hw = Math.round(lm.w / 2);
+                    const topY = GROUND_Y - lm.h;
+                    ctx.beginPath();
+                    ctx.moveTo(sx - hw, GROUND_Y);
+                    ctx.lineTo(sx, topY);
+                    ctx.lineTo(sx + hw, GROUND_Y);
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (lm.type === 'dune') {
+                    ctx.beginPath();
+                    ctx.ellipse(sx, GROUND_Y, lm.w / 2, lm.h, 0, Math.PI, 0);
+                    ctx.fill();
+                }
+            }
+        });
+
+        // 6. Grand Tall Buildings in City World (Parallax 0.40 - STRICTLY ZERO GREEN!)
+        SCENERY.tallBuildings.forEach(b => {
+            const sx = worldToScreenX(b.worldX, cameraX, 0.40);
+            drawTallBuilding(ctx, b, sx);
         });
     }
 
@@ -750,6 +1025,9 @@
     let resizeObserver = null;
 
     let catWorldX = 0;
+    let lastWorldZone = -1;
+    let worldBannerText = '';
+    let worldBannerTimer = 0;
     let currentBeatIndex = 0;
     let beatProgress = 0;
 
@@ -1022,6 +1300,8 @@
         isHoldingJump = false;
         confettiParticles = [];
         popNotifications = [];
+        lastWorldZone = -1;
+        worldBannerTimer = 0;
 
         spawnInitialTrack();
         playRetroCountdownBeep(false); // First countdown beep for '3'
@@ -1053,6 +1333,8 @@
         isHoldingJump = false;
         confettiParticles = [];
         popNotifications = [];
+        lastWorldZone = -1;
+        worldBannerTimer = 0;
 
         spawnInitialTrack();
         playRetroCountdownBeep(true); // Bright chirp on restart!
@@ -1074,6 +1356,8 @@
         currentSpeed = START_SPEED;
         idlePlayTimer = 0;
         lastBeepSec = -1;
+        lastWorldZone = -1;
+        worldBannerTimer = 0;
         stop();
 
         if (canvas) {
@@ -1132,6 +1416,18 @@
 
             // Continuous background world loop sync
             catWorldX = (catWorldX + currentSpeed * dt) % WORLD_WIDTH;
+
+            // Automatic World Transition Announcement (Mountain -> Desert -> City)
+            const currentZone = Math.floor((((catWorldX % WORLD_WIDTH) + WORLD_WIDTH) % WORLD_WIDTH) / 900);
+            if (lastWorldZone === -1) {
+                lastWorldZone = currentZone;
+            } else if (currentZone !== lastWorldZone) {
+                lastWorldZone = currentZone;
+                if (currentZone === 0) worldBannerText = '✦ MOUNTAIN VALLEY ✦';
+                else if (currentZone === 1) worldBannerText = '✦ GOLDEN DESERT ✦';
+                else if (currentZone === 2) worldBannerText = '✦ METROPOLIS CITY ✦';
+                worldBannerTimer = 1.4;
+            }
 
             // 1. Variable Jump Physics (Authentic Chrome Dino Parabolic Arc)
             // Short Jump (Tap): 9.2px apex, 0.50s duration, 24px air travel (clears 1 cactus, fails on 3!)
@@ -1628,6 +1924,24 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('GO!', cx, cy);
+            ctx.restore();
+        } else if (worldBannerTimer > 0 && isDinoMode) {
+            const cx = Math.round(currentLogicalWidth / 2);
+            const cy = 13;
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+            const bannerW = 104;
+            ctx.fillRect(cx - bannerW / 2, cy - 8, bannerW, 16);
+            ctx.strokeStyle = (lastWorldZone === 2) ? '#fde047' : ((lastWorldZone === 1) ? '#fb923c' : '#38bdf8');
+            ctx.lineWidth = 1;
+            ctx.strokeRect(cx - bannerW / 2 + 0.5, cy - 8 + 0.5, bannerW - 1, 15);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 7px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(worldBannerText, cx, cy);
             ctx.restore();
         }
 
