@@ -310,8 +310,11 @@
 
             // Ascending major pentatonic scale: D5 (587Hz), E5 (659Hz), G5 (784Hz), A5 (880Hz), C6 (1046Hz), D6 (1174Hz)
             const baseFreqs = [587, 659, 784, 880, 1046, 1174];
-            const startFreq = baseFreqs[Math.min(baseFreqs.length - 1, Math.max(0, comboIndex - 1))];
-            const endFreq = Math.round(startFreq * 1.5);
+            const octave = Math.floor((comboIndex - 1) / baseFreqs.length);
+            const noteIdx = (comboIndex - 1) % baseFreqs.length;
+            const multiplier = Math.min(2.2, Math.pow(1.22, octave));
+            const startFreq = Math.round(baseFreqs[noteIdx] * multiplier);
+            const endFreq = Math.round(startFreq * 1.4);
 
             osc.type = 'sine';
             osc.frequency.setValueAtTime(startFreq, t);
@@ -417,8 +420,8 @@
 
     function popBalloon(x, y, color, isUserPop = false) {
         if (isUserPop) {
-            snackComboCount = (snackComboTimer > 0) ? Math.min(6, snackComboCount + 1) : 1;
-            snackComboTimer = 0.70;
+            snackComboCount = (snackComboTimer > 0) ? (snackComboCount + 1) : 1;
+            snackComboTimer = 1.35;
             playRetroComboCollectSound(snackComboCount);
         }
         const particleColors = [color, '#ffffff', '#fde047', '#f43f5e'];
@@ -439,8 +442,8 @@
     }
 
     function collectFishBone(x, y, type) {
-        snackComboCount = (snackComboTimer > 0) ? Math.min(6, snackComboCount + 1) : 1;
-        snackComboTimer = 0.70;
+        snackComboCount = (snackComboTimer > 0) ? (snackComboCount + 1) : 1;
+        snackComboTimer = 1.35;
         playRetroComboCollectSound(snackComboCount);
 
         const colors = type === 'fish'
@@ -1512,16 +1515,16 @@
         const pos = getCanvasCoordinates(e);
 
         if (isGameOver) {
-            // Game Over action buttons (Side-by-side centered below GAME OVER at y=22)
+            // Game Over action buttons (Side-by-side centered below text at y=22 or y=25)
             const cx = Math.round(currentLogicalWidth / 2);
-            // Replay Button bounds: [cx - 24, 22, 20, 12] with touch forgiveness
-            // Exit Button bounds: [cx + 4, 22, 20, 12] with touch forgiveness
-            if (pos.x >= cx + 2 && pos.x <= cx + 28 && pos.y >= 18 && pos.y <= 38) {
+            // Replay Button bounds: [cx - 24, by, 20, 12] with touch forgiveness
+            // Exit Button bounds: [cx + 4, by, 20, 12] with touch forgiveness
+            if (pos.x >= cx + 2 && pos.x <= cx + 28 && pos.y >= 16 && pos.y <= 40) {
                 // Clicked Exit button [✕]
                 exitMiniGame();
                 return;
             }
-            if (pos.x >= cx - 28 && pos.x <= cx - 2 && pos.y >= 18 && pos.y <= 38) {
+            if (pos.x >= cx - 28 && pos.x <= cx - 2 && pos.y >= 16 && pos.y <= 40) {
                 // Clicked Replay button [↻]
                 restartGame();
                 return;
@@ -2442,27 +2445,48 @@
             ctx.restore();
         }
 
-        // 11. Authentic Game Over Screen with Centered Side-by-Side Action Buttons
+        // 11. Authentic Game Over Screen / New High Score Celebration with Action Buttons
         if (isGameOver) {
             // High-contrast overlay to focus attention
             ctx.fillStyle = 'rgba(15, 23, 42, 0.74)';
             ctx.fillRect(0, 0, currentLogicalWidth, CANVAS_HEIGHT);
 
             const cx = Math.round(currentLogicalWidth / 2);
+            let by = 22;
 
-            // A. GAME OVER text centered at Y = 11
-            ctx.save();
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 8px monospace, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('G A M E   O V E R', cx, 11);
-            ctx.restore();
+            if (isNewHighScoreSession && dinoScore > 0) {
+                // Celebration: New High Score!
+                by = 25; // Lower buttons slightly for two-line celebration layout
 
-            // B. Replay [↻] and Exit [✕] Buttons side by side centered below text at Y = 22
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Line 1: ★ NEW HIGH SCORE! ★
+                ctx.font = 'bold 7px monospace, sans-serif';
+                ctx.fillStyle = '#fde047';
+                ctx.fillText('★ NEW HI-SCORE! ★', cx, 8);
+
+                // Line 2: SCORE: 01420
+                ctx.font = 'bold 8px monospace, sans-serif';
+                ctx.fillStyle = '#ffffff';
+                const scorePadded = String(Math.floor(dinoScore)).padStart(5, '0');
+                ctx.fillText(`SCORE: ${scorePadded}`, cx, 16);
+                ctx.restore();
+            } else {
+                // Standard Game Over text centered at Y = 11
+                ctx.save();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 8px monospace, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('G A M E   O V E R', cx, 11);
+                ctx.restore();
+            }
+
+            // B. Replay [↻] and Exit [✕] Buttons side by side centered below text
             const bw = 20;
             const bh = 12;
-            const by = 22;
             const rx = cx - 24; // Replay button X
             const ex = cx + 4;  // Exit button X
 
