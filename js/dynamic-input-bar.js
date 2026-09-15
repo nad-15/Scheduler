@@ -63,6 +63,7 @@
   let dynamicEmojiTray = null;
   let emojiGridContainer = null;
   let btnEmojiBackspace = null;
+  let isPointerDownOnBackspace = false;
   let titleSubmitContainer = null;
   let taskTitle = null;
   let flowerContainer = null;
@@ -200,6 +201,7 @@
 
   function updateEmojiBackspaceVisibility() {
     if (!btnEmojiBackspace) return;
+    if (isPointerDownOnBackspace) return;
     const hasText = Boolean(taskTitle && taskTitle.value && taskTitle.value.length > 0);
     if (isEmojiTrayOpen && hasText) {
       btnEmojiBackspace.classList.remove('hidden');
@@ -852,10 +854,27 @@
         }
       };
 
+      const finishBackspaceInteraction = () => {
+        stopRepeat();
+        if (isPointerDownOnBackspace) {
+          isPointerDownOnBackspace = false;
+          setTimeout(() => {
+            updateEmojiBackspaceVisibility();
+          }, 0);
+        }
+      };
+
       const startRepeat = (e) => {
         e.stopPropagation();
         e.preventDefault();
         pointerHandled = true;
+        isPointerDownOnBackspace = true;
+        try {
+          if (e.pointerId && btnEmojiBackspace.setPointerCapture) {
+            btnEmojiBackspace.setPointerCapture(e.pointerId);
+          }
+        } catch (_) {}
+
         updateSavedSelection();
         performBackspace();
 
@@ -872,12 +891,34 @@
       };
 
       btnEmojiBackspace.addEventListener('pointerdown', startRepeat);
-      btnEmojiBackspace.addEventListener('pointerup', stopRepeat);
-      btnEmojiBackspace.addEventListener('pointercancel', stopRepeat);
-      btnEmojiBackspace.addEventListener('pointerleave', stopRepeat);
+      btnEmojiBackspace.addEventListener('pointerup', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        try {
+          if (e.pointerId && btnEmojiBackspace.hasPointerCapture && btnEmojiBackspace.hasPointerCapture(e.pointerId)) {
+            btnEmojiBackspace.releasePointerCapture(e.pointerId);
+          }
+        } catch (_) {}
+        finishBackspaceInteraction();
+      });
+      btnEmojiBackspace.addEventListener('pointercancel', (e) => {
+        e.stopPropagation();
+        try {
+          if (e.pointerId && btnEmojiBackspace.hasPointerCapture && btnEmojiBackspace.hasPointerCapture(e.pointerId)) {
+            btnEmojiBackspace.releasePointerCapture(e.pointerId);
+          }
+        } catch (_) {}
+        finishBackspaceInteraction();
+      });
+      btnEmojiBackspace.addEventListener('pointerleave', (e) => {
+        if (isPointerDownOnBackspace) {
+          finishBackspaceInteraction();
+        }
+      });
 
       btnEmojiBackspace.addEventListener('mousedown', (e) => {
         e.preventDefault();
+        e.stopPropagation();
       });
 
       btnEmojiBackspace.addEventListener('click', (e) => {
@@ -890,6 +931,7 @@
         setTimeout(() => {
           pointerHandled = false;
         }, 50);
+        finishBackspaceInteraction();
       });
 
       btnEmojiBackspace.addEventListener('contextmenu', (e) => {
