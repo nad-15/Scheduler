@@ -225,6 +225,35 @@
         }
     }
 
+    // Crisp micro reward chime when safely clearing / surpassing a cactus obstacle
+    function playRetroPassObstacleSound() {
+        try {
+            const ctx = initAudio();
+            if (!ctx) return;
+
+            const t = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            // Sweet high-pitch two-step ascending micro chime (880Hz -> 1320Hz)
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, t);
+            osc.frequency.setValueAtTime(1320, t + 0.025);
+
+            gain.gain.setValueAtTime(0.032, t);
+            gain.gain.setValueAtTime(0.038, t + 0.025);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.065);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(t);
+            osc.stop(t + 0.07);
+        } catch (e) {
+            // Fails silently if browser blocks audio
+        }
+    }
+
     // ------------------------------------------------------------------------
     // 4. Procedural Obstacles & Floating Balloons (Dino Run System)
     // ------------------------------------------------------------------------
@@ -1715,6 +1744,12 @@
                             });
                             break;
                         }
+                    }
+
+                    // Reward sound when player safely clears / surpasses the cactus obstacle
+                    if (!obs.passed && obsRight < catLeft && !isGameOver && isDinoMode) {
+                        obs.passed = true;
+                        playRetroPassObstacleSound();
                     }
                 }
             }
