@@ -893,6 +893,29 @@
         ctx.fillStyle = getSkyColor(catWorldX);
         ctx.fillRect(0, 0, currentLogicalWidth, CANVAS_HEIGHT);
 
+        // Helper to draw a pixel-perfect celestial orb (Sun or Moon) with soft rounded corners & core
+        function drawCelestialOrb(cx, cy, outerColor, innerColor, highlightColor, craterColor) {
+            // 1. Outer rounded halo (6x6 circle with 1px clipped corners)
+            ctx.fillStyle = outerColor;
+            ctx.fillRect(cx - 2, cy - 3, 4, 6);
+            ctx.fillRect(cx - 3, cy - 2, 6, 4);
+
+            // 2. Inner solid disc (4x4)
+            ctx.fillStyle = innerColor;
+            ctx.fillRect(cx - 2, cy - 2, 4, 4);
+
+            // 3. Highlight / Craters (if applicable)
+            if (highlightColor) {
+                ctx.fillStyle = highlightColor;
+                ctx.fillRect(cx - 1, cy - 2, 2, 1);
+            }
+            if (craterColor) {
+                ctx.fillStyle = craterColor;
+                ctx.fillRect(cx + 1, cy - 1, 1, 1);
+                ctx.fillRect(cx - 1, cy + 1, 1, 1);
+            }
+        }
+
         // 2. Dynamic Celestial Bodies (Sun, Moon, Stars)
         // A. Dynamic Sun: Arcs across the sky from Dawn (0.0), Midday (0.34) to Sunset (0.68)
         if (dayProgress <= 0.68) {
@@ -902,37 +925,33 @@
 
             if (dayProgress < 0.15) {
                 // Dawn sun (warm peach-gold rising from horizon)
-                ctx.fillStyle = '#fed7aa';
-                ctx.fillRect(sunScreenX - 3, sunY - 1, 6, 6);
-                ctx.fillStyle = '#fb923c';
-                ctx.fillRect(sunScreenX - 2, sunY, 4, 4);
+                drawCelestialOrb(sunScreenX, sunY, '#fed7aa', '#fb923c', '#fde047', null);
             } else if (dayProgress < 0.50) {
                 // Bright midday sun (golden yellow high in the sky)
-                ctx.fillStyle = '#fef08a';
-                ctx.fillRect(sunScreenX - 3, sunY - 1, 6, 6);
-                ctx.fillStyle = '#fde047';
-                ctx.fillRect(sunScreenX - 2, sunY, 4, 4);
+                drawCelestialOrb(sunScreenX, sunY, '#fef08a', '#fde047', '#ffffff', null);
             } else {
-                // Sunset sun (large fiery orange-amber sinking into the horizon)
-                ctx.fillStyle = '#fb923c';
-                ctx.fillRect(sunScreenX - 4, sunY - 2, 8, 8);
-                ctx.fillStyle = '#ea580c';
-                ctx.fillRect(sunScreenX - 3, sunY - 1, 6, 6);
+                // Sunset sun (fiery orange-amber sinking into the horizon)
+                drawCelestialOrb(sunScreenX, sunY, '#ea580c', '#f97316', '#fde047', null);
             }
         }
 
-        // B. Dynamic Moon: Arcs across the sky from Dusk (0.68), Midnight (0.83) to Dawn (0.98)
-        if (dayProgress >= 0.68 && dayProgress <= 0.98) {
-            const moonNorm = (dayProgress - 0.68) / (0.98 - 0.68);
+        // B. Dynamic Moon: Arcs across the sky from Dusk (0.64), Midnight (0.84) to Dawn (0.04)
+        // Same round orb shape as the sun, rendered in cool grayish-bluish lunar tones with subtle craters
+        if (dayProgress >= 0.64 || dayProgress <= 0.04) {
+            const rawProg = dayProgress >= 0.64 ? (dayProgress - 0.64) : (dayProgress + 1.0 - 0.64);
+            const moonNorm = Math.min(1.0, Math.max(0, rawProg / 0.40));
             const moonScreenX = Math.round((currentLogicalWidth + 40) * moonNorm) - 20;
             const arc = Math.sin(moonNorm * Math.PI);
-            const moonY = Math.round(11 - arc * 7); // Arches Y: 11 -> 4 -> 11
+            const moonY = Math.round(12 - arc * 8); // Arches Y: 12 (horizon) -> 4 (zenith) -> 12 (horizon)
 
-            // Silver crescent moon
-            ctx.fillStyle = '#f8fafc';
-            ctx.fillRect(moonScreenX - 2, moonY, 5, 5);
-            ctx.fillStyle = getSkyColor(catWorldX);
-            ctx.fillRect(moonScreenX - 1, moonY, 3, 4);
+            // Grayish-bluish celestial moon matching the sun's circular orb geometry
+            const isMidnight = (dayProgress >= 0.78 && dayProgress <= 0.92);
+            const outerMoon = isMidnight ? '#64748b' : '#94a3b8';
+            const innerMoon = isMidnight ? '#cbd5e1' : '#e2e8f0';
+            const moonHighlight = '#f8fafc';
+            const craterColor = isMidnight ? '#475569' : '#94a3b8';
+
+            drawCelestialOrb(moonScreenX, moonY, outerMoon, innerMoon, moonHighlight, craterColor);
         }
 
         // C. Twinkling Stars: Active during Dusk, Night, Pre-Dawn (0.64 to 0.08)
