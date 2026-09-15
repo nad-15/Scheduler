@@ -1825,15 +1825,15 @@
             // Track continuous distance traveled (20 units per second) for steady, predictable speed progression
             dinoDistanceTraveled += dt * 20;
 
-            // Extended Gradual High-Speed Progression + Late-Game Plateau + Smooth Breather Waves:
-            // 1. Gentle continuous ramp (0.017) based on distance traveled, scaling smoothly from 48 px/s to 160 px/s over ~4.5 - 5 mins
-            const baseBonus = Math.min(112, dinoDistanceTraveled * 0.017);
+            // Accelerated Gradual High-Speed Progression (~1.75 - 2 mins to Max Speed) + Smooth Breather Waves:
+            // 1. Continuous ramp (0.052) based on distance traveled, scaling smoothly from 48 px/s to 160 px/s over ~105 - 115s
+            const baseBonus = Math.min(112, dinoDistanceTraveled * 0.052);
 
-            // 2. Periodic Relaxation Wave: Gentle breathing dip (-12 to -18 px/s) every ~35-40s for ~12 seconds
+            // 2. Periodic Relaxation Wave: Gentle breathing dip (-12 to -18 px/s) every ~30s for ~9 seconds
             let waveOffset = 0;
-            if (dinoDistanceTraveled >= 400) {
-                const waveProgress = ((dinoDistanceTraveled - 400) % 800) / 800;
-                // Peak cruise from 0.0 to 0.70 (~25s), smooth relaxation dip from 0.70 to 1.0 (~12s)
+            if (dinoDistanceTraveled >= 300) {
+                const waveProgress = ((dinoDistanceTraveled - 300) % 600) / 600;
+                // Peak cruise from 0.0 to 0.70 (~21s), smooth relaxation dip from 0.70 to 1.0 (~9s)
                 if (waveProgress > 0.70) {
                     const relaxFactor = Math.sin(((waveProgress - 0.70) / 0.30) * Math.PI);
                     const dipAmount = Math.min(18, 10 + baseBonus * 0.08);
@@ -1843,7 +1843,7 @@
 
             const targetSpeed = Math.max(START_SPEED, START_SPEED + baseBonus + waveOffset);
             // Smooth gradual interpolation prevents abrupt acceleration or deceleration
-            currentSpeed += (targetSpeed - currentSpeed) * Math.min(1.0, dt * 1.0);
+            currentSpeed += (targetSpeed - currentSpeed) * Math.min(1.0, dt * 1.2);
 
             // Steady score accumulation: 20 points per second
             dinoScore += dt * 20;
