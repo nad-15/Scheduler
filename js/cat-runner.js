@@ -298,6 +298,52 @@
         }
     }
 
+    // Harmonious ascending musical combo chime (each consecutive item in a line pitches up!)
+    function playRetroComboCollectSound(comboIndex = 1) {
+        try {
+            const ctx = initAudio();
+            if (!ctx || !masterGainNode) return;
+
+            const t = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            // Ascending major pentatonic scale: D5 (587Hz), E5 (659Hz), G5 (784Hz), A5 (880Hz), C6 (1046Hz), D6 (1174Hz)
+            const baseFreqs = [587, 659, 784, 880, 1046, 1174];
+            const startFreq = baseFreqs[Math.min(baseFreqs.length - 1, Math.max(0, comboIndex - 1))];
+            const endFreq = Math.round(startFreq * 1.5);
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(startFreq, t);
+            osc.frequency.exponentialRampToValueAtTime(endFreq, t + 0.035);
+
+            gain.gain.setValueAtTime(0.065, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.085);
+
+            osc.connect(gain);
+            gain.connect(masterGainNode);
+
+            osc.start(t);
+            osc.stop(t + 0.09);
+
+            // Sparkling overtone harmonic on combo 3+!
+            if (comboIndex >= 3) {
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(endFreq * 1.25, t);
+                gain2.gain.setValueAtTime(0.03, t);
+                gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+                osc2.connect(gain2);
+                gain2.connect(masterGainNode);
+                osc2.start(t);
+                osc2.stop(t + 0.075);
+            }
+        } catch (e) {
+            // Fails silently if browser blocks audio
+        }
+    }
+
     // 4. Procedural Obstacles, High Floating Balloons & Ground Fish Bones
     // ------------------------------------------------------------------------
     let activeObstacles = [];
@@ -332,6 +378,8 @@
     let invulnerableTimer = 0;     // Post-start grace period
     let idlePlayTimer = 0;         // Inactivity timer
     let milestoneFlashTimer = 0;   // Milestone flash every 100 points
+    let snackComboCount = 0;       // Consecutive snack/balloon combo counter
+    let snackComboTimer = 0;       // Combo chain decay timer
 
     // Countdown State before Player Mode Starts (3, 2, 1, GO!)
     let countdownTimer = 0;        // > 0 when counting down (3.0 -> 0.0)
@@ -369,7 +417,9 @@
 
     function popBalloon(x, y, color, isUserPop = false) {
         if (isUserPop) {
-            playRetroPopSound();
+            snackComboCount = (snackComboTimer > 0) ? Math.min(6, snackComboCount + 1) : 1;
+            snackComboTimer = 0.70;
+            playRetroComboCollectSound(snackComboCount);
         }
         const particleColors = [color, '#ffffff', '#fde047', '#f43f5e'];
         for (let i = 0; i < 8; i++) {
@@ -389,7 +439,10 @@
     }
 
     function collectFishBone(x, y, type) {
-        playRetroPopSound();
+        snackComboCount = (snackComboTimer > 0) ? Math.min(6, snackComboCount + 1) : 1;
+        snackComboTimer = 0.70;
+        playRetroComboCollectSound(snackComboCount);
+
         const colors = type === 'fish'
             ? ['#f97316', '#fbbf24', '#ea580c', '#fdba74']
             : ['#f59e0b', '#d97706', '#fbbf24', '#78350f'];
@@ -712,6 +765,27 @@
     }
 
     function drawSpeechBubble(ctx, text, x, y, isPop = false) {
+        if (isPop) {
+            ctx.font = 'bold 7px monospace, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const drawX = Math.max(8, Math.min(currentLogicalWidth - 8, Math.round(x)));
+            const drawY = Math.max(4, Math.min(CANVAS_HEIGHT - 4, Math.round(y)));
+
+            // 1px dark shadow for high contrast against any background
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            ctx.fillText(text, drawX + 1, drawY + 1);
+
+            // Bright golden retro text
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillText(text, drawX, drawY);
+
+            // Restore baseline and alignment
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            return;
+        }
+
         ctx.font = 'bold 8px monospace, sans-serif';
         const textWidth = Math.round(ctx.measureText(text).width);
         const padX = 4;
@@ -720,19 +794,19 @@
         const bubbleH = 11;
 
         // Clamp safely so it NEVER clips off top, bottom, or sides
-        const bubbleX = Math.max(3, Math.min(currentLogicalWidth - bubbleW - 3, Math.round(x - bubbleW / 2)));
-        const bubbleY = Math.max(2, Math.min(CANVAS_HEIGHT - bubbleH - 3, Math.round(y)));
+        const bubbleX = Math.max(2, Math.min(currentLogicalWidth - bubbleW - 2, Math.round(x - bubbleW / 2)));
+        const bubbleY = Math.max(2, Math.min(CANVAS_HEIGHT - bubbleH - 2, Math.round(y)));
 
         // Subtle drop shadow for high contrast against any sky
         ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
         ctx.fillRect(bubbleX + 1, bubbleY + 1, bubbleW, bubbleH);
 
-        // Bubble background (bright retro yellow for pop, white for dialogue)
-        ctx.fillStyle = isPop ? '#fef08a' : '#ffffff';
+        // Bubble background
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(bubbleX, bubbleY, bubbleW, bubbleH);
 
         // Border
-        ctx.strokeStyle = isPop ? '#f43f5e' : '#e11d48';
+        ctx.strokeStyle = '#e11d48';
         ctx.lineWidth = 1;
         ctx.strokeRect(bubbleX + 0.5, bubbleY + 0.5, bubbleW - 1, bubbleH - 1);
 
@@ -1520,49 +1594,64 @@
         activeBalloons = [];
         activeFishBones = [];
 
-        // Seed runway with classic Dino consecutive rhythm:
-        // 1. First short single cactus (easy jump)
-        activeObstacles.push({
-            x: currentLogicalWidth + 40,
-            type: 'short_single',
-            width: 6,
-            height: 7
-        });
-        // 2. Consecutive short cactus with tight Dino gap (88px later: "hop... land... hop!")
-        activeObstacles.push({
-            x: currentLogicalWidth + 128,
-            type: 'short_single',
-            width: 6,
-            height: 7
-        });
-        // 3. Ground Fish Bone Treat in open clear space (walk through on ground to collect!)
-        activeFishBones.push({
-            id: 'fb_init1',
-            x: currentLogicalWidth + 195,
-            type: 'bone'
-        });
-        // 4. High Balloon floating up in the air
+        // 1. Immediate visible runway right in front of the cat:
+        // A. Line of 3 golden fish snacks on the ground (X = 140, 156, 172)
+        activeFishBones.push({ id: 'fb_0a', x: 140, type: 'fish' });
+        activeFishBones.push({ id: 'fb_0b', x: 156, type: 'fish' });
+        activeFishBones.push({ id: 'fb_0c', x: 172, type: 'fish' });
+
+        // B. First high air balloon floating above (X = 210)
         activeBalloons.push({
             id: 'b_init1',
-            x: currentLogicalWidth + 235,
+            x: 210,
             baseY: 7,
             color: '#38bdf8',
             highlight: '#bae6fd',
             seed: 1.2
         });
-        // 5. Tall single cactus after a breath gap
+
+        // C. First short single cactus (X = 265)
         activeObstacles.push({
-            x: currentLogicalWidth + 310,
-            type: 'tall_single',
-            width: 7,
-            height: 10
+            x: 265,
+            type: 'short_single',
+            width: 6,
+            height: 7
         });
-        // 6. Ground Golden Fish Snack in clear open ground after cactus
-        activeFishBones.push({
-            id: 'fb_init2',
-            x: currentLogicalWidth + 380,
-            type: 'fish'
+
+        // D. Line of 3 fish bones lined up on the ground after the jump (X = 335, 351, 367)
+        activeFishBones.push({ id: 'fb_1a', x: 335, type: 'bone' });
+        activeFishBones.push({ id: 'fb_1b', x: 351, type: 'bone' });
+        activeFishBones.push({ id: 'fb_1c', x: 367, type: 'bone' });
+
+        // E. Pair of high balloons in the air (X = 415, 435)
+        activeBalloons.push({
+            id: 'b_init2a',
+            x: 415,
+            baseY: 6,
+            color: '#f43f5e',
+            highlight: '#fda4af',
+            seed: 2.1
         });
+        activeBalloons.push({
+            id: 'b_init2b',
+            x: 435,
+            baseY: 8,
+            color: '#fbbf24',
+            highlight: '#fde68a',
+            seed: 3.4
+        });
+
+        // F. Second short cactus (X = 495)
+        activeObstacles.push({
+            x: 495,
+            type: 'short_single',
+            width: 6,
+            height: 7
+        });
+
+        // G. Line of 2 golden fish snacks on ground after cactus (X = 565, 581)
+        activeFishBones.push({ id: 'fb_2a', x: 565, type: 'fish' });
+        activeFishBones.push({ id: 'fb_2b', x: 581, type: 'fish' });
     }
 
     // ------------------------------------------------------------------------
@@ -1609,6 +1698,8 @@
         isHoldingJump = false;
         confettiParticles = [];
         popNotifications = [];
+        snackComboCount = 0;
+        snackComboTimer = 0;
 
         spawnInitialTrack();
         playRetroCountdownBeep(false); // First countdown beep for '3'
@@ -1640,6 +1731,8 @@
         isHoldingJump = false;
         confettiParticles = [];
         popNotifications = [];
+        snackComboCount = 0;
+        snackComboTimer = 0;
 
         spawnInitialTrack();
         playRetroCountdownBeep(true); // Bright chirp on restart!
@@ -1664,6 +1757,8 @@
         activeObstacles = [];
         activeBalloons = [];
         activeFishBones = [];
+        snackComboCount = 0;
+        snackComboTimer = 0;
         stop();
 
         if (canvas) {
@@ -1697,6 +1792,12 @@
         }
         if (invulnerableTimer > 0) {
             invulnerableTimer = Math.max(0, invulnerableTimer - dt);
+        }
+        if (snackComboTimer > 0) {
+            snackComboTimer = Math.max(0, snackComboTimer - dt);
+            if (snackComboTimer === 0) {
+                snackComboCount = 0;
+            }
         }
 
         if (isDinoMode) {
@@ -1844,7 +1945,7 @@
                 });
             }
 
-            // 3. Procedural High Floating Balloons Movement & Spawning (Top Air)
+            // 3. Procedural High Floating Balloons Movement & Spawning (Top Air - Lines & Pairs)
             for (let i = activeBalloons.length - 1; i >= 0; i--) {
                 activeBalloons[i].x -= currentSpeed * dt;
                 if (activeBalloons[i].x < -20) {
@@ -1856,15 +1957,15 @@
             if (activeBalloons.length > 0) {
                 lastBalloonX = activeBalloons[activeBalloons.length - 1].x;
             }
-            if (lastBalloonX < currentLogicalWidth + 40 && activeBalloons.length < 2) {
-                const balloonGap = 180 + Math.random() * 120;
+            if (lastBalloonX < currentLogicalWidth + 40 && activeBalloons.length < 4) {
+                const balloonGap = 130 + Math.random() * 90;
                 let bSpawnX = Math.max(currentLogicalWidth + 25, lastBalloonX + balloonGap);
 
                 // STRICT CACTUS CLEARANCE CHECK (Never overlap/cover cactus)
                 for (let j = 0; j < activeObstacles.length; j++) {
                     const obs = activeObstacles[j];
-                    if (Math.abs(bSpawnX - obs.x) < 40) {
-                        bSpawnX = obs.x + obs.width + 40;
+                    if (Math.abs(bSpawnX - obs.x) < 35) {
+                        bSpawnX = obs.x + obs.width + 35;
                     }
                 }
 
@@ -1874,18 +1975,21 @@
                     { color: '#ec4899', highlight: '#fbcfe8' },
                     { color: '#fbbf24', highlight: '#fde68a' }
                 ];
-                const c = rainbow[Math.floor(Math.random() * rainbow.length)];
-                activeBalloons.push({
-                    id: 'b_' + Math.random(),
-                    x: bSpawnX,
-                    baseY: 6 + Math.random() * 4, // High in the air
-                    color: c.color,
-                    highlight: c.highlight,
-                    seed: Math.random() * 10
-                });
+                const count = Math.random() < 0.50 ? 2 : 1; // Spawns single or pair of 2 balloons
+                for (let k = 0; k < count; k++) {
+                    const c = rainbow[(Math.floor(Math.random() * rainbow.length) + k) % rainbow.length];
+                    activeBalloons.push({
+                        id: 'b_' + Math.random(),
+                        x: bSpawnX + k * 18,
+                        baseY: 6 + Math.random() * 3, // High in the air
+                        color: c.color,
+                        highlight: c.highlight,
+                        seed: Math.random() * 10
+                    });
+                }
             }
 
-            // 3b. Procedural Ground Fish Bones Movement & Spawning (Bottom Ground)
+            // 3b. Procedural Ground Fish Bones Movement & Spawning (Bottom Ground - Lined Up in Rows of 2-3!)
             for (let i = activeFishBones.length - 1; i >= 0; i--) {
                 activeFishBones[i].x -= currentSpeed * dt;
                 if (activeFishBones[i].x < -20) {
@@ -1897,19 +2001,19 @@
             if (activeFishBones.length > 0) {
                 lastFishBoneX = activeFishBones[activeFishBones.length - 1].x;
             }
-            if (lastFishBoneX < currentLogicalWidth + 40 && activeFishBones.length < 2) {
-                const treatGap = 160 + Math.random() * 110;
+            if (lastFishBoneX < currentLogicalWidth + 40 && activeFishBones.length < 6) {
+                const treatGap = 110 + Math.random() * 80;
                 let tSpawnX = Math.max(currentLogicalWidth + 30, lastFishBoneX + treatGap);
 
                 // STRICT CACTUS CLEARANCE CHECK (Never place on/near cactus!)
                 let isClear = false;
                 let attempts = 0;
-                while (!isClear && attempts < 6) {
+                while (!isClear && attempts < 8) {
                     isClear = true;
                     for (let j = 0; j < activeObstacles.length; j++) {
                         const obs = activeObstacles[j];
-                        if (Math.abs(tSpawnX - obs.x) < 40) {
-                            tSpawnX = obs.x + obs.width + 40;
+                        if (Math.abs(tSpawnX - obs.x) < 35 || Math.abs((tSpawnX + 32) - obs.x) < 35) {
+                            tSpawnX = obs.x + obs.width + 35;
                             isClear = false;
                             break;
                         }
@@ -1917,11 +2021,16 @@
                     attempts++;
                 }
 
-                activeFishBones.push({
-                    id: 'fb_' + Math.random(),
-                    x: tSpawnX,
-                    type: (Math.random() < 0.50) ? 'bone' : 'fish'
-                });
+                // Spawn a lined-up row of 2 to 3 fish treats on the ground!
+                const rowCount = Math.random() < 0.65 ? 3 : 2;
+                const rowType = (Math.random() < 0.50) ? 'bone' : 'fish';
+                for (let k = 0; k < rowCount; k++) {
+                    activeFishBones.push({
+                        id: 'fb_' + Math.random(),
+                        x: tSpawnX + k * 16, // Lined up 16px apart in a row
+                        type: rowType
+                    });
+                }
             }
 
             // 4. Cat Obstacle Collision Detection (Dino Run Mode)
@@ -1994,6 +2103,15 @@
                                 isNewHighScoreSession = true;
                                 saveHighScore(catRunnerHighScore);
                             }
+
+                            popNotifications.push({
+                                text: `x${snackComboCount}`,
+                                x: Math.round(b.x + 3),
+                                y: Math.max(4, Math.round(bobY - 8)),
+                                life: 0.6,
+                                maxLife: 0.6
+                            });
+
                             activeBalloons.splice(i, 1);
                         }
                     }
@@ -2017,12 +2135,13 @@
                             isNewHighScoreSession = true;
                             saveHighScore(catRunnerHighScore);
                         }
+
                         popNotifications.push({
-                            text: '+100',
+                            text: `x${snackComboCount}`,
                             x: Math.round(fb.x + 4),
-                            y: GROUND_Y - 14,
-                            life: 0.8,
-                            maxLife: 0.8
+                            y: GROUND_Y - 12,
+                            life: 0.6,
+                            maxLife: 0.6
                         });
                         activeFishBones.splice(i, 1);
                     }
