@@ -71,9 +71,9 @@ function safeDateFromPopUpDate(str) {
 
 
 yearContainer.addEventListener('click', (e) => {
-  // Don't open popup if either sliding drawer mode is open
+  // Don't open popup if the sliding drawer is open (both modes use 'show' for visibility)
   const drawer = document.getElementById('slidingInputView');
-  if (drawer && (drawer.classList.contains('dynamic-bar-active') || drawer.classList.contains('show'))) return;
+  if (drawer && drawer.classList.contains('show')) return;
 
   const dateEl = e.target.closest('.date');
 
