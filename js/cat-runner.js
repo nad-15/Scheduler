@@ -352,9 +352,6 @@
     let activeObstacles = [];
     let activeBalloons = [];   // High in the air (jump to pop!)
     let activeFishBones = [];  // On the ground (walk/run through to collect!)
-    let consecutiveTightCount = 0; // Tracks consecutive tight gaps to prevent impossible exhaustion chains
-    let obstaclesSinceRunway = 0;  // Counts obstacles to trigger periodic open sprint runways
-    let targetRunwayInterval = 9;  // Dynamic interval (8-12 obstacles) before next open runway
 
     // Confetti particles when a balloon pops
     let confettiParticles = [];
@@ -362,26 +359,24 @@
     // Floating notifications (strictly for "✦ OUCH! ✦" when hitting an obstacle)
     let popNotifications = [];
 
-    // Player Variable Jump Physics (Authentic Chrome Dino Continuous Euler Integration)
+    // Player Variable Jump Physics (Authentic Chrome Dino Parabolic Arc)
+    const SHORT_JUMP_DURATION = 0.50;  // Short Jump: 0.50s duration
+    const LONG_JUMP_DURATION = 0.84;   // Long Jump: 0.84s duration
+    const SHORT_JUMP_APEX = 10.5;      // Short Jump (tap): 10.5px apex (forgiving on all single cacti!)
+    const LONG_JUMP_APEX = 14.8;       // Long Jump (hold): 14.8px apex (sails over wide clumps & high balloons)
     let isJumping = false;
     let isHoldingJump = false;
     let isLongJump = false;            // True when hold threshold is met
-    let maxJumpOffsetY = 0;            // Peak apex height recorded during current jump
     let jumpTime = 0;                  // Elapsed time of current jump in seconds
-    let catOffsetY = 0;                // 0 on ground, up to ~13.5px at apex
+    let currentJumpDuration = SHORT_JUMP_DURATION;
+    let currentJumpApexHeight = SHORT_JUMP_APEX;
+    let catOffsetY = 0;                // 0 on ground, up to 14.8px at apex
     let jumpVy = 0;                    // Instantaneous vertical velocity in px/s
-    let jumpBufferTimer = 0;           // Input buffering timer for seamless chained hopping
     let justPoppedTimer = 0;           // Claw slash spark effect when popping
+    const START_SPEED = 48;            // 48 px/s starting speed
+    const HOLD_THRESHOLD = 0.18;       // Holding past 180ms activates Long Jump!
     let jumpPressStartTime = 0;        // Timestamp when pointer/touch was pressed
-
-    // Euler Jump Physics Constants (Tuned to 40px Canvas & 34px Cat Sprite)
-    const START_SPEED = 80;            // 80 px/s brisk starting speed (full athletic running stride)
-    const JUMP_INITIAL_VY = 106;       // Initial upward launch velocity in px/s (gives clean solid lift!)
-    const JUMP_BASE_GRAVITY = 340;     // Buoyant gravity while holding jump (px/s^2)
-    const JUMP_FALL_GRAVITY = 400;     // Crisp snappy gravity while descending (px/s^2)
-    const JUMP_RELEASE_GRAVITY = 460;  // Fair, responsive release gravity for clean short hops (px/s^2)
-    const JUMP_FAST_DROP_VY = -140;    // Downward dive velocity for Dino speed drop (px/s)
-    const JUMP_BUFFER_DURATION = 0.15; // 150ms input buffer window
+    let isInputHeldDown = false;       // Tracks if jump key or pointer is physically held
 
     // Dynamic Speed & Game States
     let currentSpeed = START_SPEED;    // Current running speed
@@ -1477,7 +1472,6 @@
         // Interaction listeners on canvas
         canvas.addEventListener('mousedown', onPointerDown);
         canvas.addEventListener('touchstart', onPointerDown, { passive: false });
-        canvas.addEventListener('touchmove', onPointerMove, { passive: true });
 
         // Safe global release listeners with passive: true (only active when game is visible)
         window.addEventListener('mouseup', onPointerUp, { passive: true });
@@ -1508,7 +1502,6 @@
     }
 
     let isTouchActive = false;
-    let pointerStartY = 0;
 
     function onPointerDown(e) {
         if (e.type === 'touchstart') {
@@ -1526,7 +1519,6 @@
         initAudio();
 
         const pos = getCanvasCoordinates(e);
-        pointerStartY = pos.y;
 
         if (isGameOver) {
             // Game Over action buttons (Side-by-side centered below text at y=22 or y=25)
@@ -1555,16 +1547,8 @@
 
         if (isDinoMode) {
             idlePlayTimer = 0;
+            isInputHeldDown = true;
             startJump();
-        }
-    }
-
-    function onPointerMove(e) {
-        if (!isVisible || !isDinoMode || !isJumping) return;
-        const pos = getCanvasCoordinates(e);
-        // Mobile swipe-down gesture: trigger fast drop
-        if (pos.y - pointerStartY > 10) {
-            fastDrop();
         }
     }
 
@@ -1573,53 +1557,34 @@
         if (e && (e.type === 'touchend' || e.type === 'touchcancel')) {
             setTimeout(() => { isTouchActive = false; }, 350);
         }
+        isInputHeldDown = false;
         endJump();
     }
 
     function startJump() {
-        if (isDinoMode && !isGameOver) {
-            if (!isJumping) {
-                isJumping = true;
-                isHoldingJump = true;
-                isLongJump = false;
-                maxJumpOffsetY = 0;
-                catOffsetY = 0;
-                jumpVy = JUMP_INITIAL_VY; // Initial upward impulse (106 px/s)
-                jumpTime = 0;
-                jumpPressStartTime = performance.now();
-                playRetroJumpSound();
-                console.log('[Cat Runner] 🐾 Jump started! (Tap = Short Jump [apex ~10.5px, 0.43s] | Hold > 160ms = Long Jump [apex ~16.5px, 0.60s])');
-            } else {
-                // Jump Buffering: store input to leap immediately upon touching the ground
-                jumpBufferTimer = JUMP_BUFFER_DURATION;
-            }
-        }
+        if (!isDinoMode || isGameOver || isJumping) return;
+        isJumping = true;
+        isHoldingJump = isInputHeldDown;
+        isLongJump = false;
+        jumpTime = 0;
+        jumpPressStartTime = performance.now();
+        currentJumpDuration = SHORT_JUMP_DURATION; // Short Jump (tap): 0.50s duration
+        currentJumpApexHeight = SHORT_JUMP_APEX;   // Short Jump (tap): 10.5px apex (generous clearance on single cacti!)
+        jumpVy = (4 * SHORT_JUMP_APEX) / SHORT_JUMP_DURATION;
+        playRetroJumpSound();
+        console.log(`[Cat Runner] 🐾 Jump started! (Tap = Short Jump [apex ${SHORT_JUMP_APEX}px, 0.50s] | Hold > 180ms = Long Jump [apex ${LONG_JUMP_APEX}px, 0.84s])`);
     }
 
     function endJump() {
+        isInputHeldDown = false;
         if (isHoldingJump) {
             isHoldingJump = false;
             const holdMs = Math.round(performance.now() - jumpPressStartTime);
-            // Authentic Chrome Dino Early-Release Cutoff with Guaranteed Minimum Jump Height:
-            // Ensures even the quickest tap reaches MIN_SHORT_APEX (10.5px) to effortlessly clear a single cactus.
-            // Holding longer smoothly scales height up to 16.5px for doubles, triples, and floating balloons.
-            const MIN_SHORT_APEX = 10.5;
-            const minVyNeeded = (catOffsetY < MIN_SHORT_APEX) ? Math.sqrt(2 * JUMP_RELEASE_GRAVITY * (MIN_SHORT_APEX - catOffsetY)) : 0;
-            const maxReleaseVy = 72; // Snappy ceiling when released
-            jumpVy = Math.max(minVyNeeded, Math.min(jumpVy, maxReleaseVy));
-
             if (!isLongJump) {
-                console.log(`%c[Cat Runner] 🐇 SHORT JUMP EXECUTED! (Tap: ${holdMs}ms < 160ms | Apex: ~10.5px | Air Time: ~0.43s | Clears 1 Cactus Cleanly)`, 'color: #84cc16; font-weight: bold;');
+                console.log(`%c[Cat Runner] 🐇 SHORT JUMP EXECUTED! (Tap: ${holdMs}ms < 180ms | Apex: ${SHORT_JUMP_APEX}px | Air Distance: ~24px | Clears Single Cacti)`, 'color: #84cc16; font-weight: bold;');
             } else {
-                console.log(`%c[Cat Runner] 🚀 LONG JUMP RELEASED! (Held: ${holdMs}ms >= 160ms | Apex: ~16.5px | Air Time: ~0.60s | Sails Over 3 Cacti)`, 'color: #38bdf8; font-weight: bold;');
+                console.log(`%c[Cat Runner] 🚀 LONG JUMP RELEASED! (Held: ${holdMs}ms >= 180ms | Apex: ${currentJumpApexHeight.toFixed(1)}px | Air Distance: ~40px | Sails Over 3 Cacti)`, 'color: #38bdf8; font-weight: bold;');
             }
-        }
-    }
-
-    function fastDrop() {
-        if (isDinoMode && !isGameOver && isJumping && catOffsetY > 1.5) {
-            // Chrome Dino speed drop: slam downward fast
-            jumpVy = JUMP_FAST_DROP_VY;
         }
     }
 
@@ -1627,9 +1592,10 @@
         if (!isJumping) {
             isJumping = true;
             isHoldingJump = false;
-            catOffsetY = 0;
-            jumpVy = 72;
             jumpTime = 0;
+            currentJumpDuration = 0.50;
+            currentJumpApexHeight = 9.5;
+            jumpVy = (4 * 9.5) / 0.50;
             playRetroJumpSound();
         }
     }
@@ -1639,49 +1605,71 @@
         activeBalloons = [];
         activeFishBones = [];
 
-        // 1. Quick Introductory Snack Fiesta (X = 95, 112, 128) -> instant x3 combo!
-        activeFishBones.push({ id: 'fb_0a', x: 95, type: 'fish' });
-        activeFishBones.push({ id: 'fb_0b', x: 112, type: 'fish' });
-        activeFishBones.push({ id: 'fb_0c', x: 128, type: 'fish' });
+        // 1. OPENING SNACK INTRO (Quick, responsive start!):
+        // A. Ground Fish Snack Run (X = 90, 108, 126) -> quick x1 to x3 combo
+        activeFishBones.push({ id: 'fb_0a', x: 90, type: 'fish' });
+        activeFishBones.push({ id: 'fb_0b', x: 108, type: 'fish' });
+        activeFishBones.push({ id: 'fb_0c', x: 126, type: 'fish' });
 
-        // 2. Introductory Air Balloon (X = 165)
+        // B. First Introductory Single Cactus (X = 180, ~2.2s after GO!):
+        activeObstacles.push({
+            x: 180,
+            type: 'short_single',
+            width: 6,
+            height: 7
+        });
+
+        // C. High Air Balloons Pair (X = 228, 250) -> x4 to x5 combo!
         activeBalloons.push({
-            id: 'b_init1',
-            x: 165,
+            id: 'b_init1a',
+            x: 228,
             baseY: 7,
             color: '#38bdf8',
             highlight: '#bae6fd',
             seed: 1.2
         });
-
-        // 3. First Single Cactus arrives immediately at X = 230 (~1.8s in at 80 px/s!)
-        activeObstacles.push({
-            x: 230,
-            type: 'short_single',
-            width: 6,
-            height: 7,
-            passed: false
+        activeBalloons.push({
+            id: 'b_init1b',
+            x: 250,
+            baseY: 6,
+            color: '#fbbf24',
+            highlight: '#fde68a',
+            seed: 2.3
         });
 
-        // 4. Second introductory cactus at X = 295 (tight hop rhythm: jump, land, jump!)
+        // D. First Consecutive Cactus Hurdle Sequence ("Jump then Jump then Jump!"):
+        // Cactus 1 at X = 295, Cactus 2 at X = 337, Cactus 3 at X = 379 (36px landing gaps!)
         activeObstacles.push({
             x: 295,
             type: 'short_single',
             width: 6,
-            height: 7,
-            passed: false
+            height: 7
         });
-
-        // 5. Third cactus at X = 365
         activeObstacles.push({
-            x: 365,
+            x: 337,
             type: 'short_single',
             width: 6,
-            height: 7,
-            passed: false
+            height: 7
+        });
+        activeObstacles.push({
+            x: 379,
+            type: 'short_single',
+            width: 6,
+            height: 7
         });
 
-        // Beyond X = 365, the continuous organic spawner seamlessly queues the next obstacles!
+        // E. Ground Golden Fish Treats Celebration (X = 432, 450, 468) -> combo rewards!
+        activeFishBones.push({ id: 'fb_1a', x: 432, type: 'fish' });
+        activeFishBones.push({ id: 'fb_1b', x: 450, type: 'fish' });
+        activeFishBones.push({ id: 'fb_1c', x: 468, type: 'fish' });
+
+        // F. Tall Single Cactus (X = 525)
+        activeObstacles.push({
+            x: 525,
+            type: 'tall_single',
+            width: 7,
+            height: 10
+        });
     }
 
     // ------------------------------------------------------------------------
@@ -1722,18 +1710,16 @@
         catOffsetY = 0;
         jumpVy = 0;
         jumpTime = 0;
-        jumpBufferTimer = 0;
+        currentJumpDuration = SHORT_JUMP_DURATION;
+        currentJumpApexHeight = SHORT_JUMP_APEX;
+        isLongJump = false;
         isJumping = false;
         isHoldingJump = false;
-        isLongJump = false;
-        maxJumpOffsetY = 0;
+        isInputHeldDown = false;
         confettiParticles = [];
         popNotifications = [];
         snackComboCount = 0;
         snackComboTimer = 0;
-        consecutiveTightCount = 0;
-        obstaclesSinceRunway = 0;
-        targetRunwayInterval = 8;
 
         spawnInitialTrack();
         playRetroCountdownBeep(false); // First countdown beep for '3'
@@ -1759,18 +1745,16 @@
         catOffsetY = 0;
         jumpVy = 0;
         jumpTime = 0;
-        jumpBufferTimer = 0;
+        currentJumpDuration = SHORT_JUMP_DURATION;
+        currentJumpApexHeight = SHORT_JUMP_APEX;
+        isLongJump = false;
         isJumping = false;
         isHoldingJump = false;
-        isLongJump = false;
-        maxJumpOffsetY = 0;
+        isInputHeldDown = false;
         confettiParticles = [];
         popNotifications = [];
         snackComboCount = 0;
         snackComboTimer = 0;
-        consecutiveTightCount = 0;
-        obstaclesSinceRunway = 0;
-        targetRunwayInterval = 8;
 
         spawnInitialTrack();
         playRetroCountdownBeep(true); // Bright chirp on restart!
@@ -1785,12 +1769,10 @@
         goBannerTimer = 0;
         isJumping = false;
         isHoldingJump = false;
-        isLongJump = false;
-        maxJumpOffsetY = 0;
+        isInputHeldDown = false;
         catOffsetY = 0;
         jumpVy = 0;
         jumpTime = 0;
-        jumpBufferTimer = 0;
         dinoScore = 0;
         currentSpeed = START_SPEED;
         idlePlayTimer = 0;
@@ -1800,9 +1782,6 @@
         activeFishBones = [];
         snackComboCount = 0;
         snackComboTimer = 0;
-        consecutiveTightCount = 0;
-        obstaclesSinceRunway = 0;
-        targetRunwayInterval = 8;
         stop();
 
         if (canvas) {
@@ -1846,23 +1825,22 @@
 
         if (isDinoMode) {
             idlePlayTimer += dt;
-            if (jumpBufferTimer > 0) {
-                jumpBufferTimer = Math.max(0, jumpBufferTimer - dt);
-            }
 
             // Track continuous distance traveled (20 units per second) for steady, predictable speed progression
             dinoDistanceTraveled += dt * 20;
 
-            // Continuous ramp based on distance traveled, scaling smoothly from 80 px/s to 240 px/s
-            const baseBonus = Math.min(160, dinoDistanceTraveled * 0.08);
+            // Hardcore High-Speed Progression (Ramping to 240 px/s Max Speed Cap) + Smooth Breather Waves:
+            // 1. Continuous ramp (0.082) based on distance traveled, scaling smoothly from 48 px/s to a blistering 240 px/s over ~115s
+            const baseBonus = Math.min(192, dinoDistanceTraveled * 0.082);
 
-            // Periodic Relaxation Wave: Gentle breathing dip (-12 to -26 px/s) every ~30s for ~9 seconds
+            // 2. Periodic Relaxation Wave: Gentle breathing dip (-15 to -32 px/s) every ~30s for ~9 seconds
             let waveOffset = 0;
             if (dinoDistanceTraveled >= 300) {
                 const waveProgress = ((dinoDistanceTraveled - 300) % 600) / 600;
+                // Peak cruise from 0.0 to 0.70 (~21s), smooth relaxation dip from 0.70 to 1.0 (~9s)
                 if (waveProgress > 0.70) {
                     const relaxFactor = Math.sin(((waveProgress - 0.70) / 0.30) * Math.PI);
-                    const dipAmount = Math.min(26, 10 + baseBonus * 0.10);
+                    const dipAmount = Math.min(32, 12 + baseBonus * 0.12);
                     waveOffset = -dipAmount * relaxFactor;
                 }
             }
@@ -1888,55 +1866,38 @@
             // Continuous background world loop sync
             catWorldX = (catWorldX + currentSpeed * dt) % WORLD_WIDTH;
 
-            // 1. Variable Jump Physics (Authentic Chrome Dino Continuous Euler Integration)
+            // 1. Variable Jump Physics (Authentic Chrome Dino Parabolic Arc)
+            // Short Jump (Tap): 10.5px apex, 0.50s duration, 24px air travel (clears single cacti!)
+            // Long Jump (Hold): 14.8px apex, 0.84s duration, 40.3px air travel (cleanly sails over wide clumps!)
             if (isJumping) {
                 jumpTime += dt;
-                maxJumpOffsetY = Math.max(maxJumpOffsetY, catOffsetY);
 
-                // Holding past 160ms threshold activates Long Jump!
-                if (isHoldingJump && jumpTime >= 0.16 && !isLongJump) {
+                // Holding finger past 180ms threshold triggers soaring Long Jump!
+                if (isHoldingJump && jumpTime >= HOLD_THRESHOLD && !isLongJump) {
                     isLongJump = true;
-                    console.log('%c[Cat Runner] 🚀 LONG JUMP ACTIVATED! (Hold > 160ms reached -> Soaring over 3 cacti!)', 'color: #0284c7; font-weight: bold;');
+                    console.log('%c[Cat Runner] 🚀 LONG JUMP ACTIVATED! (Hold > 180ms reached -> Soaring over 3 cacti!)', 'color: #0284c7; font-weight: bold;');
                 }
 
-                // Appropriate gravity based on ascent/descent and player hold state
-                let currentGravity;
-                if (jumpVy > 0) {
-                    if (isHoldingJump) {
-                        currentGravity = JUMP_BASE_GRAVITY; // 350 px/s^2 while holding for buoyant high float
-                    } else {
-                        currentGravity = JUMP_RELEASE_GRAVITY; // 800 px/s^2 snappy cutoff on release
-                    }
-                } else {
-                    currentGravity = JUMP_FALL_GRAVITY; // 430 px/s^2 crisp snappy landing descent
+                if (isLongJump) {
+                    currentJumpApexHeight = Math.min(LONG_JUMP_APEX, currentJumpApexHeight + dt * (LONG_JUMP_APEX - SHORT_JUMP_APEX) / 0.14);
+                    currentJumpDuration = Math.min(LONG_JUMP_DURATION, currentJumpDuration + dt * (LONG_JUMP_DURATION - SHORT_JUMP_DURATION) / 0.14);
                 }
 
-                // Euler velocity and position step
-                jumpVy -= currentGravity * dt;
-                catOffsetY += jumpVy * dt;
-
-                // Ground contact check
-                if (catOffsetY <= 0) {
+                const progress = jumpTime / currentJumpDuration;
+                if (progress >= 1.0) {
                     catOffsetY = 0;
                     jumpVy = 0;
                     isJumping = false;
                     isHoldingJump = false;
                     isLongJump = false;
                     jumpTime = 0;
-
-                    // Jump Buffer check: seamless chained hopping ("jump jump jump"!)
-                    if (jumpBufferTimer > 0) {
-                        jumpBufferTimer = 0;
-                        startJump();
-                    }
+                } else {
+                    catOffsetY = 4 * currentJumpApexHeight * progress * (1 - progress);
+                    jumpVy = (4 * currentJumpApexHeight * (1 - 2 * progress)) / currentJumpDuration;
                 }
-            } else if (jumpBufferTimer > 0) {
-                // If on ground and jump buffer active, start jump immediately
-                jumpBufferTimer = 0;
-                startJump();
             }
 
-            // 2. Procedural Obstacles Movement & Continuous Organic Spawning (Chrome Dino Flow)
+            // 2. Procedural Obstacles Movement & Spawning (Consecutive Hurdles & Tighter Tempo)
             for (let i = activeObstacles.length - 1; i >= 0; i--) {
                 activeObstacles[i].x -= currentSpeed * dt;
                 if (activeObstacles[i].x + activeObstacles[i].width < -25) {
@@ -1946,112 +1907,125 @@
 
             let lastObsX = 0;
             let lastObsType = 'short_single';
-            let lastObsWidth = 6;
             if (activeObstacles.length > 0) {
                 const last = activeObstacles[activeObstacles.length - 1];
                 lastObsX = last.x + last.width;
                 lastObsType = last.type;
-                lastObsWidth = last.width;
             }
-
-            // Keep obstacles continuously queued ahead of the screen (no empty deserts!)
-            if (lastObsX < currentLogicalWidth + 120) {
+            if (lastObsX < currentLogicalWidth + 60) {
                 const speedFactor = currentSpeed / START_SPEED;
-                const isPreviousLarge = (lastObsWidth >= 12); // Double or triple cactus
-                const isPreviousTriple = (lastObsType === 'short_triple' || lastObsType === 'tall_triple');
                 const roll = Math.random();
 
-                // Dynamic organic gap distribution with Mathematical Clearance Guarantee:
-                // Rule 1: Periodic Straight Runway without Cacti:
-                //         Every 8 to 12 obstacles, clear a generous unobstructed sprint runway (230-280px)!
-                // Rule 2: A tight gap (48-56px) is ONLY allowed if previous was a SINGLE cactus,
-                //         and we haven't exceeded 2 consecutive tight hops.
-                // Rule 3: If previous was a double or triple, gap is GUARANTEED >= 74px * speedFactor
-                //         so player lands cleanly with full reaction runway.
+                // Dynamic gap to next obstacle event (snappy pacing, no long boring dead-zones):
                 let baseGap;
-                let isTight = false;
-                let isOpenRunway = false;
-
-                if (obstaclesSinceRunway >= targetRunwayInterval) {
-                    // Straight open runway sprint! (~3 seconds of pure unobstructed running)
-                    isOpenRunway = true;
-                    baseGap = 230 + Math.random() * 50; // 230px - 280px open runway
-                    obstaclesSinceRunway = 0;
-                    targetRunwayInterval = Math.floor(8 + Math.random() * 5); // Next runway in 8-12 obstacles
-                    consecutiveTightCount = 0;
-                } else if (!isPreviousLarge && consecutiveTightCount < 2 && roll < 0.38) {
-                    baseGap = 48 + Math.random() * 8; // 48px - 56px (crisp, fair consecutive hop)
-                    isTight = true;
-                    consecutiveTightCount++;
-                    obstaclesSinceRunway++;
+                if (roll < 0.40) {
+                    // 1. RHYTHM GAP (Snappy pacing: ~1.15s - 1.5s)
+                    baseGap = 55 + Math.random() * 18;
+                } else if (roll < 0.80) {
+                    // 2. MEDIUM GAP (Balanced pacing: ~1.55s - 2.0s)
+                    baseGap = 75 + Math.random() * 20;
                 } else {
-                    consecutiveTightCount = 0;
-                    obstaclesSinceRunway++;
-                    if (isPreviousLarge) {
-                        // Generous landing runway after a long soaring leap
-                        baseGap = 74 + Math.random() * 22; // 74px - 96px
-                    } else if (roll < 0.78) {
-                        baseGap = 64 + Math.random() * 18; // 64px - 82px (standard rhythmic spacing)
-                    } else {
-                        baseGap = 96 + Math.random() * 24; // 96px - 120px (breather spacing)
-                    }
+                    // 3. BREATHER GAP (~2.2s - 2.8s: room for high balloon leaps or snack rows)
+                    baseGap = 105 + Math.random() * 28;
                 }
 
                 const calculatedGap = Math.round(baseGap * speedFactor);
-                // Position immediately after the previous obstacle (fixing the Math.max bug)
-                const nextX = Math.max(lastObsX + calculatedGap, currentLogicalWidth + 15);
+                const firstX = Math.max(currentLogicalWidth + 20, lastObsX + calculatedGap);
 
-                // During straight open runways, place a celebratory row of 3 golden fish snacks!
-                if (isOpenRunway) {
-                    const treatStart = lastObsX + Math.round(55 * speedFactor);
-                    for (let f = 0; f < 3; f++) {
-                        activeFishBones.push({
-                            id: 'fb_runway_' + Math.random(),
-                            x: treatStart + f * 16,
-                            type: (Math.random() < 0.5) ? 'fish' : 'bone'
-                        });
-                    }
+                function createSingleCactus(xPos, forceTall = false) {
+                    const isTall = forceTall || (dinoDistanceTraveled >= 80 && Math.random() < 0.45);
+                    return {
+                        x: xPos,
+                        type: isTall ? 'tall_single' : 'short_single',
+                        width: isTall ? 7 : 6,
+                        height: isTall ? 10 : 7
+                    };
                 }
 
-                // Dynamic obstacle type selection:
-                // If the gap is tight, the next obstacle MUST be a single cactus!
-                // If previous was a triple, do not spawn another triple right away.
-                const availableTypes = ['short_single'];
-                if (dinoDistanceTraveled >= 60) {
-                    availableTypes.push('tall_single');
+                function createClumpCactus(xPos) {
+                    const availableClumps = ['short_double'];
+                    if (dinoDistanceTraveled >= 350) availableClumps.push('tall_double');
+                    if (dinoDistanceTraveled >= 500) availableClumps.push('short_triple');
+                    if (dinoDistanceTraveled >= 750) availableClumps.push('tall_triple');
+                    const chosen = availableClumps[Math.floor(Math.random() * availableClumps.length)];
+                    let w = 13, h = 7;
+                    if (chosen === 'tall_double') { w = 14; h = 10; }
+                    else if (chosen === 'short_triple') { w = 19; h = 7; }
+                    else if (chosen === 'tall_triple') { w = 21; h = 10; }
+                    return {
+                        x: xPos,
+                        type: chosen,
+                        width: w,
+                        height: h
+                    };
                 }
 
-                if (!isTight) {
-                    if (dinoDistanceTraveled >= 150) {
-                        availableTypes.push('short_double');
-                    }
-                    if (dinoDistanceTraveled >= 300) {
-                        availableTypes.push('tall_double');
-                    }
-                    if (!isPreviousTriple && dinoDistanceTraveled >= 450) {
-                        availableTypes.push('short_triple');
-                    }
-                    if (!isPreviousTriple && dinoDistanceTraveled >= 650) {
-                        availableTypes.push('tall_triple');
-                    }
+                // Determine pattern type:
+                const patternRoll = Math.random();
+                let pattern = 'single';
+
+                if (dinoDistanceTraveled < 80) {
+                    // Early run: singles, doubles, and exciting triple hurdles!
+                    if (patternRoll < 0.35) pattern = 'consecutive_double';
+                    else if (patternRoll < 0.60) pattern = 'consecutive_triple';
+                    else pattern = 'single';
+                } else if (dinoDistanceTraveled < 250) {
+                    // Building tempo: doubles, triples, clumps, and singles
+                    if (patternRoll < 0.30) pattern = 'consecutive_double';
+                    else if (patternRoll < 0.60) pattern = 'consecutive_triple';
+                    else if (patternRoll < 0.85) pattern = 'clump';
+                    else pattern = 'single';
+                } else if (dinoDistanceTraveled < 550) {
+                    // High action: doubles, triples, and thrilling quad jumps!
+                    if (patternRoll < 0.25) pattern = 'consecutive_double';
+                    else if (patternRoll < 0.55) pattern = 'consecutive_triple';
+                    else if (patternRoll < 0.75) pattern = 'consecutive_quad';
+                    else if (patternRoll < 0.90) pattern = 'clump';
+                    else pattern = 'single';
+                } else {
+                    // Expert mastery: intense triple, quad, and mixed consecutive sequences
+                    if (patternRoll < 0.20) pattern = 'consecutive_double';
+                    else if (patternRoll < 0.45) pattern = 'consecutive_triple';
+                    else if (patternRoll < 0.70) pattern = 'consecutive_quad';
+                    else if (patternRoll < 0.85) pattern = 'consecutive_mixed';
+                    else pattern = 'clump';
                 }
 
-                const chosenType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-                let w = 6;
-                let h = 7;
-                if (chosenType === 'tall_single') { w = 7; h = 10; }
-                else if (chosenType === 'short_double') { w = 13; h = 7; }
-                else if (chosenType === 'tall_double') { w = 14; h = 10; }
-                else if (chosenType === 'short_triple') { w = 19; h = 7; }
-                else if (chosenType === 'tall_triple') { w = 21; h = 10; }
-
-                activeObstacles.push({
-                    x: nextX,
-                    type: chosenType,
-                    width: w,
-                    height: h,
-                    passed: false
-                });
+                if (pattern === 'consecutive_double') {
+                    // Double Consecutive Cacti: Jump over #1 -> land -> quick reaction jump over #2!
+                    const obs1 = createSingleCactus(firstX);
+                    const consecGap = Math.round((36 + Math.random() * 6) * speedFactor);
+                    const obs2 = createSingleCactus(firstX + obs1.width + consecGap);
+                    activeObstacles.push(obs1, obs2);
+                } else if (pattern === 'consecutive_triple') {
+                    // Triple Consecutive Cacti: Jump -> land -> jump -> land -> jump! (3x rhythm combo!)
+                    const obs1 = createSingleCactus(firstX, false);
+                    const consecGap1 = Math.round((36 + Math.random() * 5) * speedFactor);
+                    const obs2 = createSingleCactus(firstX + obs1.width + consecGap1, false);
+                    const consecGap2 = Math.round((36 + Math.random() * 5) * speedFactor);
+                    const obs3 = createSingleCactus(obs2.x + obs2.width + consecGap2);
+                    activeObstacles.push(obs1, obs2, obs3);
+                } else if (pattern === 'consecutive_quad') {
+                    // Quadruple Consecutive Cacti: Jump -> land -> jump -> land -> jump -> land -> jump! (4x rhythm combo!)
+                    const obs1 = createSingleCactus(firstX, false);
+                    const consecGap1 = Math.round((36 + Math.random() * 5) * speedFactor);
+                    const obs2 = createSingleCactus(firstX + obs1.width + consecGap1, false);
+                    const consecGap2 = Math.round((36 + Math.random() * 5) * speedFactor);
+                    const obs3 = createSingleCactus(obs2.x + obs2.width + consecGap2, false);
+                    const consecGap3 = Math.round((36 + Math.random() * 5) * speedFactor);
+                    const obs4 = createSingleCactus(obs3.x + obs3.width + consecGap3);
+                    activeObstacles.push(obs1, obs2, obs3, obs4);
+                } else if (pattern === 'consecutive_mixed') {
+                    // Mixed Consecutive: Single cactus -> land -> double clump cactus (short tap then long jump!)
+                    const obs1 = createSingleCactus(firstX, false);
+                    const consecGap = Math.round((38 + Math.random() * 6) * speedFactor);
+                    const obs2 = createClumpCactus(firstX + obs1.width + consecGap);
+                    activeObstacles.push(obs1, obs2);
+                } else if (pattern === 'clump') {
+                    activeObstacles.push(createClumpCactus(firstX));
+                } else {
+                    activeObstacles.push(createSingleCactus(firstX));
+                }
             }
 
             // 3. Procedural High Floating Balloons Movement & Spawning (Top Air - Lines & Pairs)
@@ -2067,16 +2041,8 @@
                 lastBalloonX = activeBalloons[activeBalloons.length - 1].x;
             }
             if (lastBalloonX < currentLogicalWidth + 40 && activeBalloons.length < 4) {
-                const balloonGap = 110 + Math.random() * 80;
+                const balloonGap = 130 + Math.random() * 90;
                 let bSpawnX = Math.max(currentLogicalWidth + 25, lastBalloonX + balloonGap);
-
-                // STRICT CACTUS CLEARANCE CHECK (Never overlap/cover cactus)
-                for (let j = 0; j < activeObstacles.length; j++) {
-                    const obs = activeObstacles[j];
-                    if (Math.abs(bSpawnX - obs.x) < 30) {
-                        bSpawnX = obs.x + obs.width + 30;
-                    }
-                }
 
                 const rainbow = [
                     { color: '#f43f5e', highlight: '#fda4af' },
@@ -2085,6 +2051,23 @@
                     { color: '#fbbf24', highlight: '#fde68a' }
                 ];
                 const count = Math.random() < 0.50 ? 2 : 1; // Spawns single or pair of 2 balloons
+
+                // STRICT CACTUS CLEARANCE CHECK (Never overlap/cover cactus)
+                let bClear = false;
+                let bAttempts = 0;
+                while (!bClear && bAttempts < 10) {
+                    bClear = true;
+                    for (let j = 0; j < activeObstacles.length; j++) {
+                        const obs = activeObstacles[j];
+                        if (Math.abs(bSpawnX - obs.x) < 35 || Math.abs((bSpawnX + (count - 1) * 18) - obs.x) < 35) {
+                            bSpawnX = obs.x + obs.width + 35;
+                            bClear = false;
+                            break;
+                        }
+                    }
+                    bAttempts++;
+                }
+
                 for (let k = 0; k < count; k++) {
                     const c = rainbow[(Math.floor(Math.random() * rainbow.length) + k) % rainbow.length];
                     activeBalloons.push({
@@ -2111,18 +2094,18 @@
                 lastFishBoneX = activeFishBones[activeFishBones.length - 1].x;
             }
             if (lastFishBoneX < currentLogicalWidth + 40 && activeFishBones.length < 6) {
-                const treatGap = 90 + Math.random() * 70;
+                const treatGap = 110 + Math.random() * 80;
                 let tSpawnX = Math.max(currentLogicalWidth + 30, lastFishBoneX + treatGap);
 
-                // STRICT CACTUS CLEARANCE CHECK (Only spawn in open clear windows between cacti)
+                // STRICT CACTUS CLEARANCE CHECK (Never place on/near cactus!)
                 let isClear = false;
                 let attempts = 0;
-                while (!isClear && attempts < 6) {
+                while (!isClear && attempts < 8) {
                     isClear = true;
                     for (let j = 0; j < activeObstacles.length; j++) {
                         const obs = activeObstacles[j];
-                        if (obs.x + obs.width > tSpawnX - 18 && obs.x < tSpawnX + 48) {
-                            tSpawnX = obs.x + obs.width + 24;
+                        if (Math.abs(tSpawnX - obs.x) < 35 || Math.abs((tSpawnX + 32) - obs.x) < 35) {
+                            tSpawnX = obs.x + obs.width + 35;
                             isClear = false;
                             break;
                         }
@@ -2151,20 +2134,21 @@
 
                 for (let i = 0; i < activeObstacles.length; i++) {
                     const obs = activeObstacles[i];
-                    // 2.5px horizontal forgiveness inset on cactus edges
-                    const obsLeft = obs.x + 2.5;
-                    const obsRight = obs.x + obs.width - 2.5;
+                    // 2px horizontal forgiveness inset on cactus edges
+                    const obsLeft = obs.x + 2;
+                    const obsRight = obs.x + obs.width - 2;
                     const obsTop = GROUND_Y - obs.height;
 
                     if (obsRight >= catLeft && obsLeft <= catRight) {
-                        // Vertical clearance check with 2.5px forgiving buffer (requires catOffsetY >= obs.height - 2.5)
-                        if (catFeetY > obsTop + 2.5) {
+                        // Vertical clearance check with 2.0px forgiving buffer
+                        if (catFeetY > obsTop + 2.0) {
                             // COLLISION / GAME OVER: Screen freezes, Game Over UI displays!
                             isGameOver = true;
                             isDinoMode = false;
                             currentSpeed = 0;
                             isJumping = false;
                             isHoldingJump = false;
+                            isInputHeldDown = false;
                             catOffsetY = 0;
                             jumpVy = 0;
                             jumpTime = 0;
@@ -2276,9 +2260,7 @@
                 catOffsetY = 0;
                 jumpVy = 0;
                 jumpTime = 0;
-                jumpBufferTimer = 0;
-                isJumping = false;
-                isHoldingJump = false;
+                isInputHeldDown = false;
                 goBannerTimer = 0.7; // Flash 'GO!'
                 playRetroCountdownBeep(true); // Bright chime!
             }
@@ -2286,13 +2268,15 @@
             // Gentle hop during countdown
             if (isJumping) {
                 jumpTime += dt;
-                jumpVy -= JUMP_FALL_GRAVITY * dt;
-                catOffsetY += jumpVy * dt;
-                if (catOffsetY <= 0) {
+                const progress = jumpTime / currentJumpDuration;
+                if (progress >= 1.0) {
                     catOffsetY = 0;
                     jumpVy = 0;
                     isJumping = false;
                     jumpTime = 0;
+                } else {
+                    catOffsetY = 4 * currentJumpApexHeight * progress * (1 - progress);
+                    jumpVy = (4 * currentJumpApexHeight * (1 - 2 * progress)) / currentJumpDuration;
                 }
             }
         } else {
@@ -2407,10 +2391,7 @@
             // B. COUNTDOWN STATE
             const catDrawY = CAT_BASE_Y - Math.round(catOffsetY);
             if (isJumping) {
-                let jumpFrame = 0;
-                if (Math.abs(jumpVy) < 20) jumpFrame = 1;
-                else if (jumpVy < 0) jumpFrame = 2;
-                drawCatSprite(ctx, 'jump', jumpFrame, CAT_SCREEN_X, catDrawY, true, CAT_DEST_W, CAT_DEST_H);
+                drawCatSprite(ctx, 'jump', jumpVy > 0 ? 0 : 2, CAT_SCREEN_X, catDrawY, true, CAT_DEST_W, CAT_DEST_H);
             } else {
                 const frameIndex = Math.floor(movieTime * 6) % 8;
                 drawCatSprite(ctx, 'idle', frameIndex, CAT_SCREEN_X, catDrawY, true, CAT_DEST_W, CAT_DEST_H);
@@ -2427,15 +2408,12 @@
                     drawCatSprite(ctx, 'attack', attackFrame, CAT_SCREEN_X, catDrawY, true);
                     ctx.fillStyle = '#fde047';
                     ctx.fillRect(CAT_SCREEN_X + 34, catDrawY + 6, 2, 2);
+                } else if (jumpVy > 0) {
+                    const jumpSprite = (currentSpeed >= 78) ? 'runningJump' : 'jump';
+                    drawCatSprite(ctx, jumpSprite, 0, CAT_SCREEN_X, catDrawY, true);
                 } else {
                     const jumpSprite = (currentSpeed >= 78) ? 'runningJump' : 'jump';
-                    let jumpFrame = 0; // Ascent leap frame
-                    if (Math.abs(jumpVy) < 22) {
-                        jumpFrame = 1; // Apex floating frame
-                    } else if (jumpVy < 0) {
-                        jumpFrame = 2; // Landing descent frame
-                    }
-                    drawCatSprite(ctx, jumpSprite, jumpFrame, CAT_SCREEN_X, catDrawY, true);
+                    drawCatSprite(ctx, jumpSprite, 2, CAT_SCREEN_X, catDrawY, true);
                 }
             } else {
                 // D. RUNNER MODE (On Ground)
@@ -2704,8 +2682,9 @@
         const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
         if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
 
-        if (e.code === 'Space' || e.key === ' ' || e.code === 'ArrowUp' || e.key === 'ArrowUp' || e.code === 'KeyW' || e.key === 'w' || e.key === 'W') {
+        if (e.code === 'Space' || e.key === ' ' || e.code === 'ArrowUp' || e.key === 'ArrowUp') {
             e.preventDefault();
+            isInputHeldDown = true;
             initAudio();
             if (isGameOver) {
                 restartGame();
@@ -2713,11 +2692,6 @@
                 triggerPrepJump();
             } else if (isDinoMode) {
                 startJump();
-            }
-        } else if (e.code === 'ArrowDown' || e.key === 'ArrowDown' || e.code === 'KeyS' || e.key === 's' || e.key === 'S') {
-            e.preventDefault();
-            if (isDinoMode && isJumping) {
-                fastDrop();
             }
         } else if (e.code === 'Escape' || e.key === 'Escape') {
             e.preventDefault();
@@ -2730,8 +2704,9 @@
         const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
         if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
 
-        if (e.code === 'Space' || e.key === ' ' || e.code === 'ArrowUp' || e.key === 'ArrowUp' || e.code === 'KeyW' || e.key === 'w' || e.key === 'W') {
+        if (e.code === 'Space' || e.key === ' ' || e.code === 'ArrowUp' || e.key === 'ArrowUp') {
             e.preventDefault();
+            isInputHeldDown = false;
             if (isDinoMode) {
                 endJump();
             }
