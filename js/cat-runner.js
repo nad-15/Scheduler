@@ -1825,18 +1825,18 @@
             // Track continuous distance traveled (20 units per second) for steady, predictable speed progression
             dinoDistanceTraveled += dt * 20;
 
-            // Accelerated Gradual High-Speed Progression (~1.75 - 2 mins to Max Speed) + Smooth Breather Waves:
-            // 1. Continuous ramp (0.052) based on distance traveled, scaling smoothly from 48 px/s to 160 px/s over ~105 - 115s
-            const baseBonus = Math.min(112, dinoDistanceTraveled * 0.052);
+            // Hardcore High-Speed Progression (Ramping to 240 px/s Max Speed Cap) + Smooth Breather Waves:
+            // 1. Continuous ramp (0.082) based on distance traveled, scaling smoothly from 48 px/s to a blistering 240 px/s over ~115s
+            const baseBonus = Math.min(192, dinoDistanceTraveled * 0.082);
 
-            // 2. Periodic Relaxation Wave: Gentle breathing dip (-12 to -18 px/s) every ~30s for ~9 seconds
+            // 2. Periodic Relaxation Wave: Gentle breathing dip (-15 to -32 px/s) every ~30s for ~9 seconds
             let waveOffset = 0;
             if (dinoDistanceTraveled >= 300) {
                 const waveProgress = ((dinoDistanceTraveled - 300) % 600) / 600;
                 // Peak cruise from 0.0 to 0.70 (~21s), smooth relaxation dip from 0.70 to 1.0 (~9s)
                 if (waveProgress > 0.70) {
                     const relaxFactor = Math.sin(((waveProgress - 0.70) / 0.30) * Math.PI);
-                    const dipAmount = Math.min(18, 10 + baseBonus * 0.08);
+                    const dipAmount = Math.min(32, 12 + baseBonus * 0.12);
                     waveOffset = -dipAmount * relaxFactor;
                 }
             }
