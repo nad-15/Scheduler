@@ -176,23 +176,6 @@ function createCalendarGrid() {
     dayCell.appendChild(taskContainer);
     daysGridVertView.appendChild(dayCell);
   }
-
-
-
-  // === SET MAX HEIGHT for each task container after DOM elements are in place
-  const allDayCells = daysGridVertView.querySelectorAll(".day-vert-view");
-  allDayCells.forEach(cell => {
-    const dayNumber = cell.querySelector(".day-number");
-    const taskContainer = cell.querySelector(".task-container-vert-view");
-
-    const cellHeight = cell.clientHeight;
-    const dayNumberHeight = dayNumber.offsetHeight;
-
-    const marginTop = 4; // matches CSS: margin-top: 4px
-    const availableHeight = cellHeight - dayNumberHeight - marginTop;
-
-    taskContainer.style.maxHeight = `${availableHeight}px`;
-  });
 }
 
 function updateCalendarWithTasks(month, year) {

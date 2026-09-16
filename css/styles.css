@@ -6924,21 +6924,31 @@ html.hide-all-buttons-active #slidingInputView {
     overflow: hidden;
     flex-grow: 1;
     /* Ensure the cells grow to fill available space */
+    box-sizing: border-box;
+}
 
+.day-number {
+    flex-shrink: 0;
 }
 
 /* Task container scrollable area */
 .task-container-vert-view {
     /* background: red; */
-    margin-top: 0.4rem;
+    margin-top: 0.25rem;
     overflow-y: auto;
-    flex-grow: 1;
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    max-height: calc(100% - 1.2rem);
-    /* Leaves space for the date number */
+    gap: 2px;
     scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.task-container-vert-view::-webkit-scrollbar {
+    display: none;
 }
 
 /* Task styling */
@@ -6947,28 +6957,29 @@ html.hide-all-buttons-active #slidingInputView {
 .task-evening {
 
     font-family: monospace;
-    font-size: 10px;
+    font-size: 8.5px;
     font-weight: bold;
-    min-height: 13px;
-    height: 13px;
-    /* Fix height */
-    line-height: 13px;
-    /* Vertically center text */
+    min-height: 12px;
+    line-height: 1.25;
+    flex-shrink: 0;
     width: 100%;
     /* border: 1px solid var(--calendar-border); */
     border-radius: 3px;
     box-sizing: border-box;
-    padding: 0 2px;
-    /* Optional small padding */
+    padding: 1px 2px;
 
     /* background-color: #f9f9f9; */
     color: #333;
 
-    display: block;
-    /* Simplify ellipsis behavior */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
     border-left: 3px solid transparent;
     background-color: transparent;
     text-align: left;
