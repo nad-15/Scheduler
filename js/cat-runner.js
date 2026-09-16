@@ -53,7 +53,7 @@
     const CANVAS_HEIGHT = 40; // 40px height for larger cat and balloons
     const GROUND_Y = 35;      // Feet land on ground line at y = 35
     const CAT_SCREEN_X = 75;  // Cat anchored at left-center
-    const WORLD_WIDTH = 4500; // Continuous loop length in pixels (5 worlds x 900px)
+    const WORLD_WIDTH = 5400; // Continuous loop length in pixels (6 worlds x 900px)
 
     // Sprite Scale: Player Mode Runner (42x34)
     const CAT_DEST_W = 42;
@@ -384,6 +384,7 @@
     let isGameOver = false;        // True on collision (screen freeze + Game Over UI)
     let dinoScore = 0;             // Points earned in active run (distance + snack collectibles)
     let dinoDistanceTraveled = 0;  // Track distance traveled (drives gradual speed curve & obstacle tiers)
+    let hasAnnouncedHardestMode = false; // Tracks if hardest mode (max speed + consecutive hurdles) has been announced
     let invulnerableTimer = 0;     // Post-start grace period
     let idlePlayTimer = 0;         // Inactivity timer
     let milestoneFlashTimer = 0;   // Milestone flash every 100 points
@@ -551,7 +552,13 @@
             { type: 'volcano', worldX: 3680, w: 100, h: 13, color: '#1e293b' },
             { type: 'volcano', worldX: 3900, w: 120, h: 15, color: '#0f172a' },
             { type: 'volcano', worldX: 4140, w: 95, h: 12, color: '#1e293b' },
-            { type: 'volcano', worldX: 4360, w: 110, h: 14, color: '#0f172a' }
+            { type: 'volcano', worldX: 4360, w: 110, h: 14, color: '#0f172a' },
+
+            // Zone 6: Distant Maple Hills & Autumn Canopy Ridges (4500 - 5400px)
+            { type: 'maple_ridge', worldX: 4580, w: 95, h: 13, color: '#7c2d12' },
+            { type: 'maple_canopy', worldX: 4800, w: 110, h: 15, color: '#9a3412' },
+            { type: 'maple_ridge', worldX: 5040, w: 90, h: 12, color: '#7c2d12' },
+            { type: 'maple_canopy', worldX: 5260, w: 105, h: 14, color: '#9a3412' }
         ],
 
         // Midground Landmarks (Parallax factor 0.40 - STRICTLY ZERO GREEN!)
@@ -577,7 +584,13 @@
             { type: 'volcanic_crag', worldX: 3760, w: 80, h: 11, color: '#334155' },
             { type: 'volcanic_crag', worldX: 3980, w: 90, h: 12, color: '#1e293b' },
             { type: 'volcanic_crag', worldX: 4220, w: 85, h: 10, color: '#334155' },
-            { type: 'volcanic_crag', worldX: 4430, w: 75, h: 12, color: '#1e293b' }
+            { type: 'volcanic_crag', worldX: 4430, w: 75, h: 12, color: '#1e293b' },
+
+            // Zone 6: Near Japanese Maple Trees, Autumn Groves & Torii Gate (4500 - 5400px)
+            { type: 'maple_tree', worldX: 4620, w: 36, h: 25, trunkColor: '#451a03', crownColor: '#dc2626', leafColor: '#f97316', tipColor: '#fde047' },
+            { type: 'torii_gate', worldX: 4820, w: 26, h: 21, color: '#dc2626', capColor: '#0f172a' },
+            { type: 'autumn_grove', worldX: 5040, w: 46, h: 26, trunkColor: '#521f08', crownColor: '#ea580c', leafColor: '#f59e0b', tipColor: '#fbbf24' },
+            { type: 'maple_tree', worldX: 5260, w: 34, h: 24, trunkColor: '#451a03', crownColor: '#b91c1c', leafColor: '#ea580c', tipColor: '#fde047' }
         ],
 
         // Grand Tall Buildings in City World (Parallax factor 0.40, WorldX: 1800 - 2700px - STRICTLY ZERO GREEN!)
@@ -860,11 +873,16 @@
             baselineColor = isNight ? '#1e3a8a' : '#7dd3fc';
             speckColor1 = isNight ? '#0284c7' : '#ffffff';
             speckColor2 = isNight ? '#38bdf8' : '#e0f2fe';
-        } else if (wx >= 3600) {
+        } else if (wx >= 3600 && wx < 4500) {
             // Zone 5: Volcanic Basalt & Glowing Embers
             baselineColor = isNight ? '#0f172a' : '#1e293b';
             speckColor1 = isNight ? '#ef4444' : '#f97316';
             speckColor2 = isNight ? '#ea580c' : '#fbbf24';
+        } else if (wx >= 4500) {
+            // Zone 6: Maple Autumn Forest Floor & Fallen Foliage
+            baselineColor = isNight ? '#451a03' : '#78350f';
+            speckColor1 = isNight ? '#dc2626' : '#ef4444'; // Scarlet fallen maple leaf specks
+            speckColor2 = isNight ? '#d97706' : '#f59e0b'; // Golden amber foliage specks
         }
 
         ctx.fillStyle = baselineColor;
@@ -1099,6 +1117,182 @@
         }
     }
 
+    // ------------------------------------------------------------------------
+    // 11c. Maple Autumn Forest Visuals (Momiji Trees, Torii Gate & Falling Leaves)
+    // ------------------------------------------------------------------------
+    function drawPixelMapleTree(ctx, sx, lm) {
+        const trunkColor = lm.trunkColor || '#451a03';
+        const crownColor = lm.crownColor || '#dc2626';
+        const leafColor = lm.leafColor || '#f97316';
+        const tipColor = lm.tipColor || '#fde047';
+
+        // 1. Trunk and spreading branches (Dark timber)
+        ctx.fillStyle = trunkColor;
+        ctx.fillRect(sx - 1, GROUND_Y - 12, 3, 12);
+        ctx.fillRect(sx - 2, GROUND_Y - 2, 5, 2); // Roots spreading into ground
+        // Left branch
+        ctx.fillRect(sx - 5, GROUND_Y - 15, 5, 2);
+        ctx.fillRect(sx - 9, GROUND_Y - 18, 5, 2);
+        // Right branch
+        ctx.fillRect(sx + 1, GROUND_Y - 16, 6, 2);
+        ctx.fillRect(sx + 6, GROUND_Y - 19, 5, 2);
+        // Center stem
+        ctx.fillRect(sx, GROUND_Y - 20, 2, 8);
+
+        // 2. Center Top Crown (Main multi-lobed maple foliage)
+        ctx.fillStyle = crownColor;
+        ctx.fillRect(sx - 6, GROUND_Y - 24, 13, 8);
+        ctx.fillRect(sx - 4, GROUND_Y - 26, 9, 3);
+        ctx.fillRect(sx - 1, GROUND_Y - 28, 3, 3); // Peak lobe
+        ctx.fillRect(sx - 8, GROUND_Y - 22, 3, 5); // Left lobe
+        ctx.fillRect(sx + 6, GROUND_Y - 22, 3, 5); // Right lobe
+
+        // Vibrant vermilion mid-tones
+        ctx.fillStyle = leafColor;
+        ctx.fillRect(sx - 4, GROUND_Y - 24, 9, 5);
+        ctx.fillRect(sx - 2, GROUND_Y - 26, 5, 3);
+        ctx.fillRect(sx - 6, GROUND_Y - 21, 3, 3);
+        ctx.fillRect(sx + 4, GROUND_Y - 21, 3, 3);
+
+        // Radiant golden tips & highlights (distinctive notched maple look)
+        ctx.fillStyle = tipColor;
+        ctx.fillRect(sx, GROUND_Y - 27, 1, 2);
+        ctx.fillRect(sx - 5, GROUND_Y - 22, 2, 1);
+        ctx.fillRect(sx + 4, GROUND_Y - 22, 2, 1);
+        ctx.fillRect(sx - 2, GROUND_Y - 25, 2, 1);
+
+        // 3. Left Drooping Foliage Clump
+        ctx.fillStyle = crownColor;
+        ctx.fillRect(sx - 14, GROUND_Y - 20, 7, 6);
+        ctx.fillRect(sx - 12, GROUND_Y - 22, 4, 3);
+        ctx.fillStyle = leafColor;
+        ctx.fillRect(sx - 13, GROUND_Y - 19, 5, 4);
+        ctx.fillStyle = tipColor;
+        ctx.fillRect(sx - 14, GROUND_Y - 18, 2, 1);
+
+        // 4. Right Drooping Foliage Clump
+        ctx.fillStyle = crownColor;
+        ctx.fillRect(sx + 8, GROUND_Y - 21, 8, 6);
+        ctx.fillRect(sx + 10, GROUND_Y - 23, 4, 3);
+        ctx.fillStyle = leafColor;
+        ctx.fillRect(sx + 9, GROUND_Y - 20, 6, 4);
+        ctx.fillStyle = tipColor;
+        ctx.fillRect(sx + 13, GROUND_Y - 19, 2, 1);
+    }
+
+    function drawToriiGate(ctx, sx, lm) {
+        const gateColor = lm.color || '#dc2626';
+        const capColor = lm.capColor || '#0f172a';
+
+        // Stone foundation plinths (Kamebara)
+        ctx.fillStyle = capColor;
+        ctx.fillRect(sx - 9, GROUND_Y - 2, 4, 2);
+        ctx.fillRect(sx + 6, GROUND_Y - 2, 4, 2);
+
+        // Two main vermilion pillars (Hashira)
+        ctx.fillStyle = gateColor;
+        ctx.fillRect(sx - 8, GROUND_Y - 18, 2, 16);
+        ctx.fillRect(sx + 7, GROUND_Y - 18, 2, 16);
+
+        // Lower horizontal tie-beam (Nuki)
+        ctx.fillStyle = gateColor;
+        ctx.fillRect(sx - 11, GROUND_Y - 14, 23, 2);
+
+        // Central tablet strut (Gakuzuka)
+        ctx.fillStyle = capColor;
+        ctx.fillRect(sx, GROUND_Y - 18, 1, 4);
+
+        // Upper horizontal main beam (Shimaki)
+        ctx.fillStyle = gateColor;
+        ctx.fillRect(sx - 12, GROUND_Y - 18, 25, 2);
+
+        // Top curved roof lintel (Kasagi) with upturned tips in black obsidian
+        ctx.fillStyle = capColor;
+        ctx.fillRect(sx - 13, GROUND_Y - 20, 27, 2);
+        ctx.fillRect(sx - 14, GROUND_Y - 21, 2, 2); // Upturned left tip
+        ctx.fillRect(sx + 13, GROUND_Y - 21, 2, 2); // Upturned right tip
+
+        // Subtle gold ornament accent
+        ctx.fillStyle = '#fde047';
+        ctx.fillRect(sx - 1, GROUND_Y - 17, 3, 1);
+    }
+
+    function drawAutumnGrove(ctx, sx, lm) {
+        const trunkColor = lm.trunkColor || '#521f08';
+        const crownColor = lm.crownColor || '#ea580c';
+        const leafColor = lm.leafColor || '#f59e0b';
+        const tipColor = lm.tipColor || '#fbbf24';
+
+        // Two twin trunks
+        ctx.fillStyle = trunkColor;
+        ctx.fillRect(sx - 8, GROUND_Y - 13, 2, 13);
+        ctx.fillRect(sx - 13, GROUND_Y - 16, 6, 2);
+        ctx.fillRect(sx + 7, GROUND_Y - 16, 3, 16);
+        ctx.fillRect(sx + 3, GROUND_Y - 19, 5, 2);
+        ctx.fillRect(sx + 9, GROUND_Y - 20, 6, 2);
+
+        // Broad overlapping autumn canopy (deep fiery orange and amber)
+        ctx.fillStyle = crownColor;
+        ctx.fillRect(sx - 18, GROUND_Y - 22, 14, 8);
+        ctx.fillRect(sx - 15, GROUND_Y - 24, 8, 3);
+        ctx.fillRect(sx + 1, GROUND_Y - 26, 17, 10);
+        ctx.fillRect(sx + 5, GROUND_Y - 28, 9, 3);
+        ctx.fillRect(sx - 5, GROUND_Y - 21, 9, 6);
+
+        // Golden leaf highlights
+        ctx.fillStyle = leafColor;
+        ctx.fillRect(sx - 16, GROUND_Y - 20, 10, 5);
+        ctx.fillRect(sx + 3, GROUND_Y - 24, 13, 6);
+        ctx.fillRect(sx - 3, GROUND_Y - 19, 6, 3);
+
+        // Radiant amber foliage tips
+        ctx.fillStyle = tipColor;
+        ctx.fillRect(sx - 13, GROUND_Y - 23, 3, 1);
+        ctx.fillRect(sx + 7, GROUND_Y - 27, 4, 1);
+        ctx.fillRect(sx + 14, GROUND_Y - 22, 2, 1);
+        ctx.fillRect(sx - 17, GROUND_Y - 19, 2, 1);
+    }
+
+    const MAPLE_FALLING_LEAVES = [
+        { worldX: 4520, yOffset: 6, speedY: 7, freq: 3.2, amp: 5, color: '#ef4444', size: 2 },
+        { worldX: 4590, yOffset: 14, speedY: 9, freq: 2.8, amp: 6, color: '#f97316', size: 2 },
+        { worldX: 4660, yOffset: 4, speedY: 6, freq: 3.6, amp: 4, color: '#f59e0b', size: 2 },
+        { worldX: 4730, yOffset: 18, speedY: 8, freq: 2.5, amp: 7, color: '#dc2626', size: 3 },
+        { worldX: 4800, yOffset: 10, speedY: 7, freq: 3.0, amp: 5, color: '#ea580c', size: 2 },
+        { worldX: 4870, yOffset: 22, speedY: 10, freq: 2.7, amp: 6, color: '#fbbf24', size: 2 },
+        { worldX: 4940, yOffset: 8, speedY: 6, freq: 3.4, amp: 5, color: '#ef4444', size: 2 },
+        { worldX: 5010, yOffset: 16, speedY: 8, freq: 2.9, amp: 6, color: '#f97316', size: 3 },
+        { worldX: 5080, yOffset: 5, speedY: 7, freq: 3.1, amp: 4, color: '#b91c1c', size: 2 },
+        { worldX: 5150, yOffset: 20, speedY: 9, freq: 2.6, amp: 7, color: '#f59e0b', size: 2 },
+        { worldX: 5220, yOffset: 12, speedY: 8, freq: 3.3, amp: 5, color: '#ea580c', size: 2 },
+        { worldX: 5290, yOffset: 7, speedY: 6, freq: 3.0, amp: 6, color: '#ef4444', size: 3 },
+        { worldX: 5360, yOffset: 17, speedY: 9, freq: 2.8, amp: 5, color: '#fbbf24', size: 2 }
+    ];
+
+    function drawMapleFallingLeaves(ctx, cameraX) {
+        MAPLE_FALLING_LEAVES.forEach((leaf, idx) => {
+            const sx = worldToScreenX(leaf.worldX, cameraX, 0.65);
+            if (sx >= -20 && sx <= currentLogicalWidth + 20) {
+                const fallRange = GROUND_Y - 5;
+                const curY = 3 + ((leaf.yOffset + movieTime * leaf.speedY) % fallRange);
+                const sway = Math.sin(movieTime * leaf.freq + idx * 1.3) * leaf.amp;
+                const drawX = Math.round(sx + sway);
+                const drawY = Math.round(curY);
+
+                ctx.fillStyle = leaf.color;
+                if (leaf.size === 3) {
+                    ctx.fillRect(drawX + 1, drawY, 1, 2);
+                    ctx.fillRect(drawX, drawY + 1, 3, 1);
+                    ctx.fillStyle = '#fde047';
+                    ctx.fillRect(drawX + 1, drawY, 1, 1);
+                } else {
+                    ctx.fillRect(drawX, drawY, 2, 1);
+                    ctx.fillRect(drawX + 1, drawY + 1, 1, 1);
+                }
+            }
+        });
+    }
+
     function drawSimpleBackground(ctx, cameraX) {
         const dayProgress = getDayProgress();
 
@@ -1255,11 +1449,36 @@
                         ctx.fillStyle = '#ef4444';
                         ctx.fillRect(sx - 1, topY - 1, 2, 1);
                     }
+                } else if (lm.type === 'maple_ridge') {
+                    const hw = Math.round(lm.w / 2);
+                    const topY = GROUND_Y - lm.h;
+                    ctx.beginPath();
+                    ctx.moveTo(sx - hw, GROUND_Y);
+                    ctx.quadraticCurveTo(sx - hw * 0.4, topY - 2, sx, topY);
+                    ctx.quadraticCurveTo(sx + hw * 0.4, topY - 1, sx + hw, GROUND_Y);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Warm autumnal ridge highlight
+                    ctx.fillStyle = '#b45309';
+                    ctx.fillRect(sx - 12, topY, 24, 1);
+                } else if (lm.type === 'maple_canopy') {
+                    const hw = Math.round(lm.w / 2);
+                    const topY = GROUND_Y - lm.h;
+                    ctx.beginPath();
+                    ctx.moveTo(sx - hw, GROUND_Y);
+                    ctx.bezierCurveTo(sx - hw * 0.6, topY + 3, sx - hw * 0.3, topY - 2, sx, topY);
+                    ctx.bezierCurveTo(sx + hw * 0.3, topY - 2, sx + hw * 0.6, topY + 2, sx + hw, GROUND_Y);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Subtle fiery amber rim
+                    ctx.fillStyle = '#ea580c';
+                    ctx.fillRect(sx - 16, topY + 1, 10, 1);
+                    ctx.fillRect(sx + 6, topY + 1, 12, 1);
                 }
             }
         });
 
-        // 5. Midground Landmarks (Near Mountains, Dunes, Ice Spires, Volcanic Crags - Parallax 0.40)
+        // 5. Midground Landmarks (Near Mountains, Dunes, Ice Spires, Volcanic Crags, Maple Trees & Torii Gate - Parallax 0.40)
         SCENERY.midLandmarks.forEach(lm => {
             const sx = worldToScreenX(lm.worldX, cameraX, 0.40);
             if (sx >= -120 && sx <= currentLogicalWidth + 120) {
@@ -1305,6 +1524,12 @@
                     ctx.fillRect(sx - 1, topY + 3, 2, Math.max(2, lm.h - 5));
                     ctx.fillStyle = '#fbbf24';
                     ctx.fillRect(sx, topY + 4, 1, 2);
+                } else if (lm.type === 'maple_tree') {
+                    drawPixelMapleTree(ctx, sx, lm);
+                } else if (lm.type === 'torii_gate') {
+                    drawToriiGate(ctx, sx, lm);
+                } else if (lm.type === 'autumn_grove') {
+                    drawAutumnGrove(ctx, sx, lm);
                 }
             }
         });
@@ -1314,6 +1539,9 @@
             const sx = worldToScreenX(b.worldX, cameraX, 0.40);
             drawTallBuilding(ctx, b, sx, dayProgress);
         });
+
+        // 7. Swirling Autumn Leaves in Maple World (Parallax 0.65, WorldX: 4500 - 5400px)
+        drawMapleFallingLeaves(ctx, cameraX);
     }
 
     // ------------------------------------------------------------------------
@@ -1637,35 +1865,22 @@
             seed: 2.3
         });
 
-        // D. First Consecutive Cactus Hurdle Sequence ("Jump then Jump then Jump!"):
-        // Cactus 1 at X = 295, Cactus 2 at X = 337, Cactus 3 at X = 379 (36px landing gaps!)
+        // D. Second Single Cactus (Introductory Single Obstacle)
         activeObstacles.push({
-            x: 295,
-            type: 'short_single',
-            width: 6,
-            height: 7
-        });
-        activeObstacles.push({
-            x: 337,
-            type: 'short_single',
-            width: 6,
-            height: 7
-        });
-        activeObstacles.push({
-            x: 379,
+            x: 310,
             type: 'short_single',
             width: 6,
             height: 7
         });
 
-        // E. Ground Golden Fish Treats Celebration (X = 432, 450, 468) -> combo rewards!
-        activeFishBones.push({ id: 'fb_1a', x: 432, type: 'fish' });
-        activeFishBones.push({ id: 'fb_1b', x: 450, type: 'fish' });
-        activeFishBones.push({ id: 'fb_1c', x: 468, type: 'fish' });
+        // E. Ground Golden Fish Treats Celebration (X = 380, 398, 416) -> combo rewards!
+        activeFishBones.push({ id: 'fb_1a', x: 380, type: 'fish' });
+        activeFishBones.push({ id: 'fb_1b', x: 398, type: 'fish' });
+        activeFishBones.push({ id: 'fb_1c', x: 416, type: 'fish' });
 
-        // F. Tall Single Cactus (X = 525)
+        // F. Tall Single Cactus (X = 475)
         activeObstacles.push({
-            x: 525,
+            x: 475,
             type: 'tall_single',
             width: 7,
             height: 10
@@ -1718,6 +1933,7 @@
         isInputHeldDown = false;
         confettiParticles = [];
         popNotifications = [];
+        hasAnnouncedHardestMode = false;
         snackComboCount = 0;
         snackComboTimer = 0;
 
@@ -1753,6 +1969,7 @@
         isInputHeldDown = false;
         confettiParticles = [];
         popNotifications = [];
+        hasAnnouncedHardestMode = false;
         snackComboCount = 0;
         snackComboTimer = 0;
 
@@ -1777,6 +1994,7 @@
         currentSpeed = START_SPEED;
         idlePlayTimer = 0;
         lastBeepSec = -1;
+        hasAnnouncedHardestMode = false;
         activeObstacles = [];
         activeBalloons = [];
         activeFishBones = [];
@@ -1848,6 +2066,19 @@
             const targetSpeed = Math.max(START_SPEED, START_SPEED + baseBonus + waveOffset);
             // Smooth gradual interpolation prevents abrupt acceleration or deceleration
             currentSpeed += (targetSpeed - currentSpeed) * Math.min(1.0, dt * 1.2);
+
+            // Hardest Mode trigger announcement (max speed + rapid consecutive hurdles)
+            const isHardestMode = (dinoDistanceTraveled >= 2000 || currentSpeed >= 225);
+            if (isHardestMode && !hasAnnouncedHardestMode) {
+                hasAnnouncedHardestMode = true;
+                popNotifications.push({
+                    text: '⚡ HARDEST MODE ⚡',
+                    x: Math.round(CAT_SCREEN_X + 16),
+                    y: 8,
+                    life: 1.5,
+                    maxLife: 1.5
+                });
+            }
 
             // Steady score accumulation: 20 points per second
             dinoScore += dt * 20;
@@ -1964,31 +2195,29 @@
                 const patternRoll = Math.random();
                 let pattern = 'single';
 
-                if (dinoDistanceTraveled < 80) {
-                    // Early run: singles, doubles, and exciting triple hurdles!
-                    if (patternRoll < 0.35) pattern = 'consecutive_double';
-                    else if (patternRoll < 0.60) pattern = 'consecutive_triple';
-                    else pattern = 'single';
-                } else if (dinoDistanceTraveled < 250) {
-                    // Building tempo: doubles, triples, clumps, and singles
-                    if (patternRoll < 0.30) pattern = 'consecutive_double';
-                    else if (patternRoll < 0.60) pattern = 'consecutive_triple';
-                    else if (patternRoll < 0.85) pattern = 'clump';
-                    else pattern = 'single';
-                } else if (dinoDistanceTraveled < 550) {
-                    // High action: doubles, triples, and thrilling quad jumps!
-                    if (patternRoll < 0.25) pattern = 'consecutive_double';
-                    else if (patternRoll < 0.55) pattern = 'consecutive_triple';
-                    else if (patternRoll < 0.75) pattern = 'consecutive_quad';
-                    else if (patternRoll < 0.90) pattern = 'clump';
-                    else pattern = 'single';
+                const isHardestModeActive = (dinoDistanceTraveled >= 2000 || currentSpeed >= 225);
+
+                if (!isHardestModeActive) {
+                    // Standard Progression (Single Cacti + Clumped Cacti, NO consecutive hurdles):
+                    // Clumped cacti spawn normally based on distance tiers (short_double at 120+, tall_double at 350+, etc.)
+                    if (dinoDistanceTraveled < 120) {
+                        pattern = 'single';
+                    } else if (dinoDistanceTraveled < 350) {
+                        pattern = (patternRoll < 0.35) ? 'clump' : 'single';
+                    } else if (dinoDistanceTraveled < 700) {
+                        pattern = (patternRoll < 0.45) ? 'clump' : 'single';
+                    } else {
+                        pattern = (patternRoll < 0.55) ? 'clump' : 'single';
+                    }
                 } else {
-                    // Expert mastery: intense triple, quad, and mixed consecutive sequences
-                    if (patternRoll < 0.20) pattern = 'consecutive_double';
-                    else if (patternRoll < 0.45) pattern = 'consecutive_triple';
+                    // HARDEST MODE ACTIVATED (Fastest Speed + Rapid Consecutive Hurdles!):
+                    // Rapid "jump then jump again" hurdles combined with max velocity
+                    if (patternRoll < 0.25) pattern = 'consecutive_double';
+                    else if (patternRoll < 0.50) pattern = 'consecutive_triple';
                     else if (patternRoll < 0.70) pattern = 'consecutive_quad';
                     else if (patternRoll < 0.85) pattern = 'consecutive_mixed';
-                    else pattern = 'clump';
+                    else if (patternRoll < 0.95) pattern = 'clump';
+                    else pattern = 'single';
                 }
 
                 if (pattern === 'consecutive_double') {
