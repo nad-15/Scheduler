@@ -75,7 +75,7 @@ yearContainer.addEventListener('click', (e) => {
   const drawer = document.getElementById('slidingInputView');
   if (drawer && drawer.classList.contains('show')) return;
   const movable = document.getElementById('movable-template');
-  if (movable && movable.style.display === 'flex') return;
+  if (movable && (movable.style.display === 'flex' || movable.classList.contains('is-open'))) return;
 
   const dateEl = e.target.closest('.date');
 

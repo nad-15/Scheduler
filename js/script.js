@@ -1047,6 +1047,7 @@ hideWidgetBtn.addEventListener('click', () => {
 templateTaskBtn.addEventListener('click', () => {
     const willBeOpen = movableTemplate.style.display !== 'flex';
     movableTemplate.style.display = willBeOpen ? 'flex' : 'none';
+    movableTemplate.classList.toggle('is-open', willBeOpen);
     if (!willBeOpen && typeof setTemplateEditMode === 'function') {
         setTemplateEditMode(false);
     }

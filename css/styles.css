@@ -5055,7 +5055,7 @@ input[type="radio"]:checked::after {
 }
 
 
-.date:active {
+body:not(:has(#slidingInputView.show)):not(:has(#movable-template.is-open)):not(:has(#movable-template[style*="display: flex"])) .date:active {
     background-color: #ADD8E6;
     border: .5px solid #ADD8E6;
     font-size: 105%;
