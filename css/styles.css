@@ -6852,9 +6852,16 @@ html.hide-all-buttons-active #slidingInputView {
     flex-grow: 1;
     /* Allow it to grow and fill available space */
     overflow: hidden;
-
-
+    transition: grid-template-rows 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
+
+/* Accordion Row Stretch: swiped row expands to 2.5fr, other rows squeeze to 0.7fr */
+.days-grid-vert-view[data-expanded-row="0"] { grid-template-rows: 2.5fr 0.7fr 0.7fr 0.7fr 0.7fr 0.7fr; }
+.days-grid-vert-view[data-expanded-row="1"] { grid-template-rows: 0.7fr 2.5fr 0.7fr 0.7fr 0.7fr 0.7fr; }
+.days-grid-vert-view[data-expanded-row="2"] { grid-template-rows: 0.7fr 0.7fr 2.5fr 0.7fr 0.7fr 0.7fr; }
+.days-grid-vert-view[data-expanded-row="3"] { grid-template-rows: 0.7fr 0.7fr 0.7fr 2.5fr 0.7fr 0.7fr; }
+.days-grid-vert-view[data-expanded-row="4"] { grid-template-rows: 0.7fr 0.7fr 0.7fr 0.7fr 2.5fr 0.7fr; }
+.days-grid-vert-view[data-expanded-row="5"] { grid-template-rows: 0.7fr 0.7fr 0.7fr 0.7fr 0.7fr 2.5fr; }
 
 /* Cell Style */
 .days-grid-vert-view>div {

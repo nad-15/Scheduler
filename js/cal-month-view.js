@@ -64,69 +64,151 @@ window.addEventListener('timezone-changed', () => {
 
 let touchStartX = 0;
 let touchStartY = 0;
+let touchStartRow = -1;
+let touchStartScrollTop = 0;
+let isMonthViewSwiping = false;
 let isEditing = false;
 
-// function showSavePopup(callback) {
-//   const popup = document.getElementById("savePopup");
-//   popup.style.display = "flex";
+function expandGridRow(rowIndex) {
+  if (rowIndex < 0 || rowIndex > 5) return;
+  if (!daysGridVertView) return;
+  daysGridVertView.setAttribute("data-expanded-row", rowIndex.toString());
+}
 
-//   const yesBtn = popup.querySelector(".confirm-yes");
-//   const noBtn = popup.querySelector(".confirm-no");
-
-//   // Cleanup old listeners to avoid duplicates
-//   yesBtn.onclick = () => {
-//     popup.style.display = "none";
-//     callback(true);
-//   };
-
-//   noBtn.onclick = () => {
-//     popup.style.display = "none";
-//     callback(false);
-//   };
-// }
-
-
+function collapseGridRows() {
+  if (!daysGridVertView) return;
+  daysGridVertView.removeAttribute("data-expanded-row");
+}
 
 calendarContainerVertView.addEventListener("touchstart", (e) => {
-  touchStartX = e.changedTouches[0].screenX;
-  touchStartY = e.changedTouches[0].screenY;
-});
+  if (e.touches.length > 1) return;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  isMonthViewSwiping = false;
+
+  const targetCell = e.target.closest(".day-vert-view");
+  if (targetCell && daysGridVertView) {
+    const cellIndex = Array.from(daysGridVertView.children).indexOf(targetCell);
+    touchStartRow = cellIndex >= 0 ? Math.floor(cellIndex / 7) : -1;
+    const taskContainer = targetCell.querySelector(".task-container-vert-view");
+    touchStartScrollTop = taskContainer ? taskContainer.scrollTop : 0;
+  } else {
+    touchStartRow = -1;
+    touchStartScrollTop = 0;
+  }
+}, { passive: true });
+
+calendarContainerVertView.addEventListener("touchmove", (e) => {
+  if (e.touches.length > 1) return;
+  const currentX = e.touches[0].clientX;
+  const currentY = e.touches[0].clientY;
+  const dx = currentX - touchStartX;
+  const dy = currentY - touchStartY;
+
+  if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+    isMonthViewSwiping = true;
+  }
+}, { passive: true });
 
 calendarContainerVertView.addEventListener("touchend", (e) => {
-  const touchEndX = e.changedTouches[0].screenX;
-  const touchEndY = e.changedTouches[0].screenY;
-  handleMobileSwipe(touchStartX, touchEndX, touchStartY, touchEndY);
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndY = e.changedTouches[0].clientY;
+  handleCalendarSwipe(touchStartX, touchEndX, touchStartY, touchEndY);
+
+  setTimeout(() => {
+    isMonthViewSwiping = false;
+  }, 120);
 });
 
-function handleMobileSwipe(startX, endX, startY, endY) {
+// Desktop mouse drag support for month swipe and row accordion stretch
+let mouseStartX = 0;
+let mouseStartY = 0;
+let isMonthViewMouseDown = false;
+
+calendarContainerVertView.addEventListener("mousedown", (e) => {
+  if (e.button !== 0) return;
+  if (e.target.closest("#calendar-pop-up") || e.target.closest("#backdrop")) return;
+
+  mouseStartX = e.clientX;
+  mouseStartY = e.clientY;
+  isMonthViewMouseDown = true;
+  isMonthViewSwiping = false;
+
+  const targetCell = e.target.closest(".day-vert-view");
+  if (targetCell && daysGridVertView) {
+    const cellIndex = Array.from(daysGridVertView.children).indexOf(targetCell);
+    touchStartRow = cellIndex >= 0 ? Math.floor(cellIndex / 7) : -1;
+    const taskContainer = targetCell.querySelector(".task-container-vert-view");
+    touchStartScrollTop = taskContainer ? taskContainer.scrollTop : 0;
+  } else {
+    touchStartRow = -1;
+    touchStartScrollTop = 0;
+  }
+});
+
+window.addEventListener("mousemove", (e) => {
+  if (!isMonthViewMouseDown) return;
+  const dx = e.clientX - mouseStartX;
+  const dy = e.clientY - mouseStartY;
+  if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+    isMonthViewSwiping = true;
+  }
+});
+
+window.addEventListener("mouseup", (e) => {
+  if (!isMonthViewMouseDown) return;
+  isMonthViewMouseDown = false;
+  const mouseEndX = e.clientX;
+  const mouseEndY = e.clientY;
+  handleCalendarSwipe(mouseStartX, mouseEndX, mouseStartY, mouseEndY);
+
+  setTimeout(() => {
+    isMonthViewSwiping = false;
+  }, 120);
+});
+
+function handleCalendarSwipe(startX, endX, startY, endY) {
   const dx = endX - startX;
   const dy = endY - startY;
 
-  const minSwipeDistance = 50;
-  if (Math.abs(dx) < minSwipeDistance) return; // too short
+  const minHorizontalDistance = 50;
+  const minVerticalDistance = 35;
 
-  const slope = Math.abs(dy / dx);
-  const maxAllowedSlope = Math.tan(30 * Math.PI / 180); // ~0.7
-
-  if (slope > maxAllowedSlope) return; // too vertical
-
-  if (dx < 0) {
-    // Swipe left → next month
-    currentMonthVertView++;
-    if (currentMonthVertView > 11) {
-      currentMonthVertView = 0;
-      currentYearVertView++;
+  // 1. Horizontal swipe: change month
+  if (Math.abs(dx) >= minHorizontalDistance && Math.abs(dx) > Math.abs(dy) * 1.15) {
+    if (dx < 0) {
+      // Swipe left → next month
+      currentMonthVertView++;
+      if (currentMonthVertView > 11) {
+        currentMonthVertView = 0;
+        currentYearVertView++;
+      }
+    } else {
+      // Swipe right → previous month
+      currentMonthVertView--;
+      if (currentMonthVertView < 0) {
+        currentMonthVertView = 11;
+        currentYearVertView--;
+      }
     }
-  } else {
-    // Swipe right → previous month
-    currentMonthVertView--;
-    if (currentMonthVertView < 0) {
-      currentMonthVertView = 11;
-      currentYearVertView--;
-    }
+    collapseGridRows();
+    updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+    return;
   }
 
-  updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
+  // 2. Vertical swipe: stretch or squeeze week row
+  if (Math.abs(dy) >= minVerticalDistance && Math.abs(dy) > Math.abs(dx) * 1.15) {
+    // Swipe DOWN (dy > 0): expand the touched row
+    if (dy > 0) {
+      if (touchStartRow >= 0 && touchStartScrollTop <= 3) {
+        expandGridRow(touchStartRow);
+      }
+    }
+    // Swipe UP (dy < 0): collapse back to balanced 6 rows
+    else {
+      collapseGridRows();
+    }
+  }
 }
 
 
@@ -184,6 +266,7 @@ function updateCalendarWithTasks(month, year) {
   document.querySelectorAll(".grid-cell").forEach(cell => {
     cell.classList.remove("is-active");
   });
+  collapseGridRows();
 
   const tasks = loadTasksFromLocalStorage();
   const firstDayOfMonth = new Date(year, month, 1).getDay();
@@ -283,6 +366,7 @@ function updateCalendarWithTasks(month, year) {
     //   showDayTasks(fullDate);
     // });
     cell.addEventListener('click', () => {
+      if (isMonthViewSwiping) return;
 
       document.querySelectorAll(".grid-cell").forEach(cell => {
         cell.classList.remove("is-active");
@@ -295,7 +379,7 @@ function updateCalendarWithTasks(month, year) {
       lastClickedCell = cell;
 
       popupTimeout = setTimeout(() => {
-        if (lastClickedCell === cell) {
+        if (lastClickedCell === cell && !isMonthViewSwiping) {
           const fullDate = cell.getAttribute("data-full-date");
           showDayTasks(fullDate); // Only show if this is still the last clicked
         }
