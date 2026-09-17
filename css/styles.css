@@ -4618,6 +4618,8 @@ input[type="radio"]:checked::after {
     color: rgb(37, 37, 37) !important;
 }
 
+#go-to-date-popup-btn.disabled-btn,
+#go-to-date-popup-btn:disabled,
 #go-to-today.disabled-btn,
 #go-to-today:disabled {
     background-color: transparent;
@@ -4627,6 +4629,8 @@ input[type="radio"]:checked::after {
 }
 
 /* Disable pointer events for children */
+#go-to-date-popup-btn.disabled-btn *,
+#go-to-date-popup-btn:disabled *,
 #go-to-today.disabled-btn *,
 #go-to-today:disabled * {
     pointer-events: none;
@@ -6772,11 +6776,52 @@ html.hide-all-buttons-active #slidingInputView {
 
 
 
+.month-view-date-picker-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: transparent;
+    border: none;
+    padding: 3px 6px 3px 6px;
+    margin-left: 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.month-view-date-picker-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.month-view-date-picker-btn:active {
+    transform: scale(0.96);
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
 .month-label-vert-view {
     font-family: 'Roboto', sans-serif;
     font-size: 1.2rem;
     font-weight: 600;
     color: #333;
+    pointer-events: none;
+}
+
+.month-label-arrow-icon {
+    font-size: 1.45rem;
+    color: #555;
+    transition: transform 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.month-view-date-picker-btn:hover .month-label-arrow-icon {
+    color: #2563eb;
+    transform: translateY(1px);
 }
 
 .month-label-vert-view:active,
@@ -8784,4 +8829,301 @@ ic {
     visibility: hidden;
     pointer-events: none;
     transform: scale(0.8);
+}
+
+/* ==========================================================================
+   Go to Date Modal (Styled to match Scheduler's native look and feel)
+   ========================================================================== */
+.goto-date-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2200;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.goto-date-backdrop.active {
+    opacity: 1;
+}
+
+.goto-date-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2201;
+    width: 82%;
+    max-width: 360px;
+    background-color: white;
+    color: black;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: var(--todo-font);
+}
+
+.goto-date-modal.active {
+    opacity: 1;
+}
+
+.goto-date-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.goto-date-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.goto-date-header-icon {
+    font-size: 20px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.goto-date-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111;
+    font-family: var(--todo-font);
+}
+
+.goto-date-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    color: #666;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.goto-date-close-btn .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.goto-date-close-btn:hover {
+    background: #f0f0f0;
+    color: #111;
+}
+
+.goto-date-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.goto-date-selects-row {
+    display: grid;
+    grid-template-columns: 1.3fr 0.8fr 1fr;
+    gap: 8px;
+}
+
+.goto-date-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.goto-date-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    margin-left: 2px;
+}
+
+.goto-date-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.goto-date-select {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 8px 24px 8px 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-family: var(--todo-font);
+}
+
+.goto-date-select:hover {
+    border-color: #999;
+}
+
+.goto-date-select:focus {
+    border-color: #2196f3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.goto-date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.goto-date-year-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 6px 8px 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    font-family: var(--todo-font);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.goto-date-year-input:hover {
+    border-color: #999;
+}
+
+.goto-date-year-input:focus {
+    border-color: #2196f3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.goto-date-select-arrow {
+    position: absolute;
+    right: 6px;
+    pointer-events: none;
+    font-size: 18px;
+    color: #666;
+}
+
+.goto-date-preview {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0;
+    color: #444;
+}
+
+.goto-date-preview-icon {
+    font-size: 18px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.goto-date-preview-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+}
+
+.goto-date-shortcuts {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.goto-date-shortcut-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: #333;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--todo-font);
+    transition: background-color 0.15s ease;
+}
+
+.goto-date-shortcut-btn .shortcut-icon {
+    font-size: 16px;
+    color: #2196f3;
+}
+
+.goto-date-shortcut-btn:hover {
+    background: #e8e8e8;
+}
+
+.goto-date-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+}
+
+.goto-date-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    font-family: var(--todo-font);
+    transition: background-color 0.15s ease;
+}
+
+.goto-date-btn-cancel {
+    background: none;
+    border: none;
+    color: #666;
+}
+
+.goto-date-btn-cancel:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.goto-date-btn-submit {
+    background-color: #2196f3;
+    border: none;
+    color: white;
+}
+
+.goto-date-btn-submit:hover {
+    background-color: #1976d2;
+}
+
+.goto-date-btn-submit .goto-btn-arrow {
+    font-size: 16px;
 }

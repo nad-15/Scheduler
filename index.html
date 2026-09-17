@@ -781,7 +781,10 @@
 
                 <button class="menu-button hamburger-month-view"><span
                         class="material-icons menu-icon-month-view">menu</span></button>
-                <div class="month-label-vert-view" id="month-label-vert-view">May 2025</div>
+                <button class="month-view-date-picker-btn" id="month-view-date-picker-btn" title="Go to Date">
+                    <span class="month-label-vert-view" id="month-label-vert-view">May 2025</span>
+                    <span class="material-symbols-outlined month-label-arrow-icon">arrow_drop_down</span>
+                </button>
 
             </div>
 
@@ -929,11 +932,11 @@
 
 
 
-            <!-- Today -->
-            <button class="calendar-icon-button normal-mode" title="Today" id="go-to-today">
+            <!-- Go to -->
+            <button class="calendar-icon-button normal-mode" title="Go to Date" id="go-to-date-popup-btn">
                 <div class="calendar-icon-wrapper">
-                    <span class="material-symbols-outlined" id="calendar-icon-today">today</span>
-                    <span class="calendar-icon-label">Today</span>
+                    <span class="material-symbols-outlined" id="calendar-icon-goto">today</span>
+                    <span class="calendar-icon-label">Go to</span>
                 </div>
             </button>
 
@@ -1230,6 +1233,66 @@
     </div>
     <div class="overlay-menu"></div>
     <div id="backdrop" class="backdrop"></div>
+    <div id="goto-date-backdrop" class="goto-date-backdrop" style="display: none;"></div>
+    <div id="goto-date-modal" class="goto-date-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="goto-date-title">
+        <div class="goto-date-header">
+            <div class="goto-date-title-wrap">
+                <span class="material-symbols-outlined goto-date-header-icon">today</span>
+                <h3 id="goto-date-title" class="goto-date-title">Go to Date</h3>
+            </div>
+            <button type="button" class="goto-date-close-btn" id="goto-date-close-btn" aria-label="Close">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="goto-date-body">
+            <div class="goto-date-selects-row">
+                <div class="goto-date-field">
+                    <label for="goto-date-month-select" class="goto-date-label">Month</label>
+                    <div class="goto-date-select-wrapper">
+                        <select id="goto-date-month-select" class="goto-date-select"></select>
+                        <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                    </div>
+                </div>
+
+                <div class="goto-date-field">
+                    <label for="goto-date-day-select" class="goto-date-label">Day</label>
+                    <div class="goto-date-select-wrapper">
+                        <select id="goto-date-day-select" class="goto-date-select"></select>
+                        <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                    </div>
+                </div>
+
+                <div class="goto-date-field">
+                    <label for="goto-date-year-select" class="goto-date-label">Year</label>
+                    <div class="goto-date-select-wrapper">
+                        <select id="goto-date-year-select" class="goto-date-select"></select>
+                        <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="goto-date-preview" id="goto-date-preview">
+                <span class="material-symbols-outlined goto-date-preview-icon">event</span>
+                <span id="goto-date-preview-text" class="goto-date-preview-text"></span>
+            </div>
+
+            <div class="goto-date-shortcuts">
+                <button type="button" class="goto-date-shortcut-btn" id="goto-date-today-btn">
+                    <span class="material-symbols-outlined shortcut-icon">my_location</span>
+                    <span>Today</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="goto-date-footer">
+            <button type="button" class="goto-date-btn goto-date-btn-cancel" id="goto-date-cancel-btn">Cancel</button>
+            <button type="button" class="goto-date-btn goto-date-btn-submit" id="goto-date-confirm-btn">
+                <span>Go to Date</span>
+                <span class="material-symbols-outlined goto-btn-arrow">arrow_forward</span>
+            </button>
+        </div>
+    </div>
     <div id="toast">Toast message</div>
     <div id="template-strip-dropdown" class="template-strip-dropdown hidden">
         <button type="button" class="dropdown-option" id="templateInsertAbove">
@@ -1259,6 +1322,7 @@
     <script src="./js/drag-and-drop-task.js"></script>
     <script src="./js/dynamic-input-bar.js"></script>
     <script src="./js/cat-runner.js"></script>
+    <script src="./js/go-to-date.js"></script>
 
     <!-- PWA Service Worker & In-App Install Handler -->
     <script>

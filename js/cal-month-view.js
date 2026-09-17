@@ -814,13 +814,15 @@ function handleTouchEndPopUp() {
 function addDragListeners() {
   applyBordersToEventContent();
   swipeEnabledPopUp = false;
-  const goTodayBtn = document.getElementById('go-to-today');
+  const goTodayBtn = document.getElementById('go-to-date-popup-btn') || document.getElementById('go-to-today');
   const copyBtn = document.getElementById("copy-tasks-btn");
 
   copyBtn.disabled = true;
   copyBtn.classList.add('disabled-btn');
-  goTodayBtn.disabled = true;
-  goTodayBtn.classList.add(`disabled-btn`);
+  if (goTodayBtn) {
+    goTodayBtn.disabled = true;
+    goTodayBtn.classList.add(`disabled-btn`);
+  }
 
   const popupTasks = document.getElementById("popup-tasks");
 
@@ -841,13 +843,15 @@ function addDragListeners() {
 function removeDragListeners() {
   removeExtraBordersFromEventContent();
   swipeEnabledPopUp = true;
-  const goTodayBtn = document.getElementById('go-to-today');
+  const goTodayBtn = document.getElementById('go-to-date-popup-btn') || document.getElementById('go-to-today');
   const copyBtn = document.getElementById("copy-tasks-btn");
 
   copyBtn.disabled = false;
   copyBtn.classList.remove('disabled-btn');
-  goTodayBtn.disabled = false;
-  goTodayBtn.classList.remove(`disabled-btn`);
+  if (goTodayBtn) {
+    goTodayBtn.disabled = false;
+    goTodayBtn.classList.remove(`disabled-btn`);
+  }
 
   const popupTasks = document.getElementById("popup-tasks");
 
@@ -884,11 +888,14 @@ function removeExtraBordersFromEventContent() {
 }
 
 
-document.getElementById('go-to-today').addEventListener('click', () => {
-  const today = AppTimezone.now();
-  const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
-  showDayTasks(todayKey);
-});
+const popupGoDateBtn = document.getElementById('go-to-date-popup-btn') || document.getElementById('go-to-today');
+if (popupGoDateBtn) {
+  popupGoDateBtn.addEventListener('click', () => {
+    if (typeof openGoToDateModal === 'function') {
+      openGoToDateModal();
+    }
+  });
+}
 
 
 
