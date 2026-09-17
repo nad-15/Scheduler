@@ -3616,7 +3616,8 @@ h2 {
     left: 0;
     width: 77vw;
     /* max-width: 340px; */
-    /* height: 100vh; */
+    height: 100vh;
+    height: 100dvh;
     padding: 2rem;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
@@ -6695,16 +6696,19 @@ html.hide-all-buttons-active #slidingInputView {
 
 }
 
-.menu-icon-month-view {
+.menu-icon-month-view,
+.menu-icon-year-view {
     color: black;
 }
 
 .menu-button.hamburger-month-view,
+.menu-button.hamburger-year-view,
 .todo-filter-mode-btn {
     background-color: transparent;
 }
 
 .menu-button.hamburger-month-view:active,
+.menu-button.hamburger-year-view:active,
 .menu-button.todo-filter-mode-btn:active {
     transform: scale(0.9);
 }
@@ -9236,6 +9240,7 @@ ic {
     height: 42px;
     min-height: 42px;
     padding: 0 12px;
+    padding-left: 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -9243,6 +9248,12 @@ ic {
     background: #ffffff;
     box-sizing: border-box;
     flex-shrink: 0;
+}
+
+.year-map-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .year-map-title-wrapper {

@@ -62,16 +62,38 @@ localStorage.setItem("appSettings", JSON.stringify(appSettings));
 // Select elements
 const menuButton = document.querySelector('.menu-button');
 const menuButtonMonthView = document.querySelector(".hamburger-month-view");
+const menuButtonYearView = document.querySelector(".hamburger-year-view");
 const menuSlider = document.querySelector('.menu-slider');
 const overlayMenu = document.querySelector('.overlay-menu');
 const closeButtonMenu = document.querySelector('.close-button-menu');
 
-// Menu button to toggle the menu
-menuButton.addEventListener('click', () => {
-  menuSlider.classList.toggle('open');
+function openMenu() {
+  menuSlider.classList.add('open');
   overlayMenu.classList.add('show');
   updateStorageUsage();
-});
+}
+
+function closeMenu() {
+  menuSlider.classList.remove('open');
+  overlayMenu.classList.remove('show');
+}
+
+function toggleMenu() {
+  if (menuSlider.classList.contains('open')) {
+    closeMenu();
+  } else {
+    openMenu();
+  }
+}
+
+// Menu buttons to toggle the menu
+if (menuButton) menuButton.addEventListener('click', toggleMenu);
+if (menuButtonMonthView) menuButtonMonthView.addEventListener('click', toggleMenu);
+if (menuButtonYearView) menuButtonYearView.addEventListener('click', toggleMenu);
+
+window.openMenu = openMenu;
+window.closeMenu = closeMenu;
+window.toggleMenu = toggleMenu;
 
 // Update LocalStorage usage display in settings drawer
 function updateStorageUsage() {
@@ -125,18 +147,9 @@ if (storageUsageItem) {
   storageUsageItem.addEventListener('click', updateStorageUsage);
 }
 
-menuButtonMonthView.addEventListener("click", () => {
-  menuButton.click();
-});
-
 // Close the menu
 closeButtonMenu.addEventListener('click', closeMenu);
 overlayMenu.addEventListener('click', closeMenu);
-
-function closeMenu() {
-  menuSlider.classList.remove('open');
-  overlayMenu.classList.remove('show');
-}
 
 const todoMenuItem = document.getElementById("to-do");
 const todoContainer = document.getElementById("todo-container");

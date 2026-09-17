@@ -846,16 +846,21 @@
     <!-- Year Map View (12 Months Grid) -->
     <div id="year-map-container" class="year-map-container" style="display: none;">
         <div class="year-map-header">
-            <div class="year-map-title-wrapper" id="year-map-title-wrapper">
-                <span class="year-map-title" id="year-map-title" title="Click to edit year">2026</span>
-                <input type="number" class="year-map-title-input" id="year-map-title-input" min="2025" max="9999" style="display: none;" />
-                <div class="year-map-arrow-wrapper" id="year-map-arrow-wrapper">
-                    <button type="button" class="year-map-arrow-btn" id="year-map-arrow-btn" title="Select Year">
-                        <span class="material-symbols-outlined year-map-arrow-icon">arrow_drop_down</span>
-                    </button>
-                    <select class="year-map-select" id="year-map-select" title="Select Year">
-                        <option value="type-here">Type year...</option>
-                    </select>
+            <div class="year-map-header-left">
+                <button type="button" class="menu-button hamburger-year-view" id="year-map-hamburger-btn" title="Menu">
+                    <span class="material-icons menu-icon-year-view">menu</span>
+                </button>
+                <div class="year-map-title-wrapper" id="year-map-title-wrapper">
+                    <span class="year-map-title" id="year-map-title" title="Click to edit year">2026</span>
+                    <input type="number" class="year-map-title-input" id="year-map-title-input" min="2025" max="9999" style="display: none;" />
+                    <div class="year-map-arrow-wrapper" id="year-map-arrow-wrapper">
+                        <button type="button" class="year-map-arrow-btn" id="year-map-arrow-btn" title="Select Year">
+                            <span class="material-symbols-outlined year-map-arrow-icon">arrow_drop_down</span>
+                        </button>
+                        <select class="year-map-select" id="year-map-select" title="Select Year">
+                            <option value="type-here">Type year...</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
