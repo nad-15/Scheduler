@@ -8984,7 +8984,7 @@ ic {
 
 .goto-date-header-icon {
     font-size: 20px;
-    color: var(--goto-theme-color, #333);
+    color: #111;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9120,59 +9120,62 @@ ic {
 .goto-date-preview {
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    text-align: center;
     padding: 6px 0;
     color: #444;
 }
 
-.goto-date-preview-icon {
-    font-size: 18px;
-    color: #666;
-    flex-shrink: 0;
-}
-
 .goto-date-preview-text {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 500;
     color: #333;
+    text-align: center;
 }
 
 .goto-date-shortcuts {
     display: flex;
     align-items: center;
-    gap: 8px;
+    width: 100%;
 }
 
 .goto-date-shortcut-btn {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 5px 12px;
+    justify-content: center;
+    width: 100%;
+    gap: 6px;
+    padding: 8px 16px;
     background: #f4f4f4;
     border: 1px solid #ddd;
     border-radius: 6px;
     color: #333;
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
     font-family: var(--todo-font);
-    transition: background-color 0.15s ease;
+    box-sizing: border-box;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
 }
 
 .goto-date-shortcut-btn .shortcut-icon {
-    font-size: 16px;
+    font-size: 18px;
     color: var(--goto-theme-color, #2196f3);
 }
 
 .goto-date-shortcut-btn:hover {
-    background: #e8e8e8;
+    background: #eaeaea;
+    border-color: #ccc;
+}
+
+.goto-date-shortcut-btn:active {
+    transform: scale(0.99);
 }
 
 .goto-date-footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
+    width: 100%;
     padding-top: 8px;
     border-top: 1px solid #eee;
 }
@@ -9181,16 +9184,17 @@ ic {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 7px 16px;
+    gap: 6px;
+    padding: 9px 16px;
     border-radius: 6px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     user-select: none;
     outline: none;
     font-family: var(--todo-font);
-    transition: background-color 0.15s ease, filter 0.15s ease;
+    box-sizing: border-box;
+    transition: background-color 0.15s ease, filter 0.15s ease, transform 0.08s ease;
 }
 
 .goto-date-btn-cancel {
@@ -9205,17 +9209,22 @@ ic {
 }
 
 .goto-date-btn-submit {
+    width: 100%;
     background-color: var(--goto-theme-color, #2196f3);
     border: none;
     color: var(--goto-theme-text-color, #ffffff);
 }
 
 .goto-date-btn-submit:hover {
-    filter: brightness(0.9);
+    filter: brightness(0.92);
+}
+
+.goto-date-btn-submit:active {
+    transform: scale(0.99);
 }
 
 .goto-date-btn-submit .goto-btn-arrow {
-    font-size: 16px;
+    font-size: 17px;
 }
 
 /* ==========================================================================
