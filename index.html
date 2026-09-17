@@ -854,10 +854,11 @@
                     <span class="year-map-title" id="year-map-title" title="Click to edit year">2026</span>
                     <input type="number" class="year-map-title-input" id="year-map-title-input" min="2025" max="9999" style="display: none;" />
                     <div class="year-map-arrow-wrapper" id="year-map-arrow-wrapper">
-                        <button type="button" class="year-map-arrow-btn" id="year-map-arrow-btn" title="Select Year">
+                        <button type="button" class="year-map-arrow-btn" id="year-map-arrow-btn" title="Select Year" aria-haspopup="listbox" aria-expanded="false">
                             <span class="material-symbols-outlined year-map-arrow-icon">arrow_drop_down</span>
                         </button>
-                        <select class="year-map-select" id="year-map-select" title="Select Year">
+                        <div class="year-map-dropdown-menu hidden" id="year-map-dropdown-menu" role="listbox" tabindex="-1"></div>
+                        <select class="year-map-select-hidden" id="year-map-select" title="Select Year" tabindex="-1" aria-hidden="true" style="display: none;">
                             <option value="type-here">Type year...</option>
                         </select>
                     </div>
@@ -1294,27 +1295,39 @@
 
         <div class="goto-date-body">
             <div class="goto-date-selects-row">
-                <div class="goto-date-field">
-                    <label for="goto-date-month-select" class="goto-date-label">Month</label>
-                    <div class="goto-date-select-wrapper">
-                        <select id="goto-date-month-select" class="goto-date-select"></select>
-                        <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                <div class="goto-date-field" id="goto-date-month-field">
+                    <span class="goto-date-label">Month</span>
+                    <div class="goto-date-select-wrapper" id="goto-date-month-wrapper">
+                        <button type="button" class="goto-date-custom-select" id="goto-date-month-btn" aria-haspopup="listbox" aria-expanded="false" title="Select Month">
+                            <span class="goto-date-select-text" id="goto-date-month-text">January</span>
+                            <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                        </button>
+                        <div class="goto-date-dropdown-menu hidden" id="goto-date-month-menu" role="listbox" tabindex="-1"></div>
+                        <select id="goto-date-month-select" class="goto-date-select-hidden" tabindex="-1" aria-hidden="true" style="display: none;"></select>
                     </div>
                 </div>
 
-                <div class="goto-date-field">
-                    <label for="goto-date-day-select" class="goto-date-label">Day</label>
-                    <div class="goto-date-select-wrapper">
-                        <select id="goto-date-day-select" class="goto-date-select"></select>
-                        <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                <div class="goto-date-field" id="goto-date-day-field">
+                    <span class="goto-date-label">Day</span>
+                    <div class="goto-date-select-wrapper" id="goto-date-day-wrapper">
+                        <button type="button" class="goto-date-custom-select" id="goto-date-day-btn" aria-haspopup="listbox" aria-expanded="false" title="Select Day">
+                            <span class="goto-date-select-text" id="goto-date-day-text">1</span>
+                            <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                        </button>
+                        <div class="goto-date-dropdown-menu hidden" id="goto-date-day-menu" role="listbox" tabindex="-1"></div>
+                        <select id="goto-date-day-select" class="goto-date-select-hidden" tabindex="-1" aria-hidden="true" style="display: none;"></select>
                     </div>
                 </div>
 
-                <div class="goto-date-field">
-                    <label for="goto-date-year-select" class="goto-date-label">Year</label>
-                    <div class="goto-date-select-wrapper">
-                        <select id="goto-date-year-select" class="goto-date-select"></select>
-                        <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                <div class="goto-date-field" id="goto-date-year-field">
+                    <span class="goto-date-label">Year</span>
+                    <div class="goto-date-select-wrapper" id="goto-date-year-wrapper">
+                        <button type="button" class="goto-date-custom-select" id="goto-date-year-btn" aria-haspopup="listbox" aria-expanded="false" title="Select Year">
+                            <span class="goto-date-select-text" id="goto-date-year-text">2026</span>
+                            <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
+                        </button>
+                        <div class="goto-date-dropdown-menu hidden" id="goto-date-year-menu" role="listbox" tabindex="-1"></div>
+                        <select id="goto-date-year-select" class="goto-date-select-hidden" tabindex="-1" aria-hidden="true" style="display: none;"></select>
                     </div>
                 </div>
             </div>

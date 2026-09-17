@@ -26,6 +26,8 @@
   let titleEl = null;
   let titleInputEl = null;
   let arrowWrapperEl = null;
+  let arrowBtn = null;
+  let dropdownMenuEl = null;
   let yearSelectEl = null;
   let modeBtn = null;
   let modeLabelEl = null;
@@ -37,33 +39,104 @@
   let currentMode = 'stripes'; // 'stripes' | 'heatmap'
 
   function populateYearSelect() {
-    if (!yearSelectEl) return;
-    yearSelectEl.innerHTML = '';
+    if (yearSelectEl) {
+      yearSelectEl.innerHTML = '';
+      const firstOpt = document.createElement('option');
+      firstOpt.value = 'type-here';
+      firstOpt.textContent = 'Type year...';
+      yearSelectEl.appendChild(firstOpt);
 
-    const firstOpt = document.createElement('option');
-    firstOpt.value = 'type-here';
-    firstOpt.textContent = 'Type year...';
-    yearSelectEl.appendChild(firstOpt);
+      for (let y = 2025; y <= 2100; y++) {
+        const opt = document.createElement('option');
+        opt.value = y.toString();
+        opt.textContent = y.toString();
+        yearSelectEl.appendChild(opt);
+      }
+    }
 
-    for (let y = 2025; y <= 2100; y++) {
-      const opt = document.createElement('option');
-      opt.value = y.toString();
-      opt.textContent = y.toString();
-      yearSelectEl.appendChild(opt);
+    if (dropdownMenuEl) {
+      dropdownMenuEl.innerHTML = '';
+
+      // "Type year..." option
+      const typeBtn = document.createElement('button');
+      typeBtn.type = 'button';
+      typeBtn.className = 'year-map-dropdown-item';
+      typeBtn.setAttribute('role', 'option');
+      typeBtn.textContent = 'Type year...';
+      typeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeYearDropdown();
+        startYearEdit();
+      });
+      dropdownMenuEl.appendChild(typeBtn);
+
+      // Years 2025 to 2100
+      for (let y = 2025; y <= 2100; y++) {
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'year-map-dropdown-item';
+        itemBtn.dataset.year = y.toString();
+        itemBtn.setAttribute('role', 'option');
+        itemBtn.textContent = y.toString();
+        itemBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeYearDropdown();
+          currentYear = y;
+          renderYearMap(currentYear);
+        });
+        dropdownMenuEl.appendChild(itemBtn);
+      }
     }
   }
 
   function syncYearSelect(year) {
-    if (!yearSelectEl) return;
-    const yStr = (year || currentYear).toString();
-    let existingOpt = yearSelectEl.querySelector(`option[value="${yStr}"]`);
-    if (!existingOpt) {
-      existingOpt = document.createElement('option');
-      existingOpt.value = yStr;
-      existingOpt.textContent = yStr;
-      yearSelectEl.appendChild(existingOpt);
+    const yVal = year || currentYear;
+    const yStr = yVal.toString();
+    if (yearSelectEl) {
+      let existingOpt = yearSelectEl.querySelector(`option[value="${yStr}"]`);
+      if (!existingOpt) {
+        existingOpt = document.createElement('option');
+        existingOpt.value = yStr;
+        existingOpt.textContent = yStr;
+        yearSelectEl.appendChild(existingOpt);
+      }
+      yearSelectEl.value = yStr;
     }
-    yearSelectEl.value = yStr;
+
+    if (dropdownMenuEl) {
+      dropdownMenuEl.querySelectorAll('.year-map-dropdown-item[data-year]').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.year === yStr);
+      });
+    }
+  }
+
+  function closeYearDropdown() {
+    if (dropdownMenuEl) dropdownMenuEl.classList.add('hidden');
+    if (arrowBtn) {
+      arrowBtn.classList.remove('is-open');
+      arrowBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function toggleYearDropdown() {
+    if (!dropdownMenuEl) return;
+    const isCurrentlyOpen = !dropdownMenuEl.classList.contains('hidden');
+    if (isCurrentlyOpen) {
+      closeYearDropdown();
+    } else {
+      dropdownMenuEl.classList.remove('hidden');
+      if (arrowBtn) {
+        arrowBtn.classList.add('is-open');
+        arrowBtn.setAttribute('aria-expanded', 'true');
+      }
+      syncYearSelect(currentYear);
+      const activeItem = dropdownMenuEl.querySelector('.year-map-dropdown-item.active');
+      if (activeItem) {
+        requestAnimationFrame(() => {
+          activeItem.scrollIntoView({ block: 'nearest' });
+        });
+      }
+    }
   }
 
   function init() {
@@ -72,6 +145,8 @@
     titleEl = document.getElementById('year-map-title');
     titleInputEl = document.getElementById('year-map-title-input');
     arrowWrapperEl = document.getElementById('year-map-arrow-wrapper');
+    arrowBtn = document.getElementById('year-map-arrow-btn');
+    dropdownMenuEl = document.getElementById('year-map-dropdown-menu');
     yearSelectEl = document.getElementById('year-map-select');
     modeBtn = document.getElementById('year-map-mode-btn');
     modeLabelEl = document.getElementById('year-map-mode-label');
@@ -110,6 +185,25 @@
         startYearEdit();
       });
     }
+
+    if (arrowBtn) {
+      arrowBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleYearDropdown();
+      });
+    }
+
+    // Dismiss year dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (arrowWrapperEl && arrowWrapperEl.contains(e.target)) return;
+      closeYearDropdown();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && dropdownMenuEl && !dropdownMenuEl.classList.contains('hidden')) {
+        closeYearDropdown();
+      }
+    });
 
     if (yearSelectEl) {
       yearSelectEl.addEventListener('change', (e) => {
@@ -312,6 +406,7 @@
   }
 
   function closeYearMap() {
+    closeYearDropdown();
     if (containerEl) {
       containerEl.style.display = 'none';
       if (gridEl) {

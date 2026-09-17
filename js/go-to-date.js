@@ -15,6 +15,15 @@
   let monthSelect = null;
   let daySelect = null;
   let yearSelect = null;
+  let monthBtn = null;
+  let monthTextEl = null;
+  let monthMenuEl = null;
+  let dayBtn = null;
+  let dayTextEl = null;
+  let dayMenuEl = null;
+  let yearBtn = null;
+  let yearTextEl = null;
+  let yearMenuEl = null;
   let previewTextEl = null;
   let todayBtn = null;
   let confirmBtn = null;
@@ -27,6 +36,19 @@
     monthSelect = document.getElementById('goto-date-month-select');
     daySelect = document.getElementById('goto-date-day-select');
     yearSelect = document.getElementById('goto-date-year-select');
+
+    monthBtn = document.getElementById('goto-date-month-btn');
+    monthTextEl = document.getElementById('goto-date-month-text');
+    monthMenuEl = document.getElementById('goto-date-month-menu');
+
+    dayBtn = document.getElementById('goto-date-day-btn');
+    dayTextEl = document.getElementById('goto-date-day-text');
+    dayMenuEl = document.getElementById('goto-date-day-menu');
+
+    yearBtn = document.getElementById('goto-date-year-btn');
+    yearTextEl = document.getElementById('goto-date-year-text');
+    yearMenuEl = document.getElementById('goto-date-year-menu');
+
     previewTextEl = document.getElementById('goto-date-preview-text');
     todayBtn = document.getElementById('goto-date-today-btn');
     confirmBtn = document.getElementById('goto-date-confirm-btn');
@@ -39,6 +61,36 @@
 
     populateMonths();
     populateYears();
+
+    // Trigger buttons toggle custom dropdown menus
+    if (monthBtn) {
+      monthBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdown('month');
+      });
+    }
+
+    if (dayBtn) {
+      dayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdown('day');
+      });
+    }
+
+    if (yearBtn) {
+      yearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdown('year');
+      });
+    }
+
+    // Dismiss custom dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (modalEl && modalEl.contains(e.target) && e.target.closest('.goto-date-select-wrapper')) {
+        return;
+      }
+      closeAllDropdowns();
+    });
 
     monthSelect.addEventListener('change', onMonthOrYearChange);
     yearSelect.addEventListener('change', onMonthOrYearChange);
@@ -67,7 +119,11 @@
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isModalOpen()) {
-        closeGoToDateModal();
+        if (hasOpenDropdown()) {
+          closeAllDropdowns();
+        } else {
+          closeGoToDateModal();
+        }
       }
     });
 
@@ -78,23 +134,127 @@
     return modalEl && modalEl.classList.contains('active');
   }
 
+  function hasOpenDropdown() {
+    return (
+      (monthMenuEl && !monthMenuEl.classList.contains('hidden')) ||
+      (dayMenuEl && !dayMenuEl.classList.contains('hidden')) ||
+      (yearMenuEl && !yearMenuEl.classList.contains('hidden'))
+    );
+  }
+
+  function closeAllDropdowns() {
+    if (monthMenuEl) monthMenuEl.classList.add('hidden');
+    if (dayMenuEl) dayMenuEl.classList.add('hidden');
+    if (yearMenuEl) yearMenuEl.classList.add('hidden');
+
+    if (monthBtn) {
+      monthBtn.classList.remove('is-open');
+      monthBtn.setAttribute('aria-expanded', 'false');
+    }
+    if (dayBtn) {
+      dayBtn.classList.remove('is-open');
+      dayBtn.setAttribute('aria-expanded', 'false');
+    }
+    if (yearBtn) {
+      yearBtn.classList.remove('is-open');
+      yearBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function toggleDropdown(type) {
+    let targetBtn = null;
+    let targetMenu = null;
+
+    if (type === 'month') {
+      targetBtn = monthBtn;
+      targetMenu = monthMenuEl;
+    } else if (type === 'day') {
+      targetBtn = dayBtn;
+      targetMenu = dayMenuEl;
+    } else if (type === 'year') {
+      targetBtn = yearBtn;
+      targetMenu = yearMenuEl;
+    }
+
+    if (!targetBtn || !targetMenu) return;
+
+    const isCurrentlyOpen = !targetMenu.classList.contains('hidden');
+    closeAllDropdowns();
+
+    if (!isCurrentlyOpen) {
+      targetMenu.classList.remove('hidden');
+      targetBtn.classList.add('is-open');
+      targetBtn.setAttribute('aria-expanded', 'true');
+
+      // Scroll active item smoothly into view
+      const activeItem = targetMenu.querySelector('.goto-date-dropdown-item.active');
+      if (activeItem) {
+        requestAnimationFrame(() => {
+          activeItem.scrollIntoView({ block: 'nearest' });
+        });
+      }
+    }
+  }
+
   function populateMonths() {
     monthSelect.innerHTML = '';
+    if (monthMenuEl) monthMenuEl.innerHTML = '';
+
     MONTH_NAMES.forEach((name, idx) => {
+      // Hidden select option
       const opt = document.createElement('option');
       opt.value = idx.toString();
       opt.textContent = name;
       monthSelect.appendChild(opt);
+
+      // Custom dropdown item
+      if (monthMenuEl) {
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'goto-date-dropdown-item';
+        itemBtn.dataset.value = idx.toString();
+        itemBtn.setAttribute('role', 'option');
+        itemBtn.textContent = name;
+        itemBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          monthSelect.value = idx.toString();
+          syncAllDropdownLabels();
+          closeAllDropdowns();
+          onMonthOrYearChange();
+        });
+        monthMenuEl.appendChild(itemBtn);
+      }
     });
   }
 
   function populateYears() {
     yearSelect.innerHTML = '';
+    if (yearMenuEl) yearMenuEl.innerHTML = '';
+
     for (let y = 2025; y <= 2100; y++) {
+      // Hidden select option
       const opt = document.createElement('option');
       opt.value = y.toString();
       opt.textContent = y.toString();
       yearSelect.appendChild(opt);
+
+      // Custom dropdown item
+      if (yearMenuEl) {
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'goto-date-dropdown-item';
+        itemBtn.dataset.value = y.toString();
+        itemBtn.setAttribute('role', 'option');
+        itemBtn.textContent = y.toString();
+        itemBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          yearSelect.value = y.toString();
+          syncAllDropdownLabels();
+          closeAllDropdowns();
+          onMonthOrYearChange();
+        });
+        yearMenuEl.appendChild(itemBtn);
+      }
     }
   }
 
@@ -104,15 +264,73 @@
     const currentVal = preferredDay || parseInt(daySelect.value, 10) || 1;
 
     daySelect.innerHTML = '';
+    if (dayMenuEl) dayMenuEl.innerHTML = '';
+
     for (let d = 1; d <= daysInMonth; d++) {
+      // Hidden select option
       const opt = document.createElement('option');
       opt.value = d.toString();
       opt.textContent = d.toString();
       daySelect.appendChild(opt);
+
+      // Custom dropdown item
+      if (dayMenuEl) {
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'goto-date-dropdown-item';
+        itemBtn.dataset.value = d.toString();
+        itemBtn.setAttribute('role', 'option');
+        itemBtn.textContent = d.toString();
+        itemBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          daySelect.value = d.toString();
+          syncAllDropdownLabels();
+          closeAllDropdowns();
+          updatePreview();
+        });
+        dayMenuEl.appendChild(itemBtn);
+      }
     }
 
     const safeDay = Math.min(Math.max(1, currentVal), daysInMonth);
     daySelect.value = safeDay.toString();
+    syncAllDropdownLabels();
+  }
+
+  function syncAllDropdownLabels() {
+    const m = parseInt(monthSelect.value, 10);
+    const y = parseInt(yearSelect.value, 10);
+    const d = parseInt(daySelect.value, 10);
+
+    // Month label & active state
+    if (monthTextEl && !isNaN(m) && MONTH_NAMES[m]) {
+      monthTextEl.textContent = MONTH_NAMES[m];
+    }
+    if (monthMenuEl) {
+      monthMenuEl.querySelectorAll('.goto-date-dropdown-item').forEach((item) => {
+        item.classList.toggle('active', item.dataset.value === monthSelect.value);
+      });
+    }
+
+    // Day label & active state
+    if (dayTextEl && !isNaN(d)) {
+      dayTextEl.textContent = d.toString();
+    }
+    if (dayMenuEl) {
+      dayMenuEl.querySelectorAll('.goto-date-dropdown-item').forEach((item) => {
+        item.classList.toggle('active', item.dataset.value === daySelect.value);
+      });
+    }
+
+    // Year label & active state
+    if (yearTextEl && !isNaN(y)) {
+      yearTextEl.textContent = y.toString();
+    }
+    if (yearMenuEl) {
+      yearMenuEl.querySelectorAll('.goto-date-dropdown-item').forEach((item) => {
+        item.classList.toggle('active', item.dataset.value === yearSelect.value);
+      });
+    }
   }
 
   function onMonthOrYearChange() {
@@ -150,6 +368,7 @@
     yearSelect.value = targetY.toString();
     monthSelect.value = targetM.toString();
     updateDays(targetM, targetY, targetD);
+    syncAllDropdownLabels();
     updatePreview();
   }
 
@@ -207,7 +426,11 @@
     yearSelect.value = initialYear.toString();
     monthSelect.value = initialMonth.toString();
     updateDays(initialMonth, initialYear, initialDay);
+    syncAllDropdownLabels();
     updatePreview();
+
+    // Close any open custom dropdown menus
+    closeAllDropdowns();
 
     // Show modal & backdrop
     if (backdropEl) {
@@ -248,6 +471,8 @@
   }
 
   function closeGoToDateModal() {
+    closeAllDropdowns();
+
     if (backdropEl) {
       backdropEl.classList.remove('active');
       setTimeout(() => {
