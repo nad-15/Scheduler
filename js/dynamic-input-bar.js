@@ -411,8 +411,9 @@
 
     // If closing tray and textarea is not actively focused, return to resting state
     if (document.activeElement !== taskTitle) {
-      isManualTextareaExpanded = false;
-      updateCollapseLogic();
+      if (!isManualTextareaExpanded) {
+        updateCollapseLogic();
+      }
     }
 
     if (typeof window.syncTaskToolbarWithDrawer === 'function') {
@@ -675,13 +676,18 @@
     // Allow chevron collapse button interactions (its own click handler manages collapse upon lifting)
     if (btnCollapseActions && btnCollapseActions.contains(e.target)) return;
 
+    // If user manually expanded it, all actions that collapse it should NOT trigger collapsing it!
+    if (isManualTextareaExpanded) {
+      if (document.activeElement === taskTitle) {
+        taskTitle.blur();
+      }
+      return;
+    }
+
     // For any other interaction anywhere on the screen (colors, calendar, toolbar, counter, add task, etc.):
     // Neither action (focus or swipe-left) is active, so textarea MUST NOT be extended:
     if (document.activeElement === taskTitle) {
       taskTitle.blur();
-    }
-    if (isManualTextareaExpanded) {
-      isManualTextareaExpanded = false;
     }
     wasExpandedBeforeEmoji = false;
     if (isEmojiTrayOpen) {
@@ -1009,11 +1015,12 @@
         if (document.activeElement === taskTitle) {
           taskTitle.blur();
         }
-        isManualTextareaExpanded = false;
-        wasExpandedBeforeEmoji = false;
-        savedSelectionStart = null;
-        savedSelectionEnd = null;
-        updateCollapseLogic();
+        if (!isManualTextareaExpanded) {
+          wasExpandedBeforeEmoji = false;
+          savedSelectionStart = null;
+          savedSelectionEnd = null;
+          updateCollapseLogic();
+        }
       });
     }
 
@@ -1023,27 +1030,31 @@
         if (document.activeElement === taskTitle) {
           taskTitle.blur();
         }
-        isManualTextareaExpanded = false;
-        wasExpandedBeforeEmoji = false;
-        savedSelectionStart = null;
-        savedSelectionEnd = null;
-        setTimeout(updateCollapseLogic, 50);
+        if (!isManualTextareaExpanded) {
+          wasExpandedBeforeEmoji = false;
+          savedSelectionStart = null;
+          savedSelectionEnd = null;
+          setTimeout(updateCollapseLogic, 50);
+        } else {
+          // If manually expanded, keep expanded state active
+          setTimeout(() => {
+            if (isManualTextareaExpanded) {
+              setCollapsedState(true);
+              autoResizeTextarea();
+            }
+          }, 50);
+        }
       });
     }
 
-    // Close emoji tray or exit preview on Escape key
+    // Close emoji tray on Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (isEmojiTrayOpen) closeEmojiTray();
-        if (isManualTextareaExpanded) {
-          isManualTextareaExpanded = false;
-          updateCollapseLogic();
-        }
       }
     });
 
     // Global capture listener: Any interaction outside taskTitle (colors, calendar, toolbar, counter, etc.)
-    // guarantees tools immediately uncollapse and textarea contracts
     document.addEventListener('pointerdown', handleOutsideInteraction, true);
     document.addEventListener('touchstart', handleOutsideInteraction, { capture: true, passive: true });
     document.addEventListener('click', handleOutsideInteraction, true);
@@ -1058,8 +1069,9 @@
         if (isEmojiTrayOpen) {
           closeEmojiTray();
         }
-        isManualTextareaExpanded = false;
-        updateCollapseLogic();
+        if (!isManualTextareaExpanded) {
+          updateCollapseLogic();
+        }
       };
       colorOptionsContainer.addEventListener('pointerdown', handleColorInteraction, true);
       colorOptionsContainer.addEventListener('click', handleColorInteraction, true);
@@ -1082,7 +1094,6 @@
           taskTitle.blur();
           return;
         }
-        isManualTextareaExpanded = false;
         autoResizeTextarea();
         updateCollapseLogic();
         updateSavedSelection();
@@ -1091,6 +1102,10 @@
       taskTitle.addEventListener('blur', () => {
         updateSavedSelection();
         setTimeout(() => {
+          // If manually expanded, do not collapse on blur
+          if (isManualTextareaExpanded) {
+            return;
+          }
           // If emoji tray is open and was kept expanded, don't collapse on blur
           if (isEmojiTrayOpen && isManualTextareaExpanded) {
             return;
@@ -1108,7 +1123,6 @@
           return;
         }
         updateSavedSelection();
-        isManualTextareaExpanded = false;
         autoResizeTextarea();
         updateCollapseLogic();
       });
@@ -1129,13 +1143,15 @@
       titleSubmitContainer.addEventListener('touchcancel', handleTouchCancel, { passive: true });
     }
 
-    // Automatically close emoji tray if the drawer is closed or hidden
+    // Automatically close emoji tray and reset manual expansion if the drawer is closed or hidden
     if (slidingInputView) {
       const drawerObserver = new MutationObserver(() => {
         if (!slidingInputView.classList.contains('show')) {
           if (isEmojiTrayOpen) {
             closeEmojiTray();
           }
+          isManualTextareaExpanded = false;
+          wasExpandedBeforeEmoji = false;
         }
       });
       drawerObserver.observe(slidingInputView, { attributes: true, attributeFilter: ['class'] });
