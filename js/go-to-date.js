@@ -592,6 +592,7 @@
     if (typeof currentYearVertView !== 'undefined') currentYearVertView = y;
     if (typeof currentMonthValue !== 'undefined') currentMonthValue = m;
     if (typeof currentYearValue !== 'undefined') currentYearValue = y;
+    if (typeof popUpDate !== 'undefined') popUpDate = targetDateKey;
 
     if (openedFromPopup) {
       // Triggered from daily task popup: keep popup open and navigate it
