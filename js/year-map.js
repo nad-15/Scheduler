@@ -37,6 +37,7 @@
 
   let currentYear = 2026;
   let currentMode = 'heatmap'; // 'heatmap' | 'stripes'
+  let selectedMonth = 0;
 
   function populateYearSelect() {
     if (yearSelectEl) {
@@ -199,12 +200,6 @@
       closeYearDropdown();
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && dropdownMenuEl && !dropdownMenuEl.classList.contains('hidden')) {
-        closeYearDropdown();
-      }
-    });
-
     if (yearSelectEl) {
       yearSelectEl.addEventListener('change', (e) => {
         const val = e.target.value;
@@ -282,38 +277,48 @@
     if (gotoMonthBtn) {
       gotoMonthBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const m = typeof currentMonthVertView !== 'undefined' ? currentMonthVertView : 0;
-        goToMonthView(m, currentYear);
+        goToMonthView(selectedMonth, currentYear);
       });
     }
 
     if (gotoListBtn) {
       gotoListBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const m = typeof currentMonthVertView !== 'undefined' ? currentMonthVertView : 0;
-        if (typeof currentMonthVertView !== 'undefined') currentMonthVertView = m;
+        if (typeof currentMonthVertView !== 'undefined') currentMonthVertView = selectedMonth;
         if (typeof currentYearVertView !== 'undefined') currentYearVertView = currentYear;
-        if (typeof currentMonthValue !== 'undefined') currentMonthValue = m;
+        if (typeof currentMonthValue !== 'undefined') currentMonthValue = selectedMonth;
         if (typeof currentYearValue !== 'undefined') currentYearValue = currentYear;
         if (typeof popUpDate !== 'undefined') popUpDate = null;
 
         closeYearMap();
 
         if (typeof showCalHorView === 'function') {
-          showCalHorView(m, currentYear);
+          showCalHorView(selectedMonth, currentYear);
         }
       });
     }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isYearMapOpen()) {
-        const returnView = window.previousViewBeforeYear || 'month';
-        closeYearMap();
-        if (returnView === 'list' && typeof showCalHorView === 'function') {
-          showCalHorView(currentMonthVertView || 0, currentYear);
-        } else if (typeof showCalVertView === 'function') {
-          showCalVertView(currentMonthVertView || 0, currentYear);
-        }
+      if (e.key !== 'Escape' || !isYearMapOpen()) return;
+
+      if (dropdownMenuEl && !dropdownMenuEl.classList.contains('hidden')) {
+        e.stopPropagation();
+        closeYearDropdown();
+        return;
+      }
+
+      if (titleInputEl && titleInputEl.style.display !== 'none') {
+        e.stopPropagation();
+        finishYearEdit(false);
+        return;
+      }
+
+      const returnView = window.previousViewBeforeYear || 'month';
+      closeYearMap();
+      if (returnView === 'list' && typeof showCalHorView === 'function') {
+        showCalHorView(selectedMonth, currentYear);
+      } else if (typeof showCalVertView === 'function') {
+        showCalVertView(selectedMonth, currentYear);
       }
     });
   }
@@ -387,10 +392,12 @@
     let targetYear = null;
     if (typeof targetYearParam === 'number' && targetYearParam >= 2025) {
       targetYear = targetYearParam;
-    } else if (typeof popUpDate === 'string' && popUpDate) {
-      const pY = parseInt(popUpDate.split('-')[0], 10);
-      if (!isNaN(pY) && pY >= 2025) {
-        targetYear = pY;
+    } else {
+      const activeYear = (typeof currentYearVertView !== 'undefined' && currentYearVertView >= 2025)
+        ? currentYearVertView
+        : (typeof currentYearValue !== 'undefined' && currentYearValue >= 2025 ? currentYearValue : null);
+      if (activeYear) {
+        targetYear = activeYear;
       }
     }
 
@@ -400,6 +407,11 @@
     }
 
     currentYear = targetYear;
+
+    const now = typeof AppTimezone !== 'undefined' ? AppTimezone.now() : new Date();
+    selectedMonth = (typeof currentMonthVertView !== 'undefined')
+      ? currentMonthVertView
+      : (typeof currentMonthValue !== 'undefined' ? currentMonthValue : now.getMonth());
 
     containerEl.style.display = 'flex';
     updateModeButtonLabel();
@@ -509,6 +521,13 @@
       const monthBox = document.createElement('div');
       monthBox.className = 'year-map-month';
       monthBox.dataset.month = m.toString();
+      if (m === selectedMonth) {
+        monthBox.classList.add('is-selected');
+      }
+
+      monthBox.addEventListener('click', () => {
+        selectMonth(m);
+      });
 
       // Month Title (Clicking it zooms Month View directly to that month)
       const monthHeader = document.createElement('div');
@@ -517,6 +536,7 @@
       monthHeader.title = `Open ${MONTH_NAMES_SHORT[m]} ${year} in Month View`;
       monthHeader.addEventListener('click', (e) => {
         e.stopPropagation();
+        selectMonth(m);
         goToMonthView(m, year);
       });
       monthBox.appendChild(monthHeader);
@@ -593,13 +613,6 @@
         dayNumberSpan.className = 'year-map-day-number';
         dayNumberSpan.textContent = d.toString();
         dayCell.appendChild(dayNumberSpan);
-
-        // Click to open that day's task popup
-        dayCell.addEventListener('click', (e) => {
-          e.stopPropagation();
-          onDayClick(m, year, d, dateKey);
-        });
-
         daysGrid.appendChild(dayCell);
       }
 
@@ -608,20 +621,14 @@
     }
   }
 
-  function onDayClick(m, year, d, dateKey) {
-    // Sync Month View state
+  function selectMonth(m) {
+    selectedMonth = m;
     if (typeof currentMonthVertView !== 'undefined') currentMonthVertView = m;
-    if (typeof currentYearVertView !== 'undefined') currentYearVertView = year;
     if (typeof currentMonthValue !== 'undefined') currentMonthValue = m;
-    if (typeof currentYearValue !== 'undefined') currentYearValue = year;
-
-    if (typeof updateCalendarWithTasks === 'function') {
-      updateCalendarWithTasks(m, year);
-    }
-
-    // Open daily task popup
-    if (typeof showDayTasks === 'function') {
-      showDayTasks(dateKey);
+    if (gridEl) {
+      gridEl.querySelectorAll('.year-map-month').forEach((box) => {
+        box.classList.toggle('is-selected', parseInt(box.dataset.month, 10) === m);
+      });
     }
   }
 

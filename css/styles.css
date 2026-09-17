@@ -9195,12 +9195,12 @@ ic {
 .goto-date-year-input {
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 6px 8px 10px;
-    font-size: 14px;
+    padding: 8px 8px 8px 10px;
+    font-size: 13.5px;
     font-weight: 500;
-    color: #333;
-    background-color: #fff;
-    border: 1px solid #ccc;
+    color: #1e293b;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
     border-radius: 6px;
     outline: none;
     font-family: var(--todo-font);
@@ -9208,12 +9208,12 @@ ic {
 }
 
 .goto-date-year-input:hover {
-    border-color: #999;
+    border-color: #94a3b8;
 }
 
 .goto-date-year-input:focus {
     border-color: var(--goto-theme-color, #2196f3);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.18);
 }
 
 .goto-date-preview {
@@ -9624,13 +9624,30 @@ ic {
     display: flex;
     flex-direction: column;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1.5px solid #e2e8f0;
     border-radius: 6px;
     padding: 2px 3px;
     box-sizing: border-box;
     overflow: hidden;
     min-height: 0;
     min-width: 0;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.year-map-month:hover {
+    border-color: #cbd5e1;
+}
+
+.year-map-month.is-selected {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1.5px #2563eb;
+    background: #f8fafc;
+}
+
+.year-map-month.is-selected .year-map-month-header {
+    color: #2563eb;
+    background-color: #eff6ff;
 }
 
 .year-map-month-header {
@@ -9689,10 +9706,6 @@ ic {
     background: transparent;
     cursor: default;
     pointer-events: none;
-}
-
-.year-map-day:hover:not(.year-map-day-empty) {
-    box-shadow: inset 0 0 0 1px #2563eb;
 }
 
 .year-map-day.year-map-today {
