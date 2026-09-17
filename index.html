@@ -800,7 +800,10 @@
                 </button>
 
                 <button class="month-view-year-map-btn" id="month-view-year-map-btn" title="Year Map">
-                    <span class="material-symbols-outlined month-view-year-map-icon">transition_dissolve</span>
+                    <svg class="year-view-cal-icon month-view-year-map-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+                        <text x="12" y="15.3" font-family="'Roboto', -apple-system, sans-serif" font-size="6.5" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="currentColor" letter-spacing="-0.3px">YR</text>
+                    </svg>
                 </button>
 
                 <div class="navigation-vertview-container" style="display: none;">
@@ -877,11 +880,14 @@
             <div class="popup-date-copy-container ">
                 <span class="popup-date" id="popup-date">May 21, 2025</span>
             </div>
-                 <div class="edit-close-container" id="editCloseContainer">
+            <div class="edit-close-container" id="editCloseContainer">
+                <!-- To-do -->
+                <button class="popup-top-todo-btn todo-popup-btn normal-mode" title="To-do" id="todo-popup-btn">
+                    <span class="material-symbols-outlined popup-top-todo-icon">checklist</span>
+                </button>
 
                 <!-- Copy -->
-
-                <button class="copy-tasks-button" title="Copy Tasks" id="copy-tasks-btn">
+                <button class="copy-tasks-button normal-mode" title="Copy Tasks" id="copy-tasks-btn">
                     <span class="material-symbols-outlined copy-task-icon">content_copy</span>
                 </button>
                 <button class="close-popup" id="closePopupBtn">
@@ -892,7 +898,6 @@
                         </video>
                     </div>
                 </button>
-                <!-- </button> -->
             </div>
         </div>
 
@@ -936,11 +941,14 @@
             </button>
             <!-- Normal Mode -->
 
-            <!-- To do -->
-            <button class="calendar-icon-button normal-mode todo-popup-btn" title="Todo">
-                <div class="calendar-icon-wrapper to-do">
-                    <span class="material-symbols-outlined popup-todo">checklist</span>
-                    <span class="calendar-icon-label to-do-label">To-do</span>
+            <!-- Year View -->
+            <button class="calendar-icon-button normal-mode" title="Year View" id="year-map-popup-btn">
+                <div class="calendar-icon-wrapper">
+                    <svg class="year-view-cal-icon" id="calendar-icon-yearview" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+                        <text x="12" y="15.3" font-family="'Roboto', -apple-system, sans-serif" font-size="6.5" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="currentColor" letter-spacing="-0.3px">YR</text>
+                    </svg>
+                    <span class="calendar-icon-label">Year View</span>
                 </div>
             </button>
 

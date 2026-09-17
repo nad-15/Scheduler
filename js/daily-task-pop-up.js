@@ -987,10 +987,12 @@ function hidePopup() {
 
 // });
 
-const todoBtnPopup = document.querySelector(".todo-popup-btn");
-
-todoBtnPopup.addEventListener("click", ()=>{
-  todoMenuItem.click();
+document.querySelectorAll(".todo-popup-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (typeof todoMenuItem !== 'undefined' && todoMenuItem) {
+      todoMenuItem.click();
+    }
+  });
 });
 
 

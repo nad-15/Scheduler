@@ -54,6 +54,20 @@
       });
     }
 
+    const popupYearMapBtn = document.getElementById('year-map-popup-btn');
+    if (popupYearMapBtn) {
+      popupYearMapBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (typeof hidePopup === 'function') {
+          hidePopup();
+        } else {
+          const closeBtn = document.getElementById('closePopupBtn');
+          if (closeBtn) closeBtn.click();
+        }
+        openYearMap();
+      });
+    }
+
     if (editBtn) {
       editBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -179,8 +193,20 @@
     if (!containerEl) init();
     if (!containerEl) return;
 
-    const now = typeof AppTimezone !== 'undefined' ? AppTimezone.now() : new Date();
-    currentYear = typeof currentYearVertView !== 'undefined' ? currentYearVertView : now.getFullYear();
+    let targetYear = null;
+    if (typeof popUpDate === 'string' && popUpDate) {
+      const pY = parseInt(popUpDate.split('-')[0], 10);
+      if (!isNaN(pY) && pY >= 2025) {
+        targetYear = pY;
+      }
+    }
+
+    if (!targetYear) {
+      const now = typeof AppTimezone !== 'undefined' ? AppTimezone.now() : new Date();
+      targetYear = typeof currentYearVertView !== 'undefined' ? currentYearVertView : now.getFullYear();
+    }
+
+    currentYear = targetYear;
 
     containerEl.style.display = 'flex';
     updateModeButtonLabel();

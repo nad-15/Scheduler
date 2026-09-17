@@ -132,17 +132,7 @@ body {
     font-size: 30px;
 }
 
-.calendar-icon-button.todo-popup-btn {
-    background: linear-gradient(135deg,
-            rgba(173, 216, 230, 0.85),
-            rgba(187, 222, 214, 0.85),
-            rgba(255, 204, 213, 0.85),
-            rgba(218, 187, 255, 0.85),
-            rgba(255, 229, 180, 0.85));
-    background-size: 400% 400%;
-    animation: aurora 18s ease infinite;
-    /* border-radius: 50%; */
-}
+
 
 /* 
 .todo-filter-mode-btn {
@@ -6755,7 +6745,10 @@ html.hide-all-buttons-active #slidingInputView {
 
 .material-symbols-outlined.header-icon-vert-view,
 .material-symbols-outlined.month-view-year-map-icon,
+.year-view-cal-icon.month-view-year-map-icon,
 .material-symbols-outlined.month-view-todo-icon {
+    width: 1.25rem;
+    height: 1.25rem;
     font-weight: 500;
     font-size: 1.25rem;
     color: #475569;
@@ -7347,6 +7340,39 @@ html.hide-all-buttons-active #slidingInputView {
     gap: 3px;
 }
 
+.popup-top-todo-btn {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: 2px solid white;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.popup-top-todo-btn:hover {
+    background-color: #f1f5f9;
+}
+
+.popup-top-todo-btn:active {
+    transform: scale(0.95);
+}
+
+.material-symbols-outlined.popup-top-todo-icon {
+    font-variation-settings: 'FILL' 0, 'wght' 550, 'GRAD' 50, 'opsz' 24 !important;
+    font-weight: 600;
+    font-size: 21px;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .copy-tasks-button {
     width: 35px;
     height: 35px;
@@ -7354,19 +7380,30 @@ html.hide-all-buttons-active #slidingInputView {
     align-items: center;
     justify-content: center;
     padding: 0;
-    /* background: rgba(255, 192, 203, 0.6); */
-    /* background-color: none;
-    background: none; */
+    background: none;
     border: 2px solid white;
     border-radius: 50%;
     overflow: hidden;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
+.copy-tasks-button:hover {
+    background-color: #f1f5f9;
+}
+
+.copy-tasks-button:active {
+    transform: scale(0.95);
+}
 
 .material-symbols-outlined.copy-task-icon {
-    font-weight: 200;
+    font-variation-settings: 'FILL' 0, 'wght' 550, 'GRAD' 50, 'opsz' 24 !important;
+    font-weight: 600;
     font-size: 20px;
-    color: #2c2b2b;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -7715,8 +7752,18 @@ ic {
 
 
 .edit-mode.hidden,
-.normal-mode.hidden {
-    display: none;
+.normal-mode.hidden,
+.popup-top-todo-btn.hidden,
+.copy-tasks-button.hidden {
+    display: none !important;
+}
+
+.year-view-cal-icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+    color: inherit;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
 
