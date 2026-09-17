@@ -36,7 +36,7 @@
   let triggerBtn = null;
 
   let currentYear = 2026;
-  let currentMode = 'stripes'; // 'stripes' | 'heatmap'
+  let currentMode = 'heatmap'; // 'heatmap' | 'stripes'
 
   function populateYearSelect() {
     if (yearSelectEl) {
@@ -466,6 +466,33 @@
     return tasksList;
   }
 
+  function fadeColor(color, alpha = 0.6) {
+    if (!color) return `rgba(106, 80, 68, ${alpha})`;
+    if (typeof window.fadeColor === 'function') {
+      return window.fadeColor(color, alpha);
+    }
+    if (color.startsWith('rgba')) {
+      return color.replace(/rgba?\(([^)]+)\)/, (match, values) => {
+        const parts = values.split(',').map(v => v.trim());
+        return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
+      });
+    }
+    if (color.startsWith('rgb')) {
+      return color.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+    }
+    let hex = color.replace('#', '').trim();
+    if (hex.length === 3) {
+      hex = hex.split('').map(c => c + c).join('');
+    }
+    if (hex.length >= 6) {
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    return color;
+  }
+
   function renderYearMap(year) {
     if (!gridEl || !titleEl) return;
 
@@ -540,7 +567,7 @@
             tasksList.forEach(taskItem => {
               const stripe = document.createElement('div');
               stripe.className = 'year-map-stripe';
-              stripe.style.backgroundColor = taskItem.color;
+              stripe.style.backgroundColor = fadeColor(taskItem.color, 0.6);
               stripesWrap.appendChild(stripe);
             });
 
