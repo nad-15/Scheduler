@@ -170,7 +170,7 @@
     if (popupYearMapBtn) {
       popupYearMapBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        let targetYear = (typeof currentYearValue !== 'undefined' && currentYearValue >= 2025) ? currentYearValue : null;
+        let targetYear = (typeof currentYearValue !== 'undefined' && currentYearValue >= 1) ? currentYearValue : null;
         let targetMonth = (typeof currentMonthValue !== 'undefined') ? currentMonthValue : null;
         if ((targetYear === null || targetMonth === null) && typeof popUpDate === 'string' && popUpDate) {
           const parts = popUpDate.split('-').map(Number);
@@ -218,7 +218,7 @@
           startYearEdit();
         } else {
           const parsed = parseInt(val, 10);
-          if (!isNaN(parsed) && parsed >= 2025) {
+          if (!isNaN(parsed) && parsed >= 1) {
             currentYear = parsed;
             renderYearMap(currentYear);
           }
@@ -270,11 +270,9 @@
             currentYear++;
             renderYearMap(currentYear);
           } else {
-            // Swipe right -> Previous year (constrained to min 2025)
-            if (currentYear > 2025) {
-              currentYear--;
-              renderYearMap(currentYear);
-            }
+            // Swipe right -> Previous year (unbounded)
+            currentYear--;
+            renderYearMap(currentYear);
           }
         }
       }
@@ -350,8 +348,8 @@
     if (commit) {
       const rawVal = titleInputEl.value.trim();
       const parsed = parseInt(rawVal, 10);
-      // Valid year constraint: number >= 2025 and <= 9999
-      if (!isNaN(parsed) && parsed >= 2025 && parsed <= 9999 && String(parsed) === rawVal) {
+      // Valid year constraint: number >= 1 and <= 9999
+      if (!isNaN(parsed) && parsed >= 1 && parsed <= 9999 && String(parsed) === rawVal) {
         currentYear = parsed;
         renderYearMap(currentYear);
       } else {
@@ -400,12 +398,12 @@
     }
 
     let targetYear = null;
-    if (typeof targetYearParam === 'number' && targetYearParam >= 2025) {
+    if (typeof targetYearParam === 'number' && !isNaN(targetYearParam) && targetYearParam >= 1) {
       targetYear = targetYearParam;
     } else {
-      const activeYear = (typeof currentYearVertView !== 'undefined' && currentYearVertView >= 2025)
+      const activeYear = (typeof currentYearVertView !== 'undefined' && currentYearVertView >= 1)
         ? currentYearVertView
-        : (typeof currentYearValue !== 'undefined' && currentYearValue >= 2025 ? currentYearValue : null);
+        : (typeof currentYearValue !== 'undefined' && currentYearValue >= 1 ? currentYearValue : null);
       if (activeYear) {
         targetYear = activeYear;
       }
