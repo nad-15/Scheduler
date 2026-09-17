@@ -6647,9 +6647,9 @@ html.hide-all-buttons-active #slidingInputView {
     box-sizing: border-box;
     /* overflow: hidden;  */
     overflow-y: auto;
+    overscroll-behavior-y: contain;
     scrollbar-width: none;
     transition: opacity 0.3s ease;
-
 }
 
 /* Header */
@@ -6853,6 +6853,7 @@ html.hide-all-buttons-active #slidingInputView {
     /* Allow it to grow and fill available space */
     overflow: hidden;
     transition: grid-template-rows 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    overscroll-behavior: contain;
 }
 
 /* Accordion Row Stretch: swiped row expands to 2.5fr, other rows squeeze to 0.7fr */
