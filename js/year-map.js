@@ -170,13 +170,23 @@
     if (popupYearMapBtn) {
       popupYearMapBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        let targetYear = (typeof currentYearValue !== 'undefined' && currentYearValue >= 2025) ? currentYearValue : null;
+        let targetMonth = (typeof currentMonthValue !== 'undefined') ? currentMonthValue : null;
+        if ((targetYear === null || targetMonth === null) && typeof popUpDate === 'string' && popUpDate) {
+          const parts = popUpDate.split('-').map(Number);
+          if (parts.length === 3) {
+            targetYear = parts[0];
+            targetMonth = parts[1];
+          }
+        }
+
         if (typeof hidePopup === 'function') {
           hidePopup();
         } else {
           const closeBtn = document.getElementById('closePopupBtn');
           if (closeBtn) closeBtn.click();
         }
-        openYearMap();
+        openYearMap(targetYear, targetMonth);
       });
     }
 
@@ -363,7 +373,7 @@
     return containerEl && containerEl.style.display !== 'none';
   }
 
-  function openYearMap(targetYearParam) {
+  function openYearMap(targetYearParam, targetMonthParam) {
     if (!containerEl) init();
     if (!containerEl) return;
 
@@ -409,9 +419,20 @@
     currentYear = targetYear;
 
     const now = typeof AppTimezone !== 'undefined' ? AppTimezone.now() : new Date();
-    selectedMonth = (typeof currentMonthVertView !== 'undefined')
-      ? currentMonthVertView
-      : (typeof currentMonthValue !== 'undefined' ? currentMonthValue : now.getMonth());
+    let targetMonth = null;
+    if (typeof targetMonthParam === 'number' && targetMonthParam >= 0 && targetMonthParam <= 11) {
+      targetMonth = targetMonthParam;
+    } else {
+      targetMonth = (typeof currentMonthVertView !== 'undefined' && currentMonthVertView !== null)
+        ? currentMonthVertView
+        : (typeof currentMonthValue !== 'undefined' && currentMonthValue !== null ? currentMonthValue : now.getMonth());
+    }
+
+    selectedMonth = targetMonth;
+    if (typeof currentMonthVertView !== 'undefined') currentMonthVertView = selectedMonth;
+    if (typeof currentYearVertView !== 'undefined') currentYearVertView = currentYear;
+    if (typeof currentMonthValue !== 'undefined') currentMonthValue = selectedMonth;
+    if (typeof currentYearValue !== 'undefined') currentYearValue = currentYear;
 
     containerEl.style.display = 'flex';
     updateModeButtonLabel();
