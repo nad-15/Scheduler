@@ -7018,6 +7018,18 @@ html.hide-all-buttons-active #slidingInputView {
     text-align: left;
 }
 
+/* When a day cell is in an expanded row, unclamp tasks so full text can be read */
+.day-vert-view.row-expanded .task-morning,
+.day-vert-view.row-expanded .task-afternoon,
+.day-vert-view.row-expanded .task-evening {
+    display: block;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+    overflow: visible;
+    text-overflow: unset;
+    height: auto;
+}
+
 /*  .day-number  is the class of day number only */
 
 .days-grid-vert-view>div.today-vert-view {

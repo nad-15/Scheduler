@@ -62,10 +62,14 @@ window.addEventListener('timezone-changed', () => {
 });
 
 
-let touchStartX = 0;
-let touchStartY = 0;
-let touchStartRow = -1;
-let touchStartScrollTop = 0;
+let gestureStartX = 0;
+let gestureStartY = 0;
+let gestureStartTime = 0;
+let gestureStartRow = -1;
+let gestureStartScrollTop = 0;
+let gestureTargetContainer = null;
+let gestureStartedOnHeader = false;
+let didTaskContentScroll = false;
 let isMonthViewSwiping = false;
 let isEditing = false;
 
@@ -73,28 +77,42 @@ function expandGridRow(rowIndex) {
   if (rowIndex < 0 || rowIndex > 5) return;
   if (!daysGridVertView) return;
   daysGridVertView.setAttribute("data-expanded-row", rowIndex.toString());
+
+  Array.from(daysGridVertView.children).forEach((cell, idx) => {
+    const row = Math.floor(idx / 7);
+    cell.classList.toggle("row-expanded", row === rowIndex);
+  });
 }
 
 function collapseGridRows() {
   if (!daysGridVertView) return;
   daysGridVertView.removeAttribute("data-expanded-row");
+  Array.from(daysGridVertView.children).forEach(cell => {
+    cell.classList.remove("row-expanded");
+  });
 }
 
+// Touch event tracking
 calendarContainerVertView.addEventListener("touchstart", (e) => {
   if (e.touches.length > 1) return;
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
+  gestureStartTime = Date.now();
+  gestureStartX = e.touches[0].clientX;
+  gestureStartY = e.touches[0].clientY;
   isMonthViewSwiping = false;
+  didTaskContentScroll = false;
 
   const targetCell = e.target.closest(".day-vert-view");
   if (targetCell && daysGridVertView) {
     const cellIndex = Array.from(daysGridVertView.children).indexOf(targetCell);
-    touchStartRow = cellIndex >= 0 ? Math.floor(cellIndex / 7) : -1;
-    const taskContainer = targetCell.querySelector(".task-container-vert-view");
-    touchStartScrollTop = taskContainer ? taskContainer.scrollTop : 0;
+    gestureStartRow = cellIndex >= 0 ? Math.floor(cellIndex / 7) : -1;
+    gestureTargetContainer = targetCell.querySelector(".task-container-vert-view");
+    gestureStartScrollTop = gestureTargetContainer ? gestureTargetContainer.scrollTop : 0;
+    gestureStartedOnHeader = Boolean(e.target.closest(".day-number"));
   } else {
-    touchStartRow = -1;
-    touchStartScrollTop = 0;
+    gestureStartRow = -1;
+    gestureTargetContainer = null;
+    gestureStartScrollTop = 0;
+    gestureStartedOnHeader = false;
   }
 }, { passive: true });
 
@@ -102,10 +120,17 @@ calendarContainerVertView.addEventListener("touchmove", (e) => {
   if (e.touches.length > 1) return;
   const currentX = e.touches[0].clientX;
   const currentY = e.touches[0].clientY;
-  const dx = currentX - touchStartX;
-  const dy = currentY - touchStartY;
+  const dx = currentX - gestureStartX;
+  const dy = currentY - gestureStartY;
 
-  if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+  // Detect if task container scrolled
+  if (gestureTargetContainer) {
+    if (Math.abs(gestureTargetContainer.scrollTop - gestureStartScrollTop) > 3) {
+      didTaskContentScroll = true;
+    }
+  }
+
+  if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
     isMonthViewSwiping = true;
   }
 }, { passive: true });
@@ -113,44 +138,62 @@ calendarContainerVertView.addEventListener("touchmove", (e) => {
 calendarContainerVertView.addEventListener("touchend", (e) => {
   const touchEndX = e.changedTouches[0].clientX;
   const touchEndY = e.changedTouches[0].clientY;
-  handleCalendarSwipe(touchStartX, touchEndX, touchStartY, touchEndY);
+
+  // Final check if container scrolled
+  if (gestureTargetContainer) {
+    if (Math.abs(gestureTargetContainer.scrollTop - gestureStartScrollTop) > 3) {
+      didTaskContentScroll = true;
+    }
+  }
+
+  handleCalendarGesture(gestureStartX, touchEndX, gestureStartY, touchEndY, Date.now() - gestureStartTime);
 
   setTimeout(() => {
     isMonthViewSwiping = false;
   }, 120);
 });
 
-// Desktop mouse drag support for month swipe and row accordion stretch
-let mouseStartX = 0;
-let mouseStartY = 0;
+// Desktop mouse drag support
 let isMonthViewMouseDown = false;
 
 calendarContainerVertView.addEventListener("mousedown", (e) => {
   if (e.button !== 0) return;
   if (e.target.closest("#calendar-pop-up") || e.target.closest("#backdrop")) return;
 
-  mouseStartX = e.clientX;
-  mouseStartY = e.clientY;
+  gestureStartTime = Date.now();
+  gestureStartX = e.clientX;
+  gestureStartY = e.clientY;
   isMonthViewMouseDown = true;
   isMonthViewSwiping = false;
+  didTaskContentScroll = false;
 
   const targetCell = e.target.closest(".day-vert-view");
   if (targetCell && daysGridVertView) {
     const cellIndex = Array.from(daysGridVertView.children).indexOf(targetCell);
-    touchStartRow = cellIndex >= 0 ? Math.floor(cellIndex / 7) : -1;
-    const taskContainer = targetCell.querySelector(".task-container-vert-view");
-    touchStartScrollTop = taskContainer ? taskContainer.scrollTop : 0;
+    gestureStartRow = cellIndex >= 0 ? Math.floor(cellIndex / 7) : -1;
+    gestureTargetContainer = targetCell.querySelector(".task-container-vert-view");
+    gestureStartScrollTop = gestureTargetContainer ? gestureTargetContainer.scrollTop : 0;
+    gestureStartedOnHeader = Boolean(e.target.closest(".day-number"));
   } else {
-    touchStartRow = -1;
-    touchStartScrollTop = 0;
+    gestureStartRow = -1;
+    gestureTargetContainer = null;
+    gestureStartScrollTop = 0;
+    gestureStartedOnHeader = false;
   }
 });
 
 window.addEventListener("mousemove", (e) => {
   if (!isMonthViewMouseDown) return;
-  const dx = e.clientX - mouseStartX;
-  const dy = e.clientY - mouseStartY;
-  if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+  const dx = e.clientX - gestureStartX;
+  const dy = e.clientY - gestureStartY;
+
+  if (gestureTargetContainer) {
+    if (Math.abs(gestureTargetContainer.scrollTop - gestureStartScrollTop) > 3) {
+      didTaskContentScroll = true;
+    }
+  }
+
+  if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
     isMonthViewSwiping = true;
   }
 });
@@ -160,31 +203,42 @@ window.addEventListener("mouseup", (e) => {
   isMonthViewMouseDown = false;
   const mouseEndX = e.clientX;
   const mouseEndY = e.clientY;
-  handleCalendarSwipe(mouseStartX, mouseEndX, mouseStartY, mouseEndY);
+
+  if (gestureTargetContainer) {
+    if (Math.abs(gestureTargetContainer.scrollTop - gestureStartScrollTop) > 3) {
+      didTaskContentScroll = true;
+    }
+  }
+
+  handleCalendarGesture(gestureStartX, mouseEndX, gestureStartY, mouseEndY, Date.now() - gestureStartTime);
 
   setTimeout(() => {
     isMonthViewSwiping = false;
   }, 120);
 });
 
-function handleCalendarSwipe(startX, endX, startY, endY) {
+// Professional Gesture vs Scroll Resolver
+function handleCalendarGesture(startX, endX, startY, endY, duration) {
   const dx = endX - startX;
   const dy = endY - startY;
+  const absDx = Math.abs(dx);
+  const absDy = Math.abs(dy);
+  const timeMs = Math.max(duration, 1);
+  const velocityY = absDy / timeMs;
+  const velocityX = absDx / timeMs;
 
-  const minHorizontalDistance = 50;
-  const minVerticalDistance = 35;
-
-  // 1. Horizontal swipe: change month
-  if (Math.abs(dx) >= minHorizontalDistance && Math.abs(dx) > Math.abs(dy) * 1.15) {
+  // 1. Horizontal swipe: Month navigation (Left / Right)
+  const isHorizontalSwipe = absDx >= 45 && absDx > absDy * 1.25 && (velocityX > 0.25 || absDx > 70);
+  if (isHorizontalSwipe && !didTaskContentScroll) {
     if (dx < 0) {
-      // Swipe left → next month
+      // Next month
       currentMonthVertView++;
       if (currentMonthVertView > 11) {
         currentMonthVertView = 0;
         currentYearVertView++;
       }
     } else {
-      // Swipe right → previous month
+      // Previous month
       currentMonthVertView--;
       if (currentMonthVertView < 0) {
         currentMonthVertView = 11;
@@ -196,17 +250,52 @@ function handleCalendarSwipe(startX, endX, startY, endY) {
     return;
   }
 
-  // 2. Vertical swipe: stretch or squeeze week row
-  if (Math.abs(dy) >= minVerticalDistance && Math.abs(dy) > Math.abs(dx) * 1.15) {
-    // Swipe DOWN (dy > 0): expand the touched row
-    if (dy > 0) {
-      if (touchStartRow >= 0 && touchStartScrollTop <= 3) {
-        expandGridRow(touchStartRow);
-      }
+  // 2. If user was actively scrolling task content inside the cell, NEVER collapse or expand row!
+  if (didTaskContentScroll) {
+    return;
+  }
+
+  // 3. Vertical Gesture Handling
+  const isPredominantlyVertical = absDy >= 30 && absDy > absDx * 1.2;
+  if (!isPredominantlyVertical) return;
+
+  // --- SWIPE DOWN: Expand the row ---
+  if (dy > 0) {
+    const atTopBoundary = gestureStartedOnHeader || gestureStartScrollTop <= 3;
+    const isIntentionalSwipe = (velocityY >= 0.3 || dy >= 45) && timeMs < 500;
+
+    if (atTopBoundary && isIntentionalSwipe && gestureStartRow >= 0) {
+      expandGridRow(gestureStartRow);
     }
-    // Swipe UP (dy < 0): collapse back to balanced 6 rows
-    else {
+  }
+  // --- SWIPE UP: Collapse row ---
+  else if (dy < 0) {
+    const isCurrentlyExpanded = daysGridVertView && daysGridVertView.hasAttribute("data-expanded-row");
+    if (!isCurrentlyExpanded) return;
+
+    // A) If started on the day header: immediate collapse
+    if (gestureStartedOnHeader) {
       collapseGridRows();
+      return;
+    }
+
+    // B) If started inside task container:
+    const container = gestureTargetContainer;
+    const hasScrollableOverflow = container ? (container.scrollHeight > container.clientHeight + 4) : false;
+
+    if (!hasScrollableOverflow) {
+      // Content fits without scrollbar -> swipe up collapses
+      if (absDy >= 35) {
+        collapseGridRows();
+      }
+    } else {
+      // Content has scrollbar -> only fast flick when at bottom boundary collapses
+      const isFastFlick = velocityY >= 0.45 && timeMs <= 320 && absDy >= 40;
+      const isAtBottom = container && (container.scrollTop + container.clientHeight >= container.scrollHeight - 4);
+
+      if (isFastFlick && isAtBottom) {
+        collapseGridRows();
+      }
     }
   }
 }
