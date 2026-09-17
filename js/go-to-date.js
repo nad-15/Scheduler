@@ -22,6 +22,7 @@
   let dayTextEl = null;
   let dayMenuEl = null;
   let yearBtn = null;
+  let yearInputEl = null;
   let yearTextEl = null;
   let yearMenuEl = null;
   let previewTextEl = null;
@@ -46,6 +47,7 @@
     dayMenuEl = document.getElementById('goto-date-day-menu');
 
     yearBtn = document.getElementById('goto-date-year-btn');
+    yearInputEl = document.getElementById('goto-date-year-input');
     yearTextEl = document.getElementById('goto-date-year-text');
     yearMenuEl = document.getElementById('goto-date-year-menu');
 
@@ -81,6 +83,21 @@
       yearBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleDropdown('year');
+      });
+    }
+
+    if (yearInputEl) {
+      yearInputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          finishYearEdit(true);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          finishYearEdit(false);
+        }
+      });
+      yearInputEl.addEventListener('blur', () => {
+        finishYearEdit(true);
       });
     }
 
@@ -121,6 +138,8 @@
       if (e.key === 'Escape' && isModalOpen()) {
         if (hasOpenDropdown()) {
           closeAllDropdowns();
+        } else if (yearInputEl && yearInputEl.style.display !== 'none') {
+          finishYearEdit(false);
         } else {
           closeGoToDateModal();
         }
@@ -128,6 +147,29 @@
     });
 
     return true;
+  }
+
+  function startYearEdit() {
+    if (!yearInputEl || !yearBtn) return;
+    yearBtn.style.display = 'none';
+    yearInputEl.style.display = 'block';
+    yearInputEl.value = yearSelect ? yearSelect.value : '2026';
+    yearInputEl.focus();
+    yearInputEl.select();
+  }
+
+  function finishYearEdit(save) {
+    if (!yearInputEl || !yearBtn || yearInputEl.style.display === 'none') return;
+    if (save) {
+      const parsed = parseInt(yearInputEl.value.trim(), 10);
+      if (!isNaN(parsed) && parsed >= 2025 && parsed <= 9999) {
+        yearSelect.value = parsed.toString();
+        syncAllDropdownLabels();
+        onMonthOrYearChange();
+      }
+    }
+    yearInputEl.style.display = 'none';
+    yearBtn.style.display = 'flex';
   }
 
   function isModalOpen() {
@@ -231,6 +273,21 @@
     yearSelect.innerHTML = '';
     if (yearMenuEl) yearMenuEl.innerHTML = '';
 
+    // "Type year..." option
+    if (yearMenuEl) {
+      const typeBtn = document.createElement('button');
+      typeBtn.type = 'button';
+      typeBtn.className = 'goto-date-dropdown-item';
+      typeBtn.setAttribute('role', 'option');
+      typeBtn.textContent = 'Type year...';
+      typeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllDropdowns();
+        startYearEdit();
+      });
+      yearMenuEl.appendChild(typeBtn);
+    }
+
     for (let y = 2025; y <= 2100; y++) {
       // Hidden select option
       const opt = document.createElement('option');
@@ -327,6 +384,23 @@
       yearTextEl.textContent = y.toString();
     }
     if (yearMenuEl) {
+      let matchingItem = yearMenuEl.querySelector(`.goto-date-dropdown-item[data-value="${y}"]`);
+      if (!matchingItem && !isNaN(y) && y >= 2025) {
+        matchingItem = document.createElement('button');
+        matchingItem.type = 'button';
+        matchingItem.className = 'goto-date-dropdown-item';
+        matchingItem.dataset.value = y.toString();
+        matchingItem.setAttribute('role', 'option');
+        matchingItem.textContent = y.toString();
+        matchingItem.addEventListener('click', (e) => {
+          e.stopPropagation();
+          yearSelect.value = y.toString();
+          syncAllDropdownLabels();
+          closeAllDropdowns();
+          onMonthOrYearChange();
+        });
+        yearMenuEl.appendChild(matchingItem);
+      }
       yearMenuEl.querySelectorAll('.goto-date-dropdown-item').forEach((item) => {
         item.classList.toggle('active', item.dataset.value === yearSelect.value);
       });
@@ -429,8 +503,9 @@
     syncAllDropdownLabels();
     updatePreview();
 
-    // Close any open custom dropdown menus
+    // Close any open custom dropdown menus and reset year input
     closeAllDropdowns();
+    finishYearEdit(false);
 
     // Show modal & backdrop
     if (backdropEl) {
@@ -472,6 +547,7 @@
 
   function closeGoToDateModal() {
     closeAllDropdowns();
+    finishYearEdit(false);
 
     if (backdropEl) {
       backdropEl.classList.remove('active');
