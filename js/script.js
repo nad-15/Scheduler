@@ -3897,8 +3897,8 @@ monthLabelVertView.addEventListener('click', () => {
     showCalHorView(currentMonthVertView, currentYearVertView);
 });
 calIconVertView.addEventListener('click', () => {
+    popUpDate = null;
     showCalHorView(currentMonthVertView, currentYearVertView);
-
 });
 
 function showCalHorView(m, y) {

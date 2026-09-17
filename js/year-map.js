@@ -295,6 +295,7 @@
         if (typeof currentYearVertView !== 'undefined') currentYearVertView = currentYear;
         if (typeof currentMonthValue !== 'undefined') currentMonthValue = m;
         if (typeof currentYearValue !== 'undefined') currentYearValue = currentYear;
+        if (typeof popUpDate !== 'undefined') popUpDate = null;
 
         closeYearMap();
 
@@ -629,6 +630,7 @@
     if (typeof currentYearVertView !== 'undefined') currentYearVertView = year;
     if (typeof currentMonthValue !== 'undefined') currentMonthValue = m;
     if (typeof currentYearValue !== 'undefined') currentYearValue = year;
+    if (typeof popUpDate !== 'undefined') popUpDate = null;
 
     if (typeof showCalVertView === 'function') {
       showCalVertView(m, year);

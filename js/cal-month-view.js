@@ -352,6 +352,11 @@ function createCalendarGrid() {
 function updateCalendarWithTasks(month, year) {
   if (!daysGridVertView || daysGridVertView.children.length < 42) return;
 
+  currentMonthVertView = month;
+  currentYearVertView = year;
+  currentMonthValue = month;
+  currentYearValue = year;
+
   document.querySelectorAll(".grid-cell").forEach(cell => {
     cell.classList.remove("is-active");
   });
