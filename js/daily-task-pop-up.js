@@ -1235,9 +1235,12 @@ function runStartupFeatures() {
   } else if (settings["view-mode"] === "list") {
     console.log("Switched to List View");
   } else if (settings["view-mode"] === "todo") {
-    const todoContainer = document.getElementById("todo-container");
-    todoContainer.classList.add("active");
-    renderTodos();
+    if (typeof todoMenuItem !== 'undefined' && todoMenuItem) {
+      todoMenuItem.click();
+    } else {
+      const tItem = document.getElementById("to-do");
+      if (tItem) tItem.click();
+    }
   }
 
   if (settings["startup-popup"]) {

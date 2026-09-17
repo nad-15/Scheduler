@@ -1673,8 +1673,11 @@ h1 {
     z-index: 10;
     gap: 10px;
     -webkit-tap-highlight-color: transparent;
+}
 
-
+#main-container.view-inactive #weather-widget,
+#main-container[style*="display: none"] #weather-widget {
+    animation-play-state: paused !important;
 }
 
 

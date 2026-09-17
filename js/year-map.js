@@ -212,7 +212,13 @@
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isYearMapOpen()) {
+        const returnView = window.previousViewBeforeYear || 'month';
         closeYearMap();
+        if (returnView === 'list' && typeof showCalHorView === 'function') {
+          showCalHorView(currentMonthVertView || 0, currentYear);
+        } else if (typeof showCalVertView === 'function') {
+          showCalVertView(currentMonthVertView || 0, currentYear);
+        }
       }
     });
   }
@@ -257,12 +263,36 @@
     return containerEl && containerEl.style.display !== 'none';
   }
 
-  function openYearMap() {
+  function openYearMap(targetYearParam) {
     if (!containerEl) init();
     if (!containerEl) return;
 
+    window.previousViewBeforeYear = window.currentActiveViewName || 'month';
+    window.currentActiveViewName = 'year';
+
+    // Deactivate other views & pause background operations
+    const main = document.getElementById('main-container');
+    const vert = document.getElementById('calendar-container-vert-view');
+    const todo = document.getElementById('todo-container');
+
+    if (main) {
+      main.style.display = 'none';
+      main.classList.add('view-inactive');
+    }
+    if (vert) {
+      vert.style.display = 'none';
+    }
+    if (todo) {
+      todo.classList.remove('active');
+    }
+    if (typeof pauseWeatherTicker === 'function') {
+      pauseWeatherTicker();
+    }
+
     let targetYear = null;
-    if (typeof popUpDate === 'string' && popUpDate) {
+    if (typeof targetYearParam === 'number' && targetYearParam >= 2025) {
+      targetYear = targetYearParam;
+    } else if (typeof popUpDate === 'string' && popUpDate) {
       const pY = parseInt(popUpDate.split('-')[0], 10);
       if (!isNaN(pY) && pY >= 2025) {
         targetYear = pY;
@@ -284,6 +314,9 @@
   function closeYearMap() {
     if (containerEl) {
       containerEl.style.display = 'none';
+      if (gridEl) {
+        gridEl.innerHTML = '';
+      }
     }
   }
 

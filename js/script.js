@@ -3902,19 +3902,37 @@ calIconVertView.addEventListener('click', () => {
 });
 
 function showCalHorView(m, y) {
-
     cleanupSelectedDivs();
-    // Make sure both elements exist
+    window.currentActiveViewName = 'list';
+
+    // Make sure containers exist
     const main = document.getElementById('main-container');
     const vert = document.getElementById('calendar-container-vert-view');
-    daysGridVertView.innerHTML = "";
-    main.style.display = 'block';
-    vert.style.display = 'none'; // Assuming your flex styles are defined in CSS
+    const todo = document.getElementById('todo-container');
+    const yearMap = document.getElementById('year-map-container');
+
+    // Deactivate other views
+    if (vert) {
+        vert.style.display = 'none';
+        if (daysGridVertView) daysGridVertView.innerHTML = "";
+    }
+    if (todo) todo.classList.remove('active');
+    if (typeof closeYearMap === 'function') {
+        closeYearMap();
+    } else if (yearMap) {
+        yearMap.style.display = 'none';
+    }
+
     if (!main || !vert) {
         console.error('One or both containers are missing in the DOM.');
         return;
     }
-    // yearContainer.innerHTML = "";
+
+    // Activate List View
+    main.style.display = 'block';
+    main.classList.remove('view-inactive');
+    if (typeof resumeWeatherTicker === 'function') resumeWeatherTicker();
+
     yearContainer.removeEventListener('scroll', handleYearContainerScroll);
     while (yearContainer.firstChild) {
         yearContainer.removeChild(yearContainer.firstChild);
@@ -3924,11 +3942,9 @@ function showCalHorView(m, y) {
     requestAnimationFrame(() => {
         currentMonthContainer.scrollIntoView({
             block: "start",
-            // behavior: "smooth"
             behavior: "auto"
         });
 
-        // Delay listener until after scroll finishes
         requestAnimationFrame(() => {
             yearContainer.addEventListener('scroll', handleYearContainerScroll);
         });
@@ -3937,22 +3953,33 @@ function showCalHorView(m, y) {
 }
 
 function showCalVertView(month, year) {
-
     cleanupSelectedDivs();
-    // console.log("Vert View Showing");
+    window.currentActiveViewName = 'month';
 
-    // Make sure both elements exist
     const main = document.getElementById('main-container');
     const vert = document.getElementById('calendar-container-vert-view');
+    const todo = document.getElementById('todo-container');
+    const yearMap = document.getElementById('year-map-container');
 
     if (!main || !vert) {
         console.error('One or both containers are missing in the DOM.');
         return;
     }
+
+    // Deactivate other views & pause background operations
+    main.style.display = 'none';
+    main.classList.add('view-inactive');
+    if (typeof pauseWeatherTicker === 'function') pauseWeatherTicker();
+    if (todo) todo.classList.remove('active');
+    if (typeof closeYearMap === 'function') {
+        closeYearMap();
+    } else if (yearMap) {
+        yearMap.style.display = 'none';
+    }
+
+    // Activate Month View
     createCalendarGrid();
     updateCalendarWithTasks(month, year);
-    // main.innerHTML = "";
-    main.style.display = 'none';
     vert.style.display = 'flex';
 
     const todayElement = document.querySelector(`.grid-cell[data-full-date="${popUpDate}"]`);

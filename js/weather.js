@@ -122,6 +122,22 @@ let weatherFetchPromise = null;
 let isExpandedPanelInitialized = false;
 let selectedDayKey = null;
 let timeTickerInterval = null;
+let activeTimeUpdateFn = null;
+
+window.pauseWeatherTicker = function() {
+    if (timeTickerInterval) {
+        clearInterval(timeTickerInterval);
+        timeTickerInterval = null;
+    }
+};
+
+window.resumeWeatherTicker = function() {
+    if (typeof activeTimeUpdateFn === 'function') {
+        activeTimeUpdateFn();
+        if (timeTickerInterval) clearInterval(timeTickerInterval);
+        timeTickerInterval = setInterval(activeTimeUpdateFn, 1000);
+    }
+};
 let isExtendedForecast = false;
 const EXTENDED_FORECAST_DAYS = 14;
 
@@ -850,6 +866,7 @@ async function getWeather() {
                 if (secondsEl) secondsEl.textContent = `:${second} ${ampm}`;
             }
 
+            activeTimeUpdateFn = updateTime;
             updateTime();
             if (timeTickerInterval) clearInterval(timeTickerInterval);
             timeTickerInterval = setInterval(updateTime, 1000);

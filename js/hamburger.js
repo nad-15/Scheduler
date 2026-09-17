@@ -156,28 +156,73 @@ const todoContainer = document.getElementById("todo-container");
 const todoCloseBtn = todoContainer.querySelector(".todo-close-btn");
 
 // Open when clicking menu
-todoMenuItem.addEventListener("click", () => {
+function openTodoView() {
+  window.previousViewBeforeTodo = window.currentActiveViewName || 'list';
+  window.currentActiveViewName = 'todo';
+
+  // Deactivate other views & pause background operations
+  const main = document.getElementById('main-container');
+  const vert = document.getElementById('calendar-container-vert-view');
+  const yearMap = document.getElementById('year-map-container');
+
+  if (main) {
+    main.style.display = 'none';
+    main.classList.add('view-inactive');
+  }
+  if (vert) {
+    vert.style.display = 'none';
+  }
+  if (typeof closeYearMap === 'function') {
+    closeYearMap();
+  } else if (yearMap) {
+    yearMap.style.display = 'none';
+  }
+  if (typeof pauseWeatherTicker === 'function') {
+    pauseWeatherTicker();
+  }
+
   todoContainer.classList.add("active");
   renderTodos();
   
-const activeButton = document.querySelector(`[data-filter="${filterMode}"]`);
+  const activeButton = document.querySelector(`[data-filter="${filterMode}"]`);
   if (activeButton) {
     activeButton.classList.add("active");
-
-    // Add this line to scroll active button into center on page load
     activeButton.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'center'
     });
   }
+}
 
-});
+function closeTodoView() {
+  todoContainer.classList.remove("active");
+  const returnView = window.previousViewBeforeTodo || 'list';
+
+  if (returnView === 'month') {
+    if (typeof showCalVertView === 'function') {
+      const m = typeof currentMonthVertView !== 'undefined' ? currentMonthVertView : 0;
+      const y = typeof currentYearVertView !== 'undefined' ? currentYearVertView : 2026;
+      showCalVertView(m, y);
+    }
+  } else if (returnView === 'year') {
+    if (typeof openYearMap === 'function') {
+      const y = typeof currentYearVertView !== 'undefined' ? currentYearVertView : 2026;
+      openYearMap(y);
+    }
+  } else {
+    if (typeof showCalHorView === 'function') {
+      const m = typeof currentMonthVertView !== 'undefined' ? currentMonthVertView : 0;
+      const y = typeof currentYearVertView !== 'undefined' ? currentYearVertView : 2026;
+      showCalHorView(m, y);
+    }
+  }
+}
+
+todoMenuItem.addEventListener("click", openTodoView);
 
 // Close when clicking ×
-todoCloseBtn.addEventListener("click", () => {
-  todoContainer.classList.remove("active");
-});
+todoCloseBtn.addEventListener("click", closeTodoView);
 
 
 // ===== Hook Settings Toggles =====
