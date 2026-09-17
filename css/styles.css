@@ -4966,6 +4966,32 @@ input[type="radio"]:checked::after {
     transform: scale(0.9);
 }
 
+.list-view-arrow-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.list-view-arrow-icon {
+    font-size: 22px;
+    color: inherit;
+    line-height: 1;
+    pointer-events: none;
+    transition: transform 0.15s ease;
+}
+
+.list-view-arrow-btn:hover .list-view-arrow-icon {
+    transform: translateY(2px);
+}
+
+.list-view-arrow-btn:active {
+    transform: scale(0.85);
+}
+
 
 
 .day-container {
@@ -8873,6 +8899,8 @@ ic {
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     font-family: var(--todo-font);
+    --goto-theme-color: #2196f3;
+    --goto-theme-text-color: #ffffff;
 }
 
 .goto-date-modal.active {
@@ -8894,7 +8922,7 @@ ic {
 
 .goto-date-header-icon {
     font-size: 20px;
-    color: #333;
+    color: var(--goto-theme-color, #333);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -8985,8 +9013,8 @@ ic {
 }
 
 .goto-date-select:focus {
-    border-color: #2196f3;
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+    border-color: var(--goto-theme-color, #2196f3);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
 }
 
 .goto-date-input-wrapper {
@@ -9015,8 +9043,8 @@ ic {
 }
 
 .goto-date-year-input:focus {
-    border-color: #2196f3;
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+    border-color: var(--goto-theme-color, #2196f3);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
 }
 
 .goto-date-select-arrow {
@@ -9071,7 +9099,7 @@ ic {
 
 .goto-date-shortcut-btn .shortcut-icon {
     font-size: 16px;
-    color: #2196f3;
+    color: var(--goto-theme-color, #2196f3);
 }
 
 .goto-date-shortcut-btn:hover {
@@ -9100,7 +9128,7 @@ ic {
     user-select: none;
     outline: none;
     font-family: var(--todo-font);
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, filter 0.15s ease;
 }
 
 .goto-date-btn-cancel {
@@ -9115,13 +9143,13 @@ ic {
 }
 
 .goto-date-btn-submit {
-    background-color: #2196f3;
+    background-color: var(--goto-theme-color, #2196f3);
     border: none;
-    color: white;
+    color: var(--goto-theme-text-color, #ffffff);
 }
 
 .goto-date-btn-submit:hover {
-    background-color: #1976d2;
+    filter: brightness(0.9);
 }
 
 .goto-date-btn-submit .goto-btn-arrow {

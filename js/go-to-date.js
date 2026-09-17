@@ -153,38 +153,55 @@
     updatePreview();
   }
 
-  function openGoToDateModal() {
+  let openedFromPopup = false;
+
+  function openGoToDateModal(targetMonth, targetYear, fromPopup) {
     if (!modalEl && !initElements()) {
       return;
     }
+
+    openedFromPopup = Boolean(fromPopup);
 
     const now = typeof AppTimezone !== 'undefined' ? AppTimezone.now() : new Date();
     let initialYear = now.getFullYear();
     let initialMonth = now.getMonth();
     let initialDay = now.getDate();
 
-    // Context check: If daily popup is open, use its date
-    const popupEl = document.getElementById('calendar-pop-up');
-    const isPopupOpen = popupEl && getComputedStyle(popupEl).display !== 'none';
-
-    if (isPopupOpen && typeof popUpDate === 'string' && popUpDate) {
-      const parts = popUpDate.split('-').map(Number);
-      if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
-        initialYear = parts[0];
-        initialMonth = parts[1];
-        initialDay = parts[2];
-      }
-    } else if (typeof currentMonthVertView !== 'undefined' && typeof currentYearVertView !== 'undefined') {
-      initialMonth = currentMonthVertView;
-      initialYear = currentYearVertView;
+    if (typeof targetMonth === 'number' && typeof targetYear === 'number') {
+      initialMonth = targetMonth;
+      initialYear = targetYear;
       if (initialMonth === now.getMonth() && initialYear === now.getFullYear()) {
         initialDay = now.getDate();
       } else {
         initialDay = 1;
       }
+    } else {
+      // Context check: If daily popup is open, use its date
+      const popupEl = document.getElementById('calendar-pop-up');
+      const isPopupOpen = popupEl && getComputedStyle(popupEl).display !== 'none';
+
+      if (isPopupOpen && typeof popUpDate === 'string' && popUpDate) {
+        const parts = popUpDate.split('-').map(Number);
+        if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+          initialYear = parts[0];
+          initialMonth = parts[1];
+          initialDay = parts[2];
+        }
+      } else if (typeof currentMonthVertView !== 'undefined' && typeof currentYearVertView !== 'undefined') {
+        initialMonth = currentMonthVertView;
+        initialYear = currentYearVertView;
+        if (initialMonth === now.getMonth() && initialYear === now.getFullYear()) {
+          initialDay = now.getDate();
+        } else {
+          initialDay = 1;
+        }
+      }
     }
 
     initialYear = Math.max(2025, initialYear);
+
+    // Apply active theme colors
+    applyThemeColors();
 
     // Set selectors
     yearSelect.value = initialYear.toString();
@@ -203,6 +220,31 @@
     modalEl.style.display = 'flex';
     void modalEl.offsetWidth;
     modalEl.classList.add('active');
+  }
+
+  function applyThemeColors() {
+    if (!modalEl) return;
+    const themeKey = localStorage.getItem('theme') || 'default';
+    let evenColor = '#2196f3';
+    if (typeof colorThemes !== 'undefined' && colorThemes && colorThemes[themeKey] && colorThemes[themeKey].even) {
+      evenColor = colorThemes[themeKey].even;
+    }
+    modalEl.style.setProperty('--goto-theme-color', evenColor);
+
+    if (evenColor.startsWith('#') && (evenColor.length === 7 || evenColor.length === 4)) {
+      let r, g, b;
+      if (evenColor.length === 7) {
+        r = parseInt(evenColor.substr(1, 2), 16) || 0;
+        g = parseInt(evenColor.substr(3, 2), 16) || 0;
+        b = parseInt(evenColor.substr(5, 2), 16) || 0;
+      } else {
+        r = parseInt(evenColor[1] + evenColor[1], 16) || 0;
+        g = parseInt(evenColor[2] + evenColor[2], 16) || 0;
+        b = parseInt(evenColor[3] + evenColor[3], 16) || 0;
+      }
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      modalEl.style.setProperty('--goto-theme-text-color', brightness > 165 ? '#1a1a1a' : '#ffffff');
+    }
   }
 
   function closeGoToDateModal() {
@@ -244,26 +286,49 @@
 
     closeGoToDateModal();
 
-    // Update month view variables & calendar grid
+    // Update global month/year state
     if (typeof currentMonthVertView !== 'undefined') currentMonthVertView = m;
     if (typeof currentYearVertView !== 'undefined') currentYearVertView = y;
     if (typeof currentMonthValue !== 'undefined') currentMonthValue = m;
     if (typeof currentYearValue !== 'undefined') currentYearValue = y;
 
-    if (typeof updateCalendarWithTasks === 'function') {
-      updateCalendarWithTasks(m, y);
-    }
+    if (openedFromPopup) {
+      // Triggered from daily task popup: keep popup open and navigate it
+      if (typeof updateCalendarWithTasks === 'function') {
+        updateCalendarWithTasks(m, y);
+      }
+      if (typeof showDayTasks === 'function') {
+        showDayTasks(targetDateKey);
+      }
+    } else {
+      // Triggered from arrow (Month View or List View):
+      // DO NOT show daily task popup. Navigate and highlight the date.
+      const main = document.getElementById('main-container');
+      const isListView = main && getComputedStyle(main).display === 'block';
 
-    // Open daily tasks popup for the selected date
-    if (typeof showDayTasks === 'function') {
-      showDayTasks(targetDateKey);
-    }
-
-    // Highlight active cell in month view grid if present
-    const activeCell = document.querySelector(`.grid-cell[data-full-date="${targetDateKey}"]`);
-    if (activeCell) {
-      document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('is-active'));
-      activeCell.classList.add('is-active');
+      if (isListView) {
+        // In List View: render the month/year if needed and scroll with blue flash
+        if (typeof showCalHorView === 'function') {
+          showCalHorView(m, y);
+        }
+        setTimeout(() => {
+          if (typeof currentDayScroll === 'function') {
+            currentDayScroll(targetDateKey);
+          }
+        }, 80);
+      } else {
+        // In Month View: update grid and highlight date cell with blue outline
+        if (typeof updateCalendarWithTasks === 'function') {
+          updateCalendarWithTasks(m, y);
+        }
+        setTimeout(() => {
+          document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('is-active'));
+          const activeCell = document.querySelector(`.grid-cell[data-full-date="${targetDateKey}"]`);
+          if (activeCell) {
+            activeCell.classList.add('is-active');
+          }
+        }, 80);
+      }
     }
   }
 
@@ -276,7 +341,9 @@
     if (monthViewPickerBtn) {
       monthViewPickerBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        openGoToDateModal();
+        const m = (typeof currentMonthVertView !== 'undefined') ? currentMonthVertView : null;
+        const y = (typeof currentYearVertView !== 'undefined') ? currentYearVertView : null;
+        openGoToDateModal(m, y, false);
       });
     }
 
@@ -285,7 +352,7 @@
     if (popupGoToBtn) {
       popupGoToBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        openGoToDateModal();
+        openGoToDateModal(null, null, true);
       });
     }
   });

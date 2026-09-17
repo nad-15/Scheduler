@@ -1357,6 +1357,23 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     // yearLetterContainer.textContent = yearDate;
     monthNameContainer.appendChild(yearLetterContainer);
 
+    // Go to Date arrow button below the vertical year
+    let toGotoDateBtn = document.createElement("div");
+    toGotoDateBtn.classList.add("grid-cal-btn", "list-view-arrow-btn");
+    toGotoDateBtn.title = "Go to Date";
+    const arrowIcon = document.createElement("span");
+    arrowIcon.classList.add("material-symbols-outlined", "list-view-arrow-icon");
+    arrowIcon.textContent = "arrow_drop_down";
+    toGotoDateBtn.appendChild(arrowIcon);
+    monthNameContainer.appendChild(toGotoDateBtn);
+
+    toGotoDateBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (typeof openGoToDateModal === 'function') {
+            openGoToDateModal(monthName, yearDate, false);
+        }
+    });
+
 
     const monthContainer = document.createElement('div');
     monthContainer.classList.add('month-container');

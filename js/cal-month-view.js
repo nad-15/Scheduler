@@ -892,7 +892,7 @@ const popupGoDateBtn = document.getElementById('go-to-date-popup-btn') || docume
 if (popupGoDateBtn) {
   popupGoDateBtn.addEventListener('click', () => {
     if (typeof openGoToDateModal === 'function') {
-      openGoToDateModal();
+      openGoToDateModal(null, null, true);
     }
   });
 }
