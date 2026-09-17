@@ -6728,6 +6728,7 @@ html.hide-all-buttons-active #slidingInputView {
 }
 
 .month-view-todo-btn,
+.month-view-year-map-btn,
 .month-view__goto-list-view-btn {
     display: flex;
     justify-content: center;
@@ -6753,6 +6754,7 @@ html.hide-all-buttons-active #slidingInputView {
 }
 
 .material-symbols-outlined.header-icon-vert-view,
+.material-symbols-outlined.month-view-year-map-icon,
 .material-symbols-outlined.month-view-todo-icon {
     font-weight: 500;
     font-size: 1.25rem;
@@ -6789,8 +6791,21 @@ html.hide-all-buttons-active #slidingInputView {
     transform: scale(1.08);
 }
 
+.month-view-year-map-btn:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%);
+    border-color: #fbcfe8;
+    box-shadow: 0 3px 8px rgba(219, 39, 119, 0.15);
+    transform: translateY(-1px);
+}
+
+.month-view-year-map-btn:hover .month-view-year-map-icon {
+    color: #db2777;
+    transform: scale(1.08);
+}
+
 /* Active press feedback */
 .month-view-todo-btn:active,
+.month-view-year-map-btn:active,
 .month-view__goto-list-view-btn:active {
     transform: scale(0.92);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
@@ -9154,4 +9169,302 @@ ic {
 
 .goto-date-btn-submit .goto-btn-arrow {
     font-size: 16px;
+}
+
+/* ==========================================================================
+   Year Map (12-Month Viewport Grid)
+   ========================================================================== */
+.year-map-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background-color: #ffffff;
+    z-index: 2150;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: var(--todo-font);
+}
+
+.year-map-header {
+    height: 42px;
+    min-height: 42px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.year-map-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.year-map-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+}
+
+.year-map-title:hover {
+    background-color: #f1f5f9;
+}
+
+.year-map-title-input {
+    width: 74px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'Roboto', sans-serif;
+    color: #1e293b;
+    padding: 2px 6px;
+    border: 1.5px solid #2196f3;
+    border-radius: 6px;
+    outline: none;
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+.year-map-edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    color: #64748b;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    padding: 0;
+}
+
+.year-map-edit-btn:hover {
+    background: #f1f5f9;
+    color: #2196f3;
+}
+
+.year-map-edit-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.year-map-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.year-map-mode-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 6px;
+    color: #475569;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.year-map-mode-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.year-map-mode-btn.active {
+    background: #dafbe1;
+    border-color: #40c463;
+    color: #1a7f37;
+}
+
+.year-map-mode-icon {
+    font-size: 19px;
+    color: inherit;
+}
+
+.year-map-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    color: #64748b;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    padding: 0;
+}
+
+.year-map-close-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.year-map-close-btn .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.year-map-grid {
+    flex: 1;
+    display: grid;
+    width: 100%;
+    height: calc(100% - 42px);
+    box-sizing: border-box;
+    padding: 4px;
+    gap: 4px;
+    overflow: hidden;
+}
+
+/* Portrait (default mobile) 3 columns x 4 rows = 12 months */
+@media (orientation: portrait), (max-aspect-ratio: 1/1) {
+    .year-map-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+    }
+}
+
+/* Landscape (tablets/desktops) 4 columns x 3 rows = 12 months */
+@media (orientation: landscape) and (min-aspect-ratio: 1/1) {
+    .year-map-grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+    }
+}
+
+.year-map-month {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 2px 3px;
+    box-sizing: border-box;
+    overflow: hidden;
+    min-height: 0;
+    min-width: 0;
+}
+
+.year-map-month-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center;
+    padding: 1px 0;
+    cursor: pointer;
+    line-height: 1.1;
+    border-radius: 4px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.year-map-month-header:hover {
+    background-color: #f1f5f9;
+    color: #2563eb;
+}
+
+.year-map-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-size: 8px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-align: center;
+    line-height: 1;
+    padding-bottom: 2px;
+    flex-shrink: 0;
+}
+
+.year-map-days-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 1.5px;
+    min-height: 0;
+}
+
+.year-map-day {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    background-color: #f8fafc;
+    overflow: hidden;
+    cursor: pointer;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+.year-map-day-empty {
+    background: transparent;
+    cursor: default;
+    pointer-events: none;
+}
+
+.year-map-day:hover:not(.year-map-day-empty) {
+    box-shadow: inset 0 0 0 1px #2563eb;
+}
+
+.year-map-day.year-map-today {
+    box-shadow: inset 0 0 0 1.5px #2563eb;
+}
+
+.year-map-stripes-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.year-map-stripe {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.year-map-day-number {
+    position: relative;
+    z-index: 2;
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1;
+    pointer-events: none;
+    color: #334155;
+}
+
+.year-map-day.has-stripes .year-map-day-number {
+    color: #ffffff;
+    text-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.8), 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+.year-map-day.has-heatmap.text-light .year-map-day-number {
+    color: #ffffff;
+    text-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.6);
 }

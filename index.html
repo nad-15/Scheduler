@@ -799,6 +799,10 @@
                     <span class="material-symbols-outlined month-view-todo-icon">checklist</span>
                 </button>
 
+                <button class="month-view-year-map-btn" id="month-view-year-map-btn" title="Year Map">
+                    <span class="material-symbols-outlined month-view-year-map-icon">transition_dissolve</span>
+                </button>
+
                 <div class="navigation-vertview-container" style="display: none;">
                     <button id="prev-month-vert-view" class="nav-button-vert-view"><span
                             class="material-symbols-outlined navi-span-vertview">
@@ -837,6 +841,32 @@
         <!-- Calendar Days Grid (Filled Dynamically) -->
         <div class="days-grid-vert-view" id="days-grid-vert-view">
             <!-- Days will be inserted dynamically here -->
+        </div>
+    </div>
+
+    <!-- Year Map View (12 Months Grid) -->
+    <div id="year-map-container" class="year-map-container" style="display: none;">
+        <div class="year-map-header">
+            <div class="year-map-title-wrapper" id="year-map-title-wrapper">
+                <span class="year-map-title" id="year-map-title" title="Click to edit year">2026</span>
+                <input type="number" class="year-map-title-input" id="year-map-title-input" min="2025" max="9999" style="display: none;" />
+                <button type="button" class="year-map-edit-btn" id="year-map-edit-btn" title="Edit Year">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+            </div>
+
+            <div class="year-map-actions">
+                <button type="button" class="year-map-mode-btn" id="year-map-mode-btn" title="Toggle Color Mode">
+                    <span class="material-symbols-outlined year-map-mode-icon">invert_colors</span>
+                </button>
+                <button type="button" class="year-map-close-btn" id="year-map-close-btn" title="Close Year Map">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="year-map-grid" id="year-map-grid">
+            <!-- 12 months rendered dynamically -->
         </div>
     </div>
 
@@ -1323,6 +1353,7 @@
     <script src="./js/dynamic-input-bar.js"></script>
     <script src="./js/cat-runner.js"></script>
     <script src="./js/go-to-date.js"></script>
+    <script src="./js/year-map.js"></script>
 
     <!-- PWA Service Worker & In-App Install Handler -->
     <script>
