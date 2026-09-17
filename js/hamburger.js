@@ -15,7 +15,8 @@ const DEFAULT_SETTINGS = {
   "sliding-templates-peek": false,
   "movable-template-expanded": false,
   "dynamic-input-bar": false,
-  "catrunner-highscore": 0
+  "catrunner-highscore": 0,
+  "recent-emojis": []
 };
 
 

@@ -32,6 +32,61 @@
     '💼', '📄', '🔍', '🎯', '📌', '✅', '📝', '💡', '🔔', '⭐', '🔥', '❗'
   ];
 
+  const SETTINGS_KEY = 'appSettings';
+  const RECENT_EMOJIS_KEY = 'recent-emojis';
+  const MAX_RECENT_EMOJIS = 10;
+
+  function getRecentEmojis() {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      if (!raw) return [];
+      const settings = JSON.parse(raw);
+      const list = settings[RECENT_EMOJIS_KEY] || settings['recentEmojis'];
+      return Array.isArray(list) ? list : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function recordRecentEmoji(emoji) {
+    if (!emoji) return;
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      const settings = raw ? JSON.parse(raw) : {};
+      let recents = settings[RECENT_EMOJIS_KEY] || settings['recentEmojis'];
+      if (!Array.isArray(recents)) {
+        recents = [];
+      }
+      // Remove if already present so it moves to slot 1
+      recents = recents.filter((item) => item !== emoji);
+      // Prepend to slot 1 (index 0)
+      recents.unshift(emoji);
+      // Retain max 10
+      if (recents.length > MAX_RECENT_EMOJIS) {
+        recents = recents.slice(0, MAX_RECENT_EMOJIS);
+      }
+      settings[RECENT_EMOJIS_KEY] = recents;
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+
+      // Keep in-memory appSettings in sync if defined
+      if (typeof window !== 'undefined' && window.appSettings) {
+        window.appSettings[RECENT_EMOJIS_KEY] = recents;
+      }
+      if (typeof appSettings !== 'undefined' && appSettings) {
+        appSettings[RECENT_EMOJIS_KEY] = recents;
+      }
+    } catch (err) {
+      console.warn('Failed to save recent emoji to appSettings:', err);
+    }
+  }
+
+  function getDisplayEmojis() {
+    const recents = getRecentEmojis().slice(0, MAX_RECENT_EMOJIS);
+    const recentSet = new Set(recents);
+    const remaining = CURATED_EMOJIS.filter((emoji) => !recentSet.has(emoji));
+    return [...recents, ...remaining];
+  }
+
   let isManualTextareaExpanded = false;
   let isEmojiTrayOpen = false;
   let savedSelectionStart = null;
@@ -95,7 +150,9 @@
     if (!emojiGridContainer) return;
     emojiGridContainer.innerHTML = '';
 
-    CURATED_EMOJIS.forEach((emoji) => {
+    const displayEmojis = getDisplayEmojis();
+
+    displayEmojis.forEach((emoji) => {
       const emojiBtn = document.createElement('button');
       emojiBtn.type = 'button';
       emojiBtn.className = 'emoji-item-btn';
@@ -123,6 +180,9 @@
 
   function insertEmoji(emoji) {
     if (!taskTitle) return;
+
+    // Record as recently used in appSettings
+    recordRecentEmoji(emoji);
 
     // Track whether keyboard is currently active (taskTitle focused)
     const wasFocused = (document.activeElement === taskTitle);
@@ -328,6 +388,9 @@
 
     isEmojiTrayOpen = true;
     renderEmojiGrid();
+    if (emojiGridContainer) {
+      emojiGridContainer.scrollLeft = 0;
+    }
     dynamicEmojiTray.classList.remove('hidden');
     slidingInputView.classList.add('emoji-tray-active');
     if (btnEmojiPicker) btnEmojiPicker.classList.add('active');
