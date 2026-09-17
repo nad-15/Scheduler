@@ -7,11 +7,11 @@ const calIconVertView = document.getElementById("icon-month-label-vert-view");
 const prevMonthBtnVertView = document.getElementById("prev-month-vert-view");
 const nextMonthBtnVertView = document.getElementById("next-month-vert-view");
 const monthViewTodoBtn = document.querySelector(".month-view-todo-btn");
-
-
-monthViewTodoBtn.addEventListener("click", () => {
-  todoMenuItem.click();
-});
+if (monthViewTodoBtn) {
+  monthViewTodoBtn.addEventListener("click", () => {
+    todoMenuItem.click();
+  });
+}
 
 const yearContainer = document.getElementById('year-container');
 let swipeEnabledPopUp = true;

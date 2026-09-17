@@ -795,14 +795,10 @@
                     </span>
                 </button>
 
-                <button class="month-view-todo-btn">
-                    <span class="material-symbols-outlined month-view-todo-icon">checklist</span>
-                </button>
-
                 <button class="month-view-year-map-btn" id="month-view-year-map-btn" title="Year Map">
-                    <svg class="year-view-cal-icon month-view-year-map-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
-                        <text x="12" y="15.3" font-family="'Roboto', -apple-system, sans-serif" font-size="6.5" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="currentColor" letter-spacing="-0.3px">YR</text>
+                    <svg class="year-view-cal-icon month-view-year-map-icon" viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" stroke="currentColor" stroke-width="0.6" stroke-linejoin="round" />
+                        <text x="12" y="15.3" font-family="'Roboto', -apple-system, sans-serif" font-size="6.8" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="currentColor" stroke="currentColor" stroke-width="0.3" letter-spacing="-0.3px">YR</text>
                     </svg>
                 </button>
 
@@ -853,17 +849,25 @@
             <div class="year-map-title-wrapper" id="year-map-title-wrapper">
                 <span class="year-map-title" id="year-map-title" title="Click to edit year">2026</span>
                 <input type="number" class="year-map-title-input" id="year-map-title-input" min="2025" max="9999" style="display: none;" />
-                <button type="button" class="year-map-edit-btn" id="year-map-edit-btn" title="Edit Year">
-                    <span class="material-symbols-outlined">edit</span>
-                </button>
+                <div class="year-map-arrow-wrapper" id="year-map-arrow-wrapper">
+                    <button type="button" class="year-map-arrow-btn" id="year-map-arrow-btn" title="Select Year">
+                        <span class="material-symbols-outlined year-map-arrow-icon">arrow_drop_down</span>
+                    </button>
+                    <select class="year-map-select" id="year-map-select" title="Select Year">
+                        <option value="type-here">Type year...</option>
+                    </select>
+                </div>
             </div>
 
             <div class="year-map-actions">
                 <button type="button" class="year-map-mode-btn" id="year-map-mode-btn" title="Toggle Color Mode">
                     <span class="material-symbols-outlined year-map-mode-icon">invert_colors</span>
                 </button>
-                <button type="button" class="year-map-close-btn" id="year-map-close-btn" title="Close Year Map">
-                    <span class="material-symbols-outlined">close</span>
+                <button type="button" class="year-map-nav-btn year-map-goto-month-btn" id="year-map-goto-month-btn" title="Month View">
+                    <span class="material-symbols-outlined year-map-header-icon">calendar_month</span>
+                </button>
+                <button type="button" class="year-map-nav-btn year-map-goto-list-btn" id="year-map-goto-list-btn" title="List View">
+                    <span class="material-symbols-outlined year-map-header-icon">event_note</span>
                 </button>
             </div>
         </div>

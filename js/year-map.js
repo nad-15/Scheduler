@@ -25,27 +25,63 @@
   let gridEl = null;
   let titleEl = null;
   let titleInputEl = null;
-  let editBtn = null;
+  let arrowWrapperEl = null;
+  let yearSelectEl = null;
   let modeBtn = null;
   let modeLabelEl = null;
-  let closeBtn = null;
+  let gotoMonthBtn = null;
+  let gotoListBtn = null;
   let triggerBtn = null;
 
   let currentYear = 2026;
   let currentMode = 'stripes'; // 'stripes' | 'heatmap'
+
+  function populateYearSelect() {
+    if (!yearSelectEl) return;
+    yearSelectEl.innerHTML = '';
+
+    const firstOpt = document.createElement('option');
+    firstOpt.value = 'type-here';
+    firstOpt.textContent = 'Type year...';
+    yearSelectEl.appendChild(firstOpt);
+
+    for (let y = 2025; y <= 2100; y++) {
+      const opt = document.createElement('option');
+      opt.value = y.toString();
+      opt.textContent = y.toString();
+      yearSelectEl.appendChild(opt);
+    }
+  }
+
+  function syncYearSelect(year) {
+    if (!yearSelectEl) return;
+    const yStr = (year || currentYear).toString();
+    let existingOpt = yearSelectEl.querySelector(`option[value="${yStr}"]`);
+    if (!existingOpt) {
+      existingOpt = document.createElement('option');
+      existingOpt.value = yStr;
+      existingOpt.textContent = yStr;
+      yearSelectEl.appendChild(existingOpt);
+    }
+    yearSelectEl.value = yStr;
+  }
 
   function init() {
     containerEl = document.getElementById('year-map-container');
     gridEl = document.getElementById('year-map-grid');
     titleEl = document.getElementById('year-map-title');
     titleInputEl = document.getElementById('year-map-title-input');
-    editBtn = document.getElementById('year-map-edit-btn');
+    arrowWrapperEl = document.getElementById('year-map-arrow-wrapper');
+    yearSelectEl = document.getElementById('year-map-select');
     modeBtn = document.getElementById('year-map-mode-btn');
     modeLabelEl = document.getElementById('year-map-mode-label');
-    closeBtn = document.getElementById('year-map-close-btn');
+    gotoMonthBtn = document.getElementById('year-map-goto-month-btn');
+    gotoListBtn = document.getElementById('year-map-goto-list-btn');
     triggerBtn = document.getElementById('month-view-year-map-btn');
 
     if (!containerEl || !gridEl) return;
+
+    populateYearSelect();
 
     if (triggerBtn) {
       triggerBtn.addEventListener('click', (e) => {
@@ -68,17 +104,26 @@
       });
     }
 
-    if (editBtn) {
-      editBtn.addEventListener('click', (e) => {
+    if (titleEl) {
+      titleEl.addEventListener('click', (e) => {
         e.stopPropagation();
         startYearEdit();
       });
     }
 
-    if (titleEl) {
-      titleEl.addEventListener('click', (e) => {
-        e.stopPropagation();
-        startYearEdit();
+    if (yearSelectEl) {
+      yearSelectEl.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val === 'type-here') {
+          syncYearSelect();
+          startYearEdit();
+        } else {
+          const parsed = parseInt(val, 10);
+          if (!isNaN(parsed) && parsed >= 2025) {
+            currentYear = parsed;
+            renderYearMap(currentYear);
+          }
+        }
       });
     }
 
@@ -140,8 +185,29 @@
       modeBtn.addEventListener('click', toggleMode);
     }
 
-    if (closeBtn) {
-      closeBtn.addEventListener('click', closeYearMap);
+    if (gotoMonthBtn) {
+      gotoMonthBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const m = typeof currentMonthVertView !== 'undefined' ? currentMonthVertView : 0;
+        goToMonthView(m, currentYear);
+      });
+    }
+
+    if (gotoListBtn) {
+      gotoListBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const m = typeof currentMonthVertView !== 'undefined' ? currentMonthVertView : 0;
+        if (typeof currentMonthVertView !== 'undefined') currentMonthVertView = m;
+        if (typeof currentYearVertView !== 'undefined') currentYearVertView = currentYear;
+        if (typeof currentMonthValue !== 'undefined') currentMonthValue = m;
+        if (typeof currentYearValue !== 'undefined') currentYearValue = currentYear;
+
+        closeYearMap();
+
+        if (typeof showCalHorView === 'function') {
+          showCalHorView(m, currentYear);
+        }
+      });
     }
 
     document.addEventListener('keydown', (e) => {
@@ -155,7 +221,7 @@
     if (!titleInputEl || !titleEl) return;
     titleInputEl.value = currentYear.toString();
     titleEl.style.display = 'none';
-    if (editBtn) editBtn.style.display = 'none';
+    if (arrowWrapperEl) arrowWrapperEl.style.display = 'none';
     titleInputEl.style.display = 'inline-block';
     titleInputEl.focus();
     titleInputEl.select();
@@ -175,14 +241,16 @@
       } else {
         // Invalid input: catch error, do nothing and revert back to currentYear
         titleEl.textContent = currentYear.toString();
+        syncYearSelect();
       }
     } else {
       titleEl.textContent = currentYear.toString();
+      syncYearSelect();
     }
 
     titleInputEl.style.display = 'none';
     titleEl.style.display = '';
-    if (editBtn) editBtn.style.display = '';
+    if (arrowWrapperEl) arrowWrapperEl.style.display = '';
   }
 
   function isYearMapOpen() {
@@ -274,6 +342,7 @@
     if (!gridEl || !titleEl) return;
 
     titleEl.textContent = year.toString();
+    syncYearSelect(year);
     gridEl.innerHTML = '';
 
     const storedTasks = getStoredTasks();

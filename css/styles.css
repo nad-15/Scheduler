@@ -6712,96 +6712,80 @@ html.hide-all-buttons-active #slidingInputView {
 
 .month-view-actions {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
     justify-content: flex-end;
 }
 
-.month-view-todo-btn,
 .month-view-year-map-btn,
 .month-view__goto-list-view-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 34px;
-    height: 34px;
-    padding: 0;
-    border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: linear-gradient(135deg, #ffffff 0%, #edf4fd 100%);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    width: auto;
+    height: auto;
+    padding: 2px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    box-shadow: none;
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    transition: background 0.25s ease,
-        border-color 0.25s ease,
-        box-shadow 0.25s ease,
-        transform 0.15s ease;
-    position: relative;
+    transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.material-symbols-outlined.header-icon-vert-view,
-.material-symbols-outlined.month-view-year-map-icon,
-.year-view-cal-icon.month-view-year-map-icon,
-.material-symbols-outlined.month-view-todo-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    font-weight: 500;
-    font-size: 1.25rem;
-    color: #475569;
+.material-symbols-outlined.header-icon-vert-view {
+    font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 50, 'opsz' 28 !important;
+    font-weight: 600;
+    font-size: 26px;
+    color: #1e293b;
     background-color: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s ease, transform 0.2s ease;
+    transition: color 0.15s ease;
+}
+
+.year-view-cal-icon.month-view-year-map-icon {
+    width: 26px;
+    height: 26px;
+    color: #1e293b;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
 }
 
 /* Hover effects */
 .month-view__goto-list-view-btn:hover {
-    background: linear-gradient(135deg, #ffffff 0%, #e0effe 100%);
-    border-color: #93c5fd;
-    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.15);
-    transform: translateY(-1px);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    transform: scale(1.1);
 }
 
 .month-view__goto-list-view-btn:hover .header-icon-vert-view {
     color: #2563eb;
-    transform: scale(1.08);
-}
-
-.month-view-todo-btn:hover {
-    background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);
-    border-color: #a7f3d0;
-    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.15);
-    transform: translateY(-1px);
-}
-
-.month-view-todo-btn:hover .month-view-todo-icon {
-    color: #059669;
-    transform: scale(1.08);
 }
 
 .month-view-year-map-btn:hover {
-    background: linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%);
-    border-color: #fbcfe8;
-    box-shadow: 0 3px 8px rgba(219, 39, 119, 0.15);
-    transform: translateY(-1px);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    transform: scale(1.1);
 }
 
 .month-view-year-map-btn:hover .month-view-year-map-icon {
-    color: #db2777;
-    transform: scale(1.08);
+    color: #0f172a;
 }
 
 /* Active press feedback */
-.month-view-todo-btn:active,
 .month-view-year-map-btn:active,
 .month-view__goto-list-view-btn:active {
     transform: scale(0.92);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    box-shadow: none;
     transition: transform 0.08s ease;
 }
 
@@ -9296,34 +9280,97 @@ ic {
     box-sizing: border-box;
 }
 
-.year-map-edit-btn {
-    display: flex;
+.year-map-arrow-wrapper {
+    position: relative;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+}
+
+.year-map-arrow-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
     border: none;
-    background: transparent;
-    border-radius: 6px;
-    color: #64748b;
+    padding: 2px;
     cursor: pointer;
+    border-radius: 4px;
+    color: #475569;
     transition: background-color 0.15s ease, color 0.15s ease;
-    padding: 0;
 }
 
-.year-map-edit-btn:hover {
-    background: #f1f5f9;
-    color: #2196f3;
+.year-map-arrow-wrapper:hover .year-map-arrow-btn {
+    background-color: #f1f5f9;
+    color: #0f172a;
 }
 
-.year-map-edit-btn .material-symbols-outlined {
-    font-size: 18px;
+.year-map-arrow-icon {
+    font-size: 26px;
+    line-height: 1;
+    color: inherit;
+}
+
+.year-map-select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    z-index: 2;
 }
 
 .year-map-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+}
+
+.year-map-nav-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: auto;
+    padding: 2px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.year-map-nav-btn:hover {
+    transform: scale(1.1);
+}
+
+.year-map-nav-btn:active {
+    transform: scale(0.92);
+}
+
+.year-map-header-icon {
+    font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 50, 'opsz' 28 !important;
+    font-weight: 600;
+    font-size: 26px;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+}
+
+.year-map-goto-month-btn:hover .year-map-header-icon {
+    color: #2563eb;
+}
+
+.year-map-goto-list-btn:hover .year-map-header-icon {
+    color: #2563eb;
 }
 
 .year-map-mode-btn {
@@ -9356,30 +9403,6 @@ ic {
 .year-map-mode-icon {
     font-size: 19px;
     color: inherit;
-}
-
-.year-map-close-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border: none;
-    background: transparent;
-    border-radius: 50%;
-    color: #64748b;
-    cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
-    padding: 0;
-}
-
-.year-map-close-btn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-}
-
-.year-map-close-btn .material-symbols-outlined {
-    font-size: 20px;
 }
 
 .year-map-grid {
