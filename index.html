@@ -851,16 +851,11 @@
                     <span class="material-icons menu-icon-year-view">menu</span>
                 </button>
                 <div class="year-map-title-wrapper" id="year-map-title-wrapper">
-                    <span class="year-map-title" id="year-map-title" title="Click to edit year">2026</span>
-                    <input type="number" class="year-map-title-input" id="year-map-title-input" min="1" max="9999" style="display: none;" />
+                    <span class="year-map-title" id="year-map-title" title="Go to Date">2026</span>
                     <div class="year-map-arrow-wrapper" id="year-map-arrow-wrapper">
-                        <button type="button" class="year-map-arrow-btn" id="year-map-arrow-btn" title="Select Year" aria-haspopup="listbox" aria-expanded="false">
+                        <button type="button" class="year-map-arrow-btn" id="year-map-arrow-btn" title="Go to Date" aria-label="Go to Date">
                             <span class="material-symbols-outlined year-map-arrow-icon">arrow_drop_down</span>
                         </button>
-                        <div class="year-map-dropdown-menu hidden" id="year-map-dropdown-menu" role="listbox" tabindex="-1"></div>
-                        <select class="year-map-select-hidden" id="year-map-select" title="Select Year" tabindex="-1" aria-hidden="true" style="display: none;">
-                            <option value="type-here">Type year...</option>
-                        </select>
                     </div>
                 </div>
             </div>
@@ -1322,11 +1317,13 @@
                 <div class="goto-date-field" id="goto-date-year-field">
                     <span class="goto-date-label">Year</span>
                     <div class="goto-date-select-wrapper" id="goto-date-year-wrapper">
-                        <button type="button" class="goto-date-custom-select" id="goto-date-year-btn" aria-haspopup="listbox" aria-expanded="false" title="Select Year">
-                            <span class="goto-date-select-text" id="goto-date-year-text">2026</span>
-                            <span class="material-symbols-outlined goto-date-select-arrow">expand_more</span>
-                        </button>
-                        <input type="number" id="goto-date-year-input" class="goto-date-year-input" min="2025" max="9999" style="display: none;" placeholder="Year" />
+                        <div class="goto-date-custom-select goto-date-year-composite" id="goto-date-year-btn" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="goto-date-select-text goto-date-year-text" id="goto-date-year-text" title="Click to edit year">2026</span>
+                            <button type="button" class="goto-date-arrow-trigger" id="goto-date-year-arrow-btn" title="Select Year" aria-label="Select Year">
+                                <span class="material-symbols-outlined goto-date-select-arrow" id="goto-date-year-arrow">expand_more</span>
+                            </button>
+                        </div>
+                        <input type="number" id="goto-date-year-input" class="goto-date-year-input" style="display: none;" placeholder="Year" />
                         <div class="goto-date-dropdown-menu hidden" id="goto-date-year-menu" role="listbox" tabindex="-1"></div>
                         <select id="goto-date-year-select" class="goto-date-select-hidden" tabindex="-1" aria-hidden="true" style="display: none;"></select>
                     </div>

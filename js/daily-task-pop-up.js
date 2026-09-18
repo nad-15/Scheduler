@@ -177,13 +177,15 @@ function showDayTasks(d) {
   const dayTasks = storedTasks[date];
 
   const [year, month, day] = date.split('-').map(Number);
-  const dateObj = new Date(year, month, day);
+  const dateObj = new Date(0);
+  dateObj.setFullYear(year, month, day);
 
   currentMonthValue = dateObj.getMonth();
   currentYearValue = dateObj.getFullYear();
 
   const today = AppTimezone.now();
-  const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  const target = new Date(0);
+  target.setFullYear(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
   const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   const dayDiff = Math.round((target - todayAtMidnight) / (1000 * 60 * 60 * 24));

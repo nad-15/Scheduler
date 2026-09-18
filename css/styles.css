@@ -9182,6 +9182,55 @@ ic {
     font-weight: 600;
 }
 
+.goto-date-year-composite {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 !important;
+    overflow: hidden;
+    cursor: default;
+}
+
+.goto-date-year-composite .goto-date-select-text {
+    flex: 1;
+    padding: 8px 4px 8px 10px;
+    cursor: text;
+    user-select: text;
+    transition: color 0.15s ease;
+}
+
+.goto-date-year-composite .goto-date-select-text:hover {
+    color: var(--goto-theme-color, #2196f3);
+}
+
+.goto-date-arrow-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 8px 8px;
+    cursor: pointer;
+    color: inherit;
+    border-radius: 0 5px 5px 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    margin: 0;
+    outline: none;
+}
+
+.goto-date-arrow-trigger:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.goto-date-arrow-trigger .goto-date-select-arrow {
+    pointer-events: none;
+}
+
+.goto-date-custom-select.is-open .goto-date-arrow-trigger .goto-date-select-arrow {
+    transform: rotate(180deg);
+    color: var(--goto-theme-color, #2196f3);
+}
+
 .goto-date-select-hidden {
     display: none !important;
 }

@@ -363,9 +363,18 @@ function updateCalendarWithTasks(month, year) {
   collapseGridRows();
 
   const tasks = loadTasksFromLocalStorage();
-  const firstDayOfMonth = new Date(year, month, 1).getDay();
-  const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
-  const totalDaysLastMonth = new Date(year, month, 0).getDate();
+
+  const firstDayDate = new Date(0);
+  firstDayDate.setFullYear(year, month, 1);
+  const firstDayOfMonth = firstDayDate.getDay();
+
+  const totalDaysDate = new Date(0);
+  totalDaysDate.setFullYear(year, month + 1, 0);
+  const totalDaysInMonth = totalDaysDate.getDate();
+
+  const totalDaysLastDate = new Date(0);
+  totalDaysLastDate.setFullYear(year, month, 0);
+  const totalDaysLastMonth = totalDaysLastDate.getDate();
 
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -486,15 +495,20 @@ function updateCalendarWithTasks(month, year) {
 
 // === REMOVE THIS HELPER FUNCTION ONCE PUT IN SHCEDULER ===
 function fadeColor(color, alpha = 0.6) {
+  if (!color || typeof color !== 'string') return `rgba(106, 80, 68, ${alpha})`;
   // If color is in rgb format, return it with the alpha applied
   if (color.startsWith('rgb')) {
     return color.replace(')', `, ${alpha})`).replace('rgba', 'rgb');
   }
 
   // Otherwise, treat it as a hex color and convert to rgba
-  const r = parseInt(color.substr(1, 2), 16);
-  const g = parseInt(color.substr(3, 2), 16);
-  const b = parseInt(color.substr(5, 2), 16);
+  let hex = color.replace('#', '').trim();
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('');
+  }
+  const r = parseInt(hex.substring(0, 2), 16) || 0;
+  const g = parseInt(hex.substring(2, 4), 16) || 0;
+  const b = parseInt(hex.substring(4, 6), 16) || 0;
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
