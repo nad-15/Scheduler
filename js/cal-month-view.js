@@ -73,9 +73,15 @@ let didTaskContentScroll = false;
 let isMonthViewSwiping = false;
 let isEditing = false;
 
+let collapseTimeout = null;
+
 function expandGridRow(rowIndex) {
   if (rowIndex < 0 || rowIndex > 5) return;
   if (!daysGridVertView) return;
+  if (collapseTimeout) {
+    clearTimeout(collapseTimeout);
+    collapseTimeout = null;
+  }
   daysGridVertView.setAttribute("data-expanded-row", rowIndex.toString());
 
   Array.from(daysGridVertView.children).forEach((cell, idx) => {
@@ -84,12 +90,29 @@ function expandGridRow(rowIndex) {
   });
 }
 
-function collapseGridRows() {
+function collapseGridRows(immediate = false) {
   if (!daysGridVertView) return;
+  if (collapseTimeout) {
+    clearTimeout(collapseTimeout);
+    collapseTimeout = null;
+  }
   daysGridVertView.removeAttribute("data-expanded-row");
-  Array.from(daysGridVertView.children).forEach(cell => {
-    cell.classList.remove("row-expanded");
-  });
+
+  if (immediate) {
+    Array.from(daysGridVertView.children).forEach(cell => {
+      cell.classList.remove("row-expanded");
+    });
+  } else {
+    // Wait for the grid-template-rows transition to complete before re-clamping tasks
+    collapseTimeout = setTimeout(() => {
+      if (daysGridVertView && !daysGridVertView.hasAttribute("data-expanded-row")) {
+        Array.from(daysGridVertView.children).forEach(cell => {
+          cell.classList.remove("row-expanded");
+        });
+      }
+      collapseTimeout = null;
+    }, 380);
+  }
 }
 
 // Touch event tracking
@@ -245,7 +268,7 @@ function handleCalendarGesture(startX, endX, startY, endY, duration) {
         currentYearVertView--;
       }
     }
-    collapseGridRows();
+    collapseGridRows(true);
     updateCalendarWithTasks(currentMonthVertView, currentYearVertView);
     return;
   }
@@ -360,7 +383,7 @@ function updateCalendarWithTasks(month, year) {
   document.querySelectorAll(".grid-cell").forEach(cell => {
     cell.classList.remove("is-active");
   });
-  collapseGridRows();
+  collapseGridRows(true);
 
   const tasks = loadTasksFromLocalStorage();
 

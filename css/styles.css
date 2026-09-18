@@ -6985,7 +6985,7 @@ html.hide-all-buttons-active #slidingInputView {
     /* background: red; */
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
     height: 100%;
     border-top: 0.5px solid var(--calendar-border);
     border-bottom: 0.5px solid var(--calendar-border);
@@ -6995,7 +6995,8 @@ html.hide-all-buttons-active #slidingInputView {
     flex-grow: 1;
     /* Allow it to grow and fill available space */
     overflow: hidden;
-    transition: grid-template-rows 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: grid-template-rows 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: grid-template-rows;
     overscroll-behavior: contain;
 }
 
@@ -7017,6 +7018,7 @@ html.hide-all-buttons-active #slidingInputView {
     /* font-size: 1rem; */
     box-sizing: border-box;
     height: 100%;
+    min-height: 0;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -7071,11 +7073,13 @@ html.hide-all-buttons-active #slidingInputView {
     font-size: 0.87rem;
     /* font-weight: bold; */
     height: 100%;
+    min-height: 0;
     position: relative;
     overflow: hidden;
     flex-grow: 1;
     /* Ensure the cells grow to fill available space */
     box-sizing: border-box;
+    transition: background-color 0.35s ease;
 }
 
 .day-number {
@@ -7146,6 +7150,16 @@ html.hide-all-buttons-active #slidingInputView {
     overflow: visible;
     text-overflow: unset;
     height: auto;
+    animation: taskFadeIn 0.3s ease;
+}
+
+@keyframes taskFadeIn {
+    from {
+        opacity: 0.6;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 /*  .day-number  is the class of day number only */
