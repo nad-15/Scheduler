@@ -8,9 +8,6 @@ const dayTodayElementScroll = nowTodayElementScroll.getDate();
 
 const todayDateScroll = `${yearTodayElementScroll}-${monthTodayElementScroll}-${dayTodayElementScroll}`;
 
-// Call initially and on resize
-adjustCalendarHeight();
-window.addEventListener('resize', adjustCalendarHeight);
 
 
 const calendarPopup = document.getElementById('calendar-pop-up');
@@ -145,17 +142,6 @@ function currentDayScroll(todayDate) {
 
 
 
-// === RESIZE THE CALENDAR VIEW MINUS THE ADDRESS BAR ===
-function adjustCalendarHeight() {
-  //   calendarContainerVertView.style.height = `${window.innerHeight}px`;
-
-  // Adjust popup max-height as well
-  const popup = document.getElementById("calendar-pop-up");
-  if (popup) {
-    popup.style.maxHeight = `${window.innerHeight * 0.8}px`;
-    popup.style.height = `${window.innerHeight * 0.8}px`;
-  }
-}
 
 
 

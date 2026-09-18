@@ -1168,10 +1168,6 @@ function saveTaskOrderToTemp() {
 
 
 
-function rgbToHex(rgb) {
-  const result = rgb.match(/\d+/g).map(n => (+n).toString(16).padStart(2, "0"));
-  return `#${result.join("")}`;
-}
 
 
 

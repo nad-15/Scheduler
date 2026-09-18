@@ -3814,22 +3814,6 @@ jumPingText.addEventListener("click", () => {
 });
 
 
-function rgbToHex(rgb) {
-
-    if (!rgb) {
-        return "";
-    }
-    if (rgb.startsWith('#')) {
-        return rgb;
-    }
-
-    // Extract the RGB values and convert to hex
-    const match = rgb.match(/\d+/g);
-    if (match) {
-        return `#${match.map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
-    }
-    return rgb;
-}
 
 function normalizeHex(color) {
     if (!color) return '';

@@ -51,5 +51,29 @@ function fadeColor(color, alpha = 0.6) {
   return color;
 }
 
+/**
+ * Converts an RGB string ('rgb(r, g, b)' or 'rgba(...)') or hex string to '#rrggbb' hex format.
+ * Returns empty string if input is null/undefined/empty, or preserves existing hex.
+ *
+ * @param {string} rgb - RGB or Hex color string
+ * @returns {string} - Hex formatted string (e.g. '#2196f3')
+ */
+function rgbToHex(rgb) {
+  if (!rgb || typeof rgb !== 'string') {
+    return "";
+  }
+  if (rgb.startsWith('#')) {
+    return rgb;
+  }
+
+  // Extract the RGB values and convert to hex
+  const match = rgb.match(/\d+/g);
+  if (match && match.length >= 3) {
+    return `#${match.slice(0, 3).map(x => Number(x).toString(16).padStart(2, '0')).join('')}`;
+  }
+  return rgb;
+}
+
 // Expose on window for global access across all scripts
 window.fadeColor = fadeColor;
+window.rgbToHex = rgbToHex;
