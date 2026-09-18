@@ -762,19 +762,22 @@ async function fetchWeatherData(forceRefresh = false, targetDays = 7) {
 /**
  * Primary startup function called by daily-task-pop-up.js
  */
-async function getWeather() {
+async function getWeather(forceRefresh = false) {
     try {
         const weatherWidget = document.getElementById('weather-widget');
-        if (weatherWidget && !weatherWidget.querySelector('.time-container') && !weatherWidget.querySelector('.weather-widget-loading')) {
-            weatherWidget.innerHTML = `
-                <div class="weather-widget-loading">
-                    <div class="weather-widget-spinner"></div>
-                    <span class="weather-widget-loading-text">Loading weather...</span>
-                </div>
-            `;
+        if (weatherWidget) {
+            weatherWidget.classList.remove('is-error');
+            if (forceRefresh || (!weatherWidget.querySelector('.time-container') && !weatherWidget.querySelector('.weather-widget-loading'))) {
+                weatherWidget.innerHTML = `
+                    <div class="weather-widget-loading">
+                        <div class="weather-widget-spinner"></div>
+                        <span class="weather-widget-loading-text">Loading weather...</span>
+                    </div>
+                `;
+            }
         }
 
-        const data = await fetchWeatherData();
+        const data = await fetchWeatherData(forceRefresh);
         if (!data || !data.current) throw new Error('No weather data received');
 
         initWeatherExpandedPanel();
@@ -877,8 +880,12 @@ async function getWeather() {
 
     } catch (error) {
         console.error('Error fetching weather data:', error);
+        if (typeof window.pauseWeatherTicker === 'function') {
+            window.pauseWeatherTicker();
+        }
         const weatherWidget = document.getElementById('weather-widget');
         if (weatherWidget) {
+            weatherWidget.classList.add('is-error');
             weatherWidget.innerHTML = `
                 <div class="time-container">
                     <div id="weather-location">${currentLocation.name}</div>
@@ -889,6 +896,12 @@ async function getWeather() {
                     <span id="weather-seconds">:-- --</span>
                 </div>
 
+                <div class="weather-reload-center-btn" id="weather-reload-btn" title="Click to reload weather">
+                    <svg class="weather-reload-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                    </svg>
+                </div>
+
                 <div class="weather-container">
                     <div id="weather-icon">
                         <img src="./images/weather/wind-spinner.svg" alt="icon">
@@ -897,6 +910,17 @@ async function getWeather() {
                     <div id="weather-desc">Weather unavailable</div>
                 </div>
             `;
+            const reloadBtn = weatherWidget.querySelector('#weather-reload-btn');
+            if (reloadBtn) {
+                reloadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    getWeather(true);
+                });
+            }
+        }
+        const outlookBar = document.getElementById('weather-outlook-bar');
+        if (outlookBar) {
+            outlookBar.style.display = 'none';
         }
     }
 }
@@ -913,6 +937,7 @@ function renderWeatherOutlook(data) {
         outlookBar.style.display = 'none';
         return;
     }
+    outlookBar.style.display = '';
 
     const todayDateKey = getCityDateKey(new Date(), currentLocation.timezone);
     const todayIndex = data.daily.time.indexOf(todayDateKey);
@@ -1329,11 +1354,15 @@ function initWeatherExpandedPanel() {
         if (e.key === 'Escape') closeWeatherExpandedPanel();
     });
 
-    // Make #weather-widget also open the expanded dashboard on click
+    // Make #weather-widget also open the expanded dashboard on click (or reload if in error state)
     const weatherWidget = document.getElementById('weather-widget');
     if (weatherWidget) {
         weatherWidget.addEventListener('click', (e) => {
             if (e.target.closest('.hide-widget') || e.target.closest('#hide-widget-btn')) return;
+            if (weatherWidget.classList.contains('is-error') || weatherWidget.querySelector('#weather-reload-btn')) {
+                getWeather(true);
+                return;
+            }
             openWeatherExpandedPanel();
         });
     }
