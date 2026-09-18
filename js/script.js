@@ -1316,33 +1316,39 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
     let monthLetterContainer = document.createElement('div');
     monthLetterContainer.classList.add('month-letter-container'); // Add a class for styling
 
-
-
-
-
     letters.forEach(letter => {
         let letterDiv = document.createElement('div');
         letterDiv.textContent = letter;
         monthLetterContainer.appendChild(letterDiv); // Append each letter to the wrapper
     });
 
+    // Month Section: open_in_new icon on top of vertical month letters
+    let monthSection = document.createElement('div');
+    monthSection.classList.add('month-label-section');
 
+    let monthOpenBtn = document.createElement('div');
+    monthOpenBtn.classList.add('grid-cal-btn', 'list-view-open-icon-btn');
+    monthOpenBtn.title = 'Open Month View';
+    const monthOpenIcon = document.createElement('span');
+    monthOpenIcon.classList.add('material-symbols-outlined', 'list-view-open-icon');
+    monthOpenIcon.textContent = 'open_in_new';
+    monthOpenBtn.appendChild(monthOpenIcon);
 
-    // Append the wrapper to the main container
-    monthNameContainer.appendChild(monthLetterContainer);
+    monthOpenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        popUpDate = null;
+        swapToGridView(monthName, yearDate);
+    });
+
+    monthSection.appendChild(monthOpenBtn);
+    monthSection.appendChild(monthLetterContainer);
+    monthNameContainer.appendChild(monthSection);
 
     // Set background color based on monthName
-    // if (monthName % 2 == 0) {
-    //     monthNameContainer.style.backgroundColor = '#82c6a2'; // Light green
-    // } else {
-    //     monthNameContainer.style.backgroundColor = '#53ab8b'; // Dark green
-    // }
-
     monthNameContainer.style.backgroundColor =
         monthName % 2 === 0 ? colorThemes[selectedTheme].even : colorThemes[selectedTheme].odd;
 
-
-    //monthdays and name container
+    // Year letters wrapper
     let yearLetterContainer = document.createElement('div'); // Create a wrapper container
     yearLetterContainer.classList.add('year-letter-container'); // Add a class for styling
     let yearLetters = yearDate.toString().split('');
@@ -1352,12 +1358,29 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         yearLetterContainer.appendChild(letterDiv);
     });
 
+    // Year Section: open_in_new icon on top of vertical year letters
+    let yearSection = document.createElement('div');
+    yearSection.classList.add('year-label-section');
 
+    let yearOpenBtn = document.createElement('div');
+    yearOpenBtn.classList.add('grid-cal-btn', 'list-view-open-icon-btn');
+    yearOpenBtn.title = 'Open Year View';
+    const yearOpenIcon = document.createElement('span');
+    yearOpenIcon.classList.add('material-symbols-outlined', 'list-view-open-icon');
+    yearOpenIcon.textContent = 'open_in_new';
+    yearOpenBtn.appendChild(yearOpenIcon);
 
-    // yearLetterContainer.textContent = yearDate;
-    monthNameContainer.appendChild(yearLetterContainer);
+    yearOpenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        popUpDate = null;
+        swapToYearView(monthName, yearDate);
+    });
 
-    // Go to Date arrow button below the vertical year
+    yearSection.appendChild(yearOpenBtn);
+    yearSection.appendChild(yearLetterContainer);
+    monthNameContainer.appendChild(yearSection);
+
+    // Go to Date arrow button below the vertical year (chevron - untouched)
     let toGotoDateBtn = document.createElement("div");
     toGotoDateBtn.classList.add("grid-cal-btn", "list-view-arrow-btn");
     toGotoDateBtn.title = "Go to Date";
@@ -1374,30 +1397,9 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         }
     });
 
-
     const monthContainer = document.createElement('div');
     monthContainer.classList.add('month-container');
     let storedData = JSON.parse(localStorage.getItem('tasks')) || {};
-
-    // Lock Button
-    let toGridCalBtn = document.createElement("div");
-    toGridCalBtn.classList.add("grid-cal-btn"); // Assign class for styling
-    const icon = document.createElement("span");
-    icon.classList.add("material-icons");
-    // icon.textContent = "lock_open";
-    icon.textContent = "calendar_month";
-
-
-    toGridCalBtn.appendChild(icon);
-    monthNameContainer.prepend(toGridCalBtn);
-
-
-    toGridCalBtn.addEventListener('click', () => {
-        popUpDate = null;
-        swapToGridView(monthName, yearDate);
-    });
-
-
 
     function swapToGridView(monthName, yearDate) {
         currentMonthValue = monthName;
@@ -1407,36 +1409,16 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
         showCalVertView(monthName, yearDate);
     }
 
-    // Check if lock state exists in localStorage for this month container
-    // Check if lock state exists in localStorage for this month container
-    // let isLocked = localStorage.getItem(`lockState-${FormatMonthName}`) === 'true' ? true : false; // Default to false if not found
-
-
-    // Apply saved lock state when the page loads
-    // if (isLocked) {
-    //     // console.log(`${FormatMonthName} is locked`);
-    //     monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
-    //     // icon.textContent = "lock_open"; // Change icon to locked
-    //     icon.textContent = "calendar_month";
-    // }
-
-    // Lock/Unlock functionality
-    // toGridCalBtn.addEventListener("click", () => {
-    //     isLocked = !isLocked; // Toggle the lock state
-
-    //     if (isLocked) {
-    //         // console.log(`${FormatMonthName} is locked`);
-    //         monthContainer.style.pointerEvents = "auto"; // Disable interaction for the month container
-    //         icon.textContent = "calendar_month"; // Change icon to locked
-    //     } else {
-    //         // console.log(`${FormatMonthName} is unlocked`);
-    //         monthContainer.style.pointerEvents = "auto"; // Enable interaction for the month container
-    //         icon.textContent = "calendar_month"; // Change icon back to unlocked
-    //     }
-
-    //     // Save the lock state to localStorage
-    //     localStorage.setItem(`lockState-${FormatMonthName}`, isLocked.toString());
-    // });
+    function swapToYearView(monthName, yearDate) {
+        currentMonthValue = monthName;
+        currentYearValue = yearDate;
+        currentMonthVertView = monthName;
+        currentYearVertView = yearDate;
+        popUpDate = null;
+        if (typeof openYearMap === 'function') {
+            openYearMap(yearDate, monthName);
+        }
+    }
 
 
 
