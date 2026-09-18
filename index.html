@@ -789,17 +789,17 @@
             </div>
 
             <div class="month-view-actions">
-                <button class="month-view__goto-list-view-btn">
-                    <span class="material-symbols-outlined header-icon-vert-view " id="icon-month-label-vert-view">
-                        event_note
-                    </span>
-                </button>
-
                 <button class="month-view-year-map-btn" id="month-view-year-map-btn" title="Year Map">
                     <svg class="year-view-cal-icon month-view-year-map-icon" viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
                         <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" stroke="currentColor" stroke-width="0.6" stroke-linejoin="round" />
                         <text x="12" y="15.3" font-family="'Roboto', -apple-system, sans-serif" font-size="6.8" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="currentColor" stroke="currentColor" stroke-width="0.3" letter-spacing="-0.3px">YR</text>
                     </svg>
+                </button>
+
+                <button class="month-view__goto-list-view-btn" title="List View">
+                    <span class="material-symbols-outlined header-icon-vert-view " id="icon-month-label-vert-view">
+                        event_note
+                    </span>
                 </button>
 
                 <div class="navigation-vertview-container" style="display: none;">
@@ -1064,12 +1064,15 @@
                                     <span class="material-symbols-outlined submenu-indicator">chevron_right</span>
                                 </div>
                                 <ul class="sub-submenu sub-sub-submenu">
-                                    <li data-view="list" class="menu-item">
+                                    <li data-view="year" class="menu-item">
                                         <div class="menu-label">
-                                            <span class="material-symbols-outlined">event_note</span>
-                                            <span class="menu-text">List View</span>
-                                            <label class="list-radio">
-                                                <input type="radio" name="view-mode" value="list">
+                                            <svg class="year-view-cal-icon menu-year-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+                                                <text x="12" y="15.3" font-family="'Roboto', -apple-system, sans-serif" font-size="6.5" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="currentColor" letter-spacing="-0.3px">YR</text>
+                                            </svg>
+                                            <span class="menu-text">Year View</span>
+                                            <label class="year-radio">
+                                                <input type="radio" name="view-mode" value="year">
                                             </label>
                                         </div>
                                     </li>
@@ -1079,6 +1082,15 @@
                                             <span class="menu-text">Month View</span>
                                             <label class="month-radio">
                                                 <input type="radio" name="view-mode" value="month">
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li data-view="list" class="menu-item">
+                                        <div class="menu-label">
+                                            <span class="material-symbols-outlined">event_note</span>
+                                            <span class="menu-text">List View</span>
+                                            <label class="list-radio">
+                                                <input type="radio" name="view-mode" value="list">
                                             </label>
                                         </div>
                                     </li>

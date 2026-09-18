@@ -3642,6 +3642,7 @@ h2 {
     transform: translateX(0);
 }
 
+.year-radio,
 .month-radio,
 .list-radio,
 .todo-radio,
@@ -3860,9 +3861,13 @@ input[type="radio"]:checked::after {
 .sub-submenu .sub-submenu > .menu-item > .menu-label .material-symbols-outlined,
 .sub-submenu .sub-submenu > .menu-item > .menu-label .material-icons,
 .sub-sub-submenu > .menu-item > .menu-label .material-symbols-outlined,
-.sub-sub-submenu > .menu-item > .menu-label .material-icons {
+.sub-sub-submenu > .menu-item > .menu-label .material-icons,
+.sub-sub-submenu > .menu-item > .menu-label svg.menu-year-icon {
     font-size: 18px;
+    width: 18px;
+    height: 18px;
     color: #ddd;
+    flex-shrink: 0;
 }
 .sub-submenu .sub-submenu input[type="radio"],
 .sub-sub-submenu input[type="radio"] {

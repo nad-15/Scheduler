@@ -1218,7 +1218,14 @@ function runStartupFeatures() {
   getWeather();
 
   // Apply saved view mode
-  if (settings["view-mode"] === "month") {
+  if (settings["view-mode"] === "year") {
+    if (typeof openYearMap === "function") {
+      openYearMap();
+    } else {
+      const yearBtn = document.getElementById('year-map-popup-btn');
+      if (yearBtn) yearBtn.click();
+    }
+  } else if (settings["view-mode"] === "month") {
     showVertViewBtn.click();
   } else if (settings["view-mode"] === "list") {
     console.log("Switched to List View");
