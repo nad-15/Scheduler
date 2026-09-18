@@ -59,6 +59,9 @@ appSettings = { ...DEFAULT_SETTINGS, ...appSettings };
 // save back in case defaults added something new
 localStorage.setItem("appSettings", JSON.stringify(appSettings));
 
+window.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
+window.appSettings = appSettings;
+
 // Select elements
 const menuButton = document.querySelector('.menu-button');
 const menuButtonMonthView = document.querySelector(".hamburger-month-view");
@@ -226,10 +229,11 @@ todoCloseBtn.addEventListener("click", closeTodoView);
 
 
 // ===== Hook Settings Toggles =====
-document.getElementById("todo-floating-btn-toggle").addEventListener("change", (e) => {
-  const settings = loadSettings();
-  settings["todo-floating-btn"] = e.target.checked;
-  saveSettings(settings);
+document.getElementById("todo-floating-btn-toggle")?.addEventListener("change", (e) => {
+  if (typeof appSettings !== "undefined") {
+    appSettings["todo-floating-btn"] = e.target.checked;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+  }
 
   const todoBtn = document.querySelector(".todo-button");
   if (todoBtn) {
