@@ -4975,16 +4975,21 @@ input[type="radio"]:checked::after {
     transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
+.material-symbols-outlined.list-view-arrow-icon,
 .list-view-arrow-icon {
     font-size: 22px;
+    font-weight: normal !important;
+    font-variation-settings: 'wght' 300, 'opsz' 24;
     color: inherit;
+    opacity: 0.9;
     line-height: 1;
     pointer-events: none;
-    transition: transform 0.15s ease;
+    transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .list-view-arrow-btn:hover .list-view-arrow-icon {
     transform: translateY(2px);
+    opacity: 1;
 }
 
 .list-view-arrow-btn:active {
