@@ -5286,6 +5286,7 @@ body:not(:has(#slidingInputView.show)):not(:has(#movable-template.is-open)):not(
     background: transparent;
 
     /* border: 1px solid red; */
+    white-space: normal;
 
 }
 
@@ -5297,6 +5298,7 @@ body:not(:has(#slidingInputView.show)):not(:has(#movable-template.is-open)):not(
     overflow: visible;
     text-overflow: unset;
     padding: 2px;
+    white-space: pre-wrap;
 }
 
 
@@ -6256,7 +6258,7 @@ body:not(:has(#slidingInputView.show)):not(:has(#movable-template.is-open)):not(
     padding: 5px 4px;
     word-wrap: break-word;
     overflow-wrap: anywhere;
-    white-space: normal;
+    white-space: pre-wrap;
     word-break: break-word;
 }
 
@@ -6279,6 +6281,7 @@ body:not(:has(#slidingInputView.show)):not(:has(#movable-template.is-open)):not(
     width: 100%;
     min-width: 0;
     pointer-events: none;
+    white-space: pre-wrap;
 }
 
 .movable-template.is-expanded .items {

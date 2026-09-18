@@ -605,7 +605,7 @@ function insertTask(direction, customTaskText = null, customColor = null) {
     }
 
     const isTemplateInsert = typeof customTaskText === 'string' && customTaskText.trim() !== '';
-    const textToInsert = isTemplateInsert ? customTaskText : '';
+    const textToInsert = isTemplateInsert ? customTaskText.trim() : '';
     const colorToInsert = customColor || chosenColor || '#ccc';
 
     const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
@@ -1520,7 +1520,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 // taskDiv.textContent = task;
 
                 //webkit
-                if (task.trim()) {
+                const cleanTask = (typeof task === 'string' ? task : '').trim();
+                if (cleanTask) {
                     const span = document.createElement('span');
                     span.className = 'clamp-text';
 
@@ -1528,7 +1529,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                         span.classList.add('expanded');
                     }
 
-                    span.textContent = task;
+                    span.textContent = cleanTask;
                     taskDiv.innerHTML = ''; // clear existing content
                     taskDiv.appendChild(span);
                 } else {
@@ -1564,7 +1565,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 // taskDiv.textContent = task;
 
                 //webkit
-                if (task.trim()) {
+                const cleanTask = (typeof task === 'string' ? task : '').trim();
+                if (cleanTask) {
                     const span = document.createElement('span');
                     span.className = 'clamp-text';
 
@@ -1572,7 +1574,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                         span.classList.add('expanded');
                     }
 
-                    span.textContent = task;
+                    span.textContent = cleanTask;
                     taskDiv.innerHTML = ''; // clear existing content
                     taskDiv.appendChild(span);
                 } else {
@@ -1609,7 +1611,8 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                 // taskDiv.textContent = task;
 
                 //webkit
-                if (task.trim()) {
+                const cleanTask = (typeof task === 'string' ? task : '').trim();
+                if (cleanTask) {
                     const span = document.createElement('span');
                     span.className = 'clamp-text';
 
@@ -1617,7 +1620,7 @@ function addDays(scroll = "", monthName = 0, date = 1, day = 0, lastDateOfMonth 
                         span.classList.add('expanded');
                     }
 
-                    span.textContent = task;
+                    span.textContent = cleanTask;
                     taskDiv.innerHTML = ''; // clear existing content
                     taskDiv.appendChild(span);
                 } else {
@@ -2128,7 +2131,8 @@ function submitTask() {
             let taskTitle = document.getElementById('taskTitle').value;
 
             // Use existing text if none is typed in
-            if (taskTitle !== '') {
+            if (taskTitle.trim() !== '') {
+                taskTitle = taskTitle.trim();
                 // div.textContent = taskTitle;
 
                 //webkit
@@ -2145,7 +2149,7 @@ function submitTask() {
                 div.appendChild(span);    // Add styled span
 
             } else {
-                taskTitle = div.textContent;
+                taskTitle = div.textContent.trim();
             }
 
             addTemplate(taskTitle, chosenColor);
@@ -2526,6 +2530,7 @@ function submitTemplate(item) {
 
         const storedData = JSON.parse(localStorage.getItem('tasks')) || {};
 
+        const cleanTaskText = (typeof taskText === 'string' ? taskText : '').trim();
         selectedDivs.forEach(div => {
             // div.textContent = taskText;
 
@@ -2537,7 +2542,7 @@ function submitTemplate(item) {
                 span.classList.add('expanded');
             }
 
-            span.textContent = taskText;
+            span.textContent = cleanTaskText;
             div.innerHTML = '';       // Clear any existing content
             div.appendChild(span);    // Add styled span
 
@@ -2559,7 +2564,7 @@ function submitTemplate(item) {
             const taskDivs = Array.from(parent.querySelectorAll(`.${taskKey}TaskSub`));
             const index = taskDivs.indexOf(div); // this is key: find position of this subtask in the DOM
 
-            saveTaskData(date, taskKey, taskText, taskColor, index);
+            saveTaskData(date, taskKey, cleanTaskText, taskColor, index);
         });
 
         [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
@@ -2613,12 +2618,14 @@ function renderJobTemplates() {
     jobTemplateContainer.innerHTML = '';
     taskClipboard.forEach(task => {
         if (!task || !task.text) return;
+        const cleanText = (typeof task.text === 'string' ? task.text : '').trim();
+        if (!cleanText) return;
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('items');
         if (task.favorite) {
             itemDiv.classList.add('is-favorite');
         }
-        itemDiv.dataset.taskText = task.text;
+        itemDiv.dataset.taskText = cleanText;
         itemDiv.dataset.taskColor = task.color;
 
         // Set the background color of the div based on the task's color
@@ -2635,7 +2642,7 @@ function renderJobTemplates() {
         // Text content span
         const textSpan = document.createElement('span');
         textSpan.className = 'item-text';
-        textSpan.textContent = task.text;
+        textSpan.textContent = cleanText;
         itemDiv.appendChild(textSpan);
 
         // Delete button in edit mode
@@ -2836,13 +2843,14 @@ function renderSlidingTemplates() {
             // 3. If selectedDivs exist, stamp directly into them AND bump recency in data/storage
             if (selectedDivs.length > 0) {
                 bumpTemplateToTop(task.text, hexColor);
+                const cleanText = (typeof task.text === 'string' ? task.text : '').trim();
                 selectedDivs.forEach(div => {
                     const span = document.createElement('span');
                     span.className = 'clamp-text';
                     if (expanded) {
                         span.classList.add('expanded');
                     }
-                    span.textContent = task.text;
+                    span.textContent = cleanText;
                     div.innerHTML = '';
                     div.appendChild(span);
 
