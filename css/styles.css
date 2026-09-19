@@ -9182,8 +9182,8 @@ ic {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 8px 8px 10px;
-    font-size: 13.5px;
+    padding: 8px 4px 8px 8px;
+    font-size: 12.5px;
     font-weight: 500;
     color: #1e293b;
     background-color: #ffffff;
@@ -9217,12 +9217,12 @@ ic {
     overflow: hidden;
     text-overflow: ellipsis;
     flex: 1;
-    margin-right: 2px;
+    margin-right: 1px;
 }
 
 .goto-date-select-arrow {
     position: static;
-    font-size: 18px;
+    font-size: 16px;
     color: #64748b;
     pointer-events: none;
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s ease;
@@ -9327,7 +9327,7 @@ ic {
 
 .goto-date-year-composite .goto-date-select-text {
     flex: 1;
-    padding: 8px 4px 8px 10px;
+    padding: 8px 2px 8px 8px;
     cursor: text;
     user-select: text;
     transition: color 0.15s ease;
@@ -9343,7 +9343,7 @@ ic {
     justify-content: center;
     background: none;
     border: none;
-    padding: 8px 8px;
+    padding: 8px 4px;
     cursor: pointer;
     color: inherit;
     border-radius: 0 5px 5px 0;
