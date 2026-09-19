@@ -293,6 +293,7 @@
         itemBtn.dataset.value = idx.toString();
         itemBtn.setAttribute('role', 'option');
         itemBtn.textContent = name;
+        itemBtn.title = name;
         itemBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           monthSelect.value = idx.toString();
@@ -329,6 +330,7 @@
         itemBtn.dataset.value = y.toString();
         itemBtn.setAttribute('role', 'option');
         itemBtn.textContent = y.toString();
+        itemBtn.title = y.toString();
         itemBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           yearSelect.value = y.toString();
@@ -366,6 +368,7 @@
         itemBtn.dataset.value = d.toString();
         itemBtn.setAttribute('role', 'option');
         itemBtn.textContent = d.toString();
+        itemBtn.title = d.toString();
         itemBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           daySelect.value = d.toString();
@@ -390,6 +393,8 @@
     // Month label & active state
     if (monthTextEl && !isNaN(m) && MONTH_NAMES[m]) {
       monthTextEl.textContent = MONTH_NAMES[m];
+      monthTextEl.title = MONTH_NAMES[m];
+      if (monthBtn) monthBtn.title = MONTH_NAMES[m];
     }
     if (monthMenuEl) {
       monthMenuEl.querySelectorAll('.goto-date-dropdown-item').forEach((item) => {
@@ -400,6 +405,8 @@
     // Day label & active state
     if (dayTextEl && !isNaN(d)) {
       dayTextEl.textContent = d.toString();
+      dayTextEl.title = d.toString();
+      if (dayBtn) dayBtn.title = `Day ${d}`;
     }
     if (dayMenuEl) {
       dayMenuEl.querySelectorAll('.goto-date-dropdown-item').forEach((item) => {
@@ -410,6 +417,8 @@
     // Year label & active state
     if (yearTextEl && !isNaN(y)) {
       yearTextEl.textContent = y.toString();
+      yearTextEl.title = y.toString();
+      if (yearBtn) yearBtn.title = `Year ${y} (click to edit)`;
     }
     if (yearMenuEl) {
       let matchingItem = yearMenuEl.querySelector(`.goto-date-dropdown-item[data-value="${y}"]`);
@@ -420,6 +429,7 @@
         matchingItem.dataset.value = y.toString();
         matchingItem.setAttribute('role', 'option');
         matchingItem.textContent = y.toString();
+        matchingItem.title = y.toString();
         matchingItem.addEventListener('click', (e) => {
           e.stopPropagation();
           let opt = yearSelect.querySelector(`option[value="${y}"]`);
