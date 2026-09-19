@@ -668,6 +668,9 @@
     // Tapping directly on taskTitle allows native focus & typing to proceed (Action 1)
     if (e.target === taskTitle) return;
 
+    // Allow submitTask button interactions (prevents premature blur & layout shifts while tapping submit)
+    if (submitTask && submitTask.contains(e.target)) return;
+
     // Allow emoji picker button and emoji tray interactions
     if (btnEmojiPicker && btnEmojiPicker.contains(e.target)) return;
     if (dynamicEmojiTray && dynamicEmojiTray.contains(e.target)) return;
@@ -675,7 +678,14 @@
     // Allow chevron collapse button interactions (its own click handler manages collapse upon lifting)
     if (btnCollapseActions && btnCollapseActions.contains(e.target)) return;
 
-    // For any other interaction anywhere on the screen (colors, calendar, toolbar, counter, add task, etc.):
+    // Allow template strip pills and template container interactions
+    const slidingTemplatesContainer = document.getElementById('slidingTemplatesContainer');
+    if (slidingTemplatesContainer && slidingTemplatesContainer.contains(e.target)) return;
+
+    // Allow tools inside dynamicCollapsibleTools (counter, template toggle, add task)
+    if (dynamicCollapsibleTools && dynamicCollapsibleTools.contains(e.target)) return;
+
+    // For any other interaction outside the input bar (calendar, year map, toolbar, background, etc.):
     // Neither action (focus or swipe-left) is active, so textarea MUST NOT be extended:
     if (document.activeElement === taskTitle) {
       taskTitle.blur();
@@ -1018,10 +1028,30 @@
     }
 
     if (submitTask) {
-      submitTask.addEventListener('click', () => {
+      submitTask.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+      });
+      submitTask.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+      });
+      submitTask.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+      }, { passive: true });
+
+      submitTask.addEventListener('click', (e) => {
         if (isEmojiTrayOpen) closeEmojiTray();
-        if (document.activeElement === taskTitle) {
+        const wasInputActive = (document.activeElement === taskTitle);
+        if (wasInputActive) {
           taskTitle.blur();
+          // Shield the calendar grid temporarily during the keyboard collapse animation
+          // to prevent mobile ghost clicks from selecting any underlying task div
+          const yearContainer = document.getElementById('year-container');
+          if (yearContainer) {
+            yearContainer.style.pointerEvents = 'none';
+            setTimeout(() => {
+              yearContainer.style.pointerEvents = '';
+            }, 320);
+          }
         }
         isManualTextareaExpanded = false;
         wasExpandedBeforeEmoji = false;
