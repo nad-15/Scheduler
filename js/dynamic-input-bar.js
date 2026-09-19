@@ -1085,8 +1085,15 @@
     // Color options container: Allow color changes without changing textarea focus
     const colorOptionsContainer = document.querySelector('.color-button-options');
     if (colorOptionsContainer) {
+      colorOptionsContainer.addEventListener('pointerdown', (e) => {
+        // When real user taps a color button while typing, prevent the browser from blurring the textarea
+        if (document.activeElement === taskTitle && e.target.closest('button, .color-option, .palette-button, .dropdown-option, .shade-color-btn')) {
+          e.preventDefault();
+        }
+      });
+
       colorOptionsContainer.addEventListener('mousedown', (e) => {
-        // Prevent default mousedown focus shifting so active textarea remains focused if user was typing
+        // Prevent default mousedown focus shifting on desktop
         if (document.activeElement === taskTitle) {
           e.preventDefault();
         }
