@@ -9159,6 +9159,7 @@ ic {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
 }
 
 .goto-date-label {
@@ -9195,6 +9196,8 @@ ic {
     transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
     font-family: var(--todo-font);
     text-align: left;
+    overflow: hidden;
+    min-width: 0;
 }
 
 .goto-date-custom-select:hover {
