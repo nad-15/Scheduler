@@ -1812,6 +1812,7 @@
         const pos = getCanvasCoordinates(e);
 
         if (isGameOver) {
+            const wasDemo = isAutoPlayDemo;
             // Stop auto-play demo if active
             if (isAutoPlayDemo) {
                 isAutoPlayDemo = false;
@@ -1821,18 +1822,18 @@
             const cx = Math.round(currentLogicalWidth / 2);
             // Replay Button bounds: [cx - 24, by, 20, 12] with touch forgiveness
             // Exit Button bounds: [cx + 4, by, 20, 12] with touch forgiveness
-            if (pos.x >= cx + 2 && pos.x <= cx + 28 && pos.y >= 16 && pos.y <= 40) {
+            if (pos.x >= cx + 2 && pos.x <= cx + 28 && pos.y >= 10 && pos.y <= 40) {
                 // Clicked Exit button [✕]
                 exitMiniGame();
                 return;
             }
-            if (pos.x >= cx - 28 && pos.x <= cx - 2 && pos.y >= 16 && pos.y <= 40) {
+            if (pos.x >= cx - 28 && pos.x <= cx - 2 && pos.y >= 10 && pos.y <= 40) {
                 // Clicked Replay button [↻]
-                restartGame();
+                restartGame(wasDemo);
                 return;
             }
             // Dino game style: tapping anywhere else on screen restarts
-            restartGame();
+            restartGame(wasDemo);
             return;
         }
 
@@ -2012,13 +2013,13 @@
         start();
     }
 
-    function restartGame() {
+    function restartGame(withCountdown = false) {
         initAudio();
         catRunnerHighScore = getSavedHighScore();
         isNewHighScoreSession = false;
 
         isVisible = true;
-        isDinoMode = true;
+        isDinoMode = !withCountdown;
         isGameOver = false;
         isAutoPlayDemo = false;
         autoPlayTimer = 0;
@@ -2026,10 +2027,11 @@
         dinoDistanceTraveled = 0;
         currentSpeed = START_SPEED;
         catWorldX = CAT_SCREEN_X;
-        countdownTimer = 0;
-        goBannerTimer = 0.5;
+        countdownTimer = withCountdown ? 3.0 : 0;
+        lastBeepSec = withCountdown ? 3 : -1;
+        goBannerTimer = withCountdown ? 0 : 0.5;
         idlePlayTimer = 0;
-        invulnerableTimer = 1.0;
+        invulnerableTimer = withCountdown ? 0 : 1.0;
         catOffsetY = 0;
         jumpVy = 0;
         jumpTime = 0;
@@ -2046,7 +2048,11 @@
         snackComboTimer = 0;
 
         spawnInitialTrack();
-        playRetroCountdownBeep(true); // Bright chirp on restart!
+        if (withCountdown) {
+            playRetroCountdownBeep(false); // First countdown beep for '3'
+        } else {
+            playRetroCountdownBeep(true); // Bright chirp on restart!
+        }
         start();
     }
 
@@ -3134,13 +3140,28 @@
             let by = 22;
 
             if (isAutoPlayDemo) {
-                // DEMO label above centered buttons
+                // DEMO badge in top-left corner with dark background & sleek cyan border
                 ctx.save();
-                ctx.font = 'bold 7px monospace, sans-serif';
+                const badgeX = 4;
+                const badgeY = 3;
+                const badgeW = 28;
+                const badgeH = 10;
+
+                // Translucent dark background pill
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
+
+                // Sleek cyan outline border
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(badgeX + 0.5, badgeY + 0.5, badgeW - 1, badgeH - 1);
+
+                // Crystal-clear typography (Roboto/Arial sans-serif renders 'M' perfectly)
+                ctx.font = 'bold 7px "Roboto", Arial, -apple-system, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
+                ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#38bdf8';
-                ctx.fillText('DEMO', cx, 3);
+                ctx.fillText('DEMO', badgeX + Math.round(badgeW / 2), badgeY + Math.round(badgeH / 2));
                 ctx.restore();
 
                 // Center buttons vertically on canvas during demo
@@ -3287,11 +3308,12 @@
             isInputHeldDown = true;
             initAudio();
             if (isGameOver) {
+                const wasDemo = isAutoPlayDemo;
                 if (isAutoPlayDemo) {
                     isAutoPlayDemo = false;
                     autoPlayTimer = 0;
                 }
-                restartGame();
+                restartGame(wasDemo);
             } else if (countdownTimer > 0) {
                 triggerPrepJump();
             } else if (isDinoMode) {
