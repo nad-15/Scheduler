@@ -685,6 +685,10 @@
     // Allow tools inside dynamicCollapsibleTools (counter, template toggle, add task)
     if (dynamicCollapsibleTools && dynamicCollapsibleTools.contains(e.target)) return;
 
+    // Allow color options container interactions (keyboard state stays as is: open stays open, closed stays closed)
+    const colorOptionsContainer = document.querySelector('.color-button-options');
+    if (colorOptionsContainer && colorOptionsContainer.contains(e.target)) return;
+
     // For any other interaction outside the input bar (calendar, year map, toolbar, background, etc.):
     // Neither action (focus or swipe-left) is active, so textarea MUST NOT be extended:
     if (document.activeElement === taskTitle) {
@@ -1078,21 +1082,33 @@
     document.addEventListener('touchstart', handleOutsideInteraction, { capture: true, passive: true });
     document.addEventListener('click', handleOutsideInteraction, true);
 
-    // Direct listener on color options container for instant response
+    // Color options container: Preserve keyboard state (open stays open, closed stays closed)
     const colorOptionsContainer = document.querySelector('.color-button-options');
     if (colorOptionsContainer) {
-      const handleColorInteraction = () => {
+      let wasFocusedBeforeColor = false;
+
+      colorOptionsContainer.addEventListener('pointerdown', () => {
+        wasFocusedBeforeColor = (document.activeElement === taskTitle);
+      }, true);
+
+      colorOptionsContainer.addEventListener('mousedown', (e) => {
+        // Prevent default mousedown focus shifting so active textarea remains focused on desktop/hybrid
         if (document.activeElement === taskTitle) {
-          taskTitle.blur();
+          e.preventDefault();
         }
+      });
+
+      colorOptionsContainer.addEventListener('click', () => {
         if (isEmojiTrayOpen) {
           closeEmojiTray();
         }
-        isManualTextareaExpanded = false;
-        updateCollapseLogic();
-      };
-      colorOptionsContainer.addEventListener('pointerdown', handleColorInteraction, true);
-      colorOptionsContainer.addEventListener('click', handleColorInteraction, true);
+        // If the keyboard was open before choosing a color, keep it open and focused
+        if (wasFocusedBeforeColor) {
+          if (document.activeElement !== taskTitle) {
+            taskTitle.focus({ preventScroll: true });
+          }
+        }
+      }, true);
     }
 
     if (taskTitle) {
