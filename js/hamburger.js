@@ -327,7 +327,7 @@ if (dynamicInputBarToggle) {
 
 const colorThemes = {
   // Featured Sky Theme
-  sky: { even: '#BCD9EA', odd: '#8EB8D5', sunday: '#567E9D' },
+  sky: { even: '#BCD9EA', odd: '#97BFDB', sunday: '#6E99BA' },
 
   // Default / Gray (neutral)
   default: { even: '#bdbdbd', odd: '#9e9e9e', sunday: '#616161' },
