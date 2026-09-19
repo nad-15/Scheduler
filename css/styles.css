@@ -5077,11 +5077,11 @@ input[type="radio"]:checked::after {
 
 .material-symbols-outlined.list-view-open-icon,
 .list-view-open-icon {
-    font-size: 11px !important;
+    font-size: 14px !important;
     font-weight: normal !important;
     font-variation-settings: 'wght' 300, 'opsz' 20;
-    width: 11px;
-    height: 11px;
+    width: 14px;
+    height: 14px;
     line-height: 1;
     color: inherit;
     opacity: 0.9;
