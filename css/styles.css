@@ -9830,6 +9830,35 @@ ic {
     background-color: #eff6ff;
 }
 
+.year-map-month.is-current-month,
+.year-map-month.is-current-month.is-selected {
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: linear-gradient(#ffffff, #ffffff) padding-box,
+                linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) border-box;
+    box-shadow: none;
+}
+
+.year-map-month.is-current-month:hover,
+.year-map-month.is-current-month.is-selected:hover {
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: linear-gradient(#ffffff, #ffffff) padding-box,
+                linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) border-box;
+}
+
+.year-map-month.is-current-month .year-map-month-header,
+.year-map-month.is-current-month.is-selected .year-map-month-header {
+    color: #1e293b;
+    background-color: transparent;
+    font-weight: 800;
+}
+
+.year-map-month.is-current-month:hover .year-map-month-header,
+.year-map-month.is-current-month.is-selected:hover .year-map-month-header {
+    background-color: #f1f5f9;
+}
+
 .year-map-month-header {
     font-size: 11px;
     font-weight: 700;

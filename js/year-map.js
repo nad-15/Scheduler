@@ -335,11 +335,19 @@
     const storedTasks = getStoredTasks();
     const now = typeof AppTimezone !== 'undefined' ? AppTimezone.now() : new Date();
     const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+    const isCurrentYear = safeYear === now.getFullYear();
+    const currentActualMonth = now.getMonth();
 
     for (let m = 0; m < 12; m++) {
       const monthBox = document.createElement('div');
       monthBox.className = 'year-map-month';
       monthBox.dataset.month = m.toString();
+
+      const isCurrentMonth = isCurrentYear && m === currentActualMonth;
+      if (isCurrentMonth) {
+        monthBox.classList.add('is-current-month');
+      }
+
       if (m === selectedMonth) {
         monthBox.classList.add('is-selected');
       }
@@ -352,7 +360,9 @@
       const monthHeader = document.createElement('div');
       monthHeader.className = 'year-map-month-header';
       monthHeader.textContent = MONTH_NAMES_SHORT[m];
-      monthHeader.title = `Open ${MONTH_NAMES_SHORT[m]} ${safeYear} in Month View`;
+      monthHeader.title = isCurrentMonth
+        ? `Current Month - Open ${MONTH_NAMES_SHORT[m]} ${safeYear} in Month View`
+        : `Open ${MONTH_NAMES_SHORT[m]} ${safeYear} in Month View`;
       monthHeader.addEventListener('click', (e) => {
         e.stopPropagation();
         selectMonth(m);
