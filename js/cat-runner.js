@@ -391,6 +391,20 @@
     let snackComboCount = 0;       // Consecutive snack/balloon combo counter
     let snackComboTimer = 0;       // Combo chain decay timer
 
+    // Auto-Play Demo Mode (AI takes over after game over)
+    let isAutoPlayDemo = false;       // True when AI demo is actively running
+    let autoPlayTimer = 0;            // Countdown from game over to demo start (2.0s)
+    let autoPlaySpeed = 88;           // Demo running speed (moderate, doesn't ramp)
+    const AUTO_PLAY_DELAY = 2.0;      // Seconds to wait after game over before demo starts
+    let autoPlayJumping = false;      // AI jump state
+    let autoPlayJumpTime = 0;         // AI jump elapsed time
+    let autoPlayJumpDuration = SHORT_JUMP_DURATION;
+    let autoPlayJumpApex = SHORT_JUMP_APEX;
+    let autoPlayCatOffsetY = 0;       // AI cat vertical offset
+    let autoPlayJumpVy = 0;           // AI cat vertical velocity
+    let autoPlayWorldX = 0;           // AI demo world position
+    let autoPlayJustPopped = 0;       // AI claw slash timer
+
     // Countdown State before Player Mode Starts (3, 2, 1, GO!)
     let countdownTimer = 0;        // > 0 when counting down (3.0 -> 0.0)
     let lastBeepSec = -1;          // Tracks 3, 2, 1 beeps
@@ -718,71 +732,120 @@
         ctx.fillRect(drawX + 2 + Math.round(sway), drawY + 11, 1, 4);
     }
 
-    // Ground Collectible: Fish Snack or Toasted Golden Fish Bone (8x5 pixel art - High Visibility, ZERO WHITE / ZERO GREEN)
+    // Ground Collectible: Fish Snack or Golden Fish Bone (12x7 pixel art - Detailed & Vibrant)
     function drawPixelFishBone(ctx, x, groundY, type = 'bone') {
         const dx = Math.round(x);
-        const dy = groundY - 5; // Resting right on top of the ground baseline
+        const dy = groundY - 7; // Resting right on top of the ground baseline
 
         if (type === 'fish') {
-            // 1. Delicious Coral-Orange Salmon Fish Snack (8x5)
-            // Dark base outline for contrast against any terrain
+            // ═══ Plump Salmon Fish Snack (12x7) ═══
+
+            // Dark outline silhouette for high contrast on any terrain
             ctx.fillStyle = '#7c2d12';
-            ctx.fillRect(dx + 1, dy + 1, 6, 3);
-            ctx.fillRect(dx, dy + 2, 8, 2);
+            ctx.fillRect(dx + 2, dy, 6, 1);       // Top outline
+            ctx.fillRect(dx + 1, dy + 1, 1, 5);    // Left outline
+            ctx.fillRect(dx + 2, dy + 6, 6, 1);    // Bottom outline
+            ctx.fillRect(dx + 8, dy + 1, 1, 2);    // Right body outline top
+            ctx.fillRect(dx + 8, dy + 4, 1, 2);    // Right body outline bottom
 
-            // Vibrant coral-amber fish body
+            // Main body fill (rich salmon coral)
             ctx.fillStyle = '#f97316';
-            ctx.fillRect(dx + 2, dy + 1, 4, 3);
-            ctx.fillStyle = '#fb923c';
-            ctx.fillRect(dx + 1, dy + 2, 5, 2);
+            ctx.fillRect(dx + 2, dy + 1, 6, 5);
 
-            // Tail fin
-            ctx.fillStyle = '#ea580c';
-            ctx.fillRect(dx + 6, dy + 1, 1, 1);
-            ctx.fillRect(dx + 7, dy, 1, 1);
-            ctx.fillRect(dx + 6, dy + 3, 1, 1);
-            ctx.fillRect(dx + 7, dy + 4, 1, 1);
-
-            // Head / Snout
+            // Lighter belly (warm peach underside)
             ctx.fillStyle = '#fdba74';
-            ctx.fillRect(dx, dy + 2, 2, 2);
+            ctx.fillRect(dx + 2, dy + 4, 5, 2);
 
-            // Eye
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(dx + 1, dy + 2, 1, 1);
-
-            // Golden shimmer scale
+            // Shimmering scales (golden highlights along back)
             ctx.fillStyle = '#fbbf24';
             ctx.fillRect(dx + 3, dy + 1, 2, 1);
-        } else {
-            // 2. Toasted Golden Caramel Fish Bone (8x5 - Ultra High Contrast, Zero White!)
-            // Dark outline for crisp separation
-            ctx.fillStyle = '#78350f';
-            ctx.fillRect(dx, dy + 1, 8, 3);
+            ctx.fillRect(dx + 6, dy + 2, 1, 1);
+            ctx.fillRect(dx + 4, dy + 3, 1, 1);
 
-            // Head skull (warm golden amber)
-            ctx.fillStyle = '#f59e0b';
-            ctx.fillRect(dx, dy + 1, 2, 3);
+            // Dorsal fin (top fin - darker accent)
+            ctx.fillStyle = '#ea580c';
+            ctx.fillRect(dx + 4, dy - 1, 3, 1);
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(dx + 5, dy - 1, 1, 1);
+
+            // Pectoral fin (small side fin)
+            ctx.fillStyle = '#ea580c';
+            ctx.fillRect(dx + 3, dy + 5, 2, 1);
+
+            // Tail fin (forked V-shape)
+            ctx.fillStyle = '#ea580c';
+            ctx.fillRect(dx + 9, dy + 1, 1, 1);
+            ctx.fillRect(dx + 10, dy, 1, 1);
+            ctx.fillRect(dx + 9, dy + 3, 1, 1);
+            ctx.fillRect(dx + 9, dy + 5, 1, 1);
+            ctx.fillRect(dx + 10, dy + 6, 1, 1);
+            ctx.fillStyle = '#fb923c';
+            ctx.fillRect(dx + 9, dy + 2, 1, 1);
+            ctx.fillRect(dx + 9, dy + 4, 1, 1);
+
+            // Head / snout (lighter face)
+            ctx.fillStyle = '#fb923c';
+            ctx.fillRect(dx + 2, dy + 2, 1, 3);
+
+            // Cute eye (dark pupil with warm glint)
             ctx.fillStyle = '#0f172a';
-            ctx.fillRect(dx + 1, dy + 2, 1, 1); // Eye socket
+            ctx.fillRect(dx + 3, dy + 2, 1, 2);  // 2px tall eye
+            ctx.fillStyle = '#fef3c7';
+            ctx.fillRect(dx + 3, dy + 2, 1, 1);  // Warm glint on top half
 
-            // Spine (rich caramel)
-            ctx.fillStyle = '#d97706';
-            ctx.fillRect(dx + 2, dy + 2, 4, 1);
+            // Mouth line
+            ctx.fillStyle = '#7c2d12';
+            ctx.fillRect(dx + 1, dy + 4, 1, 1);
+        } else {
+            // ═══ Golden Caramel Fish Bone (12x7) ═══
 
-            // Rib bones (bright golden honey #fbbf24)
-            ctx.fillStyle = '#fbbf24';
-            ctx.fillRect(dx + 3, dy + 1, 1, 1);
-            ctx.fillRect(dx + 3, dy + 3, 1, 1);
-            ctx.fillRect(dx + 5, dy + 1, 1, 1);
-            ctx.fillRect(dx + 5, dy + 3, 1, 1);
-
-            // Tail bone
-            ctx.fillStyle = '#d97706';
-            ctx.fillRect(dx + 6, dy + 1, 1, 3);
+            // Skull (rounded head shape)
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(dx, dy + 1, 3, 5);        // Skull outline
             ctx.fillStyle = '#f59e0b';
-            ctx.fillRect(dx + 7, dy, 1, 1);
-            ctx.fillRect(dx + 7, dy + 4, 1, 1);
+            ctx.fillRect(dx, dy + 2, 3, 3);         // Skull fill
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(dx + 1, dy + 2, 1, 2);     // Skull highlight
+
+            // Eye socket
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(dx + 1, dy + 3, 1, 1);
+
+            // Jaw
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(dx, dy + 5, 2, 1);
+
+            // Spine (long horizontal backbone)
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(dx + 3, dy + 3, 7, 1);     // Dark spine outline
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(dx + 3, dy + 3, 6, 1);      // Caramel spine
+
+            // Rib bones (angled pairs - crisp golden honey)
+            ctx.fillStyle = '#fbbf24';
+            // Rib pair 1
+            ctx.fillRect(dx + 4, dy + 2, 1, 1);
+            ctx.fillRect(dx + 4, dy + 4, 1, 1);
+            // Rib pair 2
+            ctx.fillRect(dx + 6, dy + 1, 1, 1);
+            ctx.fillRect(dx + 6, dy + 2, 1, 1);
+            ctx.fillRect(dx + 6, dy + 4, 1, 1);
+            ctx.fillRect(dx + 6, dy + 5, 1, 1);
+            // Rib pair 3
+            ctx.fillRect(dx + 8, dy + 2, 1, 1);
+            ctx.fillRect(dx + 8, dy + 4, 1, 1);
+
+            // Tail bones (forked)
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(dx + 9, dy + 3, 1, 1);
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(dx + 10, dy + 1, 1, 1);
+            ctx.fillRect(dx + 10, dy + 2, 1, 1);
+            ctx.fillRect(dx + 10, dy + 4, 1, 1);
+            ctx.fillRect(dx + 10, dy + 5, 1, 1);
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(dx + 11, dy, 1, 1);
+            ctx.fillRect(dx + 11, dy + 6, 1, 1);
         }
     }
 
@@ -1749,6 +1812,11 @@
         const pos = getCanvasCoordinates(e);
 
         if (isGameOver) {
+            // Stop auto-play demo if active
+            if (isAutoPlayDemo) {
+                isAutoPlayDemo = false;
+                autoPlayTimer = 0;
+            }
             // Game Over action buttons (Side-by-side centered below text at y=22 or y=25)
             const cx = Math.round(currentLogicalWidth / 2);
             // Replay Button bounds: [cx - 24, by, 20, 12] with touch forgiveness
@@ -1913,6 +1981,8 @@
         isVisible = true;
         isDinoMode = false;
         isGameOver = false;
+        isAutoPlayDemo = false;
+        autoPlayTimer = 0;
         dinoScore = 0;
         dinoDistanceTraveled = 0;
         currentSpeed = START_SPEED;
@@ -1950,6 +2020,8 @@
         isVisible = true;
         isDinoMode = true;
         isGameOver = false;
+        isAutoPlayDemo = false;
+        autoPlayTimer = 0;
         dinoScore = 0;
         dinoDistanceTraveled = 0;
         currentSpeed = START_SPEED;
@@ -1982,6 +2054,8 @@
         isVisible = false;
         isDinoMode = false;
         isGameOver = false;
+        isAutoPlayDemo = false;
+        autoPlayTimer = 0;
         countdownTimer = 0;
         goBannerTimer = 0;
         isJumping = false;
@@ -2017,11 +2091,269 @@
     }
 
     // ------------------------------------------------------------------------
+    // 12c. Auto-Play AI Demo Logic (Runs after Game Over delay)
+    // ------------------------------------------------------------------------
+    function resetDemoTrack() {
+        // Clear and spawn fresh obstacles/balloons/fish for the demo
+        activeObstacles = [];
+        activeBalloons = [];
+        activeFishBones = [];
+        autoPlayWorldX = CAT_SCREEN_X;
+        autoPlayCatOffsetY = 0;
+        autoPlayJumpVy = 0;
+        autoPlayJumping = false;
+        autoPlayJumpTime = 0;
+        autoPlayJustPopped = 0;
+
+        // Spawn initial demo track
+        activeFishBones.push({ id: 'demo_fb0', x: 100, type: 'fish' });
+        activeFishBones.push({ id: 'demo_fb1', x: 118, type: 'fish' });
+        activeFishBones.push({ id: 'demo_fb2', x: 136, type: 'bone' });
+        activeObstacles.push({ x: 200, type: 'short_single', width: 6, height: 7 });
+        activeBalloons.push({ id: 'demo_b0', x: 260, baseY: 7, color: '#f43f5e', highlight: '#fda4af', seed: 1.5 });
+        activeObstacles.push({ x: 340, type: 'tall_single', width: 7, height: 10 });
+        activeFishBones.push({ id: 'demo_fb3', x: 410, type: 'fish' });
+        activeFishBones.push({ id: 'demo_fb4', x: 428, type: 'bone' });
+        activeObstacles.push({ x: 500, type: 'short_double', width: 13, height: 7 });
+        activeBalloons.push({ id: 'demo_b1', x: 570, baseY: 6, color: '#0ea5e9', highlight: '#7dd3fc', seed: 3.1 });
+    }
+
+    function updateAutoPlay(dt) {
+        if (!isAutoPlayDemo) return;
+
+        // Advance world
+        autoPlayWorldX = (autoPlayWorldX + autoPlaySpeed * dt) % WORLD_WIDTH;
+        catWorldX = autoPlayWorldX;
+
+        // Move obstacles, balloons, fish bones
+        for (let i = activeObstacles.length - 1; i >= 0; i--) {
+            activeObstacles[i].x -= autoPlaySpeed * dt;
+            if (activeObstacles[i].x + activeObstacles[i].width < -25) {
+                activeObstacles.splice(i, 1);
+            }
+        }
+        for (let i = activeBalloons.length - 1; i >= 0; i--) {
+            activeBalloons[i].x -= autoPlaySpeed * dt;
+            if (activeBalloons[i].x < -20) {
+                activeBalloons.splice(i, 1);
+            }
+        }
+        for (let i = activeFishBones.length - 1; i >= 0; i--) {
+            activeFishBones[i].x -= autoPlaySpeed * dt;
+            if (activeFishBones[i].x < -20) {
+                activeFishBones.splice(i, 1);
+            }
+        }
+
+        // AI Jump Physics
+        if (autoPlayJumping) {
+            autoPlayJumpTime += dt;
+            const progress = autoPlayJumpTime / autoPlayJumpDuration;
+            if (progress >= 1.0) {
+                autoPlayCatOffsetY = 0;
+                autoPlayJumpVy = 0;
+                autoPlayJumping = false;
+                autoPlayJumpTime = 0;
+            } else {
+                autoPlayCatOffsetY = 4 * autoPlayJumpApex * progress * (1 - progress);
+                autoPlayJumpVy = (4 * autoPlayJumpApex * (1 - 2 * progress)) / autoPlayJumpDuration;
+            }
+        }
+
+        if (autoPlayJustPopped > 0) {
+            autoPlayJustPopped = Math.max(0, autoPlayJustPopped - dt);
+        }
+
+        // AI Decision: Scan for upcoming obstacles and decide when to jump
+        if (!autoPlayJumping) {
+            let shouldJump = false;
+            let needLongJump = false;
+
+            for (let i = 0; i < activeObstacles.length; i++) {
+                const obs = activeObstacles[i];
+                const distToObs = obs.x - (CAT_SCREEN_X + 20);
+
+                // Jump timing: react when obstacle is 28-52px away (depends on speed)
+                const reactionDist = 24 + (autoPlaySpeed / START_SPEED) * 14;
+
+                if (distToObs > 0 && distToObs < reactionDist) {
+                    shouldJump = true;
+                    // Use long jump for clumps (wider obstacles)
+                    if (obs.width >= 12 || obs.height >= 10) {
+                        needLongJump = true;
+                    }
+                    break;
+                }
+            }
+
+            // Also jump for balloons if they're within reach
+            if (!shouldJump) {
+                for (let i = 0; i < activeBalloons.length; i++) {
+                    const b = activeBalloons[i];
+                    const distToBalloon = b.x - (CAT_SCREEN_X + 16);
+                    if (distToBalloon > 0 && distToBalloon < 30) {
+                        shouldJump = true;
+                        needLongJump = true; // Jump high for balloons
+                        break;
+                    }
+                }
+            }
+
+            if (shouldJump) {
+                autoPlayJumping = true;
+                autoPlayJumpTime = 0;
+                if (needLongJump) {
+                    autoPlayJumpDuration = LONG_JUMP_DURATION;
+                    autoPlayJumpApex = LONG_JUMP_APEX;
+                } else {
+                    autoPlayJumpDuration = SHORT_JUMP_DURATION;
+                    autoPlayJumpApex = SHORT_JUMP_APEX;
+                }
+                autoPlayJumpVy = (4 * autoPlayJumpApex) / autoPlayJumpDuration;
+            }
+        }
+
+        // AI Balloon Pop Detection
+        const catCenterX = CAT_SCREEN_X + 20;
+        const catClawsY = GROUND_Y - autoPlayCatOffsetY - 5;
+        for (let i = activeBalloons.length - 1; i >= 0; i--) {
+            const b = activeBalloons[i];
+            const bobY = b.baseY + Math.sin(movieTime * 3 + b.seed) * 1.5;
+            const balloonCenterX = b.x + 3;
+            const hDist = Math.abs(catCenterX - balloonCenterX);
+            if (autoPlayJumping && hDist < 16 && catClawsY <= bobY + 13 && catClawsY >= bobY - 7) {
+                popBalloon(b.x + 3, bobY + 3, b.color, false);
+                autoPlayJustPopped = 0.35;
+                activeBalloons.splice(i, 1);
+            }
+        }
+
+        // AI Fish Bone Collection
+        for (let i = activeFishBones.length - 1; i >= 0; i--) {
+            const fb = activeFishBones[i];
+            const fishCenterX = fb.x + 4;
+            const hDist = Math.abs(catCenterX - fishCenterX);
+            if (hDist < 14 && autoPlayCatOffsetY <= 8) {
+                collectFishBone(fb.x + 4, GROUND_Y - 3, fb.type);
+                autoPlayJustPopped = 0.25;
+                activeFishBones.splice(i, 1);
+            }
+        }
+
+        // Procedural Spawning (reuse simplified logic for demo)
+        let lastObsX = 0;
+        if (activeObstacles.length > 0) {
+            const last = activeObstacles[activeObstacles.length - 1];
+            lastObsX = last.x + last.width;
+        }
+        if (lastObsX < currentLogicalWidth + 60) {
+            const gap = 110 + Math.random() * 70;
+            const spawnX = Math.max(currentLogicalWidth + 20, lastObsX + gap);
+            const roll = Math.random();
+            if (roll < 0.35) {
+                activeObstacles.push({ x: spawnX, type: 'short_single', width: 6, height: 7 });
+            } else if (roll < 0.55) {
+                activeObstacles.push({ x: spawnX, type: 'tall_single', width: 7, height: 10 });
+            } else if (roll < 0.75) {
+                activeObstacles.push({ x: spawnX, type: 'short_double', width: 13, height: 7 });
+            } else if (roll < 0.88) {
+                activeObstacles.push({ x: spawnX, type: 'tall_double', width: 14, height: 10 });
+            } else {
+                activeObstacles.push({ x: spawnX, type: 'short_triple', width: 19, height: 7 });
+            }
+        }
+
+        // Spawn balloons
+        let lastBalloonX = 0;
+        if (activeBalloons.length > 0) {
+            lastBalloonX = activeBalloons[activeBalloons.length - 1].x;
+        }
+        if (lastBalloonX < currentLogicalWidth + 40 && activeBalloons.length < 3) {
+            const bGap = 150 + Math.random() * 100;
+            const bSpawnX = Math.max(currentLogicalWidth + 25, lastBalloonX + bGap);
+            const rainbow = [
+                { color: '#f43f5e', highlight: '#fda4af' },
+                { color: '#0ea5e9', highlight: '#7dd3fc' },
+                { color: '#ec4899', highlight: '#fbcfe8' },
+                { color: '#fbbf24', highlight: '#fde68a' }
+            ];
+            const c = rainbow[Math.floor(Math.random() * rainbow.length)];
+            activeBalloons.push({
+                id: 'demo_b_' + Math.random(),
+                x: bSpawnX,
+                baseY: 6 + Math.random() * 3,
+                color: c.color,
+                highlight: c.highlight,
+                seed: Math.random() * 10
+            });
+        }
+
+        // Spawn fish bones
+        let lastFishX = 0;
+        if (activeFishBones.length > 0) {
+            lastFishX = activeFishBones[activeFishBones.length - 1].x;
+        }
+        if (lastFishX < currentLogicalWidth + 40 && activeFishBones.length < 5) {
+            const fGap = 130 + Math.random() * 80;
+            let fSpawnX = Math.max(currentLogicalWidth + 30, lastFishX + fGap);
+            // Avoid spawning on cacti
+            for (let j = 0; j < activeObstacles.length; j++) {
+                if (Math.abs(fSpawnX - activeObstacles[j].x) < 35) {
+                    fSpawnX = activeObstacles[j].x + activeObstacles[j].width + 35;
+                }
+            }
+            const rowCount = Math.random() < 0.6 ? 3 : 2;
+            const rowType = Math.random() < 0.5 ? 'bone' : 'fish';
+            for (let k = 0; k < rowCount; k++) {
+                activeFishBones.push({
+                    id: 'demo_fb_' + Math.random(),
+                    x: fSpawnX + k * 16,
+                    type: rowType
+                });
+            }
+        }
+
+        // Confetti Particles Physics (keep animations alive in demo)
+        for (let i = confettiParticles.length - 1; i >= 0; i--) {
+            const p = confettiParticles[i];
+            p.life -= dt;
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.vy += 34 * dt;
+            if (p.life <= 0 || p.y > GROUND_Y + 4) {
+                confettiParticles.splice(i, 1);
+            }
+        }
+
+        // Pop Notifications (keep floating text alive in demo)
+        for (let i = popNotifications.length - 1; i >= 0; i--) {
+            const n = popNotifications[i];
+            n.life -= dt;
+            n.y -= 2.5 * dt;
+            if (n.life <= 0) {
+                popNotifications.splice(i, 1);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
     // 13. Narrative & Balloon Progression
     // ------------------------------------------------------------------------
     function updateJourney(dt) {
         if (isGameOver) {
-            // Frozen state on GAME OVER — no movement, no score accumulation
+            // Count up the auto-play timer
+            autoPlayTimer += dt;
+
+            if (!isAutoPlayDemo && autoPlayTimer >= AUTO_PLAY_DELAY) {
+                // Transition to auto-play demo after delay
+                isAutoPlayDemo = true;
+                resetDemoTrack();
+            }
+
+            if (isAutoPlayDemo) {
+                updateAutoPlay(dt);
+            }
+
             return;
         }
 
@@ -2602,20 +2934,46 @@
 
         // 8. Cat Animation & Action Handler
         if (isGameOver) {
-            // A. GAME OVER HURT STATE
-            const catDrawY = CAT_BASE_Y;
-            drawCatSprite(ctx, 'hurt', 0, CAT_SCREEN_X - 2, catDrawY, true, CAT_DEST_W, CAT_DEST_H);
+            if (isAutoPlayDemo) {
+                // A2. AUTO-PLAY DEMO STATE — AI cat is running!
+                const catDrawY = CAT_BASE_Y - Math.round(autoPlayCatOffsetY);
 
-            // Comic dizzy stars circling above cat head
-            const starAngle = movieTime * 8;
-            const sX1 = CAT_SCREEN_X + 18 + Math.cos(starAngle) * 8;
-            const sY1 = catDrawY - 4 + Math.sin(starAngle) * 3;
-            const sX2 = CAT_SCREEN_X + 18 + Math.cos(starAngle + Math.PI) * 8;
-            const sY2 = catDrawY - 4 + Math.sin(starAngle + Math.PI) * 3;
-            ctx.fillStyle = '#fde047';
-            ctx.fillRect(Math.round(sX1), Math.round(sY1), 2, 2);
-            ctx.fillStyle = '#fda4af';
-            ctx.fillRect(Math.round(sX2), Math.round(sY2), 2, 2);
+                if (autoPlayJumping) {
+                    if (autoPlayJustPopped > 0) {
+                        const attackFrame = Math.floor(movieTime * 16) % 8;
+                        drawCatSprite(ctx, 'attack', attackFrame, CAT_SCREEN_X, catDrawY, true);
+                        ctx.fillStyle = '#fde047';
+                        ctx.fillRect(CAT_SCREEN_X + 34, catDrawY + 6, 2, 2);
+                    } else if (autoPlayJumpVy > 0) {
+                        drawCatSprite(ctx, 'runningJump', 0, CAT_SCREEN_X, catDrawY, true);
+                    } else {
+                        drawCatSprite(ctx, 'runningJump', 2, CAT_SCREEN_X, catDrawY, true);
+                    }
+                } else {
+                    // Running on ground
+                    const runFps = 14;
+                    const frameIndex = Math.floor(movieTime * runFps) % 8;
+                    drawCatSprite(ctx, 'run', frameIndex, CAT_SCREEN_X, catDrawY, true);
+                    // Dust trail
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+                    ctx.fillRect(CAT_SCREEN_X - 3, GROUND_Y - 3, 3, 1);
+                }
+            } else {
+                // A. GAME OVER HURT STATE (original — shown during the 2s delay)
+                const catDrawY = CAT_BASE_Y;
+                drawCatSprite(ctx, 'hurt', 0, CAT_SCREEN_X - 2, catDrawY, true, CAT_DEST_W, CAT_DEST_H);
+
+                // Comic dizzy stars circling above cat head
+                const starAngle = movieTime * 8;
+                const sX1 = CAT_SCREEN_X + 18 + Math.cos(starAngle) * 8;
+                const sY1 = catDrawY - 4 + Math.sin(starAngle) * 3;
+                const sX2 = CAT_SCREEN_X + 18 + Math.cos(starAngle + Math.PI) * 8;
+                const sY2 = catDrawY - 4 + Math.sin(starAngle + Math.PI) * 3;
+                ctx.fillStyle = '#fde047';
+                ctx.fillRect(Math.round(sX1), Math.round(sY1), 2, 2);
+                ctx.fillStyle = '#fda4af';
+                ctx.fillRect(Math.round(sX2), Math.round(sY2), 2, 2);
+            }
         } else if (countdownTimer > 0) {
             // B. COUNTDOWN STATE
             const catDrawY = CAT_BASE_Y - Math.round(catOffsetY);
@@ -2767,14 +3125,27 @@
 
         // 11. Authentic Game Over Screen / New High Score Celebration with Action Buttons
         if (isGameOver) {
-            // High-contrast overlay to focus attention
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.74)';
+            // Overlay opacity: reduced during auto-play demo so cat is visible
+            const overlayAlpha = isAutoPlayDemo ? 0.30 : 0.74;
+            ctx.fillStyle = `rgba(15, 23, 42, ${overlayAlpha})`;
             ctx.fillRect(0, 0, currentLogicalWidth, CANVAS_HEIGHT);
 
             const cx = Math.round(currentLogicalWidth / 2);
             let by = 22;
 
-            if (isNewHighScoreSession && dinoScore > 0) {
+            if (isAutoPlayDemo) {
+                // DEMO label above centered buttons
+                ctx.save();
+                ctx.font = 'bold 7px monospace, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillText('DEMO', cx, 3);
+                ctx.restore();
+
+                // Center buttons vertically on canvas during demo
+                by = Math.round((CANVAS_HEIGHT - 12) / 2);
+            } else if (isNewHighScoreSession && dinoScore > 0) {
                 // Celebration: New High Score!
                 by = 25; // Lower buttons slightly for two-line celebration layout
 
@@ -2916,6 +3287,10 @@
             isInputHeldDown = true;
             initAudio();
             if (isGameOver) {
+                if (isAutoPlayDemo) {
+                    isAutoPlayDemo = false;
+                    autoPlayTimer = 0;
+                }
                 restartGame();
             } else if (countdownTimer > 0) {
                 triggerPrepJump();
