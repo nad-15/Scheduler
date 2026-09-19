@@ -343,7 +343,6 @@ const colorThemes = {
 
 
   // Blues & Indigo
-  legacy: { even: '#82c6a2', odd: '#53ab8b', sunday: '#3388cc' }, // your old theme
   indigo: { even: '#7986cb', odd: '#3f51b5', sunday: '#1a237e' },
   blue: { even: '#6a8caf', odd: '#4a6a8a', sunday: '#1a3d5f' },
   slate: { even: '#90a4ae', odd: '#455a64', sunday: '#1F456E' },
@@ -352,6 +351,7 @@ const colorThemes = {
   teal: { even: '#4db6ac', odd: '#00897b', sunday: '#00695c' },
 
   // Greens
+  legacy: { even: '#82c6a2', odd: '#53ab8b', sunday: '#2e6347' },
   fatigue: { even: '#6c7c47', odd: '#3e4d34', sunday: '#2b3d28' },
   green: { even: '#82c6a2', odd: '#53ab8b', sunday: '#4a7c59' },
   mint: { even: '#a5d6a7', odd: '#388e3c', sunday: '#1b5e20' },
