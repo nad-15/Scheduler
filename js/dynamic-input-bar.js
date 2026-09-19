@@ -1082,17 +1082,11 @@
     document.addEventListener('touchstart', handleOutsideInteraction, { capture: true, passive: true });
     document.addEventListener('click', handleOutsideInteraction, true);
 
-    // Color options container: Preserve keyboard state (open stays open, closed stays closed)
+    // Color options container: Allow color changes without changing textarea focus
     const colorOptionsContainer = document.querySelector('.color-button-options');
     if (colorOptionsContainer) {
-      let wasFocusedBeforeColor = false;
-
-      colorOptionsContainer.addEventListener('pointerdown', () => {
-        wasFocusedBeforeColor = (document.activeElement === taskTitle);
-      }, true);
-
       colorOptionsContainer.addEventListener('mousedown', (e) => {
-        // Prevent default mousedown focus shifting so active textarea remains focused on desktop/hybrid
+        // Prevent default mousedown focus shifting so active textarea remains focused if user was typing
         if (document.activeElement === taskTitle) {
           e.preventDefault();
         }
@@ -1102,13 +1096,8 @@
         if (isEmojiTrayOpen) {
           closeEmojiTray();
         }
-        // If the keyboard was open before choosing a color, keep it open and focused
-        if (wasFocusedBeforeColor) {
-          if (document.activeElement !== taskTitle) {
-            taskTitle.focus({ preventScroll: true });
-          }
-        }
-      }, true);
+        // Never call taskTitle.focus() here — only direct clicks on taskTitle should focus it
+      });
     }
 
     if (taskTitle) {
