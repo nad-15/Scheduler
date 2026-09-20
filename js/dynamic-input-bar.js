@@ -40,7 +40,8 @@
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
       if (!raw) return [];
-      const settings = JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      const settings = (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
       const list = settings[RECENT_EMOJIS_KEY] || settings['recentEmojis'];
       return Array.isArray(list) ? list : [];
     } catch (_) {
@@ -52,7 +53,13 @@
     if (!emoji) return;
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
-      const settings = raw ? JSON.parse(raw) : {};
+      let settings = {};
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          settings = parsed;
+        }
+      }
       let recents = settings[RECENT_EMOJIS_KEY] || settings['recentEmojis'];
       if (!Array.isArray(recents)) {
         recents = [];
@@ -68,12 +75,9 @@
       settings[RECENT_EMOJIS_KEY] = recents;
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 
-      // Keep in-memory appSettings in sync if defined
-      if (typeof window !== 'undefined' && window.appSettings) {
+      // Keep in-memory appSettings in sync if defined on window
+      if (typeof window !== 'undefined' && window.appSettings && typeof window.appSettings === 'object') {
         window.appSettings[RECENT_EMOJIS_KEY] = recents;
-      }
-      if (typeof appSettings !== 'undefined' && appSettings) {
-        appSettings[RECENT_EMOJIS_KEY] = recents;
       }
     } catch (err) {
       console.warn('Failed to save recent emoji to appSettings:', err);
@@ -487,6 +491,10 @@
       textareaRuler.style.fontWeight = computed.fontWeight;
       textareaRuler.style.letterSpacing = computed.letterSpacing;
       textareaRuler.style.lineHeight = computed.lineHeight;
+      textareaRuler.style.paddingLeft = computed.paddingLeft;
+      textareaRuler.style.paddingRight = computed.paddingRight;
+      textareaRuler.style.boxSizing = computed.boxSizing;
+      textareaRuler.style.wordBreak = computed.wordBreak;
     }
 
     textareaRuler.style.width = `${Math.max(50, Math.round(targetWidth))}px`;
