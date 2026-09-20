@@ -145,6 +145,27 @@
     addTaskWrapper = document.querySelector('.add-task-wrapper');
   }
 
+  // --- Virtual Keyboard Visibility Detection ---
+  function isVirtualKeyboardOpen() {
+    if (document.activeElement !== taskTitle) return false;
+
+    // Desktop mouse pointer devices have no software virtual keyboard
+    const isTouch = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+                    ('ontouchstart' in window) ||
+                    (navigator.maxTouchPoints > 0);
+    if (!isTouch) return false;
+
+    // Visual Viewport API (Standard on modern mobile browsers across Android and iOS)
+    if (window.visualViewport) {
+      const layoutH = window.innerHeight || (document.documentElement && document.documentElement.clientHeight) || 0;
+      const visualH = window.visualViewport.height;
+      const heightDiff = layoutH - visualH;
+      return heightDiff > 130 || (layoutH > 0 && (visualH / layoutH) < 0.78);
+    }
+
+    return false;
+  }
+
   // --- Curated Emoji Picker Rendering & Insertion ---
   function renderEmojiGrid() {
     if (!emojiGridContainer) return;
@@ -159,11 +180,17 @@
       emojiBtn.textContent = emoji;
       emojiBtn.title = `Insert ${emoji}`;
       emojiBtn.addEventListener('mousedown', (e) => {
-        e.preventDefault();
+        const isTouch = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        if (!isTouch) {
+          e.preventDefault();
+        }
       });
       emojiBtn.addEventListener('pointerdown', (e) => {
         e.stopPropagation();
-        e.preventDefault();
+        const isTouch = e.pointerType === 'touch' || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        if (isVirtualKeyboardOpen() || !isTouch) {
+          e.preventDefault();
+        }
         updateSavedSelection();
       });
       emojiBtn.addEventListener('touchstart', (e) => {
@@ -184,7 +211,9 @@
     // Record as recently used in appSettings
     recordRecentEmoji(emoji);
 
-    // Track whether keyboard is currently active (taskTitle focused)
+    // Track whether keyboard is genuinely active on screen
+    const isTouch = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const wasKeyboardActive = isTouch ? isVirtualKeyboardOpen() : (document.activeElement === taskTitle);
     const wasFocused = (document.activeElement === taskTitle);
     updateSavedSelection();
 
@@ -230,8 +259,8 @@
     taskTitle.selectionStart = taskTitle.selectionEnd = newPos;
     savedSelectionStart = savedSelectionEnd = newPos;
 
-    // If keyboard was already on, ensure focus remains so keyboard is NOT hidden
-    if (wasFocused && document.activeElement !== taskTitle) {
+    // If keyboard was genuinely active on screen, ensure focus remains so keyboard is NOT hidden
+    if (wasKeyboardActive && document.activeElement !== taskTitle) {
       taskTitle.focus({ preventScroll: true });
     }
 
@@ -279,6 +308,8 @@
       return;
     }
 
+    const isTouch = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const wasKeyboardActive = isTouch ? isVirtualKeyboardOpen() : (document.activeElement === taskTitle);
     const wasFocused = (document.activeElement === taskTitle);
     updateSavedSelection();
 
@@ -342,7 +373,7 @@
     taskTitle.selectionStart = taskTitle.selectionEnd = newPos;
     savedSelectionStart = savedSelectionEnd = newPos;
 
-    if (wasFocused && document.activeElement !== taskTitle) {
+    if (wasKeyboardActive && document.activeElement !== taskTitle) {
       taskTitle.focus({ preventScroll: true });
     }
 
@@ -871,14 +902,24 @@
                                  (slidingInputView && slidingInputView.classList.contains('actions-collapsed'));
       };
       btnEmojiPicker.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
+        const isTouch = e.pointerType === 'touch' || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        if (isTouch && document.activeElement === taskTitle && !isVirtualKeyboardOpen()) {
+          // Android back button dismissed the keyboard; cleanly blur so keyboard stays closed
+          taskTitle.blur();
+          isManualTextareaExpanded = false;
+        } else if (isVirtualKeyboardOpen() || !isTouch) {
+          e.preventDefault();
+        }
         captureExpandState();
       });
       btnEmojiPicker.addEventListener('touchstart', () => {
         captureExpandState();
       }, { passive: true });
       btnEmojiPicker.addEventListener('mousedown', (e) => {
-        e.preventDefault();
+        const isTouch = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        if (!isTouch) {
+          e.preventDefault();
+        }
         captureExpandState();
       });
       btnEmojiPicker.addEventListener('click', (e) => {
@@ -924,7 +965,10 @@
 
       const startRepeat = (e) => {
         e.stopPropagation();
-        e.preventDefault();
+        const isTouch = e.pointerType === 'touch' || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        if (isVirtualKeyboardOpen() || !isTouch) {
+          e.preventDefault();
+        }
         pointerHandled = true;
         isPointerDownOnBackspace = true;
         try {
@@ -1067,15 +1111,28 @@
     const colorOptionsContainer = document.querySelector('.color-button-options');
     if (colorOptionsContainer) {
       colorOptionsContainer.addEventListener('pointerdown', (e) => {
-        // When real user taps a color button while typing, prevent the browser from blurring the textarea
-        if (document.activeElement === taskTitle && e.target.closest('button, .color-option, .palette-button, .dropdown-option, .shade-color-btn')) {
-          e.preventDefault();
+        const isTargetBtn = e.target.closest('button, .color-option, .palette-button, .dropdown-option, .shade-color-btn');
+        if (!isTargetBtn) return;
+
+        const isTouch = e.pointerType === 'touch' || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+
+        if (document.activeElement === taskTitle) {
+          if (isTouch && !isVirtualKeyboardOpen()) {
+            // Android back button dismissed the keyboard; cleanly blur so keyboard stays closed
+            taskTitle.blur();
+            isManualTextareaExpanded = false;
+            updateCollapseLogic();
+          } else {
+            // Keyboard is genuinely open on screen (or desktop mouse click): keep it open
+            e.preventDefault();
+          }
         }
       });
 
       colorOptionsContainer.addEventListener('mousedown', (e) => {
-        // Prevent default mousedown focus shifting on desktop
-        if (document.activeElement === taskTitle) {
+        // Desktop mouse click: keep focus in textarea
+        const isTouch = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        if (!isTouch && document.activeElement === taskTitle) {
           e.preventDefault();
         }
       });
