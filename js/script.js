@@ -464,7 +464,7 @@ showHorViewBtn.addEventListener('click', () => {
 });
 
 
-// === ADD TASK CONTROLLER (CLICK FOR DEFAULT BOTTOM, LONG-PRESS FOR ABOVE / BELOW) ===
+// === ADD TASK CONTROLLER ===
 function closeAddTaskDropdown() {
     if (addTaskDropdown) {
         addTaskDropdown.classList.add('hidden');
@@ -492,109 +492,6 @@ document.addEventListener('keydown', (e) => {
         closeAddTaskDropdown();
     }
 });
-
-// Default behavior: Appends task to the bottom of the selected container
-function executeDefaultAddTask() {
-    if (selectedDivs.length === 0) {
-        triggerShakeEffect();
-        return;
-    }
-
-    const storedData = JSON.parse(localStorage.getItem("tasks")) || {};
-    const uniqueParents = new Set();
-
-    // 🔹 Collect parent elements first
-    selectedDivs.forEach(selected => {
-        const parent = selected.classList.contains('morningTaskSub') ||
-            selected.classList.contains('afternoonTaskSub') ||
-            selected.classList.contains('eveningTaskSub')
-            ? selected.parentElement
-            : selected;
-
-        if (parent) uniqueParents.add(parent);
-    });
-
-    // 🔹 Clear selectedDivs
-    selectedDivs.forEach(div => div.classList.remove('selected'));
-    selectedDivs.length = 0;
-
-    const newlyCreated = [];
-
-    uniqueParents.forEach(parent => {
-        let taskType, taskKey;
-
-        if (parent.classList.contains('morningTask')) {
-            taskType = 'morningTask';
-            taskKey = 'morning';
-        } else if (parent.classList.contains('afternoonTask')) {
-            taskType = 'afternoonTask';
-            taskKey = 'afternoon';
-        } else if (parent.classList.contains('eveningTask')) {
-            taskType = 'eveningTask';
-            taskKey = 'evening';
-        } else {
-            return;
-        }
-
-        const dayContainer = parent.closest('.day-container');
-        if (!dayContainer) return;
-        const date = dayContainer.querySelector('.date').getAttribute('data-full-date');
-
-        if (!storedData[date]) storedData[date] = {};
-        if (!Array.isArray(storedData[date][taskKey])) storedData[date][taskKey] = [];
-
-        // 🔍 Find the first visually empty div (no text AND no color)
-        let taskDivToUse = Array.from(parent.children).find(child =>
-            child.classList.contains(`${taskType}Sub`) &&
-            child.textContent.trim() === '' &&
-            (!child.style.backgroundColor || child.style.backgroundColor === 'transparent')
-        );
-
-        // 🔍 Find matching "empty" task object in storage
-        const emptyIndex = storedData[date][taskKey].findIndex(t =>
-            (t.task || '').trim() === '' && (!t.color || (t.color || '').trim() === '')
-        );
-
-        const currentActiveColor = chosenColor || '#ccc';
-
-        if (taskDivToUse) {
-            taskDivToUse.textContent = "";
-            taskDivToUse.style.borderLeft = `4px solid ${currentActiveColor}`;
-            taskDivToUse.style.backgroundColor = fadeColor(currentActiveColor);
-
-            if (emptyIndex !== -1) {
-                storedData[date][taskKey][emptyIndex] = {
-                    task: '',
-                    color: currentActiveColor
-                };
-            } else {
-                storedData[date][taskKey].push({
-                    task: '',
-                    color: currentActiveColor
-                });
-            }
-        } else {
-            taskDivToUse = document.createElement('div');
-            taskDivToUse.textContent = "";
-            taskDivToUse.classList.add(`${taskType}Sub`);
-            taskDivToUse.style.borderLeft = `4px solid ${currentActiveColor}`;
-            taskDivToUse.style.backgroundColor = fadeColor(currentActiveColor);
-            parent.appendChild(taskDivToUse);
-
-            storedData[date][taskKey].push({
-                task: '',
-                color: currentActiveColor
-            });
-        }
-
-        taskDivToUse.classList.add('selected');
-        newlyCreated.push(taskDivToUse);
-    });
-
-    selectedDivs = newlyCreated;
-    localStorage.setItem("tasks", JSON.stringify(storedData));
-    [selectedTaskCounter, deselectTemplateBtn].forEach(el => el.textContent = selectedDivs.length);
-}
 
 // Dynamic insertion: Inserts "above" (topmost selected) or "below" (lowest selected)
 function insertTask(direction, customTaskText = null, customColor = null) {
@@ -916,110 +813,18 @@ if (templatesScrollEl) {
     templatesScrollEl.addEventListener('scroll', closeTemplateStripDropdown, { passive: true });
 }
 
-// Long-press vs Short-click detection on addTaskBtn
-let longPressTimer = null;
-let isLongPressTriggered = false;
-let startCoords = { x: 0, y: 0 };
-
-function startLongPress(e) {
-    if (selectedDivs.length === 0 || addTaskBtn.classList.contains('disabled-btn')) {
-        return;
-    }
-
-    const currentMode = (typeof appSettings !== 'undefined' && appSettings['add-task-modal']) || 'on-click';
-
-    if (currentMode === 'on-click') {
-        return;
-    }
-
-    isLongPressTriggered = false;
-
-    if (e.type.startsWith('touch')) {
-        const touch = e.touches[0];
-        startCoords = { x: touch.clientX, y: touch.clientY };
-    } else {
-        startCoords = { x: e.clientX, y: e.clientY };
-    }
-
-    clearTimeout(longPressTimer);
-    longPressTimer = setTimeout(() => {
-        isLongPressTriggered = true;
-        openAddTaskDropdown();
-        if (navigator.vibrate) {
-            try { navigator.vibrate(50); } catch (_) {}
-        }
-    }, 500);
-}
-
-function cancelLongPress() {
-    clearTimeout(longPressTimer);
-}
-
-function handleTouchMove(e) {
-    if (!longPressTimer) return;
-    const touch = e.touches[0];
-    const dx = Math.abs(touch.clientX - startCoords.x);
-    const dy = Math.abs(touch.clientY - startCoords.y);
-    if (dx > 10 || dy > 10) {
-        cancelLongPress();
-    }
-}
-
-// Mouse events
-addTaskBtn.addEventListener('mousedown', (e) => {
-    if (e.button === 0) startLongPress(e);
-});
-addTaskBtn.addEventListener('mouseup', cancelLongPress);
-addTaskBtn.addEventListener('mouseleave', cancelLongPress);
-
-// Touch events
-addTaskBtn.addEventListener('touchstart', startLongPress, { passive: true });
-addTaskBtn.addEventListener('touchend', (e) => {
-    cancelLongPress();
-    if (isLongPressTriggered) {
-        e.preventDefault();
-    }
-});
-addTaskBtn.addEventListener('touchmove', handleTouchMove, { passive: true });
-addTaskBtn.addEventListener('touchcancel', cancelLongPress);
-
-// Click event
+// Add Task button click handler (toggles Add Task modal dropdown)
 addTaskBtn.addEventListener('click', (e) => {
-    if (isLongPressTriggered) {
-        isLongPressTriggered = false;
-        return;
-    }
-
-    const currentMode = (typeof appSettings !== 'undefined' && appSettings['add-task-modal']) || 'on-click';
-
-    // If "on-click" mode is selected, bypass default bottom addition and toggle the modal
-    if (currentMode === 'on-click') {
-        if (selectedDivs.length === 0 || addTaskBtn.classList.contains('disabled-btn')) {
-            triggerShakeEffect();
-            return;
-        }
-
-        if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
-            closeAddTaskDropdown();
-        } else {
-            openAddTaskDropdown();
-        }
-        return;
-    }
-
-    // Default "long-press" mode:
-    // If dropdown was open, toggle/close it
-    if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
-        closeAddTaskDropdown();
-        return;
-    }
-
     if (selectedDivs.length === 0 || addTaskBtn.classList.contains('disabled-btn')) {
         triggerShakeEffect();
         return;
     }
 
-    executeDefaultAddTask();
+    if (addTaskDropdown && !addTaskDropdown.classList.contains('hidden')) {
+        closeAddTaskDropdown();
+    } else {
+        openAddTaskDropdown();
+    }
 });
 
 

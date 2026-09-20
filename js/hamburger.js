@@ -9,7 +9,6 @@ const DEFAULT_SETTINGS = {
   "todo-floating-btn": false,
   "color-mode": "all",
   "color-shade-name": "red",
-  "add-task-modal": "on-click",
   "hide-all-buttons": false,
   "sliding-templates": false,
   "sliding-templates-peek": false,
@@ -36,6 +35,12 @@ if (localStorage.getItem("movableTemplateExpanded") !== null) {
 
 // load from localStorage or use defaults
 let appSettings = JSON.parse(localStorage.getItem("appSettings")) || { ...DEFAULT_SETTINGS };
+
+// Clean up add-task-modal setting from localStorage
+if (appSettings && "add-task-modal" in appSettings) {
+  delete appSettings["add-task-modal"];
+  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+}
 
 // Clean up bottom banner setting from localStorage
 if (appSettings && "banner-mode" in appSettings) {

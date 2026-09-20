@@ -21,7 +21,7 @@
  *   - startup-popup, weather-widget, todo-sort-mode, todo-filter-mode
  *   - clamp-expanded, todo-collapsed, todo-floating-btn
  *   - sliding-templates, sliding-templates-peek, movable-template-expanded
- *   - dynamic-input-bar, add-task-modal, catrunner-highscore, recent-emojis
+ *   - dynamic-input-bar, catrunner-highscore, recent-emojis
  *
  * Deprecated / auto-cleaned standalone keys (migrated into appSettings):
  *   - theme            → appSettings.theme
@@ -29,6 +29,7 @@
  *   - todoSortMode     → appSettings["todo-sort-mode"]
  *   - clampExpanded    → appSettings["clamp-expanded"]
  *   - movableTemplateExpanded → appSettings["movable-template-expanded"]
+ *   - add-task-modal   → removed (standardized on direct click modal toggle)
  *   - banner-mode      → removed (no longer used)
  *   - lockState-*      → removed (no longer used)
  *   - scheduler_weather_location → migrated into scheduler_weather_state
