@@ -149,25 +149,67 @@
     addTaskWrapper = document.querySelector('.add-task-wrapper');
   }
 
-  // --- Virtual Keyboard Visibility Detection ---
+  // --- Robust Virtual Keyboard State Tracking ---
+  let baselineViewportHeight = (typeof window !== 'undefined' && window.visualViewport)
+    ? window.visualViewport.height
+    : ((typeof window !== 'undefined' && window.innerHeight) || 0);
+  let isKeyboardLikelyOpen = false;
+
+  function updateKeyboardState() {
+    if (typeof window === 'undefined' || !window.visualViewport) {
+      isKeyboardLikelyOpen = false;
+      return;
+    }
+
+    const currentH = window.visualViewport.height;
+
+    // When textarea is NOT focused, the virtual keyboard is definitely closed.
+    // Continuously calibrate baseline height so URL bar expand/collapse or zoom does not skew the baseline.
+    if (document.activeElement !== taskTitle) {
+      baselineViewportHeight = Math.max(baselineViewportHeight, currentH);
+      isKeyboardLikelyOpen = false;
+      return;
+    }
+
+    // A real mobile/tablet virtual keyboard consumes 200px–400px of height.
+    // Browser address bars only shift by ~40px–60px.
+    // > 120px diff reliably detects keyboard on phones, foldables, and tablets without Android innerHeight bugs.
+    const heightDiff = baselineViewportHeight - currentH;
+    isKeyboardLikelyOpen = heightDiff > 120;
+  }
+
+  if (typeof window !== 'undefined' && window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateKeyboardState);
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        if (window.visualViewport) {
+          baselineViewportHeight = window.visualViewport.height;
+        }
+        updateKeyboardState();
+      }, 250);
+    });
+  }
+
   function isVirtualKeyboardOpen() {
     if (document.activeElement !== taskTitle) return false;
 
-    // Desktop mouse pointer devices have no software virtual keyboard
-    const isTouch = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
-                    ('ontouchstart' in window) ||
-                    (navigator.maxTouchPoints > 0);
+    // Desktop mouse devices have physical keyboards, never software virtual keyboards
+    const isTouch = (typeof window !== 'undefined') && (
+      (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+      ('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0)
+    );
     if (!isTouch) return false;
 
-    // Visual Viewport API (Standard on modern mobile browsers across Android and iOS)
-    if (window.visualViewport) {
-      const layoutH = window.innerHeight || (document.documentElement && document.documentElement.clientHeight) || 0;
-      const visualH = window.visualViewport.height;
-      const heightDiff = layoutH - visualH;
-      return heightDiff > 130 || (layoutH > 0 && (visualH / layoutH) < 0.78);
+    // Fallback for older mobile WebViews without Visual Viewport API
+    if (typeof window === 'undefined' || !window.visualViewport) {
+      return true;
     }
 
-    return false;
+    return isKeyboardLikelyOpen;
   }
 
   // --- Curated Emoji Picker Rendering & Insertion ---
