@@ -1362,6 +1362,90 @@
         </div>
     </div>
     <div id="toast">Toast message</div>
+
+    <!-- Backup Conflict Resolution Modal (Git Style: Clean, Compact & Clear) -->
+    <div id="backup-conflict-backdrop" class="backup-conflict-backdrop"></div>
+    <div id="backup-conflict-modal" class="backup-conflict-modal" role="dialog" aria-modal="true" aria-labelledby="bcm-main-title">
+        <!-- Header -->
+        <div class="bcm-header">
+            <div class="bcm-header-title-wrap">
+                <span class="material-symbols-outlined bcm-header-icon">rule</span>
+                <h3 id="bcm-main-title" class="bcm-main-title">Review Difference</h3>
+                <span id="bcm-counter" class="bcm-counter-pill">1 of 1</span>
+            </div>
+            <button type="button" class="bcm-close-btn" id="bcm-close-btn" title="Cancel Import" aria-label="Cancel Import">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Target Item Info -->
+        <div class="bcm-target-bar">
+            <span id="bcm-category-badge" class="bcm-category-badge">Schedule</span>
+            <div class="bcm-target-info">
+                <span id="bcm-conflict-title" class="bcm-item-name">Thursday, August 20, 2026</span>
+                <span id="bcm-conflict-subtitle" class="bcm-item-desc">Different tasks found between your device and this backup</span>
+            </div>
+        </div>
+
+        <!-- Dropdown Comparison Section (Clear, Friendly Text) -->
+        <div class="bcm-diff-toggle-wrap">
+            <button type="button" class="bcm-diff-toggle-btn" id="bcm-toggle-diff-btn" aria-expanded="true">
+                <span id="bcm-diff-toggle-text">Hide comparison details</span>
+                <span class="material-symbols-outlined bcm-diff-toggle-arrow">expand_less</span>
+            </button>
+        </div>
+
+        <div class="bcm-diff-drawer" id="bcm-diff-drawer">
+            <div class="bcm-comparison-grid">
+                <!-- Left: Current Local -->
+                <div class="bcm-column bcm-local-column">
+                    <div class="bcm-column-header">
+                        <span class="bcm-col-tag local">Current on Device</span>
+                    </div>
+                    <div class="bcm-column-body" id="bcm-local-content"></div>
+                </div>
+
+                <!-- Right: Incoming Backup -->
+                <div class="bcm-column bcm-incoming-column">
+                    <div class="bcm-column-header">
+                        <span class="bcm-col-tag incoming">In Backup File</span>
+                    </div>
+                    <div class="bcm-column-body" id="bcm-incoming-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compact Action Button Bar -->
+        <div class="bcm-action-bar">
+            <button type="button" class="bcm-action-btn combine" id="bcm-action-combine" title="Combine both sets without duplicates">
+                <span class="material-symbols-outlined">call_merge</span>
+                <span>Merge Both</span>
+            </button>
+            <button type="button" class="bcm-action-btn keep" id="bcm-action-keep-local" title="Keep current device data">
+                <span class="material-symbols-outlined">shield</span>
+                <span>Keep Device</span>
+            </button>
+            <button type="button" class="bcm-action-btn replace" id="bcm-action-replace" title="Use incoming version from backup">
+                <span class="material-symbols-outlined">swap_horiz</span>
+                <span>Use Backup</span>
+            </button>
+        </div>
+
+        <!-- Compact Footer -->
+        <div class="bcm-footer">
+            <label class="bcm-checkbox-label">
+                <input type="checkbox" id="bcm-apply-all-checkbox" />
+                <span id="bcm-apply-all-label">Apply to all remaining</span>
+            </label>
+            <div class="bcm-footer-links">
+                <button type="button" class="bcm-safety-link-btn" id="bcm-safety-backup-btn" title="Download backup of current local data">
+                    <span class="material-symbols-outlined">download</span> Safety Copy
+                </button>
+                <button type="button" class="bcm-cancel-link-btn" id="bcm-action-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div id="template-strip-dropdown" class="template-strip-dropdown hidden">
         <button type="button" class="dropdown-option" id="templateInsertAbove">
             <span class="material-symbols-outlined dropdown-option-icon">chevron_line_up</span>
@@ -1381,6 +1465,7 @@
     <script src="./js/data-migration.js"></script>
     <script src="./js/timezone.js"></script>
     <script src="./js/shared-utils.js"></script>
+    <script src="./js/backup-manager.js"></script>
     <script src="./js/hamburger.js"></script>
     <script src="./js/cal-month-view.js"></script>
     <script src="./js/script.js"></script>

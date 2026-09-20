@@ -479,6 +479,7 @@ function runMenuAction(item) {
     console.log(`Backup action: ${backup}`);
 
     if (backup === "download") {
+      closeMenu();
       const backupData = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -506,6 +507,7 @@ function runMenuAction(item) {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
     if (backup === "upload") {
+      closeMenu();
       // Trigger hidden file input
       const uploadInput = document.getElementById("uploadBackup");
       if (uploadInput) uploadInput.click();
@@ -524,41 +526,39 @@ if (uploadInputEl) {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      try {
-        const parsed = JSON.parse(event.target.result);
-
-        let backupData = null;
-
-        // Standard Skhayeduler signed backup
-        if (parsed && typeof parsed === "object" && parsed.signature === "SkhayedulerBackup_v1" && parsed.data) {
-          backupData = parsed.data;
-        } else if (parsed && typeof parsed === "object" && !parsed.signature) {
-          // Direct key-value backup fallback
-          backupData = parsed;
-        } else {
-          throw new Error("Invalid backup format or unrecognized signature.");
-        }
-
-        let restoredCount = 0;
-        for (const key in backupData) {
-          if (Object.prototype.hasOwnProperty.call(backupData, key)) {
-            const val = backupData[key];
-            // Ensure value is properly formatted as string in localStorage
-            localStorage.setItem(key, typeof val === "string" ? val : JSON.stringify(val));
-            restoredCount++;
+    if (window.BackupManager && typeof window.BackupManager.handleBackupUpload === "function") {
+      window.BackupManager.handleBackupUpload(file);
+    } else {
+      // Direct fallback if BackupManager is unavailable
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          let backupData = null;
+          if (parsed && typeof parsed === "object" && parsed.signature === "SkhayedulerBackup_v1" && parsed.data) {
+            backupData = parsed.data;
+          } else if (parsed && typeof parsed === "object" && !parsed.signature) {
+            backupData = parsed;
+          } else {
+            throw new Error("Invalid backup format or unrecognized signature.");
           }
+
+          let restoredCount = 0;
+          for (const key in backupData) {
+            if (Object.prototype.hasOwnProperty.call(backupData, key)) {
+              const val = backupData[key];
+              localStorage.setItem(key, typeof val === "string" ? val : JSON.stringify(val));
+              restoredCount++;
+            }
+          }
+          alert(`Backup restored successfully (${restoredCount} items)! Reloading...`);
+          setTimeout(() => location.reload(), 500);
+        } catch (err) {
+          alert("Invalid backup file: " + err.message);
         }
-
-        alert(`Backup restored successfully (${restoredCount} items)! Reloading...`);
-        setTimeout(() => location.reload(), 500);
-
-      } catch (err) {
-        alert("Invalid backup file: " + err.message);
-      }
-    };
-    reader.readAsText(file);
+      };
+      reader.readAsText(file);
+    }
 
     // Reset input so selecting the same file again still fires change event
     e.target.value = "";
