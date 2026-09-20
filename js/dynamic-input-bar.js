@@ -665,29 +665,10 @@
   function handleOutsideInteraction(e) {
     if (!slidingInputView || !slidingInputView.classList.contains('dynamic-bar-active')) return;
 
-    // Tapping directly on taskTitle allows native focus & typing to proceed (Action 1)
-    if (e.target === taskTitle) return;
-
-    // Allow submitTask button interactions (prevents premature blur & layout shifts while tapping submit)
-    if (submitTask && submitTask.contains(e.target)) return;
-
-    // Allow emoji picker button and emoji tray interactions
-    if (btnEmojiPicker && btnEmojiPicker.contains(e.target)) return;
-    if (dynamicEmojiTray && dynamicEmojiTray.contains(e.target)) return;
-
-    // Allow chevron collapse button interactions (its own click handler manages collapse upon lifting)
-    if (btnCollapseActions && btnCollapseActions.contains(e.target)) return;
-
-    // Allow template strip pills and template container interactions
-    const slidingTemplatesContainer = document.getElementById('slidingTemplatesContainer');
-    if (slidingTemplatesContainer && slidingTemplatesContainer.contains(e.target)) return;
-
-    // Allow tools inside dynamicCollapsibleTools (counter, template toggle, add task)
-    if (dynamicCollapsibleTools && dynamicCollapsibleTools.contains(e.target)) return;
-
-    // Allow color options container interactions (keyboard state stays as is: open stays open, closed stays closed)
-    const colorOptionsContainer = document.querySelector('.color-button-options');
-    if (colorOptionsContainer && colorOptionsContainer.contains(e.target)) return;
+    // If interaction is anywhere inside the sliding drawer, it is NOT an outside interaction.
+    // This protects taskTitle, submitTask, emoji buttons, chevron, templates, colors,
+    // flower paw indicator (.flower-container), and inner padding/spacing without an error-prone manual whitelist.
+    if (slidingInputView.contains(e.target)) return;
 
     // For any other interaction outside the input bar (calendar, year map, toolbar, background, etc.):
     // Neither action (focus or swipe-left) is active, so textarea MUST NOT be extended:
