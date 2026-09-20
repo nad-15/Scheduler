@@ -1041,6 +1041,136 @@ hideWidgetBtn.addEventListener('click', () => {
     }
 });
 
+// Swipe right to hide #weather-widget (reusing hideWidgetBtn - 100% strictly scoped to #weather-widget)
+(function initWeatherWidgetSwipe() {
+    if (!weatherWidget || !hideWidgetBtn) return;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchDeltaX = 0;
+    let isSwipingRight = false;
+    let hasMoved = false;
+    let isPointerDown = false;
+
+    const handleDragStart = (x, y, target) => {
+        if (target && (target.closest('.hide-widget') || target.closest('#hide-widget-btn'))) return;
+        touchStartX = x;
+        touchStartY = y;
+        touchDeltaX = 0;
+        isSwipingRight = false;
+        hasMoved = false;
+    };
+
+    const handleDragMove = (x, y) => {
+        const diffX = x - touchStartX;
+        const diffY = y - touchStartY;
+
+        // Engage swipe ONLY if moving right and predominantly horizontal
+        if (!isSwipingRight) {
+            if (diffX > 8 && diffX > Math.abs(diffY)) {
+                isSwipingRight = true;
+                hasMoved = true;
+            }
+        }
+
+        if (isSwipingRight && diffX > 0) {
+            touchDeltaX = diffX;
+        }
+    };
+
+    const handleDragEnd = () => {
+        if (!isSwipingRight) {
+            if (hasMoved) {
+                setTimeout(() => { hasMoved = false; }, 80);
+            }
+            return;
+        }
+
+        // Trigger hide if swiped right > 35px and widget is currently visible
+        const isHidden = hideWidgetBtn.classList.contains('is-true') ||
+            (weatherWidget.style.transform && weatherWidget.style.transform !== 'translateX(0px)' && weatherWidget.style.transform !== 'translateX(0)');
+
+        if (touchDeltaX > 35 && !isHidden) {
+            hideWidgetBtn.click();
+        }
+
+        isSwipingRight = false;
+        setTimeout(() => { hasMoved = false; }, 80);
+    };
+
+    // Mobile touch events (strictly on weatherWidget)
+    weatherWidget.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            handleDragStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
+        }
+    }, { passive: true });
+
+    weatherWidget.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1) {
+            handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+            if (isSwipingRight && e.cancelable) {
+                e.preventDefault();
+            }
+        }
+    }, { passive: false });
+
+    weatherWidget.addEventListener('touchend', handleDragEnd);
+    weatherWidget.addEventListener('touchcancel', handleDragEnd);
+
+    // Desktop pointer drag events (strictly on weatherWidget via Pointer Capture, NO window listeners)
+    weatherWidget.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse' && e.button === 0) {
+            if (e.target && (e.target.closest('.hide-widget') || e.target.closest('#hide-widget-btn'))) return;
+            isPointerDown = true;
+            try {
+                weatherWidget.setPointerCapture(e.pointerId);
+            } catch (_) {}
+            handleDragStart(e.clientX, e.clientY, e.target);
+        }
+    });
+
+    weatherWidget.addEventListener('pointermove', (e) => {
+        if (isPointerDown && e.pointerType === 'mouse') {
+            handleDragMove(e.clientX, e.clientY);
+        }
+    });
+
+    weatherWidget.addEventListener('pointerup', (e) => {
+        if (isPointerDown && e.pointerType === 'mouse') {
+            try {
+                if (weatherWidget.hasPointerCapture(e.pointerId)) {
+                    weatherWidget.releasePointerCapture(e.pointerId);
+                }
+            } catch (_) {}
+            isPointerDown = false;
+            handleDragEnd();
+        }
+    });
+
+    weatherWidget.addEventListener('pointercancel', (e) => {
+        if (isPointerDown && e.pointerType === 'mouse') {
+            try {
+                if (weatherWidget.hasPointerCapture(e.pointerId)) {
+                    weatherWidget.releasePointerCapture(e.pointerId);
+                }
+            } catch (_) {}
+            isPointerDown = false;
+            handleDragEnd();
+        }
+    });
+
+    // Prevent click opening expanded dashboard when swiping
+    weatherWidget.addEventListener('click', (e) => {
+        if (hasMoved) {
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            e.preventDefault();
+            hasMoved = false;
+        }
+    }, true);
+})();
+
+
 
 
 
