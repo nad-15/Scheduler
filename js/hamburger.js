@@ -16,7 +16,8 @@ const DEFAULT_SETTINGS = {
   "movable-template-expanded": false,
   "dynamic-input-bar": false,
   "catrunner-highscore": 0,
-  "recent-emojis": []
+  "recent-emojis": [],
+  "theme": "default"
 };
 
 
@@ -43,6 +44,18 @@ if (appSettings && "banner-mode" in appSettings) {
 }
 if (localStorage.getItem("banner-mode") !== null) {
   localStorage.removeItem("banner-mode");
+}
+
+// Migrate standalone 'theme' key into appSettings
+if (localStorage.getItem("theme") !== null) {
+  appSettings["theme"] = localStorage.getItem("theme");
+  localStorage.removeItem("theme");
+}
+
+// Migrate standalone 'hideAllButtons' key into appSettings
+if (localStorage.getItem("hideAllButtons") !== null) {
+  appSettings["hide-all-buttons"] = localStorage.getItem("hideAllButtons") === 'true';
+  localStorage.removeItem("hideAllButtons");
 }
 
 // Clean up unused / deprecated settings from localStorage
@@ -375,7 +388,7 @@ const colorThemes = {
 
 
 // Load the selected theme from localStorage or use 'default'
-let selectedTheme = localStorage.getItem('theme') || 'default';
+let selectedTheme = appSettings.theme || 'default';
 
 
 const themeItem = document.querySelector('.menu-item.has-submenu[data-setting="theme"]');
@@ -391,14 +404,15 @@ themeSubmenu.addEventListener("click", (event) => {
 
   if (theme && colorThemes[theme]) {
     selectedTheme = theme;
-    localStorage.setItem("theme", theme);
+    appSettings.theme = theme;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
     window.location.reload();
   }
 });
 
 function renderThemeSubmenu(themeSubmenu) {
   themeSubmenu.innerHTML = "";
-  const selectedTheme = localStorage.getItem('theme') || 'default';
+  const selectedTheme = appSettings.theme || 'default';
 
   Object.entries(colorThemes).forEach(([key, theme]) => {
     const div = document.createElement("div");

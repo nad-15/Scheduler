@@ -1147,8 +1147,7 @@ function renderWeatherOutlook(data) {
         if (!weatherWidget || outlookBar.classList.contains('dismissed')) return;
 
         const isButtonsHidden = (typeof isAllButtonsHidden !== 'undefined' && isAllButtonsHidden) ||
-            (typeof appSettings !== 'undefined' && appSettings["hide-all-buttons"]) ||
-            (localStorage.getItem("hideAllButtons") === 'true');
+            (typeof appSettings !== 'undefined' && appSettings["hide-all-buttons"]);
 
         const isSlideHidden = weatherWidget.style.transform &&
             weatherWidget.style.transform !== 'translateX(0px)' &&

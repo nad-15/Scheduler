@@ -602,7 +602,7 @@
 
   function applyThemeColors() {
     if (!modalEl) return;
-    const themeKey = localStorage.getItem('theme') || 'default';
+    const themeKey = (typeof appSettings !== 'undefined' && appSettings.theme) ? appSettings.theme : 'default';
     let evenColor = '#2196f3';
     if (typeof colorThemes !== 'undefined' && colorThemes && colorThemes[themeKey] && colorThemes[themeKey].even) {
       evenColor = colorThemes[themeKey].even;

@@ -459,7 +459,8 @@
     // 4. App Settings & Theme
     const localSettings = safeParse(localStorage.getItem('appSettings'), {});
     const incomingSettings = safeParse(backupData.appSettings, {});
-    const localTheme = localStorage.getItem('theme') || 'default';
+    const localTheme = localSettings.theme || 'default';
+    // Support old backups with standalone 'theme' key, and new backups with theme inside appSettings
     const incomingTheme = backupData.theme || (incomingSettings && incomingSettings.theme) || null;
 
     const stagedSettings = { ...localSettings };
@@ -527,9 +528,11 @@
 
     // 6. Generic other keys
     const handledKeys = new Set([
-      'tasks', 'todos', 'taskClipboard', 'appSettings', 'theme',
+      'tasks', 'todos', 'taskClipboard', 'appSettings',
       'scheduler_weather_state', 'signature', 'version', 'createdAt',
-      'pwa-installed', 'hideAllButtons'
+      'pwa-installed',
+      // Legacy standalone keys (no longer used, but skip them in 'other' bucket if found in old backups)
+      'theme', 'hideAllButtons'
     ]);
     const stagedOtherKeys = {};
 
@@ -603,9 +606,11 @@
       // 4. Settings
       localStorage.setItem('appSettings', JSON.stringify(session.stagedSettings));
 
-      // 5. Theme
+      // 5. Theme (now stored inside appSettings)
       if (session.stagedTheme) {
-        localStorage.setItem('theme', session.stagedTheme);
+        const currentSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+        currentSettings.theme = session.stagedTheme;
+        localStorage.setItem('appSettings', JSON.stringify(currentSettings));
       }
 
       // 6. Weather

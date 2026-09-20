@@ -1093,9 +1093,7 @@ function applyHideAllButtonsState(hidden) {
     }
 }
 
-let isAllButtonsHidden = (typeof appSettings !== 'undefined' && appSettings["hide-all-buttons"] !== undefined)
-    ? Boolean(appSettings["hide-all-buttons"])
-    : (localStorage.getItem("hideAllButtons") === 'true');
+let isAllButtonsHidden = (typeof appSettings !== 'undefined') ? Boolean(appSettings["hide-all-buttons"]) : false;
 
 // Apply immediately if saved as hidden
 if (isAllButtonsHidden) {
@@ -1114,12 +1112,11 @@ if (hideAllButtons) {
         isAllButtonsHidden = !isAllButtonsHidden;
         applyHideAllButtonsState(isAllButtonsHidden);
 
-        // Persist to appSettings and localStorage
+        // Persist to appSettings
         if (typeof appSettings !== 'undefined') {
             appSettings["hide-all-buttons"] = isAllButtonsHidden;
             localStorage.setItem("appSettings", JSON.stringify(appSettings));
         }
-        localStorage.setItem("hideAllButtons", isAllButtonsHidden ? 'true' : 'false');
     });
 }
 
