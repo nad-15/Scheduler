@@ -9750,25 +9750,55 @@ ic {
     justify-content: center;
     width: 30px;
     height: 30px;
-    border: 1px solid #e2e8f0;
+    border: none;
     background: #f8fafc;
     border-radius: 6px;
     color: #475569;
     cursor: pointer;
     padding: 0;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .year-map-mode-btn:hover {
     background: #f1f5f9;
-    border-color: #cbd5e1;
     color: #0f172a;
 }
 
+/* GitHub Heatmap Green */
 .year-map-mode-btn.active {
     background: #dafbe1;
-    border-color: #40c463;
+    border: none;
     color: #1a7f37;
+}
+
+.year-map-mode-btn.active:hover {
+    background: #c7f6d3;
+    color: #116329;
+}
+
+/* Mild, lightweight Aurora for User's Task Colors Mode (Zero CPU/GPU overhead) */
+.year-map-mode-btn.is-stripes {
+    background: linear-gradient(135deg,
+        rgba(215, 235, 255, 0.95),
+        rgba(228, 218, 255, 0.95),
+        rgba(255, 222, 242, 0.95),
+        rgba(220, 255, 242, 0.95)
+    );
+    border: none;
+    color: #4f46e5;
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.12);
+}
+
+.year-map-mode-btn.is-stripes:hover {
+    background: linear-gradient(135deg,
+        rgba(202, 228, 255, 1),
+        rgba(218, 206, 255, 1),
+        rgba(255, 212, 237, 1),
+        rgba(208, 255, 236, 1)
+    );
+    border: none;
+    color: #4338ca;
+    box-shadow: 0 1px 6px rgba(99, 102, 241, 0.2);
 }
 
 .year-map-mode-icon {

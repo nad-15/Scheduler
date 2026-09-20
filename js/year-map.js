@@ -281,8 +281,10 @@
       modeBtn.title = currentMode === 'stripes' ? 'Switch to Heatmap Mode' : 'Switch to Task Colors Mode';
       if (currentMode === 'heatmap') {
         modeBtn.classList.add('active');
+        modeBtn.classList.remove('is-stripes');
       } else {
         modeBtn.classList.remove('active');
+        modeBtn.classList.add('is-stripes');
       }
     }
   }
