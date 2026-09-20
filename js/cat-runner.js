@@ -2891,7 +2891,7 @@
         movieTime += dt;
         updateJourney(dt);
 
-        const cameraX = isDinoMode ? (catWorldX - CAT_SCREEN_X) : 0;
+        const cameraX = (isDinoMode || isAutoPlayDemo) ? (catWorldX - CAT_SCREEN_X) : 0;
 
         // 1. Simple Ambient Background (Dynamic Sky, Celestial Orbs, Distant Silhouettes - ZERO GREEN TREES!)
         drawSimpleBackground(ctx, cameraX);
@@ -3131,8 +3131,8 @@
 
         // 11. Authentic Game Over Screen / New High Score Celebration with Action Buttons
         if (isGameOver) {
-            // Overlay opacity: reduced during auto-play demo so cat is visible
-            const overlayAlpha = isAutoPlayDemo ? 0.30 : 0.74;
+            // Overlay opacity: keep the strong dark overlay
+            const overlayAlpha = 0.74;
             ctx.fillStyle = `rgba(15, 23, 42, ${overlayAlpha})`;
             ctx.fillRect(0, 0, currentLogicalWidth, CANVAS_HEIGHT);
 
@@ -3163,10 +3163,9 @@
                 ctx.fillStyle = '#38bdf8';
                 ctx.fillText('DEMO', badgeX + Math.round(badgeW / 2), badgeY + Math.round(badgeH / 2));
                 ctx.restore();
+            }
 
-                // Center buttons vertically on canvas during demo
-                by = Math.round((CANVAS_HEIGHT - 12) / 2);
-            } else if (isNewHighScoreSession && dinoScore > 0) {
+            if (isNewHighScoreSession && dinoScore > 0) {
                 // Celebration: New High Score!
                 by = 25; // Lower buttons slightly for two-line celebration layout
 
