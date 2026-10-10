@@ -112,43 +112,6 @@
     return true;
   }
 
-  /**
-   * Check if dayA tasks are a subset of dayB tasks (Git fast-forward helper).
-   * Returns true if every task in dayA (period, text, color) exists in dayB with 1-to-1 matching.
-   */
-  function isTaskDaySubset(dayA, dayB) {
-    const normA = normalizeDayTasks(dayA);
-    const normB = normalizeDayTasks(dayB);
-    const periods = ['morning', 'afternoon', 'evening'];
-
-    for (const p of periods) {
-      const listA = normA[p];
-      const listB = normB[p];
-
-      const matchedB = new Set();
-      for (let i = 0; i < listA.length; i++) {
-        const tA = (listA[i].task || '').trim();
-        const cA = (listA[i].color || '').toLowerCase().trim();
-
-        let foundMatch = false;
-        for (let j = 0; j < listB.length; j++) {
-          if (matchedB.has(j)) continue;
-          const tB = (listB[j].task || '').trim();
-          const cB = (listB[j].color || '').toLowerCase().trim();
-          if (tA === tB && cA === cB) {
-            matchedB.add(j);
-            foundMatch = true;
-            break;
-          }
-        }
-
-        if (!foundMatch) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
 
   /**
    * Intelligently combine two day objects (union without duplicates)
@@ -603,15 +566,11 @@
       // 3. Task Clipboard (Templates)
       localStorage.setItem('taskClipboard', JSON.stringify(session.stagedTemplates));
 
-      // 4. Settings
-      localStorage.setItem('appSettings', JSON.stringify(session.stagedSettings));
-
-      // 5. Theme (now stored inside appSettings)
+      // 4. Settings & Theme
       if (session.stagedTheme) {
-        const currentSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
-        currentSettings.theme = session.stagedTheme;
-        localStorage.setItem('appSettings', JSON.stringify(currentSettings));
+        session.stagedSettings.theme = session.stagedTheme;
       }
+      localStorage.setItem('appSettings', JSON.stringify(session.stagedSettings));
 
       // 6. Weather
       if (session.stagedWeather) {
@@ -718,6 +677,8 @@
     if (backdropEl) backdropEl.classList.remove('active');
     if (modalEl) modalEl.classList.remove('active');
     document.body.style.overflow = '';
+    const uploadInput = document.getElementById('uploadBackup');
+    if (uploadInput) uploadInput.value = '';
     mergeSession = null;
   }
 
@@ -737,7 +698,6 @@
 
     let leftHtml = '';
     let rightHtml = '';
-    const identicalPeriods = [];
     let diffCount = 0;
 
     periods.forEach(p => {
@@ -1097,7 +1057,7 @@
    * Action button handler
    */
   function handleConflictAction(action) {
-    if (!mergeSession) return;
+    if (!mergeSession || mergeSession.currentIndex >= mergeSession.conflicts.length) return;
     if (document.activeElement && typeof document.activeElement.blur === 'function') {
       document.activeElement.blur();
     }
@@ -1207,6 +1167,16 @@
       cancelBtn.addEventListener('click', () => {
         if (confirm("Cancel backup import? No changes will be made to your current data.")) {
           closeModal();
+        }
+      });
+    }
+
+    if (backdropEl) {
+      backdropEl.addEventListener('click', (e) => {
+        if (e.target === backdropEl) {
+          if (confirm("Cancel backup import? No changes will be made to your current data.")) {
+            closeModal();
+          }
         }
       });
     }
