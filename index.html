@@ -1342,8 +1342,10 @@
         <!-- Header -->
         <div class="bcm-header">
             <div class="bcm-header-title-wrap">
-                <span class="material-symbols-outlined bcm-header-icon">rule</span>
-                <h3 id="bcm-main-title" class="bcm-main-title">Review Difference</h3>
+                <svg class="bcm-header-icon" viewBox="0 -960 960 960" width="18" height="18" fill="currentColor">
+                    <path d="M120-160v-160h720v160H120Zm80-40h80v-80h-80v80Zm-80-440v-160h720v160H120Zm80-40h80v-80h-80v80Zm-80 280v-160h720v160H120Zm80-40h80v-80h-80v80Z"/>
+                </svg>
+                <h3 id="bcm-main-title" class="bcm-main-title">Schedule Difference</h3>
                 <span id="bcm-counter" class="bcm-counter-pill">1 of 1</span>
             </div>
             <button type="button" class="bcm-close-btn" id="bcm-close-btn" title="Cancel Import" aria-label="Cancel Import">
@@ -1353,7 +1355,6 @@
 
         <!-- Target Item Info -->
         <div class="bcm-target-bar">
-            <span id="bcm-category-badge" class="bcm-category-badge">Schedule</span>
             <div class="bcm-target-info">
                 <span id="bcm-conflict-title" class="bcm-item-name">Thursday, August 20, 2026</span>
                 <span id="bcm-conflict-subtitle" class="bcm-item-desc">Different tasks found between your device and this backup</span>
@@ -1373,7 +1374,8 @@
                 <!-- Left: Current Local -->
                 <div class="bcm-column bcm-local-column">
                     <div class="bcm-column-header">
-                        <span class="bcm-col-tag local">Current on Device</span>
+                        <span class="material-symbols-outlined bcm-col-icon">mobile_3</span>
+                        <span class="bcm-col-title">Current on Device</span>
                     </div>
                     <div class="bcm-column-body" id="bcm-local-content"></div>
                 </div>
@@ -1381,34 +1383,38 @@
                 <!-- Right: Incoming Backup -->
                 <div class="bcm-column bcm-incoming-column">
                     <div class="bcm-column-header">
-                        <span class="bcm-col-tag incoming">In Backup File</span>
+                        <span class="material-symbols-outlined bcm-col-icon">drive_folder_upload</span>
+                        <span class="bcm-col-title">In Backup File</span>
                     </div>
                     <div class="bcm-column-body" id="bcm-incoming-content"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Compact Action Button Bar -->
-        <div class="bcm-action-bar">
-            <button type="button" class="bcm-action-btn combine" id="bcm-action-combine" title="Combine both sets without duplicates">
-                <span class="material-symbols-outlined">call_merge</span>
-                <span>Merge Both</span>
-            </button>
-            <button type="button" class="bcm-action-btn keep" id="bcm-action-keep-local" title="Keep current device data">
-                <span class="material-symbols-outlined">shield</span>
-                <span>Keep Device</span>
-            </button>
-            <button type="button" class="bcm-action-btn replace" id="bcm-action-replace" title="Use incoming version from backup">
-                <span class="material-symbols-outlined">swap_horiz</span>
-                <span>Use Backup</span>
-            </button>
+        <!-- Action Section -->
+        <div class="bcm-action-section">
+            <div class="bcm-action-prompt">Choose how to proceed:</div>
+            <div class="bcm-action-bar">
+                <button type="button" class="bcm-action-btn combine" id="bcm-action-combine" title="Combine both sets without duplicates">
+                    <span class="material-symbols-outlined">call_merge</span>
+                    <span>Merge Both</span>
+                </button>
+                <button type="button" class="bcm-action-btn keep" id="bcm-action-keep-local" title="Keep current device data">
+                    <span class="material-symbols-outlined">shield</span>
+                    <span>Keep Device</span>
+                </button>
+                <button type="button" class="bcm-action-btn replace" id="bcm-action-replace" title="Use incoming version from backup">
+                    <span class="material-symbols-outlined">swap_horiz</span>
+                    <span>Use Backup</span>
+                </button>
+            </div>
         </div>
 
         <!-- Compact Footer -->
         <div class="bcm-footer">
             <label class="bcm-checkbox-label">
                 <input type="checkbox" id="bcm-apply-all-checkbox" />
-                <span id="bcm-apply-all-label">Apply to all remaining</span>
+                <span id="bcm-apply-all-label">Apply to all remaining Schedule differences</span>
             </label>
             <div class="bcm-footer-links">
                 <button type="button" class="bcm-safety-link-btn" id="bcm-safety-backup-btn" title="Download backup of current local data">
@@ -1416,6 +1422,18 @@
                 </button>
                 <button type="button" class="bcm-cancel-link-btn" id="bcm-action-cancel">Cancel</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Backup Merge Loading Overlay -->
+    <div id="bcm-loading-overlay" class="bcm-loading-overlay" aria-hidden="true">
+        <div class="bcm-loading-box">
+            <div class="bcm-loading-icon-wrap">
+                <div class="bcm-loading-spinner" id="bcm-loading-spinner"></div>
+                <span class="material-symbols-outlined bcm-loading-check hidden" id="bcm-loading-check">check_circle</span>
+            </div>
+            <div class="bcm-loading-title" id="bcm-loading-title">Applying changes...</div>
+            <div class="bcm-loading-subtitle" id="bcm-loading-subtitle">Saving data to your device</div>
         </div>
     </div>
 

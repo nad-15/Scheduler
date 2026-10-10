@@ -628,12 +628,22 @@
       // Hide modal
       closeModal();
 
-      // Show friendly confirmation
-      alert("✅ Backup merged successfully with your data! Reloading Skhayeduler now...");
-      setTimeout(() => location.reload(), 400);
+      // Step 1: Show spinner & "Applying changes..." (1.5s)
+      showLoadingStep('loading', 'Applying changes...', 'Saving data to your device');
+
+      // Step 2: Switch to green checkmark after 1500ms (1.2s display)
+      setTimeout(() => {
+        showLoadingStep('success', 'Changes Saved!', 'Reloading Skhayeduler now...');
+
+        // Step 3: Smooth reload after 1200ms checkmark display
+        setTimeout(() => {
+          location.reload();
+        }, 1200);
+      }, 1500);
 
     } catch (err) {
       console.error("Merge commit error:", err);
+      hideLoadingOverlay();
       // Rollback to snapshot state to prevent partial data corruption
       try {
         rollbackKeys.forEach(k => {
@@ -656,10 +666,40 @@
    */
   let modalEl = null;
   let backdropEl = null;
+  let loadingOverlayEl = null;
 
   function ensureModalElements() {
     if (!backdropEl) backdropEl = document.getElementById('backup-conflict-backdrop');
     if (!modalEl) modalEl = document.getElementById('backup-conflict-modal');
+    if (!loadingOverlayEl) loadingOverlayEl = document.getElementById('bcm-loading-overlay');
+  }
+
+  function showLoadingStep(state, title, subtitle) {
+    ensureModalElements();
+    if (!loadingOverlayEl) return;
+    const spinnerEl = document.getElementById('bcm-loading-spinner');
+    const checkEl = document.getElementById('bcm-loading-check');
+    const titleEl = document.getElementById('bcm-loading-title');
+    const subtitleEl = document.getElementById('bcm-loading-subtitle');
+
+    if (state === 'success') {
+      if (spinnerEl) spinnerEl.classList.add('hidden');
+      if (checkEl) checkEl.classList.remove('hidden');
+    } else {
+      if (spinnerEl) spinnerEl.classList.remove('hidden');
+      if (checkEl) checkEl.classList.add('hidden');
+    }
+
+    if (titleEl && title) titleEl.textContent = title;
+    if (subtitleEl && subtitle) subtitleEl.textContent = subtitle;
+    loadingOverlayEl.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function hideLoadingOverlay() {
+    ensureModalElements();
+    if (loadingOverlayEl) loadingOverlayEl.classList.remove('active');
+    document.body.style.overflow = '';
   }
 
   function openModal() {
@@ -885,7 +925,7 @@
 
     // Elements
     const counterEl = document.getElementById('bcm-counter');
-    const categoryBadgeEl = document.getElementById('bcm-category-badge');
+    const mainTitleEl = document.getElementById('bcm-main-title');
     const titleEl = document.getElementById('bcm-conflict-title');
     const subtitleEl = document.getElementById('bcm-conflict-subtitle');
     const leftContentEl = document.getElementById('bcm-local-content');
@@ -910,7 +950,14 @@
     if (counterEl) counterEl.textContent = `${currentNum} of ${total}`;
     if (applyAllCheckbox) applyAllCheckbox.checked = false;
 
-    // Friendly Badge Names
+    // Remove focus from all action buttons so none appears focused or stuck
+    const actionBtns = document.querySelectorAll('.bcm-action-btn');
+    actionBtns.forEach(btn => btn.blur());
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+
+    // Dynamic Category Header Title
     const categoryNames = {
       task: 'Schedule',
       todo: 'To-Do',
@@ -919,9 +966,10 @@
       weather: 'Weather',
       other: 'Data'
     };
-    if (categoryBadgeEl) {
-      categoryBadgeEl.textContent = categoryNames[c.category] || 'Difference';
-      categoryBadgeEl.className = `bcm-category-badge bcm-cat-${c.category}`;
+
+    if (mainTitleEl) {
+      const catLabel = categoryNames[c.category] || 'Data';
+      mainTitleEl.textContent = `${catLabel} Difference`;
     }
 
     if (titleEl) titleEl.textContent = c.title || 'Data Difference';
@@ -1050,6 +1098,9 @@
    */
   function handleConflictAction(action) {
     if (!mergeSession) return;
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
     const checkbox = document.getElementById('bcm-apply-all-checkbox');
     const applyToAllRemaining = checkbox ? checkbox.checked : false;
 
