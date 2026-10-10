@@ -330,13 +330,14 @@
    * ========================================================================== */
 
   function ensureCalculatorDOM() {
-    if (state.injected && document.getElementById('job-calculator-container')) {
+    const existing = document.getElementById('job-calculator-container');
+    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print')) {
       return;
     }
 
-    let existing = document.getElementById('job-calculator-container');
     if (existing) {
       existing.remove();
+      state.injected = false;
     }
 
     const container = document.createElement('div');
@@ -417,7 +418,7 @@
         </section>
 
         <!-- Financial Summary & Tax Deduction Card -->
-        <section class="job-calc-card job-calc-summary-card">
+        <section class="job-calc-card job-calc-summary-card" id="job-calc-summary-card">
           <div class="job-calc-card-header">
             <span class="material-symbols-outlined job-calc-card-icon">receipt_long</span>
             <span class="job-calc-card-title">Earnings Summary</span>
@@ -470,9 +471,111 @@
 
           <!-- Actions -->
           <div class="job-calc-actions-row">
-            <button type="button" class="job-calc-action-btn job-calc-btn-copy" id="job-calc-btn-copy">
-              <span class="material-symbols-outlined">content_copy</span>
-              <span>Copy Breakdown</span>
+            <button type="button" class="job-calc-action-btn job-calc-btn-view-receipt" id="job-calc-btn-view-receipt" title="View Breakdown Ticket">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <span>View Breakdown</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Retro "Receipt Ticket" Section (Swapped when user clicks View Breakdown) -->
+        <section class="job-calc-receipt-wrapper" id="job-calc-receipt-wrapper" style="display: none;">
+          <div class="job-calc-receipt-ticket" id="job-calc-receipt-ticket">
+            <!-- Top-Right Actions: Subtle Copy button -->
+            <div class="receipt-top-actions">
+              <button type="button" class="receipt-action-btn receipt-btn-copy" id="receipt-btn-copy" title="Copy breakdown ticket">
+                <span class="material-symbols-outlined">content_copy</span>
+                <span class="receipt-action-btn-text">Copy</span>
+              </button>
+            </div>
+
+            <!-- Jagged Top Tear Edge -->
+            <div class="receipt-edge receipt-edge-top"></div>
+
+            <div class="receipt-inner">
+              <!-- Header -->
+              <div class="receipt-header">
+                <div class="receipt-brand">SKHAYEDULER TICKET</div>
+                <div class="receipt-badge">★ WORK &amp; EARNINGS ★</div>
+                <div class="receipt-meta">
+                  <div class="receipt-meta-row">
+                    <span>PERIOD:</span>
+                    <span id="receipt-date-range">Selected Period</span>
+                  </div>
+                  <div class="receipt-meta-row">
+                    <span>PRINTED:</span>
+                    <span id="receipt-printed-date">Today</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="receipt-divider-dash"></div>
+
+              <!-- Calendar Shifts -->
+              <div class="receipt-section" id="receipt-shifts-section">
+                <div class="receipt-section-header">
+                  <span>CALENDAR SHIFTS</span>
+                  <span id="receipt-shifts-count">0 sessions</span>
+                </div>
+                <div class="receipt-items-list" id="receipt-shifts-list">
+                  <!-- Dynamic shift lines -->
+                </div>
+                <div class="receipt-subtotal-row">
+                  <span>SHIFTS TOTAL (<span id="receipt-shifts-hours">0.0h</span>)</span>
+                  <span id="receipt-shifts-subtotal">$0.00</span>
+                </div>
+              </div>
+
+              <div class="receipt-divider-dash"></div>
+
+              <!-- Gross Earnings -->
+              <div class="receipt-gross-row">
+                <span>GROSS EARNINGS</span>
+                <span id="receipt-gross-amount">$0.00</span>
+              </div>
+
+              <!-- Tax Deduction (if any) -->
+              <div class="receipt-section" id="receipt-tax-section" style="display: none;">
+                <div class="receipt-divider-dash"></div>
+                <div class="receipt-item-row">
+                  <div class="receipt-item-title-col">
+                    <span class="receipt-item-name">Tax Deduction</span>
+                    <span class="receipt-item-detail" id="receipt-tax-detail">(0%)</span>
+                  </div>
+                  <span class="receipt-item-amount receipt-item-deduction" id="receipt-tax-amount">-$0.00</span>
+                </div>
+              </div>
+
+              <div class="receipt-divider-double"></div>
+
+              <!-- Net Take-Home (Hero Row) -->
+              <div class="receipt-net-row">
+                <div class="receipt-net-label-col">
+                  <span class="receipt-net-main-label">NET TAKE-HOME</span>
+                  <span class="receipt-net-sublabel">Total pocket earnings</span>
+                </div>
+                <span class="receipt-net-amount" id="receipt-net-amount">$0.00</span>
+              </div>
+
+              <div class="receipt-divider-double"></div>
+
+              <!-- Footer -->
+              <div class="receipt-footer">
+                <div class="receipt-barcode">||| |||| || ||||||| ||| ||||| |||| |||</div>
+                <div class="receipt-footer-msg">THANK YOU FOR YOUR HARD WORK!</div>
+                <div class="receipt-footer-sub">EVERY SHIFT ADDS UP 🐷</div>
+              </div>
+            </div>
+
+            <!-- Jagged Bottom Tear Edge -->
+            <div class="receipt-edge receipt-edge-bottom"></div>
+          </div>
+
+          <!-- Actions Row Below Ticket -->
+          <div class="job-calc-actions-row">
+            <button type="button" class="job-calc-action-btn job-calc-btn-back-summary" id="job-calc-btn-back-summary" title="Back to Earnings Summary">
+              <span class="material-symbols-outlined">arrow_back</span>
+              <span>View Summary</span>
             </button>
           </div>
         </section>
@@ -617,11 +720,62 @@
       });
     }
 
-    // Copy Summary Button
-    const copyBtn = container.querySelector('#job-calc-btn-copy');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', handleCopySummary);
+    // View Receipt Button (Swaps Summary Card <-> Receipt Ticket)
+    function swapToReceiptTicket() {
+      const currentSummary = container.querySelector('#job-calc-summary-card') || container.querySelector('.job-calc-summary-card');
+      const currentReceipt = container.querySelector('#job-calc-receipt-wrapper') || container.querySelector('.job-calc-receipt-wrapper');
+      if (currentSummary) {
+        currentSummary.style.display = 'none';
+      }
+      if (currentReceipt) {
+        currentReceipt.style.display = 'flex';
+        updateReceiptTicket();
+        try {
+          currentReceipt.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (_) {}
+      }
     }
+
+    function swapToBreakdownSummary() {
+      const currentSummary = container.querySelector('#job-calc-summary-card') || container.querySelector('.job-calc-summary-card');
+      const currentReceipt = container.querySelector('#job-calc-receipt-wrapper') || container.querySelector('.job-calc-receipt-wrapper');
+      if (currentReceipt) {
+        currentReceipt.style.display = 'none';
+      }
+      if (currentSummary) {
+        currentSummary.style.display = '';
+        try {
+          currentSummary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (_) {}
+      }
+    }
+
+    // Direct event bindings
+    const viewReceiptBtn = container.querySelector('#job-calc-btn-view-receipt');
+    if (viewReceiptBtn) {
+      viewReceiptBtn.addEventListener('click', swapToReceiptTicket);
+    }
+
+    const backSummaryBtn = container.querySelector('#job-calc-btn-back-summary');
+    if (backSummaryBtn) {
+      backSummaryBtn.addEventListener('click', swapToBreakdownSummary);
+    }
+
+    const receiptCopyBtn = container.querySelector('#receipt-btn-copy');
+    if (receiptCopyBtn) {
+      receiptCopyBtn.addEventListener('click', handleCopyReceipt);
+    }
+
+    // Delegated container click listener (catches clicks even if dynamic DOM shifts occur)
+    container.addEventListener('click', (e) => {
+      if (e.target.closest('#job-calc-btn-view-receipt, .job-calc-btn-view-receipt')) {
+        swapToReceiptTicket();
+      } else if (e.target.closest('#job-calc-btn-back-summary, .job-calc-btn-back-summary')) {
+        swapToBreakdownSummary();
+      } else if (e.target.closest('#receipt-btn-copy, .receipt-btn-copy')) {
+        handleCopyReceipt();
+      }
+    });
   }
 
   function updateDateInputs() {
@@ -1040,13 +1194,19 @@
         btn.classList.toggle('active', btn.dataset.mode === taxSetting.type);
       });
     }
+
+    // Keep the receipt ticket synced with current data
+    updateReceiptTicket();
   }
 
   /* ==========================================================================
-   * 8. Clipboard Summary Export
+   * 8. Retro Receipt Ticket Updater & Export
    * ========================================================================== */
 
-  function handleCopySummary() {
+  function updateReceiptTicket() {
+    const container = document.getElementById('job-calculator-container');
+    if (!container) return;
+
     const {
       totalSessions,
       totalHours,
@@ -1055,59 +1215,199 @@
       netTakeHome
     } = calculateTotals();
 
+    // 1. Update Receipt Header Date Info
+    const rangeEl = container.querySelector('#receipt-date-range');
+    const printedEl = container.querySelector('#receipt-printed-date');
+    if (rangeEl && state.fromDate && state.toDate) {
+      const f = parseIsoDate(state.fromDate);
+      const t = parseIsoDate(state.toDate);
+      rangeEl.textContent = `${formatDisplayDate(f)} — ${formatDisplayDate(t)}`;
+    }
+    if (printedEl) {
+      const now = new Date();
+      printedEl.textContent = `${formatDisplayDate(now)}`;
+    }
+
+    // 2. Calendar Shifts Section
+    const shiftsCountEl = container.querySelector('#receipt-shifts-count');
+    const shiftsHoursEl = container.querySelector('#receipt-shifts-hours');
+    const shiftsSubtotalEl = container.querySelector('#receipt-shifts-subtotal');
+    const shiftsListEl = container.querySelector('#receipt-shifts-list');
+
+    if (shiftsCountEl) shiftsCountEl.textContent = `${totalSessions} session${totalSessions === 1 ? '' : 's'}`;
+    if (shiftsHoursEl) shiftsHoursEl.textContent = `${totalHours.toFixed(1)}h`;
+    if (shiftsSubtotalEl) shiftsSubtotalEl.textContent = `$${grossEarnings.toFixed(2)}`;
+
+    if (shiftsListEl) {
+      const paidNames = Object.keys(scannedJobs).filter((name) => getJobSetting(name).isPaid);
+      if (paidNames.length === 0) {
+        shiftsListEl.innerHTML = `
+          <div class="receipt-item-row receipt-item-muted">
+            <span>No paid jobs selected</span>
+            <span>$0.00</span>
+          </div>
+        `;
+      } else {
+        let shiftsHtml = '';
+        paidNames.forEach((name) => {
+          const job = scannedJobs[name];
+          const setting = getJobSetting(name);
+          const defaultHours = parseFloat(setting.defaultHours) || 0;
+          const rate = parseFloat(setting.hourlyRate) || 0;
+          let hours = 0;
+          job.occurrences.forEach((occ) => {
+            const overrideVal = setting.dateOverrides?.[occ.occKey];
+            hours += (typeof overrideVal === 'number' && !isNaN(overrideVal)) ? overrideVal : defaultHours;
+          });
+          const subtotal = hours * rate;
+
+          shiftsHtml += `
+            <div class="receipt-item-row">
+              <div class="receipt-item-title-col">
+                <span class="receipt-item-name">${escapeHtml(name)}</span>
+                <span class="receipt-item-detail">${hours.toFixed(1)}h (${job.occurrences.length}x) @ $${rate.toFixed(2)}/hr</span>
+              </div>
+              <span class="receipt-item-amount">$${subtotal.toFixed(2)}</span>
+            </div>
+          `;
+        });
+        shiftsListEl.innerHTML = shiftsHtml;
+      }
+    }
+
+    // 3. Gross Earnings
+    const grossAmountEl = container.querySelector('#receipt-gross-amount');
+    if (grossAmountEl) grossAmountEl.textContent = `$${grossEarnings.toFixed(2)}`;
+
+    // 4. Tax Deduction
+    const taxSection = container.querySelector('#receipt-tax-section');
+    const taxDetailEl = container.querySelector('#receipt-tax-detail');
+    const taxAmountEl = container.querySelector('#receipt-tax-amount');
+    const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
+
+    if (taxDeductionAmount > 0) {
+      if (taxSection) taxSection.style.display = 'block';
+      if (taxDetailEl) {
+        taxDetailEl.textContent = taxSetting.type === 'percent'
+          ? `(${taxSetting.value}% of gross)`
+          : `(Flat deduction)`;
+      }
+      if (taxAmountEl) taxAmountEl.textContent = `-$${taxDeductionAmount.toFixed(2)}`;
+    } else {
+      if (taxSection) taxSection.style.display = 'none';
+    }
+
+    // 5. Net Take-Home Hero Row
+    const netAmountEl = container.querySelector('#receipt-net-amount');
+    if (netAmountEl) netAmountEl.textContent = `$${netTakeHome.toFixed(2)}`;
+  }
+
+  function formatReceiptText(totals) {
+    const LINE_WIDTH = 42;
+    const divider = '-'.repeat(LINE_WIDTH);
+    const doubleDivider = '='.repeat(LINE_WIDTH);
+
+    function center(text) {
+      if (text.length >= LINE_WIDTH) return text;
+      const leftPad = Math.floor((LINE_WIDTH - text.length) / 2);
+      return ' '.repeat(leftPad) + text;
+    }
+
+    function row(left, right) {
+      const leftSpace = LINE_WIDTH - right.length;
+      if (left.length > leftSpace - 1) {
+        left = left.substring(0, Math.max(0, leftSpace - 4)) + '...';
+      }
+      return left.padEnd(leftSpace, ' ') + right;
+    }
+
     const rangeStr = state.fromDate && state.toDate
       ? `${formatDisplayDate(parseIsoDate(state.fromDate))} — ${formatDisplayDate(parseIsoDate(state.toDate))}`
       : 'Selected Period';
 
+    const now = new Date();
+    const timeStr = `${MONTH_SHORT[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+    let out = [];
+    out.push(doubleDivider);
+    out.push(center('SKHAYEDULER TICKET'));
+    out.push(center('★ WORK & EARNINGS PAYSLIP ★'));
+    out.push(doubleDivider);
+    out.push(row('PERIOD', rangeStr));
+    out.push(row('PRINTED', timeStr));
+    out.push(divider);
+
+    // Paid Calendar Jobs
     const paidJobs = Object.keys(scannedJobs).filter((name) => getJobSetting(name).isPaid);
-
-    let text = `📋 WORK & EARNINGS BREAKDOWN\n`;
-    text += `Period: ${rangeStr}\n`;
-    text += `─────────────────────────────────────────\n`;
-
-    if (paidJobs.length === 0) {
-      text += `No paid jobs selected for this period.\n`;
-    } else {
+    if (paidJobs.length > 0) {
+      out.push('CALENDAR SHIFTS:');
       paidJobs.forEach((name) => {
         const job = scannedJobs[name];
         const setting = getJobSetting(name);
         const defaultHours = parseFloat(setting.defaultHours) || 0;
         const rate = parseFloat(setting.hourlyRate) || 0;
-
         let hours = 0;
         job.occurrences.forEach((occ) => {
           const overrideVal = setting.dateOverrides?.[occ.occKey];
-          hours += (typeof overrideVal === 'number' && !isNaN(overrideVal))
-            ? overrideVal
-            : defaultHours;
+          hours += (typeof overrideVal === 'number' && !isNaN(overrideVal)) ? overrideVal : defaultHours;
         });
-
         const subtotal = hours * rate;
-        text += `• ${name}: ${job.occurrences.length} sessions · ${hours.toFixed(1)} hrs @ $${rate.toFixed(2)}/hr = $${subtotal.toFixed(2)}\n`;
+        const detailStr = `  ${name} (${hours.toFixed(1)}h · ${job.occurrences.length}x)`;
+        out.push(row(detailStr, `$${subtotal.toFixed(2)}`));
       });
+      out.push(row('  Total Shift Hours', `${totals.totalHours.toFixed(1)} hrs`));
+      out.push(row('  Shifts Subtotal', `$${totals.grossEarnings.toFixed(2)}`));
+      out.push(divider);
     }
 
-    text += `─────────────────────────────────────────\n`;
-    text += `Total Sessions : ${totalSessions}\n`;
-    text += `Total Hours    : ${totalHours.toFixed(1)} hrs\n`;
-    text += `Gross Earnings : $${grossEarnings.toFixed(2)}\n`;
+    out.push(row('GROSS EARNINGS', `$${totals.grossEarnings.toFixed(2)}`));
 
     const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
-    if (taxSetting.value > 0) {
-      const taxLabel = taxSetting.type === 'percent' ? `${taxSetting.value}%` : `$${taxSetting.value}`;
-      text += `Tax Deduction  : -$${taxDeductionAmount.toFixed(2)} (${taxLabel})\n`;
+    if (totals.taxDeductionAmount > 0) {
+      const typeLabel = taxSetting.type === 'percent' ? ` (${taxSetting.value}%)` : '';
+      out.push(row(`  Tax Deduction${typeLabel}`, `-$${totals.taxDeductionAmount.toFixed(2)}`));
     }
+    out.push(doubleDivider);
 
-    text += `Net Take-Home  : $${netTakeHome.toFixed(2)}\n`;
-    text += `─────────────────────────────────────────\n`;
-    text += `Generated via Skhayeduler 🐷\n`;
+    out.push(row('NET TAKE-HOME', `$${totals.netTakeHome.toFixed(2)}`));
+    out.push(doubleDivider);
+    out.push(center('THANK YOU FOR YOUR WORK!'));
+    out.push(center('EVERY SHIFT ADDS UP 🐷'));
+    out.push(doubleDivider);
+
+    return out.join('\n');
+  }
+
+  function handleCopyReceipt() {
+    const totals = calculateTotals();
+    const text = formatReceiptText(totals);
+
+    const btn = document.querySelector('#receipt-btn-copy');
+    const originalHtml = btn ? btn.innerHTML : '';
+
+    const showSuccess = () => {
+      showToastNotification('Breakdown ticket copied to clipboard! 📋');
+      if (btn) {
+        btn.innerHTML = `
+          <span class="material-symbols-outlined" style="font-size: 14px; color: #16a34a;">check</span>
+          <span class="receipt-action-btn-text" style="color: #16a34a;">Copied!</span>
+        `;
+        setTimeout(() => {
+          if (btn) btn.innerHTML = originalHtml;
+        }, 1800);
+      }
+    };
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text)
-        .then(() => showToastNotification('Breakdown copied to clipboard!'))
-        .catch(() => fallbackCopyText(text));
+        .then(showSuccess)
+        .catch(() => {
+          fallbackCopyText(text);
+          showSuccess();
+        });
     } else {
       fallbackCopyText(text);
+      showSuccess();
     }
   }
 
@@ -1121,7 +1421,7 @@
     textArea.select();
     try {
       document.execCommand('copy');
-      showToastNotification('Breakdown copied to clipboard!');
+      showToastNotification('Receipt Ticket copied to clipboard! 📋');
     } catch (err) {
       console.warn('Fallback copy failed', err);
       alert('Could not copy to clipboard. Please copy manually:\n\n' + text);
@@ -1197,6 +1497,11 @@
 
     const container = document.getElementById('job-calculator-container');
     if (container) {
+      const summaryCard = container.querySelector('#job-calc-summary-card, .job-calc-summary-card');
+      const receiptWrapper = container.querySelector('#job-calc-receipt-wrapper, .job-calc-receipt-wrapper');
+      if (summaryCard) summaryCard.style.display = '';
+      if (receiptWrapper) receiptWrapper.style.display = 'none';
+
       container.style.display = 'flex';
       container.scrollTop = 0;
     }

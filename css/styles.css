@@ -11624,20 +11624,347 @@ ic {
     transition: all 0.2s ease;
 }
 
-.job-calc-btn-copy {
+.job-calc-btn-copy,
+.job-calc-btn-view-receipt {
     background: #0284c7;
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
 }
 
-.job-calc-btn-copy:hover {
+.job-calc-btn-copy:hover,
+.job-calc-btn-view-receipt:hover {
     background: #0369a1;
     transform: translateY(-1px);
 }
 
-.job-calc-btn-copy:active {
+.job-calc-btn-copy:active,
+.job-calc-btn-view-receipt:active {
     transform: scale(0.98);
 }
+
+.job-calc-btn-back-summary {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+
+.job-calc-btn-back-summary:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: translateY(-1px);
+}
+
+.job-calc-btn-back-summary:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================================================
+ * Retro Receipt Ticket
+ * ========================================================================== */
+
+.job-calc-receipt-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 6px;
+    animation: jobCalcReceiptFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes jobCalcReceiptFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.job-calc-receipt-ticket {
+    position: relative;
+    background: #fffdf9;
+    border-radius: 4px;
+    box-shadow: 0 8px 26px rgba(15, 23, 42, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2dec9;
+    font-family: 'Courier New', Courier, 'Cascadia Code', Consolas, monospace;
+    color: #1e293b;
+    overflow: hidden;
+    user-select: text;
+}
+
+/* Top-Right Action Controls (Subtle Copy) */
+.receipt-top-actions {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 5;
+}
+
+.receipt-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    opacity: 0.8;
+}
+
+.receipt-action-btn span.material-symbols-outlined {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.receipt-action-btn:hover {
+    background: rgba(15, 23, 42, 0.05);
+    border-color: #e2e8f0;
+    color: #0f172a;
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.receipt-action-btn:hover span.material-symbols-outlined {
+    color: #0f172a;
+}
+
+.receipt-action-btn:active {
+    transform: scale(0.96);
+}
+
+/* Jagged Tear-off Edge */
+.receipt-edge {
+    height: 9px;
+    width: 100%;
+    background-repeat: repeat-x;
+    background-size: 14px 9px;
+}
+
+.receipt-edge-top {
+    background-image: linear-gradient(135deg, #f1f5f9 50%, #fffdf9 50%),
+                      linear-gradient(-135deg, #f1f5f9 50%, #fffdf9 50%);
+}
+
+.receipt-edge-bottom {
+    background-image: linear-gradient(45deg, #f1f5f9 50%, #fffdf9 50%),
+                      linear-gradient(-45deg, #f1f5f9 50%, #fffdf9 50%);
+}
+
+.receipt-inner {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Header */
+.receipt-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding-top: 14px;
+}
+
+.receipt-brand {
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: #0f172a;
+}
+
+.receipt-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #475569;
+}
+
+.receipt-meta {
+    width: 100%;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.receipt-meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.74rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Dividers */
+.receipt-divider-dash {
+    border-bottom: 1px dashed #cbd5e1;
+    margin: 2px 0;
+}
+
+.receipt-divider-double {
+    border-bottom: 3px double #334155;
+    margin: 4px 0;
+}
+
+/* Sections */
+.receipt-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.receipt-section-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #334155;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.receipt-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.receipt-item-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    gap: 10px;
+}
+
+.receipt-item-title-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.receipt-item-name {
+    font-weight: 700;
+    color: #0f172a;
+    word-break: break-word;
+}
+
+.receipt-item-detail {
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.receipt-item-amount {
+    font-weight: 700;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.receipt-item-deduction {
+    color: #dc2626;
+}
+
+.receipt-item-muted {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.receipt-subtotal-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #475569;
+    padding-top: 4px;
+    border-top: 1px dotted #e2e8f0;
+}
+
+/* Gross Row */
+.receipt-gross-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+}
+
+/* Net Hero Row */
+.receipt-net-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ecfdf5;
+    border: 1px dashed #10b981;
+    border-radius: 6px;
+    padding: 10px 12px;
+}
+
+.receipt-net-label-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.receipt-net-main-label {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #065f46;
+    letter-spacing: 0.5px;
+}
+
+.receipt-net-sublabel {
+    font-size: 0.68rem;
+    color: #047857;
+}
+
+.receipt-net-amount {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #047857;
+    letter-spacing: -0.5px;
+}
+
+/* Footer */
+.receipt-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 3px;
+    padding-top: 4px;
+}
+
+.receipt-barcode {
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    font-weight: 700;
+    color: #334155;
+    opacity: 0.75;
+}
+
+.receipt-footer-msg {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: 0.5px;
+}
+
+.receipt-footer-sub {
+    font-size: 0.68rem;
+    color: #64748b;
+}
+
 
 /* Toast Notification */
 .job-calc-toast {
