@@ -13,6 +13,7 @@
  * │ todos                   │ Array    │ To-do items with text, status, subtasks       │
  * │ taskClipboard           │ Array    │ Saved task templates (text, color, favorite)  │
  * │ scheduler_weather_state │ Object   │ Weather location + recent searches            │
+ * │ jobCalculatorSettings   │ Object   │ Work & wage calculator rates, hours, tax, etc.│
  * │ pwa-installed           │ String   │ PWA install state flag ("true")               │
  * └─────────────────────────┴──────────┴──────────────────────────────────────────────┘
  *

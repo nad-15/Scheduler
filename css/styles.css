@@ -10650,3 +10650,1015 @@ ic {
     color: #64748b;
     line-height: 1.4;
 }
+
+/* ==========================================================================
+ * ✨ JOB & EARNINGS CALCULATOR VIEW STYLES ✨
+ * ========================================================================== */
+
+/* Trigger button in .extras-toolbar */
+.job-calculator-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+    color: white;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.job-calculator-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.1);
+}
+
+.job-calculator-btn:active {
+    transform: scale(0.95);
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.job-calc-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* Fullscreen Calculator View Container */
+.job-calculator-view {
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 5000;
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    font-family: var(--todo-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    color: #1e293b;
+    line-height: 1.5;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Sticky Header */
+.job-calc-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.job-calc-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.job-calc-btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: #334155;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.job-calc-btn-back:hover {
+    background: #e2e8f0;
+    transform: translateX(-2px);
+}
+
+.job-calc-btn-back:active {
+    transform: scale(0.92);
+}
+
+.job-calc-title-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.job-calc-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.job-calc-header-icon {
+    color: #0284c7;
+    flex-shrink: 0;
+}
+
+.job-calc-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+}
+
+.job-calc-subtitle {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Scrollable Body */
+.job-calc-body {
+    flex: 1;
+    max-width: 620px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 90px;
+}
+
+/* Base Cards */
+.job-calc-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.job-calc-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f172a;
+}
+
+.job-calc-card-icon {
+    font-size: 20px;
+    color: #0284c7;
+}
+
+.job-calc-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+}
+
+/* Date Range Presets */
+.job-calc-date-presets {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.job-calc-date-presets::-webkit-scrollbar {
+    display: none;
+}
+
+.job-calc-pill {
+    flex-shrink: 0;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.job-calc-pill:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.job-calc-pill.active {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+}
+
+/* Date Pickers */
+.job-calc-date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.job-calc-date-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.job-calc-date-field label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.5px;
+}
+
+.job-calc-date-picker {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.job-calc-date-picker:focus {
+    border-color: #0284c7;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.job-calc-date-sep {
+    font-size: 16px;
+    color: #94a3b8;
+    margin-top: 18px;
+}
+
+/* Controls Bar (Tabs + Search) */
+.job-calc-controls-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.job-calc-tabs {
+    display: flex;
+    background: #e2e8f0;
+    border-radius: 12px;
+    padding: 3px;
+    gap: 3px;
+}
+
+.job-calc-tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    border-radius: 9px;
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.job-calc-tab.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.job-calc-search-box {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 6px 12px;
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.job-calc-search-icon {
+    font-size: 18px;
+    color: #94a3b8;
+}
+
+.job-calc-search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.85rem;
+    color: #0f172a;
+    font-family: inherit;
+}
+
+.job-calc-search-box input::placeholder {
+    color: #94a3b8;
+}
+
+.job-calc-search-clear {
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Tasks List */
+.job-calc-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Task Card */
+.job-calc-task-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.job-calc-task-card.is-paid {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+}
+
+.job-calc-task-card.is-unpaid {
+    opacity: 0.72;
+    background: #fafaf9;
+}
+
+.job-calc-task-card.is-unpaid:hover {
+    opacity: 0.95;
+}
+
+.job-calc-card-main {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    gap: 12px;
+}
+
+/* Custom Checkbox */
+.job-calc-checkbox-label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.job-calc-paid-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.job-calc-custom-checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid #cbd5e1;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.job-calc-custom-checkbox span {
+    font-size: 16px;
+    color: white;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.15s ease;
+}
+
+.job-calc-paid-checkbox:checked + .job-calc-custom-checkbox {
+    background: #0284c7;
+    border-color: #0284c7;
+}
+
+.job-calc-paid-checkbox:checked + .job-calc-custom-checkbox span {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Color Indicator Strip */
+.job-calc-color-indicator {
+    width: 5px;
+    height: 32px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+/* Info */
+.job-calc-card-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.job-calc-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.job-calc-job-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-calc-session-badge {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 2px 7px;
+    border-radius: 12px;
+}
+
+.job-calc-tagline {
+    font-size: 0.72rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Subtotal Badge */
+.job-calc-subtotal-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+    gap: 1px;
+}
+
+.job-calc-subtotal-amount {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0284c7;
+    letter-spacing: -0.2px;
+}
+
+.job-calc-subtotal-hours {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+/* Card Config Section */
+.job-calc-card-config {
+    padding: 10px 14px 14px 14px;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.job-calc-inputs-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.job-calc-input-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.job-calc-input-block label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.4px;
+}
+
+.job-calc-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.job-calc-num-input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.job-calc-num-input:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+}
+
+.job-calc-prefix {
+    position: absolute;
+    left: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.job-calc-rate-input {
+    padding-left: 20px;
+    padding-right: 28px;
+}
+
+.job-calc-hours-input {
+    padding-right: 32px;
+}
+
+.job-calc-unit {
+    position: absolute;
+    right: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+/* Accordion Toggle */
+.job-calc-accordion-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #0284c7;
+    cursor: pointer;
+    transition: color 0.15s;
+    user-select: none;
+}
+
+.job-calc-accordion-btn:hover {
+    color: #0369a1;
+}
+
+.job-calc-accordion-arrow {
+    font-size: 18px;
+    transition: transform 0.2s;
+}
+
+/* Accordion Dates List */
+.job-calc-dates-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.job-calc-dates-accordion.hidden {
+    display: none;
+}
+
+.job-calc-occ-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+}
+
+.job-calc-occ-date-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.job-calc-occ-date {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.job-calc-occ-period {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+}
+
+.job-calc-period-morning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.job-calc-period-afternoon {
+    background: #fed7aa;
+    color: #9a3412;
+}
+
+.job-calc-period-evening {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.job-calc-occ-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.job-calc-occ-hours-input {
+    width: 62px;
+    padding: 4px 6px;
+    padding-right: 22px;
+    font-size: 0.78rem;
+    text-align: right;
+}
+
+.job-calc-occ-unit {
+    position: absolute;
+    right: 32px;
+    font-size: 0.65rem;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.job-calc-occ-reset-btn {
+    border: none;
+    background: #e2e8f0;
+    color: #475569;
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+.job-calc-occ-reset-btn span {
+    font-size: 14px;
+}
+
+.job-calc-occ-reset-btn:hover {
+    background: #cbd5e1;
+    color: #0f172a;
+}
+
+/* Empty State */
+.job-calc-empty-state {
+    padding: 36px 16px;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px dashed #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.job-calc-empty-icon {
+    font-size: 36px;
+    color: #94a3b8;
+}
+
+.job-calc-empty-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.job-calc-empty-text {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.5;
+    max-width: 380px;
+}
+
+.job-calc-empty-action-btn {
+    margin-top: 6px;
+    background: #0284c7;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+    transition: all 0.2s ease;
+}
+
+.job-calc-empty-action-btn:hover {
+    background: #0369a1;
+    transform: translateY(-1px);
+}
+
+.job-calc-empty-action-btn:active {
+    transform: scale(0.96);
+}
+
+/* Summary Card */
+.job-calc-summary-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+.job-calc-summary-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.job-calc-metric {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.job-calc-metric-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.4px;
+}
+
+.job-calc-metric-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.job-calc-summary-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.job-calc-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.job-calc-row-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.job-calc-sum-bold {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Tax Deduction Row */
+.job-calc-tax-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+}
+
+.job-calc-tax-label-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.job-calc-tax-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.job-calc-tax-mode-toggle {
+    display: flex;
+    background: #e2e8f0;
+    border-radius: 8px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.job-calc-tax-mode-btn {
+    border: none;
+    background: transparent;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.job-calc-tax-mode-btn.active {
+    background: #0284c7;
+    color: white;
+}
+
+.job-calc-tax-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.job-calc-tax-symbol {
+    position: absolute;
+    left: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.job-calc-tax-val-input {
+    width: 68px;
+    padding: 6px 8px;
+    padding-left: 20px;
+    text-align: right;
+    font-size: 0.85rem;
+}
+
+.job-calc-tax-deduction-amount {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ef4444;
+    min-width: 65px;
+    text-align: right;
+}
+
+.job-calc-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 2px 0;
+}
+
+/* Net Row */
+.job-calc-net-row {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+
+.job-calc-net-label-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.job-calc-net-label {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #065f46;
+}
+
+.job-calc-net-sublabel {
+    font-size: 0.7rem;
+    color: #047857;
+}
+
+.job-calc-net-val {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #047857;
+    letter-spacing: -0.5px;
+}
+
+/* Actions Row */
+.job-calc-actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.job-calc-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.job-calc-btn-copy {
+    background: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+.job-calc-btn-copy:hover {
+    background: #0369a1;
+    transform: translateY(-1px);
+}
+
+.job-calc-btn-copy:active {
+    transform: scale(0.98);
+}
+
+/* Toast Notification */
+.job-calc-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #0f172a;
+    color: #ffffff;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+.job-calc-toast.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
