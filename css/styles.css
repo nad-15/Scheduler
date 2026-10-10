@@ -883,8 +883,6 @@ body {
     font-size: 12px;
     color: #555;
     transition: transform 0.2s ease;
-    vertical-align: middle;
-    /* keeps arrow nicely aligned */
     /* border: 2px solid green; */
 }
 
@@ -4553,16 +4551,6 @@ input[type="radio"]:checked::after {
     gap: 12px;
 }
 
-/* Hover effect */
-.template-task-btn:hover {
-    /* background-color: #005FCC; */
-}
-
-/* Focus effect */
-.template-task-btn:focus {
-    /* outline: 2px solid rgba(0, 120, 255, 0.5); */
-    /* outline-offset: 2px; */
-}
 
 /* Active (when clicked) effect */
 .template-task-btn:active {
@@ -4984,9 +4972,6 @@ input[type="radio"]:checked::after {
     /* background-color: red; */
 }
 
-.lock-button {
-    /* border: 2px solid violet; */
-}
 
 .year-letter-container {
     /* border: 1px solid blue; */
@@ -5000,10 +4985,6 @@ input[type="radio"]:checked::after {
 }
 
 
-.month-letter-container {
-    /* border: 2px solid black; */
-    /* background-color: red; */
-}
 
 .month-container {
     /* border: 1px solid blue; */
@@ -7194,6 +7175,7 @@ html.hide-all-buttons-active #slidingInputView {
 
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -7212,6 +7194,7 @@ html.hide-all-buttons-active #slidingInputView {
 .day-vert-view.row-expanded .task-evening {
     display: block;
     -webkit-line-clamp: unset;
+    line-clamp: unset;
     -webkit-box-orient: unset;
     overflow: visible;
     text-overflow: unset;
@@ -7613,9 +7596,6 @@ html.hide-all-buttons-active #slidingInputView {
 }
 
 
-.material-icons.close-button-menu-icon {
-    /* color: transparent; */
-}
 
 .popup-content-scroll {
     box-sizing: border-box;
