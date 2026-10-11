@@ -11203,6 +11203,13 @@ ic {
     font-family: inherit;
     outline: none;
     transition: border-color 0.2s;
+    -moz-appearance: textfield;
+}
+
+.job-calc-num-input::-webkit-outer-spin-button,
+.job-calc-num-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .job-calc-num-input:focus {
@@ -11326,24 +11333,34 @@ ic {
 }
 
 .job-calc-occ-input-wrap {
-    position: relative;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+}
+
+.job-calc-occ-input-field {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 90px;
 }
 
 .job-calc-occ-hours-input {
-    width: 62px;
-    padding: 4px 6px;
-    padding-right: 22px;
-    font-size: 0.78rem;
+    width: 100%;
+    height: 32px;
+    padding: 4px 8px;
+    padding-right: 34px;
+    font-size: 0.86rem;
+    font-weight: 600;
     text-align: right;
+    box-sizing: border-box;
 }
 
 .job-calc-occ-unit {
     position: absolute;
-    right: 32px;
-    font-size: 0.65rem;
+    right: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
     color: #94a3b8;
     pointer-events: none;
 }
@@ -11352,14 +11369,16 @@ ic {
     border: none;
     background: #e2e8f0;
     color: #475569;
-    border-radius: 4px;
-    width: 22px;
-    height: 22px;
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     padding: 0;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
 }
 
 .job-calc-occ-reset-btn span {
@@ -11534,27 +11553,57 @@ ic {
 }
 
 .job-calc-tax-input-group {
-    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.job-calc-tax-symbol {
+.job-calc-tax-field {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 78px;
+}
+
+.job-calc-tax-symbol-prefix {
     position: absolute;
     left: 8px;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.job-calc-tax-symbol-suffix {
+    position: absolute;
+    right: 8px;
+    font-size: 0.8rem;
     font-weight: 700;
     color: #64748b;
     pointer-events: none;
 }
 
 .job-calc-tax-val-input {
-    width: 68px;
-    padding: 6px 8px;
-    padding-left: 20px;
+    width: 100%;
+    height: 32px;
+    box-sizing: border-box;
+    font-size: 0.88rem;
+    font-weight: 600;
     text-align: right;
-    font-size: 0.85rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+}
+
+/* Mode-specific padding */
+.job-calc-tax-field.mode-percent .job-calc-tax-val-input {
+    padding-left: 8px;
+    padding-right: 24px;
+}
+
+.job-calc-tax-field.mode-amount .job-calc-tax-val-input {
+    padding-left: 20px;
+    padding-right: 8px;
 }
 
 .job-calc-tax-deduction-amount {
@@ -11863,6 +11912,18 @@ ic {
 .receipt-item-detail {
     font-size: 0.7rem;
     color: #64748b;
+}
+
+.receipt-item-tax-detail {
+    font-size: 0.68rem;
+    color: #dc2626;
+    margin-top: 1px;
+    font-weight: 600;
+}
+
+.receipt-item-tax-net {
+    color: #059669;
+    font-weight: 700;
 }
 
 .receipt-item-amount {
