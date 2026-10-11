@@ -33,49 +33,69 @@ if (localStorage.getItem("movableTemplateExpanded") !== null) {
   localStorage.removeItem("movableTemplateExpanded");
 }
 
-// load from localStorage or use defaults
-let appSettings = JSON.parse(localStorage.getItem("appSettings")) || { ...DEFAULT_SETTINGS };
-
-// Clean up add-task-modal setting from localStorage
-if (appSettings && "add-task-modal" in appSettings) {
-  delete appSettings["add-task-modal"];
-  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+// load from localStorage or use defaults (in-memory)
+const rawAppSettings = localStorage.getItem("appSettings");
+const hasSavedSettings = rawAppSettings !== null;
+let savedAppSettings = {};
+try {
+  if (hasSavedSettings) {
+    const parsed = JSON.parse(rawAppSettings);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      savedAppSettings = parsed;
+    }
+  }
+} catch (e) {
+  savedAppSettings = {};
 }
 
-// Clean up bottom banner setting from localStorage
-if (appSettings && "banner-mode" in appSettings) {
-  delete appSettings["banner-mode"];
-  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+let settingsModified = false;
+
+// Clean up add-task-modal setting from localStorage if present
+if (savedAppSettings && "add-task-modal" in savedAppSettings) {
+  delete savedAppSettings["add-task-modal"];
+  settingsModified = true;
+}
+
+// Clean up bottom banner setting from localStorage if present
+if (savedAppSettings && "banner-mode" in savedAppSettings) {
+  delete savedAppSettings["banner-mode"];
+  settingsModified = true;
 }
 if (localStorage.getItem("banner-mode") !== null) {
   localStorage.removeItem("banner-mode");
 }
 
-// Migrate standalone 'theme' key into appSettings
+// Migrate standalone 'theme' key into appSettings if present
 if (localStorage.getItem("theme") !== null) {
-  appSettings["theme"] = localStorage.getItem("theme");
+  savedAppSettings["theme"] = localStorage.getItem("theme");
   localStorage.removeItem("theme");
+  settingsModified = true;
 }
 
-// Migrate standalone 'hideAllButtons' key into appSettings
+// Migrate standalone 'hideAllButtons' key into appSettings if present
 if (localStorage.getItem("hideAllButtons") !== null) {
-  appSettings["hide-all-buttons"] = localStorage.getItem("hideAllButtons") === 'true';
+  savedAppSettings["hide-all-buttons"] = localStorage.getItem("hideAllButtons") === 'true';
   localStorage.removeItem("hideAllButtons");
+  settingsModified = true;
 }
 
 // Clean up unused / deprecated settings from localStorage
-if ("sliding-templates-row" in appSettings) {
-  if (appSettings["sliding-templates"] === undefined) {
-    appSettings["sliding-templates"] = appSettings["sliding-templates-row"];
+if ("sliding-templates-row" in savedAppSettings) {
+  if (savedAppSettings["sliding-templates"] === undefined) {
+    savedAppSettings["sliding-templates"] = savedAppSettings["sliding-templates-row"];
   }
-  delete appSettings["sliding-templates-row"];
+  delete savedAppSettings["sliding-templates-row"];
+  settingsModified = true;
 }
 
-// make sure all new defaults are added even if user already has saved settings
-appSettings = { ...DEFAULT_SETTINGS, ...appSettings };
+// In memory: merge defaults with saved settings so all options are available
+let appSettings = { ...DEFAULT_SETTINGS, ...savedAppSettings };
 
-// save back in case defaults added something new
-localStorage.setItem("appSettings", JSON.stringify(appSettings));
+// Only persist to localStorage if a migration actually modified legacy settings.
+// For new users (settingsModified === false), DO NOT eagerly write defaults so the device remains clean.
+if (settingsModified) {
+  localStorage.setItem("appSettings", JSON.stringify(savedAppSettings));
+}
 
 window.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
 window.appSettings = appSettings;

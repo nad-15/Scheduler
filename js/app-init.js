@@ -12,14 +12,24 @@
   'use strict';
 
   /**
-   * Load and merge settings with defaults from localStorage
+   * Load and merge settings with defaults from localStorage (without eager injection)
    */
   function loadSettings() {
     const saved = localStorage.getItem("appSettings");
-    let settings = saved ? JSON.parse(saved) : {};
+    let userSettings = {};
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          userSettings = parsed;
+        }
+      } catch (e) {}
+    }
     const defaults = window.DEFAULT_SETTINGS || {};
-    settings = { ...defaults, ...settings };
-    localStorage.setItem("appSettings", JSON.stringify(settings));
+    const settings = { ...defaults, ...userSettings };
+    // NOTE: In-memory defaults are merged onto window.appSettings.
+    // Do NOT inject defaults into localStorage on read.
+    // Settings are only persisted to localStorage when the user actively modifies them.
     window.appSettings = settings;
     return settings;
   }

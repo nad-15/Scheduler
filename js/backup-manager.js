@@ -420,7 +420,8 @@
     }
 
     // 4. App Settings & Theme
-    const localSettings = safeParse(localStorage.getItem('appSettings'), {});
+    const rawLocalSettings = localStorage.getItem('appSettings');
+    const localSettings = safeParse(rawLocalSettings, {});
     const incomingSettings = safeParse(backupData.appSettings, {});
     const localTheme = localSettings.theme || 'default';
     // Support old backups with standalone 'theme' key, and new backups with theme inside appSettings
@@ -429,39 +430,74 @@
     const stagedSettings = { ...localSettings };
     let stagedTheme = localTheme;
 
-    const settingsDiffs = [];
-    if (incomingSettings && typeof incomingSettings === 'object') {
-      Object.keys(incomingSettings).forEach(key => {
-        const localVal = localSettings[key];
-        const inVal = incomingSettings[key];
-        if (JSON.stringify(localVal) !== JSON.stringify(inVal)) {
+    // Check if the local device has any customized user data
+    const isDeviceEmpty = Object.keys(localTasks).length === 0 && localTodos.length === 0 && localTemplates.length === 0;
+
+    // Helper to check if localSettings contains only untouched default values
+    const isPristineLocalSettings = () => {
+      if (rawLocalSettings === null) return true;
+      if (!localSettings || typeof localSettings !== 'object' || Object.keys(localSettings).length === 0) return true;
+      const defaults = (typeof window !== 'undefined' && window.DEFAULT_SETTINGS) ? window.DEFAULT_SETTINGS : {};
+      const keys = Object.keys(localSettings);
+      return keys.every(k => {
+        if (k === 'theme') return !localSettings.theme || localSettings.theme === 'default';
+        if (Array.isArray(defaults[k])) return Array.isArray(localSettings[k]) && localSettings[k].length === 0;
+        return localSettings[k] === defaults[k];
+      });
+    };
+
+    if (rawLocalSettings === null || (isDeviceEmpty && isPristineLocalSettings())) {
+      // Clean / fresh device: seamlessly adopt incoming settings and theme with zero conflict prompts
+      if (incomingSettings && typeof incomingSettings === 'object') {
+        Object.assign(stagedSettings, incomingSettings);
+      }
+      if (incomingTheme) {
+        stagedTheme = incomingTheme;
+      }
+    } else {
+      // Existing device with custom user settings: detect genuine differences
+      const settingsDiffs = [];
+      if (incomingSettings && typeof incomingSettings === 'object') {
+        Object.keys(incomingSettings).forEach(key => {
+          const localVal = localSettings[key];
+          const inVal = incomingSettings[key];
+          if (localVal === undefined) {
+            // Setting from backup that doesn't exist locally -> auto-stage without conflict
+            stagedSettings[key] = inVal;
+          } else if (JSON.stringify(localVal) !== JSON.stringify(inVal)) {
+            settingsDiffs.push({
+              key,
+              localVal: localVal,
+              incomingVal: inVal
+            });
+          }
+        });
+      }
+
+      if (incomingTheme && incomingTheme !== localTheme) {
+        if (localSettings.theme && localSettings.theme !== 'default') {
           settingsDiffs.push({
-            key,
-            localVal: localVal === undefined ? '(not set)' : localVal,
-            incomingVal: inVal
+            key: 'Theme',
+            localVal: localTheme,
+            incomingVal: incomingTheme
           });
+        } else {
+          stagedTheme = incomingTheme;
+          stagedSettings.theme = incomingTheme;
         }
-      });
-    }
+      }
 
-    if (incomingTheme && incomingTheme !== localTheme) {
-      settingsDiffs.push({
-        key: 'Theme',
-        localVal: localTheme,
-        incomingVal: incomingTheme
-      });
-    }
-
-    if (settingsDiffs.length > 0) {
-      conflicts.push({
-        category: 'settings',
-        id: 'appSettings',
-        title: 'Application Preferences & Theme',
-        subtitle: `${settingsDiffs.length} setting(s) differ from backup`,
-        diffs: settingsDiffs,
-        incomingSettings,
-        incomingTheme
-      });
+      if (settingsDiffs.length > 0) {
+        conflicts.push({
+          category: 'settings',
+          id: 'appSettings',
+          title: 'Application Preferences & Theme',
+          subtitle: `${settingsDiffs.length} setting(s) differ from backup`,
+          diffs: settingsDiffs,
+          incomingSettings,
+          incomingTheme
+        });
+      }
     }
 
     // 5. Weather State
