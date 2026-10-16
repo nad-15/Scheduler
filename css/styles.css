@@ -10701,6 +10701,7 @@ ic {
     z-index: 5000;
     margin: 0;
     height: 100vh;
+    height: 100dvh;
     width: 100vw;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     font-family: var(--todo-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
@@ -10710,22 +10711,22 @@ ic {
     -webkit-overflow-scrolling: touch;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
 }
 
-/* Sticky Header */
+/* Header (Included in natural scroll) */
 .job-calc-header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    padding: 14px 16px;
+    background: #ffffff;
     border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    flex-shrink: 0;
 }
 
 .job-calc-header-left {
@@ -10734,27 +10735,37 @@ ic {
     gap: 12px;
 }
 
+.job-calc-btn-close,
 .job-calc-btn-back {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: none;
     background: #f1f5f9;
-    color: #334155;
+    color: #475569;
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
+.job-calc-btn-close:hover,
 .job-calc-btn-back:hover {
-    background: #e2e8f0;
-    transform: translateX(-2px);
+    background: #fee2e2;
+    color: #ef4444;
+    transform: scale(1.06);
 }
 
+.job-calc-btn-close:active,
 .job-calc-btn-back:active {
     transform: scale(0.92);
+}
+
+.job-calc-btn-close .material-symbols-outlined,
+.job-calc-btn-back .material-symbols-outlined {
+    font-size: 20px;
 }
 
 .job-calc-title-group {
@@ -10793,12 +10804,12 @@ ic {
     max-width: 620px;
     width: 100%;
     margin: 0 auto;
-    padding: 16px;
+    padding: 16px 14px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding-bottom: 90px;
+    padding-bottom: calc(140px + env(safe-area-inset-bottom, 24px));
 }
 
 /* Base Cards */
@@ -10874,15 +10885,21 @@ ic {
 .job-calc-date-inputs {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     margin-top: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
 }
 
 .job-calc-date-field {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 4px;
+    overflow: hidden;
+    cursor: pointer;
 }
 
 .job-calc-date-field label {
@@ -10890,13 +10907,17 @@ ic {
     font-weight: 600;
     text-transform: uppercase;
     color: #64748b;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
 .job-calc-date-picker {
     box-sizing: border-box;
     width: 100%;
-    padding: 8px 10px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 8px 8px;
     border-radius: 10px;
     border: 1px solid #cbd5e1;
     background: #f8fafc;
@@ -10906,6 +10927,13 @@ ic {
     font-family: inherit;
     outline: none;
     transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+}
+
+.job-calc-date-picker::-webkit-calendar-picker-indicator {
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
 }
 
 .job-calc-date-picker:focus {
@@ -10915,9 +10943,68 @@ ic {
 }
 
 .job-calc-date-sep {
-    font-size: 16px;
+    font-size: 15px;
     color: #94a3b8;
     margin-top: 18px;
+    flex-shrink: 0;
+}
+
+/* Jobs Card Header & Add Custom Button */
+.job-calc-jobs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.job-calc-header-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.job-calc-add-custom-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    padding: 5px 12px;
+    border-radius: 9px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: inherit;
+}
+
+.job-calc-add-custom-btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.job-calc-add-custom-btn:hover {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+}
+
+.job-calc-add-custom-btn:active {
+    transform: translateY(0);
+}
+
+.job-calc-add-custom-btn.is-expense {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #c2410c;
+}
+
+.job-calc-add-custom-btn.is-expense:hover {
+    background: #ffedd5;
+    border-color: #fdba74;
+    color: #9a3412;
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.15);
 }
 
 /* Controls Bar (Tabs + Search) */
@@ -10933,20 +11020,28 @@ ic {
     border-radius: 12px;
     padding: 3px;
     gap: 3px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
 }
 
 .job-calc-tab {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     border: none;
     background: transparent;
     border-radius: 9px;
-    padding: 7px 12px;
+    padding: 7px 8px;
     font-size: 0.8rem;
     font-weight: 600;
     color: #64748b;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
 }
 
 .job-calc-tab.active {
@@ -11013,12 +11108,24 @@ ic {
     border: 1px solid #e2e8f0;
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
     transition: all 0.2s ease;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
+}
+
+.job-calc-task-card.popover-open,
+.job-calc-task-card:has(.job-calc-triage-popover:not(.hidden)) {
+    z-index: 45;
 }
 
 .job-calc-task-card.is-paid {
-    border-color: #93c5fd;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+    border-color: #86efac;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+}
+
+.job-calc-task-card.is-expense {
+    border-color: #fed7aa;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.08);
 }
 
 .job-calc-task-card.is-unpaid {
@@ -11030,6 +11137,130 @@ ic {
     opacity: 0.95;
 }
 
+/* Custom / Off-Calendar Job Cards */
+.job-calc-task-card.job-calc-custom-card {
+    border-left: 3px solid #10b981;
+}
+
+.job-calc-task-card.job-calc-custom-card.is-paid {
+    border-color: #bbf7d0;
+    border-left: 3px solid #10b981;
+    background: #ffffff;
+}
+
+.job-calc-custom-indicator {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.job-calc-tag-custom {
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.job-calc-custom-name-input {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.94rem;
+    font-weight: 700;
+    color: #0f172a;
+    background: transparent;
+    font-family: inherit;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 140px;
+    transition: all 0.2s ease;
+}
+
+.job-calc-custom-name-input:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.job-calc-custom-name-input:focus {
+    border-color: #10b981;
+    background: #ffffff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+/* Custom Expense Cards */
+.job-calc-task-card.job-calc-expense-card {
+    border-left: 3px solid #f97316;
+}
+
+.job-calc-task-card.job-calc-expense-card.is-expense {
+    border-color: #ffedd5;
+    border-left: 3px solid #f97316;
+    background: #ffffff;
+}
+
+.job-calc-expense-indicator {
+    background: linear-gradient(135deg, #f97316, #ea580c) !important;
+}
+
+.job-calc-tag-expense {
+    background: #ffedd5;
+    color: #c2410c;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.job-calc-expense-name-input {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.94rem;
+    font-weight: 700;
+    color: #0f172a;
+    background: transparent;
+    font-family: inherit;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 140px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-calc-expense-name-input:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.job-calc-expense-name-input:focus {
+    border-color: #f97316;
+    background: #ffffff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
+}
+
+.job-calc-empty-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
 .job-calc-card-main {
     display: flex;
     align-items: center;
@@ -11037,24 +11268,16 @@ ic {
     gap: 12px;
 }
 
-/* Custom Checkbox */
-.job-calc-checkbox-label {
+/* Triage Checkbox & Popover System */
+.job-calc-triage-wrap {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     flex-shrink: 0;
 }
 
-.job-calc-paid-checkbox {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.job-calc-custom-checkbox {
+.job-calc-triage-btn {
     width: 22px;
     height: 22px;
     border-radius: 6px;
@@ -11063,25 +11286,217 @@ ic {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
-.job-calc-custom-checkbox span {
-    font-size: 16px;
-    color: white;
-    opacity: 0;
-    transform: scale(0.5);
+.job-calc-triage-btn:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+}
+
+.job-calc-triage-btn.is-paid {
+    background: #10b981;
+    border-color: #10b981;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+}
+
+.job-calc-triage-btn.is-paid:hover {
+    background: #059669;
+    border-color: #059669;
+}
+
+.job-calc-triage-btn.is-expense {
+    background: #ea580c;
+    border-color: #ea580c;
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.35);
+}
+
+.job-calc-triage-btn.is-expense:hover {
+    background: #c2410c;
+    border-color: #c2410c;
+}
+
+.job-calc-triage-btn.job-calc-custom-expense-delete-box:hover,
+.job-calc-triage-btn.job-calc-custom-earnings-delete-box:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
+}
+
+.job-calc-triage-icon {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1;
+    display: block;
+    user-select: none;
     transition: all 0.15s ease;
 }
 
-.job-calc-paid-checkbox:checked + .job-calc-custom-checkbox {
-    background: #0284c7;
-    border-color: #0284c7;
+.job-calc-triage-btn.is-unmarked .job-calc-triage-icon {
+    opacity: 0;
+    transform: scale(0.5);
 }
 
-.job-calc-paid-checkbox:checked + .job-calc-custom-checkbox span {
+.job-calc-triage-btn.is-unmarked:hover .job-calc-triage-icon {
+    opacity: 0.35;
+    color: #64748b;
+    transform: scale(0.85);
+}
+
+.job-calc-triage-btn.is-paid .job-calc-triage-icon,
+.job-calc-triage-btn.is-expense .job-calc-triage-icon {
     opacity: 1;
     transform: scale(1);
+    color: #ffffff;
+}
+
+.job-calc-triage-btn.job-calc-custom-expense-delete-box .job-calc-triage-icon,
+.job-calc-triage-btn.job-calc-custom-earnings-delete-box .job-calc-triage-icon {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Triage Popover Dropdown */
+.job-calc-triage-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 150;
+    min-width: 250px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.16), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    animation: jobCalcPopIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.job-calc-triage-popover.hidden {
+    display: none !important;
+}
+
+@keyframes jobCalcPopIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.job-calc-triage-popover-header {
+    padding: 6px 10px 4px 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.job-calc-triage-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: background 0.15s ease;
+    font-family: inherit;
+}
+
+.job-calc-triage-option:hover {
+    background: #f1f5f9;
+}
+
+.job-calc-triage-option-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.job-calc-triage-option-icon .material-symbols-outlined {
+    font-size: 17px;
+}
+
+.job-calc-triage-option.option-paid .job-calc-triage-option-icon {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.job-calc-triage-option.option-paid:hover {
+    background: #f0fdf4;
+}
+
+.job-calc-triage-option.option-expense .job-calc-triage-option-icon {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.job-calc-triage-option.option-expense:hover {
+    background: #fff7ed;
+}
+
+.job-calc-triage-option.option-unmark .job-calc-triage-option-icon {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.job-calc-triage-option.option-unmark:hover {
+    background: #fef2f2;
+}
+
+.job-calc-triage-option-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.job-calc-triage-option-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.job-calc-triage-option-desc {
+    font-size: 0.68rem;
+    color: #64748b;
+    line-height: 1.2;
+}
+
+.job-calc-option-check {
+    margin-left: auto;
+    font-size: 17px;
+    color: #16a34a;
+    flex-shrink: 0;
+}
+
+.job-calc-triage-option.option-expense .job-calc-option-check {
+    color: #ea580c;
+}
+
+.job-calc-triage-popover-divider {
+    height: 1px;
+    background: #f1f5f9;
+    margin: 3px 6px;
 }
 
 /* Color Indicator Strip */
@@ -11104,11 +11519,16 @@ ic {
 .job-calc-title-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    min-width: 0;
+    flex-wrap: nowrap;
 }
 
 .job-calc-job-name {
-    font-size: 0.92rem;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: calc(100% - 35px);
+    font-size: 0.94rem;
     font-weight: 700;
     color: #0f172a;
     white-space: nowrap;
@@ -11118,7 +11538,7 @@ ic {
 
 .job-calc-session-badge {
     flex-shrink: 0;
-    font-size: 0.68rem;
+    font-size: 0.7rem;
     font-weight: 600;
     background: #f1f5f9;
     color: #475569;
@@ -11127,9 +11547,12 @@ ic {
 }
 
 .job-calc-tagline {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     color: #64748b;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Subtotal Badge */
@@ -11144,7 +11567,7 @@ ic {
 .job-calc-subtotal-amount {
     font-size: 0.95rem;
     font-weight: 800;
-    color: #0284c7;
+    color: #059669;
     letter-spacing: -0.2px;
 }
 
@@ -11154,11 +11577,17 @@ ic {
     color: #64748b;
 }
 
+.job-calc-subtotal-badge.job-calc-expense-badge .job-calc-subtotal-amount {
+    color: #dc2626;
+}
+
 /* Card Config Section */
 .job-calc-card-config {
-    padding: 10px 14px 14px 14px;
+    padding: 12px 14px 14px 14px;
     background: #f8fafc;
     border-top: 1px solid #f1f5f9;
+    border-bottom-left-radius: 13px;
+    border-bottom-right-radius: 13px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -11168,6 +11597,113 @@ ic {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+    align-items: flex-end;
+}
+
+.job-calc-custom-inputs-row {
+    grid-template-columns: 0.85fr 1fr 1fr;
+}
+
+.job-calc-groups-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.job-calc-group-row .job-calc-num-input[readonly] {
+    background: #f1f5f9;
+    color: #475569;
+    cursor: default;
+    border-color: #e2e8f0;
+}
+
+@media (max-width: 540px) {
+    .job-calc-inputs-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    .job-calc-custom-inputs-row {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+/* Sleek Compact One-Row Taxable Checkbox */
+.job-calc-taxable-check-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+    width: fit-content;
+    padding: 0;
+    margin-top: -4px;
+    margin-bottom: -1px;
+    line-height: 1;
+}
+
+.job-calc-taxable-checkbox,
+.job-calc-custom-taxable-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    pointer-events: none;
+}
+
+.job-calc-taxable-check-box {
+    width: 11px;
+    height: 11px;
+    border-radius: 2.5px;
+    border: 1.2px solid #cbd5e1;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.job-calc-taxable-check-row:hover .job-calc-taxable-check-box {
+    border-color: #16a34a;
+}
+
+.job-calc-taxable-checkbox:checked + .job-calc-taxable-check-box,
+.job-calc-custom-taxable-checkbox:checked + .job-calc-taxable-check-box {
+    background: #16a34a;
+    border-color: #16a34a;
+}
+
+.job-calc-taxable-checkbox:checked + .job-calc-taxable-check-box::after,
+.job-calc-custom-taxable-checkbox:checked + .job-calc-taxable-check-box::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    width: 2.5px;
+    height: 5px;
+    border: solid #ffffff;
+    border-width: 0 1.4px 1.4px 0;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.job-calc-taxable-check-text {
+    font-size: 0.63rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+    transition: color 0.15s ease;
+}
+
+.job-calc-taxable-check-row:hover .job-calc-taxable-check-text {
+    color: #334155;
+}
+
+.job-calc-taxable-checkbox:checked ~ .job-calc-taxable-check-text,
+.job-calc-custom-taxable-checkbox:checked ~ .job-calc-taxable-check-text {
+    color: #15803d;
 }
 
 .job-calc-input-block {
@@ -11217,6 +11753,16 @@ ic {
     box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
 }
 
+.job-calc-task-card.is-paid .job-calc-num-input:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+.job-calc-task-card.is-expense .job-calc-num-input:focus {
+    border-color: #ea580c;
+    box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.15);
+}
+
 .job-calc-prefix {
     position: absolute;
     left: 8px;
@@ -11226,13 +11772,25 @@ ic {
     pointer-events: none;
 }
 
-.job-calc-rate-input {
+.job-calc-rate-input,
+.job-calc-custom-rate-input {
     padding-left: 20px;
     padding-right: 28px;
 }
 
-.job-calc-hours-input {
+.job-calc-hours-input,
+.job-calc-custom-hours-input {
     padding-right: 32px;
+}
+
+.job-calc-custom-shifts-input {
+    padding-right: 24px;
+}
+
+.job-calc-calendar-expense-input,
+.job-calc-expense-amount-input {
+    padding-left: 20px;
+    padding-right: 10px;
 }
 
 .job-calc-unit {
@@ -11254,14 +11812,30 @@ ic {
     gap: 6px;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #0284c7;
+    color: #059669;
     cursor: pointer;
     transition: color 0.15s;
     user-select: none;
 }
 
 .job-calc-accordion-btn:hover {
-    color: #0369a1;
+    color: #047857;
+}
+
+.job-calc-task-card.is-paid .job-calc-accordion-btn {
+    color: #059669;
+}
+
+.job-calc-task-card.is-paid .job-calc-accordion-btn:hover {
+    color: #047857;
+}
+
+.job-calc-task-card.is-expense .job-calc-accordion-btn {
+    color: #ea580c;
+}
+
+.job-calc-task-card.is-expense .job-calc-accordion-btn:hover {
+    color: #c2410c;
 }
 
 .job-calc-accordion-arrow {
@@ -11356,6 +11930,18 @@ ic {
     box-sizing: border-box;
 }
 
+.job-calc-occ-expense-input {
+    width: 100%;
+    height: 32px;
+    padding: 4px 8px;
+    padding-left: 20px;
+    padding-right: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: right;
+    box-sizing: border-box;
+}
+
 .job-calc-occ-unit {
     position: absolute;
     right: 8px;
@@ -11365,7 +11951,17 @@ ic {
     pointer-events: none;
 }
 
-.job-calc-occ-reset-btn {
+.job-calc-occ-unit-prefix {
+    position: absolute;
+    left: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.job-calc-occ-reset-btn,
+.job-calc-occ-expense-reset-btn {
     border: none;
     background: #e2e8f0;
     color: #475569;
@@ -11381,11 +11977,13 @@ ic {
     flex-shrink: 0;
 }
 
-.job-calc-occ-reset-btn span {
+.job-calc-occ-reset-btn span,
+.job-calc-occ-expense-reset-btn span {
     font-size: 14px;
 }
 
-.job-calc-occ-reset-btn:hover {
+.job-calc-occ-reset-btn:hover,
+.job-calc-occ-expense-reset-btn:hover {
     background: #cbd5e1;
     color: #0f172a;
 }
@@ -11493,18 +12091,34 @@ ic {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    flex-wrap: nowrap;
 }
 
 .job-calc-row-title {
     font-size: 0.88rem;
     font-weight: 600;
     color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .job-calc-sum-bold {
     font-size: 1.05rem;
+    font-weight: 800;
+    color: #059669;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.job-calc-expense-amount {
+    font-size: 1.05rem;
     font-weight: 700;
-    color: #0f172a;
+    color: #dc2626;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* Tax Deduction Row */
@@ -11512,20 +12126,26 @@ ic {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
     padding: 6px 0;
+    flex-wrap: nowrap;
 }
 
 .job-calc-tax-label-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    min-width: 0;
+    flex-shrink: 1;
 }
 
 .job-calc-tax-title {
     font-size: 0.85rem;
     font-weight: 600;
     color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .job-calc-tax-mode-toggle {
@@ -11609,7 +12229,7 @@ ic {
 .job-calc-tax-deduction-amount {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #ef4444;
+    color: #dc2626;
     min-width: 65px;
     text-align: right;
 }
@@ -11909,6 +12529,30 @@ ic {
     word-break: break-word;
 }
 
+.receipt-item-tag-custom {
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin-left: 5px;
+    vertical-align: middle;
+    letter-spacing: 0.3px;
+}
+
+.receipt-item-tag-expense {
+    background: #ffedd5;
+    color: #c2410c;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin-left: 5px;
+    vertical-align: middle;
+    letter-spacing: 0.3px;
+}
+
 .receipt-item-detail {
     font-size: 0.7rem;
     color: #64748b;
@@ -11959,6 +12603,10 @@ ic {
     font-weight: 900;
     color: #0f172a;
     letter-spacing: -0.2px;
+}
+
+.receipt-gross-row #receipt-gross-amount {
+    color: #059669;
 }
 
 /* Net Hero Row */
@@ -12049,4 +12697,106 @@ ic {
 .job-calc-toast.visible {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
+}
+
+/* ==========================================================================
+ * Responsive Mobile Optimizations for Job Calculator
+ * Balanced sweet spot: comfortable spacing & legible fonts without overshooting
+ * ========================================================================== */
+@media (max-width: 480px) {
+    .job-calc-header {
+        padding: 12px 14px;
+    }
+    .job-calc-title {
+        font-size: 1.1rem;
+    }
+    .job-calc-subtitle {
+        font-size: 0.74rem;
+    }
+    .job-calc-btn-close {
+        width: 36px;
+        height: 36px;
+    }
+
+    .job-calc-body {
+        padding: 12px 12px;
+        gap: 12px;
+        padding-bottom: calc(160px + env(safe-area-inset-bottom, 34px));
+    }
+
+    .job-calc-card {
+        padding: 14px 13px;
+        border-radius: 14px;
+        gap: 12px;
+    }
+
+    .job-calc-jobs-header {
+        gap: 8px;
+    }
+    .job-calc-add-custom-btn {
+        padding: 5px 11px;
+        font-size: 0.78rem;
+    }
+
+    .job-calc-date-inputs {
+        gap: 6px;
+    }
+    .job-calc-date-picker {
+        padding: 7px 6px;
+        font-size: 0.78rem;
+        border-radius: 8px;
+    }
+    .job-calc-date-sep {
+        font-size: 13px;
+        margin-top: 16px;
+    }
+
+    .job-calc-tabs {
+        padding: 3px;
+        gap: 3px;
+    }
+    .job-calc-tab {
+        padding: 7px 4px;
+        font-size: 0.77rem;
+    }
+
+    .job-calc-card-main {
+        padding: 11px 12px;
+        gap: 10px;
+    }
+    .job-calc-card-config {
+        padding: 11px 12px 13px 12px;
+    }
+
+    .job-calc-summary-metrics {
+        gap: 8px;
+    }
+    .job-calc-metric {
+        padding: 9px 12px;
+    }
+    .job-calc-metric-label {
+        font-size: 0.68rem;
+    }
+    .job-calc-metric-val {
+        font-size: 1.1rem;
+    }
+
+    .job-calc-tax-field {
+        width: 72px;
+    }
+    .job-calc-tax-val-input {
+        height: 32px;
+        font-size: 0.85rem;
+    }
+
+    .job-calc-net-row {
+        padding: 10px 12px;
+    }
+    .job-calc-net-val {
+        font-size: 1.25rem;
+    }
+
+    .receipt-inner {
+        padding: 14px 14px;
+    }
 }

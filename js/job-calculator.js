@@ -32,12 +32,17 @@
         type: 'percent', // 'percent' | 'amount'
         value: 0
       },
-      jobs: {}
+      jobs: {},
+      customJobs: [],
+      customExpenses: []
       /**
        * "Job Name": {
        *    isPaid: boolean,
+       *    isExpense: boolean,
+       *    expenseAmount: number,
        *    defaultHours: number,
        *    hourlyRate: number,
+       *    isTaxable: boolean,
        *    dateOverrides: { [occKey]: number } // occKey = "YYYY-M-D_morning"
        * }
        */
@@ -62,7 +67,9 @@
               type: parsed.tax?.type === 'amount' ? 'amount' : 'percent',
               value: typeof parsed.tax?.value === 'number' ? parsed.tax.value : (parseFloat(parsed.tax?.value) || 0)
             },
-            jobs: parsed.jobs && typeof parsed.jobs === 'object' ? parsed.jobs : {}
+            jobs: parsed.jobs && typeof parsed.jobs === 'object' ? parsed.jobs : {},
+            customJobs: Array.isArray(parsed.customJobs) ? parsed.customJobs : [],
+            customExpenses: Array.isArray(parsed.customExpenses) ? parsed.customExpenses : []
           };
         }
       }
@@ -83,10 +90,30 @@
     if (!state.settings.jobs[jobName]) {
       state.settings.jobs[jobName] = {
         isPaid: false,
+        isExpense: false,
+        expenseAmount: 0,
         defaultHours: 4,
         hourlyRate: 25,
-        dateOverrides: {}
+        isTaxable: true,
+        dateOverrides: {},
+        expenseOverrides: {}
       };
+    } else {
+      if (state.settings.jobs[jobName].isTaxable === undefined) {
+        state.settings.jobs[jobName].isTaxable = true;
+      }
+      if (state.settings.jobs[jobName].isExpense === undefined) {
+        state.settings.jobs[jobName].isExpense = false;
+      }
+      if (state.settings.jobs[jobName].expenseAmount === undefined) {
+        state.settings.jobs[jobName].expenseAmount = 0;
+      }
+      if (!state.settings.jobs[jobName].dateOverrides) {
+        state.settings.jobs[jobName].dateOverrides = {};
+      }
+      if (!state.settings.jobs[jobName].expenseOverrides) {
+        state.settings.jobs[jobName].expenseOverrides = {};
+      }
     }
     return state.settings.jobs[jobName];
   }
@@ -260,6 +287,8 @@
     let totalSessions = 0;
     let totalHours = 0;
     let grossEarnings = 0;
+    let taxableEarnings = 0;
+    let totalExpenses = 0;
 
     const jobResults = {};
 
@@ -289,39 +318,114 @@
         totalSessions += count;
         totalHours += jobHours;
         grossEarnings += jobSubtotal;
+
+        if (setting.isTaxable !== false) {
+          taxableEarnings += jobSubtotal;
+        }
+      }
+
+      // Check if calendar task is marked as an Expense
+      let jobExpenseTotal = 0;
+      if (setting.isExpense) {
+        const defaultExpAmt = parseFloat(setting.expenseAmount) || 0;
+        job.occurrences.forEach((occ) => {
+          const overrideVal = setting.expenseOverrides?.[occ.occKey];
+          const occExp = (typeof overrideVal === 'number' && !isNaN(overrideVal))
+            ? overrideVal
+            : defaultExpAmt;
+
+          jobExpenseTotal += occExp;
+        });
+
+        totalExpenses += jobExpenseTotal;
       }
 
       jobResults[name] = {
-        isPaid: setting.isPaid,
+        isPaid: setting.isPaid === true,
+        isExpense: setting.isExpense === true,
+        expenseAmount: parseFloat(setting.expenseAmount) || 0,
+        expenseTotal: jobExpenseTotal,
+        isTaxable: setting.isTaxable !== false,
         count: count,
         totalHours: jobHours,
         subtotal: jobSubtotal
       };
     });
 
-    // Tax calculation
+    // Custom / Off-calendar jobs
+    const customResults = {};
+    (state.settings.customJobs || []).forEach((cJob) => {
+      if (cJob.isPaid !== false) {
+        const count = parseInt(cJob.shiftsCount, 10) || 1;
+        const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
+        const rate = parseFloat(cJob.hourlyRate) || 0;
+        const totalCustomHours = count * hoursPerShift;
+        const customSubtotal = totalCustomHours * rate;
+        const isTaxable = cJob.isTaxable === true; // Default false for custom jobs
+
+        totalSessions += count;
+        totalHours += totalCustomHours;
+        grossEarnings += customSubtotal;
+
+        if (isTaxable) {
+          taxableEarnings += customSubtotal;
+        }
+
+        customResults[cJob.id] = {
+          id: cJob.id,
+          name: cJob.name || 'Untitled',
+          count: count,
+          hoursPerShift: hoursPerShift,
+          totalHours: totalCustomHours,
+          hourlyRate: rate,
+          isTaxable: isTaxable,
+          subtotal: customSubtotal
+        };
+      }
+    });
+
+    // Custom / Off-calendar expenses
+    const customExpenseResults = {};
+    (state.settings.customExpenses || []).forEach((cExp) => {
+      const amt = parseFloat(cExp.amount) || 0;
+      totalExpenses += amt;
+      customExpenseResults[cExp.id] = {
+        id: cExp.id,
+        name: cExp.name || 'Expense',
+        amount: amt
+      };
+    });
+
+    // Tax calculation based on TAXABLE earnings
     const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
     const taxVal = parseFloat(taxSetting.value) || 0;
     let taxDeductionAmount = 0;
 
-    if (taxVal > 0 && grossEarnings > 0) {
+    if (taxVal > 0) {
       if (taxSetting.type === 'percent') {
-        taxDeductionAmount = (grossEarnings * taxVal) / 100;
+        if (taxableEarnings > 0) {
+          taxDeductionAmount = (taxableEarnings * taxVal) / 100;
+        }
       } else {
-        taxDeductionAmount = taxVal;
+        taxDeductionAmount = Math.min(grossEarnings, taxVal);
       }
-      taxDeductionAmount = Math.min(grossEarnings, Math.max(0, taxDeductionAmount));
+      taxDeductionAmount = Math.max(0, taxDeductionAmount);
     }
 
-    const netTakeHome = Math.max(0, grossEarnings - taxDeductionAmount);
+    // Net Take-Home: Gross - Tax Deduction - Total Expenses
+    const netTakeHome = Math.max(0, grossEarnings - taxDeductionAmount - totalExpenses);
 
     return {
       totalSessions,
       totalHours,
       grossEarnings,
+      taxableEarnings,
       taxDeductionAmount,
+      totalExpenses,
       netTakeHome,
-      jobResults
+      jobResults,
+      customResults,
+      customExpenseResults
     };
   }
 
@@ -331,7 +435,7 @@
 
   function ensureCalculatorDOM() {
     const existing = document.getElementById('job-calculator-container');
-    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('job-calc-tax-field')) {
+    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.innerHTML.includes('Financial Summary')) {
       return;
     }
 
@@ -349,9 +453,6 @@
       <!-- Sticky Header -->
       <header class="job-calc-header">
         <div class="job-calc-header-left">
-          <button type="button" class="job-calc-btn-back" id="job-calc-btn-back" title="Back to Calendar">
-            <span class="material-symbols-outlined">arrow_back</span>
-          </button>
           <div class="job-calc-title-group">
             <div class="job-calc-title-row">
               <svg class="job-calc-header-icon" viewBox="0 -960 960 960" width="22" height="22" fill="currentColor">
@@ -362,12 +463,15 @@
             <span class="job-calc-subtitle" id="job-calc-subtitle">Monthly Shift Calculator</span>
           </div>
         </div>
+        <button type="button" class="job-calc-btn-close" id="job-calc-btn-back" title="Close (Back to Calendar)">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </header>
 
       <!-- Scrollable Main Content -->
       <div class="job-calc-body">
         
-        <!-- Date Range Filter Card -->
+        <!-- 1. Date Range Filter Card -->
         <section class="job-calc-card job-calc-date-card">
           <div class="job-calc-card-header">
             <span class="material-symbols-outlined job-calc-card-icon">calendar_month</span>
@@ -395,38 +499,55 @@
           </div>
         </section>
 
-        <!-- Controls / Filter Tabs -->
-        <section class="job-calc-controls-bar">
-          <div class="job-calc-tabs">
-            <button type="button" class="job-calc-tab active" data-tab="paid" id="job-calc-tab-paid">
-              Paid (<span id="job-calc-count-paid">0</span>)
-            </button>
-            <button type="button" class="job-calc-tab" data-tab="all" id="job-calc-tab-all">
-              All (<span id="job-calc-count-all">0</span>)
+        <!-- 2. Schedules Card (Containerized Work Section) -->
+        <section class="job-calc-card job-calc-jobs-card" id="job-calc-jobs-card">
+          <div class="job-calc-card-header job-calc-jobs-header">
+            <div class="job-calc-header-title-wrap">
+              <span class="material-symbols-outlined job-calc-card-icon">calendar_today</span>
+              <span class="job-calc-card-title">Schedules</span>
+            </div>
+            <button type="button" class="job-calc-add-custom-btn" id="job-calc-add-custom-btn" title="Add off-calendar earnings or expense">
+              <span class="material-symbols-outlined">add</span>
+              <span>Add Custom</span>
             </button>
           </div>
-          <div class="job-calc-search-box">
-            <span class="material-symbols-outlined job-calc-search-icon">search</span>
-            <input type="text" id="job-calc-search-input" placeholder="Search..." autocomplete="off">
-            <button type="button" class="job-calc-search-clear" id="job-calc-search-clear" style="display: none;">✕</button>
+
+          <!-- Controls / Filter Tabs -->
+          <div class="job-calc-controls-bar">
+            <div class="job-calc-tabs">
+              <button type="button" class="job-calc-tab active" data-tab="paid" id="job-calc-tab-paid">
+                Earnings (<span id="job-calc-count-paid">0</span>)
+              </button>
+              <button type="button" class="job-calc-tab" data-tab="expenses" id="job-calc-tab-expenses">
+                Expenses (<span id="job-calc-count-expenses">0</span>)
+              </button>
+              <button type="button" class="job-calc-tab" data-tab="all" id="job-calc-tab-all">
+                All (<span id="job-calc-count-all">0</span>)
+              </button>
+            </div>
+            <div class="job-calc-search-box">
+              <span class="material-symbols-outlined job-calc-search-icon">search</span>
+              <input type="text" id="job-calc-search-input" placeholder="Search..." autocomplete="off">
+              <button type="button" class="job-calc-search-clear" id="job-calc-search-clear" style="display: none;">✕</button>
+            </div>
+          </div>
+
+          <!-- Tasks List Container -->
+          <div class="job-calc-tasks-list" id="job-calc-tasks-list">
+            <!-- Injected dynamically -->
           </div>
         </section>
 
-        <!-- Tasks List Container -->
-        <section class="job-calc-tasks-list" id="job-calc-tasks-list">
-          <!-- Injected dynamically -->
-        </section>
-
-        <!-- Financial Summary & Tax Deduction Card -->
+        <!-- 3. Financial Summary & Tax Deduction Card -->
         <section class="job-calc-card job-calc-summary-card" id="job-calc-summary-card">
           <div class="job-calc-card-header">
             <span class="material-symbols-outlined job-calc-card-icon">receipt_long</span>
-            <span class="job-calc-card-title">Earnings Summary</span>
+            <span class="job-calc-card-title">Financial Summary</span>
           </div>
 
           <div class="job-calc-summary-metrics">
             <div class="job-calc-metric">
-              <span class="job-calc-metric-label">Paid Shifts</span>
+              <span class="job-calc-metric-label">Earning Shifts</span>
               <span class="job-calc-metric-val" id="job-calc-sum-sessions">0x</span>
             </div>
             <div class="job-calc-metric">
@@ -460,13 +581,19 @@
               </div>
             </div>
 
+            <!-- Expenses Row (Included only when expenses exist) -->
+            <div class="job-calc-summary-row" id="job-calc-expense-summary-row" style="display: none;">
+              <span class="job-calc-row-title">Expenses</span>
+              <span class="job-calc-expense-amount" id="job-calc-sum-expenses">-$0.00</span>
+            </div>
+
             <div class="job-calc-divider"></div>
 
             <!-- Net Take-Home Row -->
             <div class="job-calc-summary-row job-calc-net-row">
               <div class="job-calc-net-label-wrap">
                 <span class="job-calc-net-label">Net Take-Home Pay</span>
-                <span class="job-calc-net-sublabel">After tax deduction</span>
+                <span class="job-calc-net-sublabel">After tax & expenses</span>
               </div>
               <span class="job-calc-net-val" id="job-calc-sum-net">$0.00</span>
             </div>
@@ -513,7 +640,7 @@
               <!-- Calendar Shifts -->
               <div class="receipt-section" id="receipt-shifts-section">
                 <div class="receipt-section-header">
-                  <span>CALENDAR SHIFTS</span>
+                  <span>CALENDAR SHIFTS & WORK</span>
                   <span id="receipt-shifts-count">0x</span>
                 </div>
                 <div class="receipt-items-list" id="receipt-shifts-list">
@@ -531,6 +658,22 @@
               <div class="receipt-gross-row">
                 <span>GROSS EARNINGS</span>
                 <span id="receipt-gross-amount">$0.00</span>
+              </div>
+
+              <!-- Expenses (if any) -->
+              <div class="receipt-section" id="receipt-expenses-section" style="display: none;">
+                <div class="receipt-divider-dash"></div>
+                <div class="receipt-section-header">
+                  <span>EXPENSES</span>
+                  <span id="receipt-expenses-count">0x</span>
+                </div>
+                <div class="receipt-items-list" id="receipt-expenses-list">
+                  <!-- Dynamic expense lines -->
+                </div>
+                <div class="receipt-subtotal-row">
+                  <span>EXPENSES TOTAL</span>
+                  <span class="receipt-item-deduction" id="receipt-expenses-subtotal">-$0.00</span>
+                </div>
               </div>
 
               <!-- Tax Deduction (if any) -->
@@ -572,7 +715,7 @@
 
           <!-- Actions Row Below Ticket -->
           <div class="job-calc-actions-row">
-            <button type="button" class="job-calc-action-btn job-calc-btn-back-summary" id="job-calc-btn-back-summary" title="Back to Earnings Summary">
+            <button type="button" class="job-calc-action-btn job-calc-btn-back-summary" id="job-calc-btn-back-summary" title="Back to Financial Summary">
               <span class="material-symbols-outlined">arrow_back</span>
               <span>View Summary</span>
             </button>
@@ -632,8 +775,8 @@
     const toInput = container.querySelector('#job-calc-to-date');
 
     const handleCustomDateChange = () => {
-      const fromVal = fromInput.value;
-      const toVal = toInput.value;
+      const fromVal = fromInput?.value;
+      const toVal = toInput?.value;
       if (fromVal && toVal) {
         state.fromDate = fromVal;
         state.toDate = toVal;
@@ -644,28 +787,64 @@
       }
     };
 
-    if (fromInput) fromInput.addEventListener('change', handleCustomDateChange);
-    if (toInput) toInput.addEventListener('change', handleCustomDateChange);
+    const triggerDatePicker = (input) => {
+      if (!input) return;
+      try {
+        if (typeof input.showPicker === 'function') {
+          input.showPicker();
+        } else {
+          input.focus();
+        }
+      } catch (err) {
+        // Fallback for browsers or when already presenting picker
+        input.focus();
+      }
+    };
 
-    // Tabs
-    const tabAll = container.querySelector('#job-calc-tab-all');
-    const tabPaid = container.querySelector('#job-calc-tab-paid');
+    if (fromInput) {
+      fromInput.addEventListener('change', handleCustomDateChange);
+      fromInput.addEventListener('click', () => triggerDatePicker(fromInput));
+    }
+    if (toInput) {
+      toInput.addEventListener('change', handleCustomDateChange);
+      toInput.addEventListener('click', () => triggerDatePicker(toInput));
+    }
 
-    if (tabAll) {
-      tabAll.addEventListener('click', () => {
-        state.activeTab = 'all';
-        tabAll.classList.add('active');
-        tabPaid.classList.remove('active');
+    container.querySelectorAll('.job-calc-date-field').forEach((field) => {
+      field.addEventListener('click', (e) => {
+        const input = field.querySelector('.job-calc-date-picker');
+        if (input && e.target !== input) {
+          triggerDatePicker(input);
+        }
+      });
+    });
+
+    // Tabs (Paid, Expenses, All)
+    const tabsWrap = container.querySelector('.job-calc-tabs');
+    if (tabsWrap) {
+      tabsWrap.addEventListener('click', (e) => {
+        const tabBtn = e.target.closest('.job-calc-tab');
+        if (!tabBtn) return;
+        const tabName = tabBtn.dataset.tab;
+        if (!tabName || state.activeTab === tabName) return;
+
+        state.activeTab = tabName;
+        tabsWrap.querySelectorAll('.job-calc-tab').forEach((t) => {
+          t.classList.toggle('active', t === tabBtn);
+        });
         renderTasksList();
       });
     }
 
-    if (tabPaid) {
-      tabPaid.addEventListener('click', () => {
-        state.activeTab = 'paid';
-        tabPaid.classList.add('active');
-        tabAll.classList.remove('active');
-        renderTasksList();
+    // Add Custom Job or Expense Button
+    const addCustomBtn = container.querySelector('#job-calc-add-custom-btn');
+    if (addCustomBtn) {
+      addCustomBtn.addEventListener('click', () => {
+        if (state.activeTab === 'expenses') {
+          handleAddCustomExpense();
+        } else {
+          handleAddCustomJob();
+        }
       });
     }
 
@@ -815,8 +994,80 @@
   }
 
   /* ==========================================================================
-   * 7. Rendering Logic
+   * 7. Rendering Logic & Custom Jobs Handling
    * ========================================================================== */
+
+  function handleAddCustomJob() {
+    const container = document.getElementById('job-calculator-container');
+    if (!container) return;
+
+    state.settings.customJobs = state.settings.customJobs || [];
+    const newId = 'custom_' + Date.now();
+    state.settings.customJobs.unshift({
+      id: newId,
+      name: 'Untitled',
+      shiftsCount: 1,
+      hoursPerShift: 4,
+      hourlyRate: 25,
+      isPaid: true,
+      isTaxable: false
+    });
+    saveSettings();
+
+    // If on All or Expenses tab, switch to Paid tab so user sees new card immediately
+    if (state.activeTab !== 'paid') {
+      state.activeTab = 'paid';
+      const tabs = container.querySelectorAll('.job-calc-tab');
+      tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === 'paid'));
+    }
+
+    renderTasksList();
+    updateSummaryCard();
+
+    // Focus on new job name input for instant typing
+    const newCard = container.querySelector(`[data-custom-id="${newId}"]`);
+    if (newCard) {
+      const nameInput = newCard.querySelector('.job-calc-custom-name-input');
+      if (nameInput) {
+        nameInput.focus();
+        nameInput.select();
+      }
+    }
+  }
+
+  function handleAddCustomExpense() {
+    const container = document.getElementById('job-calculator-container');
+    if (!container) return;
+
+    state.settings.customExpenses = state.settings.customExpenses || [];
+    const newId = 'exp_' + Date.now();
+    state.settings.customExpenses.unshift({
+      id: newId,
+      name: 'Untitled',
+      amount: 25
+    });
+    saveSettings();
+
+    // If not on Expenses tab, switch to Expenses tab so user sees new card immediately
+    if (state.activeTab !== 'expenses') {
+      state.activeTab = 'expenses';
+      const tabs = container.querySelectorAll('.job-calc-tab');
+      tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === 'expenses'));
+    }
+
+    renderTasksList();
+    updateSummaryCard();
+
+    // Focus on new expense name input for instant typing
+    const newCard = container.querySelector(`[data-expense-id="${newId}"]`);
+    if (newCard) {
+      const nameInput = newCard.querySelector('.job-calc-expense-name-input');
+      if (nameInput) {
+        nameInput.focus();
+        nameInput.select();
+      }
+    }
+  }
 
   function renderAll() {
     updateDateInputs();
@@ -831,63 +1082,125 @@
     const listEl = container.querySelector('#job-calc-tasks-list');
     const countAllEl = container.querySelector('#job-calc-count-all');
     const countPaidEl = container.querySelector('#job-calc-count-paid');
+    const countExpensesEl = container.querySelector('#job-calc-count-expenses');
 
     if (!listEl) return;
 
+    // Dynamically update the header button label based on active tab
+    const addBtn = container.querySelector('#job-calc-add-custom-btn');
+    if (addBtn) {
+      if (state.activeTab === 'expenses') {
+        addBtn.style.display = '';
+        addBtn.classList.add('is-expense');
+        addBtn.innerHTML = `<span class="material-symbols-outlined">add</span><span>Add Expenses</span>`;
+        addBtn.title = 'Add custom expenses';
+      } else if (state.activeTab === 'paid') {
+        addBtn.style.display = '';
+        addBtn.classList.remove('is-expense');
+        addBtn.innerHTML = `<span class="material-symbols-outlined">add</span><span>Add Earnings</span>`;
+        addBtn.title = 'Add off-calendar earnings';
+      } else {
+        // In 'all' tab, hide add custom button
+        addBtn.style.display = 'none';
+      }
+    }
+
     const allNames = Object.keys(scannedJobs);
     const paidNames = allNames.filter((name) => getJobSetting(name).isPaid);
+    const expenseNames = allNames.filter((name) => getJobSetting(name).isExpense);
 
-    if (countAllEl) countAllEl.textContent = allNames.length;
-    if (countPaidEl) countPaidEl.textContent = paidNames.length;
+    const customJobs = state.settings.customJobs || [];
+    const paidCustomJobs = customJobs.filter((c) => c.isPaid !== false);
 
-    // Filter by tab and search
-    let visibleNames = state.activeTab === 'paid' ? paidNames : allNames;
+    const customExpenses = state.settings.customExpenses || [];
 
+    if (countAllEl) countAllEl.textContent = allNames.length + customJobs.length + customExpenses.length;
+    if (countPaidEl) countPaidEl.textContent = paidNames.length + paidCustomJobs.length;
+    if (countExpensesEl) countExpensesEl.textContent = expenseNames.length + customExpenses.length;
+
+    // Filter by tab
+    let visibleNames = [];
+    let visibleCustomJobs = [];
+    let visibleCustomExpenses = [];
+
+    if (state.activeTab === 'paid') {
+      visibleNames = [...paidNames];
+      visibleCustomJobs = [...paidCustomJobs];
+      visibleCustomExpenses = [];
+    } else if (state.activeTab === 'expenses') {
+      visibleNames = [...expenseNames];
+      visibleCustomJobs = [];
+      visibleCustomExpenses = [...customExpenses];
+    } else {
+      // 'all'
+      visibleNames = [...allNames];
+      visibleCustomJobs = [...customJobs];
+      visibleCustomExpenses = [...customExpenses];
+    }
+
+    // Filter by search
     if (state.searchQuery) {
       visibleNames = visibleNames.filter((name) =>
         name.toLowerCase().includes(state.searchQuery)
       );
+      visibleCustomJobs = visibleCustomJobs.filter((c) =>
+        (c.name || 'Untitled').toLowerCase().includes(state.searchQuery)
+      );
+      visibleCustomExpenses = visibleCustomExpenses.filter((e) =>
+        (e.name || 'Custom Expenses').toLowerCase().includes(state.searchQuery)
+      );
     }
 
-    // Sort: Paid jobs first, then by frequency
+    // Sort calendar jobs: in All tab, triage items (Paid or Expense) first, then frequency
     visibleNames.sort((a, b) => {
-      const isPaidA = getJobSetting(a).isPaid ? 1 : 0;
-      const isPaidB = getJobSetting(b).isPaid ? 1 : 0;
-      if (isPaidA !== isPaidB) return isPaidB - isPaidA;
+      const setA = getJobSetting(a);
+      const setB = getJobSetting(b);
+      const scoredA = setA.isPaid ? 2 : (setA.isExpense ? 1 : 0);
+      const scoredB = setB.isPaid ? 2 : (setB.isExpense ? 1 : 0);
+      if (scoredA !== scoredB) return scoredB - scoredA;
       return scannedJobs[b].occurrences.length - scannedJobs[a].occurrences.length;
     });
 
-    if (visibleNames.length === 0) {
+    if (visibleNames.length === 0 && visibleCustomJobs.length === 0 && visibleCustomExpenses.length === 0) {
+      const isPaidTab = state.activeTab === 'paid';
+      const isExpTab = state.activeTab === 'expenses';
+
       listEl.innerHTML = `
         <div class="job-calc-empty-state">
           <span class="material-symbols-outlined job-calc-empty-icon">
-            ${state.activeTab === 'paid' ? 'account_balance_wallet' : 'event_busy'}
+            ${isPaidTab ? 'account_balance_wallet' : (isExpTab ? 'receipt_long' : 'event_busy')}
           </span>
           <p class="job-calc-empty-title">
             ${
               state.searchQuery
-                ? 'No matching tasks'
-                : state.activeTab === 'paid'
-                ? 'No Paid Jobs Selected Yet'
+                ? 'No matching items'
+                : isPaidTab
+                ? 'No Earnings Selected Yet'
+                : isExpTab
+                ? 'No Expenses Logged Yet'
                 : 'No Tasks Found'
             }
           </p>
           <p class="job-calc-empty-text">
             ${
               state.searchQuery
-                ? `No tasks match "<b>${escapeHtml(state.searchQuery)}</b>".`
-                : state.activeTab === 'paid'
-                ? `You haven't added any paid jobs to this calculation yet. Switch to "All" to pick your paid work.`
+                ? `No items match "<b>${escapeHtml(state.searchQuery)}</b>".`
+                : isPaidTab
+                ? `You haven't added any earnings to this calculation yet. Switch to "All" to categorize calendar tasks, or use "+ Add Earnings" above.`
+                : isExpTab
+                ? `Track work-related expenses (gas, supplies, tools) to deduct them from your net pay. Switch to "All" or use "+ Add Expenses" above.`
                 : `No tasks found in the schedule between ${state.fromDate} and ${state.toDate}.`
             }
           </p>
-          ${
-            state.activeTab === 'paid' && !state.searchQuery
-              ? `<button type="button" class="job-calc-empty-action-btn" id="job-calc-switch-to-all">
-                   Browse All (${allNames.length}) →
-                 </button>`
-              : ''
-          }
+          <div class="job-calc-empty-actions">
+            ${
+              (isPaidTab || isExpTab) && !state.searchQuery && allNames.length > 0
+                ? `<button type="button" class="job-calc-empty-action-btn" id="job-calc-switch-to-all">
+                     Browse All (${allNames.length}) →
+                   </button>`
+                : ''
+            }
+          </div>
         </div>
       `;
 
@@ -895,10 +1208,8 @@
       if (switchToAllBtn) {
         switchToAllBtn.addEventListener('click', () => {
           state.activeTab = 'all';
-          const tabAll = container.querySelector('#job-calc-tab-all');
-          const tabPaid = container.querySelector('#job-calc-tab-paid');
-          if (tabAll) tabAll.classList.add('active');
-          if (tabPaid) tabPaid.classList.remove('active');
+          const tabs = container.querySelectorAll('.job-calc-tab');
+          tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === 'all'));
           renderTasksList();
         });
       }
@@ -906,28 +1217,205 @@
       return;
     }
 
-    const { jobResults } = calculateTotals();
+    const { jobResults, customResults } = calculateTotals();
 
     let html = '';
-    visibleNames.forEach((name) => {
-      const job = scannedJobs[name];
-      const setting = getJobSetting(name);
-      const isPaid = setting.isPaid;
-      const count = job.occurrences.length;
-      const result = jobResults[name] || { totalHours: 0, subtotal: 0 };
-      const isAccordionOpen = state.expandedJobs.has(name);
 
+    // 1. Render Custom Expenses (in Expenses or All tab)
+    visibleCustomExpenses.forEach((cExp) => {
+      const amt = parseFloat(cExp.amount) || 0;
       html += `
-        <div class="job-calc-task-card ${isPaid ? 'is-paid' : 'is-unpaid'}" data-job-name="${escapeHtml(name)}">
+        <div class="job-calc-task-card job-calc-expense-card is-expense" data-expense-id="${escapeHtml(cExp.id)}">
           
           <!-- Card Header / Main Row -->
           <div class="job-calc-card-main">
-            <label class="job-calc-checkbox-label" title="${isPaid ? 'Mark as Unpaid' : 'Mark as Paid Job'}">
-              <input type="checkbox" class="job-calc-paid-checkbox" ${isPaid ? 'checked' : ''}>
-              <span class="job-calc-custom-checkbox">
-                <span class="material-symbols-outlined">check</span>
-              </span>
+            <!-- Delete Box -->
+            <div class="job-calc-triage-wrap">
+              <button type="button" 
+                      class="job-calc-triage-btn is-expense job-calc-custom-expense-delete-box" 
+                      data-action="delete-custom-expense" 
+                      title="Remove custom expenses">
+                <span class="material-symbols-outlined job-calc-triage-icon">delete</span>
+              </button>
+            </div>
+
+            <div class="job-calc-color-indicator job-calc-expense-indicator" title="Custom Expenses"></div>
+
+            <div class="job-calc-card-info">
+              <div class="job-calc-title-row">
+                <input type="text" class="job-calc-expense-name-input" value="${escapeHtml(cExp.name || 'Untitled')}" placeholder="Untitled">
+              </div>
+              <div class="job-calc-tagline">Custom Expenses</div>
+            </div>
+
+            <!-- Subtotal Pill -->
+            <div class="job-calc-subtotal-badge job-calc-expense-badge">
+              <span class="job-calc-subtotal-amount">-$${amt.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <!-- Config Section -->
+          <div class="job-calc-card-config">
+            <div class="job-calc-inputs-row">
+              <div class="job-calc-input-block" style="flex: 1;">
+                <label>Cost ($)</label>
+                <div class="job-calc-input-wrapper">
+                  <span class="job-calc-prefix">$</span>
+                  <input type="number" class="job-calc-expense-amount-input job-calc-num-input" min="0" step="0.5" value="${cExp.amount ?? 25}">
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      `;
+    });
+
+    // 2. Render Custom Jobs (in Paid or All tab)
+    visibleCustomJobs.forEach((cJob) => {
+      const cRes = customResults?.[cJob.id] || {
+        totalHours: (cJob.shiftsCount || 1) * (cJob.hoursPerShift || 4),
+        subtotal: (cJob.shiftsCount || 1) * (cJob.hoursPerShift || 4) * (cJob.hourlyRate || 25)
+      };
+
+      html += `
+        <div class="job-calc-task-card job-calc-custom-card is-paid" data-custom-id="${escapeHtml(cJob.id)}">
+          
+          <!-- Card Header / Main Row -->
+          <div class="job-calc-card-main">
+            <!-- Delete Box -->
+            <div class="job-calc-triage-wrap">
+              <button type="button" 
+                      class="job-calc-triage-btn is-paid job-calc-custom-earnings-delete-box" 
+                      data-action="delete-custom-job"
+                      title="Remove custom earnings">
+                <span class="material-symbols-outlined job-calc-triage-icon">delete</span>
+              </button>
+            </div>
+
+            <div class="job-calc-color-indicator job-calc-custom-indicator" title="Custom Earnings"></div>
+
+            <div class="job-calc-card-info">
+              <div class="job-calc-title-row">
+                <input type="text" class="job-calc-custom-name-input" value="${escapeHtml(cJob.name || 'Untitled')}" placeholder="Untitled">
+              </div>
+              <div class="job-calc-tagline">Custom Earnings</div>
+            </div>
+
+            <!-- Subtotal Pill -->
+            <div class="job-calc-subtotal-badge">
+              <span class="job-calc-subtotal-amount">$${cRes.subtotal.toFixed(2)}</span>
+              <span class="job-calc-subtotal-hours">${cRes.totalHours.toFixed(1)} hrs</span>
+            </div>
+          </div>
+
+          <!-- Config Section -->
+          <div class="job-calc-card-config">
+            <div class="job-calc-inputs-row job-calc-custom-inputs-row">
+              <div class="job-calc-input-block">
+                <label>Shifts</label>
+                <div class="job-calc-input-wrapper">
+                  <input type="number" class="job-calc-custom-shifts-input job-calc-num-input" min="1" step="1" value="${cJob.shiftsCount ?? 1}">
+                  <span class="job-calc-unit">x</span>
+                </div>
+              </div>
+
+              <div class="job-calc-input-block">
+                <label>Hours / Shift</label>
+                <div class="job-calc-input-wrapper">
+                  <input type="number" class="job-calc-custom-hours-input job-calc-num-input" min="0" step="0.25" value="${cJob.hoursPerShift ?? 4}">
+                  <span class="job-calc-unit">hrs</span>
+                </div>
+              </div>
+
+              <div class="job-calc-input-block">
+                <label>Rate ($/hr)</label>
+                <div class="job-calc-input-wrapper">
+                  <span class="job-calc-prefix">$</span>
+                  <input type="number" class="job-calc-custom-rate-input job-calc-num-input" min="0" step="0.5" value="${cJob.hourlyRate ?? 25}">
+                  <span class="job-calc-unit">/hr</span>
+                </div>
+              </div>
+            </div>
+
+            <label class="job-calc-taxable-check-row" title="${cJob.isTaxable === true ? 'Subject to tax deduction' : 'Untaxed earnings'}">
+              <input type="checkbox" class="job-calc-custom-taxable-checkbox" ${cJob.isTaxable === true ? 'checked' : ''}>
+              <span class="job-calc-taxable-check-box"></span>
+              <span class="job-calc-taxable-check-text">Taxable</span>
             </label>
+          </div>
+
+        </div>
+      `;
+    });
+
+    // 3. Render Calendar Scanned Jobs
+    visibleNames.forEach((name) => {
+      const job = scannedJobs[name];
+      const setting = getJobSetting(name);
+      const isPaid = setting.isPaid === true;
+      const isExpense = setting.isExpense === true;
+      const isMarked = isPaid || isExpense;
+      const count = job.occurrences.length;
+      const result = jobResults[name] || { totalHours: 0, subtotal: 0, expenseTotal: 0 };
+      const isAccordionOpen = state.expandedJobs.has(name);
+
+      let cardClass = 'job-calc-task-card';
+      if (isPaid) cardClass += ' is-paid';
+      else if (isExpense) cardClass += ' is-expense';
+      else cardClass += ' is-unpaid';
+
+      let tagline = 'Personal / Errand (Excluded)';
+      if (isPaid) tagline = 'Earnings / Job';
+      else if (isExpense) tagline = 'Expenses / Deduction';
+
+      const checkClass = isPaid ? 'is-paid' : (isExpense ? 'is-expense' : 'is-unmarked');
+
+      html += `
+        <div class="${cardClass}" data-job-name="${escapeHtml(name)}">
+          
+          <!-- Card Header / Main Row -->
+          <div class="job-calc-card-main">
+            <!-- Triage Checkbox with Popover Menu -->
+            <div class="job-calc-triage-wrap">
+              <button type="button" 
+                      class="job-calc-triage-btn ${checkClass}" 
+                      data-action="open-triage-menu" 
+                      title="${isPaid ? 'Earnings (Click to change or exclude)' : (isExpense ? 'Expenses (Click to change or exclude)' : 'Categorize Task')}">
+                <span class="material-symbols-outlined job-calc-triage-icon">check</span>
+              </button>
+
+              <!-- Popover Menu -->
+              <div class="job-calc-triage-popover hidden">
+                <div class="job-calc-triage-popover-header">Categorize Task</div>
+                <button type="button" class="job-calc-triage-option option-paid ${isPaid ? 'selected' : ''}" data-triage-type="paid">
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">work</span></div>
+                  <div class="job-calc-triage-option-info">
+                    <span class="job-calc-triage-option-title">Earnings</span>
+                    <span class="job-calc-triage-option-desc">Earn income (Hours × Rate)</span>
+                  </div>
+                  ${isPaid ? '<span class="material-symbols-outlined job-calc-option-check">check</span>' : ''}
+                </button>
+                <button type="button" class="job-calc-triage-option option-expense ${isExpense ? 'selected' : ''}" data-triage-type="expense">
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">receipt_long</span></div>
+                  <div class="job-calc-triage-option-info">
+                    <span class="job-calc-triage-option-title">Expenses</span>
+                    <span class="job-calc-triage-option-desc">Out-of-pocket cost deduction</span>
+                  </div>
+                  ${isExpense ? '<span class="material-symbols-outlined job-calc-option-check">check</span>' : ''}
+                </button>
+                ${isMarked ? `
+                  <div class="job-calc-triage-popover-divider"></div>
+                  <button type="button" class="job-calc-triage-option option-unmark" data-triage-type="unmark">
+                    <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">cancel</span></div>
+                    <div class="job-calc-triage-option-info">
+                      <span class="job-calc-triage-option-title">Exclude Task</span>
+                      <span class="job-calc-triage-option-desc">Mark as personal / remove computation</span>
+                    </div>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
 
             <div class="job-calc-color-indicator" style="background-color: ${escapeHtml(job.color)};" title="Calendar Color"></div>
 
@@ -937,53 +1425,84 @@
                 <span class="job-calc-session-badge">${count}x</span>
               </div>
               <div class="job-calc-tagline">
-                ${isPaid ? 'Paid Work / Job' : 'Personal / Errand (Excluded)'}
+                ${tagline}
               </div>
             </div>
 
-            <!-- Subtotal Pill -->
-            <div class="job-calc-subtotal-badge" style="${isPaid ? '' : 'display: none;'}">
-              <span class="job-calc-subtotal-amount">$${result.subtotal.toFixed(2)}</span>
-              <span class="job-calc-subtotal-hours">${result.totalHours.toFixed(1)} hrs</span>
-            </div>
+            <!-- Subtotal Badge for Paid or Expense -->
+            ${
+              isPaid
+                ? `<div class="job-calc-subtotal-badge">
+                     <span class="job-calc-subtotal-amount">$${result.subtotal.toFixed(2)}</span>
+                     <span class="job-calc-subtotal-hours">${result.totalHours.toFixed(1)} hrs</span>
+                   </div>`
+                : (isExpense
+                ? `<div class="job-calc-subtotal-badge job-calc-expense-badge">
+                     <span class="job-calc-subtotal-amount">-$${(result.expenseTotal || 0).toFixed(2)}</span>
+                   </div>`
+                : '')
+            }
           </div>
 
           <!-- Config Section (Visible when Paid) -->
-          <div class="job-calc-card-config" style="${isPaid ? '' : 'display: none;'}">
-            
-            <div class="job-calc-inputs-row">
-              <div class="job-calc-input-block">
-                <label>Hours / Shift</label>
-                <div class="job-calc-input-wrapper">
-                  <input type="number" class="job-calc-hours-input job-calc-num-input" min="0" step="0.25" value="${setting.defaultHours ?? 4}" placeholder="4">
-                  <span class="job-calc-unit">hrs</span>
+          ${
+            isPaid ? `
+              <div class="job-calc-card-config">
+                <div class="job-calc-groups-wrap">
+                  ${renderJobInputsHtml(name, job, setting)}
+                </div>
+
+                <label class="job-calc-taxable-check-row" title="${setting.isTaxable !== false ? 'Subject to tax deduction' : 'Untaxed earnings'}">
+                  <input type="checkbox" class="job-calc-taxable-checkbox" ${setting.isTaxable !== false ? 'checked' : ''}>
+                  <span class="job-calc-taxable-check-box"></span>
+                  <span class="job-calc-taxable-check-text">Taxable</span>
+                </label>
+
+                <!-- Accordion Toggle Button -->
+                <button type="button" class="job-calc-accordion-btn ${isAccordionOpen ? 'active' : ''}">
+                  <span class="material-symbols-outlined job-calc-accordion-arrow">
+                    ${isAccordionOpen ? 'expand_less' : 'expand_more'}
+                  </span>
+                  <span>View & Adjust Specific Dates (${count})</span>
+                </button>
+
+                <!-- Accordion Dates List -->
+                <div class="job-calc-dates-accordion ${isAccordionOpen ? '' : 'hidden'}">
+                  ${renderJobOccurrencesHtml(job, setting)}
                 </div>
               </div>
+            ` : ''
+          }
 
-              <div class="job-calc-input-block">
-                <label>Rate ($/hr)</label>
-                <div class="job-calc-input-wrapper">
-                  <span class="job-calc-prefix">$</span>
-                  <input type="number" class="job-calc-rate-input job-calc-num-input" min="0" step="0.5" value="${setting.hourlyRate ?? 25}" placeholder="25">
-                  <span class="job-calc-unit">/hr</span>
+          <!-- Config Section (Visible when Expense) -->
+          ${
+            isExpense ? `
+              <div class="job-calc-card-config">
+                <div class="job-calc-inputs-row">
+                  <div class="job-calc-input-block" style="flex: 1;">
+                    <label>Cost / Occurrence ($)</label>
+                    <div class="job-calc-input-wrapper">
+                      <span class="job-calc-prefix">$</span>
+                      <input type="number" class="job-calc-calendar-expense-input job-calc-num-input" min="0" step="0.5" value="${setting.expenseAmount ?? 0}">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Accordion Toggle Button -->
+                <button type="button" class="job-calc-accordion-btn ${isAccordionOpen ? 'active' : ''}">
+                  <span class="material-symbols-outlined job-calc-accordion-arrow">
+                    ${isAccordionOpen ? 'expand_less' : 'expand_more'}
+                  </span>
+                  <span>View & Adjust Specific Dates (${count})</span>
+                </button>
+
+                <!-- Accordion Dates List -->
+                <div class="job-calc-dates-accordion ${isAccordionOpen ? '' : 'hidden'}">
+                  ${renderExpenseOccurrencesHtml(job, setting)}
                 </div>
               </div>
-            </div>
-
-            <!-- Accordion Toggle Button -->
-            <button type="button" class="job-calc-accordion-btn ${isAccordionOpen ? 'active' : ''}">
-              <span class="material-symbols-outlined job-calc-accordion-arrow">
-                ${isAccordionOpen ? 'expand_less' : 'expand_more'}
-              </span>
-              <span>View & Adjust Specific Dates (${count})</span>
-            </button>
-
-            <!-- Accordion Dates List -->
-            <div class="job-calc-dates-accordion ${isAccordionOpen ? '' : 'hidden'}">
-              ${renderJobOccurrencesHtml(job, setting)}
-            </div>
-
-          </div>
+            ` : ''
+          }
 
         </div>
       `;
@@ -991,6 +1510,263 @@
 
     listEl.innerHTML = html;
     bindCardEvents(listEl);
+  }
+
+  function getJobHoursGroups(job, setting) {
+    const defaultHours = typeof setting.defaultHours === 'number' ? setting.defaultHours : 4;
+    const groupsMap = new Map();
+
+    (job.occurrences || []).forEach((occ) => {
+      const hasOverride = typeof setting.dateOverrides?.[occ.occKey] === 'number';
+      const hoursVal = hasOverride ? setting.dateOverrides[occ.occKey] : defaultHours;
+
+      if (!groupsMap.has(hoursVal)) {
+        groupsMap.set(hoursVal, {
+          hours: hoursVal,
+          count: 0,
+          occKeys: [],
+          isDefault: hoursVal === defaultHours
+        });
+      }
+      const g = groupsMap.get(hoursVal);
+      g.count += 1;
+      g.occKeys.push(occ.occKey);
+    });
+
+    const groups = Array.from(groupsMap.values());
+    groups.sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      return b.hours - a.hours;
+    });
+
+    return groups;
+  }
+
+  function renderJobInputsHtml(jobName, job, setting) {
+    const groups = getJobHoursGroups(job, setting);
+    const hourlyRate = setting.hourlyRate ?? 25;
+
+    // Happy case: all occurrences have the exact same hours (or zero occurrences)
+    if (groups.length <= 1) {
+      const defaultHours = groups.length === 1 ? groups[0].hours : (setting.defaultHours ?? 4);
+      return `
+        <div class="job-calc-inputs-row">
+          <div class="job-calc-input-block">
+            <label>Hours / Shift</label>
+            <div class="job-calc-input-wrapper">
+              <input type="number" class="job-calc-hours-input job-calc-num-input" min="0" step="0.25" value="${defaultHours}" placeholder="4">
+              <span class="job-calc-unit">hrs</span>
+            </div>
+          </div>
+
+          <div class="job-calc-input-block">
+            <label>Rate ($/hr)</label>
+            <div class="job-calc-input-wrapper">
+              <span class="job-calc-prefix">$</span>
+              <input type="number" class="job-calc-rate-input job-calc-num-input" min="0" step="0.5" value="${hourlyRate}" placeholder="25">
+              <span class="job-calc-unit">/hr</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Customized dates case: multiple groups with different hours
+    let rowsHtml = '';
+    groups.forEach((g) => {
+      rowsHtml += `
+        <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-group-row" data-hours-group="${g.hours}">
+          <div class="job-calc-input-block">
+            <label>Shifts</label>
+            <div class="job-calc-input-wrapper">
+              <input type="number" class="job-calc-group-shifts-input job-calc-num-input" value="${g.count}" readonly tabindex="-1" style="cursor: default;" title="${g.count} shifts are ${g.hours} hrs">
+              <span class="job-calc-unit">x</span>
+            </div>
+          </div>
+
+          <div class="job-calc-input-block">
+            <label>Hours / Shift</label>
+            <div class="job-calc-input-wrapper">
+              <input type="number" class="job-calc-group-hours-input job-calc-num-input" min="0" step="0.25" value="${g.hours}" data-original-hours="${g.hours}">
+              <span class="job-calc-unit">hrs</span>
+            </div>
+          </div>
+
+          <div class="job-calc-input-block">
+            <label>Rate ($/hr)</label>
+            <div class="job-calc-input-wrapper">
+              <span class="job-calc-prefix">$</span>
+              <input type="number" class="job-calc-rate-input job-calc-num-input" min="0" step="0.5" value="${hourlyRate}" placeholder="25">
+              <span class="job-calc-unit">/hr</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    return rowsHtml;
+  }
+
+  function refreshCardGroups(card, jobName) {
+    if (!card) return;
+    const setting = getJobSetting(jobName);
+    const job = scannedJobs[jobName];
+    if (!job || !setting.isPaid) return;
+
+    const wrap = card.querySelector('.job-calc-groups-wrap');
+    if (!wrap) return;
+
+    wrap.innerHTML = renderJobInputsHtml(jobName, job, setting);
+    bindGroupInputs(card);
+  }
+
+  function bindGroupInputs(scope) {
+    // 1. Single default hours input (Happy Case)
+    scope.querySelectorAll('.job-calc-hours-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const setting = getJobSetting(jobName);
+        const val = parseFloat(e.target.value);
+        const newDefault = isNaN(val) ? 0 : Math.max(0, val);
+        setting.defaultHours = newDefault;
+        if (setting.dateOverrides) {
+          Object.keys(setting.dateOverrides).forEach((k) => delete setting.dateOverrides[k]);
+        }
+        saveSettings();
+
+        // Update accordion date inputs
+        card.querySelectorAll('.job-calc-occ-row').forEach((occRow) => {
+          const occInput = occRow.querySelector('.job-calc-occ-hours-input');
+          if (occInput) occInput.value = newDefault;
+          const resetBtn = occRow.querySelector('.job-calc-occ-reset-btn');
+          if (resetBtn) resetBtn.style.display = 'none';
+        });
+
+        updateCardSubtotal(card, jobName);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+        }
+      });
+    });
+
+    // 2. Grouped hours input (Multiple Different Hours)
+    scope.querySelectorAll('.job-calc-group-hours-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        const setting = getJobSetting(jobName);
+        if (!job || !setting) return;
+
+        const origHours = parseFloat(input.dataset.originalHours);
+        const rawVal = e.target.value.trim();
+        const val = parseFloat(rawVal);
+        const newHours = (rawVal === '' || isNaN(val)) ? 0 : Math.max(0, val);
+        const defaultHours = typeof setting.defaultHours === 'number' ? setting.defaultHours : 4;
+
+        let defaultUpdated = false;
+        (job.occurrences || []).forEach((occ) => {
+          const hasOverride = typeof setting.dateOverrides?.[occ.occKey] === 'number';
+          const occHours = hasOverride ? setting.dateOverrides[occ.occKey] : defaultHours;
+
+          if (occHours === origHours) {
+            if (!hasOverride && !defaultUpdated) {
+              setting.defaultHours = newHours;
+              defaultUpdated = true;
+            } else {
+              if (!setting.dateOverrides) setting.dateOverrides = {};
+              setting.dateOverrides[occ.occKey] = newHours;
+            }
+
+            const occRow = card.querySelector(`.job-calc-occ-row[data-occ-key="${occ.occKey}"]`);
+            if (occRow) {
+              const occInput = occRow.querySelector('.job-calc-occ-hours-input');
+              if (occInput) occInput.value = newHours;
+              const resetBtn = occRow.querySelector('.job-calc-occ-reset-btn');
+              if (resetBtn) {
+                resetBtn.style.display = (newHours !== (setting.defaultHours ?? 4)) ? '' : 'none';
+              }
+            }
+          }
+        });
+
+        input.dataset.originalHours = newHours;
+        saveSettings();
+        updateCardSubtotal(card, jobName);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        refreshCardGroups(card, jobName);
+      });
+    });
+
+    // 3. Hourly rate inputs (keeps all rate inputs on the card in sync)
+    scope.querySelectorAll('.job-calc-rate-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const setting = getJobSetting(jobName);
+        const val = parseFloat(e.target.value);
+        setting.hourlyRate = isNaN(val) ? 0 : Math.max(0, val);
+        saveSettings();
+        card.querySelectorAll('.job-calc-rate-input').forEach((r) => {
+          if (r !== e.target) r.value = e.target.value;
+        });
+        updateCardSubtotal(card, jobName);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+        }
+      });
+    });
+  }
+
+  function renderExpenseOccurrencesHtml(job, setting) {
+    const defaultExp = parseFloat(setting.expenseAmount) || 0;
+
+    let rowsHtml = '';
+    job.occurrences.forEach((occ) => {
+      const hasOverride = typeof setting.expenseOverrides?.[occ.occKey] === 'number';
+      const expVal = hasOverride ? setting.expenseOverrides[occ.occKey] : defaultExp;
+
+      rowsHtml += `
+        <div class="job-calc-occ-row" data-occ-key="${escapeHtml(occ.occKey)}">
+          <div class="job-calc-occ-date-wrap">
+            <span class="job-calc-occ-date">${formatDisplayDate(occ.dateObj)}</span>
+            <span class="job-calc-occ-period job-calc-period-${escapeHtml(occ.period)}">
+              ${getPeriodLabel(occ.period)}
+            </span>
+          </div>
+
+          <div class="job-calc-occ-input-wrap">
+            <div class="job-calc-occ-input-field">
+              <span class="job-calc-occ-unit-prefix">$</span>
+              <input type="number" class="job-calc-occ-expense-input job-calc-num-input" min="0" step="0.5" value="${expVal}">
+            </div>
+            <button type="button" class="job-calc-occ-expense-reset-btn" style="${hasOverride && expVal !== defaultExp ? '' : 'display: none;'}" title="Reset to default ($${defaultExp.toFixed(2)})">
+              <span class="material-symbols-outlined">restart_alt</span>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    return rowsHtml;
   }
 
   function renderJobOccurrencesHtml(job, setting) {
@@ -1027,58 +1803,80 @@
   }
 
   function bindCardEvents(listEl) {
-    // 1. Paid checkbox toggle
-    listEl.querySelectorAll('.job-calc-paid-checkbox').forEach((checkbox) => {
-      checkbox.addEventListener('change', (e) => {
+    // 1. Triage Actions (Open Menu, Fast Unmark, Popover Option Select)
+    listEl.querySelectorAll('[data-action="open-triage-menu"]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const popover = card.querySelector('.job-calc-triage-popover');
+        if (!popover) return;
+
+        const isCurrentlyHidden = popover.classList.contains('hidden');
+
+        // Close all other open popovers
+        document.querySelectorAll('.job-calc-triage-popover:not(.hidden)').forEach((p) => {
+          p.classList.add('hidden');
+          const parentCard = p.closest('.job-calc-task-card');
+          if (parentCard) parentCard.classList.remove('popover-open');
+        });
+
+        if (isCurrentlyHidden) {
+          popover.classList.remove('hidden');
+          card.classList.add('popover-open');
+        } else {
+          popover.classList.add('hidden');
+          card.classList.remove('popover-open');
+        }
+      });
+    });
+
+    listEl.querySelectorAll('[data-triage-type]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
         const jobName = card.dataset.jobName;
+        if (!jobName) return;
         const setting = getJobSetting(jobName);
-        setting.isPaid = e.target.checked;
+        const type = btn.dataset.triageType;
+
+        if (type === 'paid') {
+          setting.isPaid = true;
+          setting.isExpense = false;
+        } else if (type === 'expense') {
+          setting.isExpense = true;
+          setting.isPaid = false;
+          if (setting.expenseAmount === undefined || setting.expenseAmount === 0) {
+            setting.expenseAmount = 25;
+          }
+        } else if (type === 'unmark') {
+          setting.isPaid = false;
+          setting.isExpense = false;
+        }
+
         saveSettings();
         renderTasksList();
         updateSummaryCard();
       });
     });
 
-    // 2. Default hours input
-    listEl.querySelectorAll('.job-calc-hours-input').forEach((input) => {
-      input.addEventListener('input', (e) => {
-        const card = e.target.closest('.job-calc-task-card');
-        const jobName = card.dataset.jobName;
-        const setting = getJobSetting(jobName);
-        const val = parseFloat(e.target.value);
-        setting.defaultHours = isNaN(val) ? 0 : Math.max(0, val);
-        saveSettings();
-        updateCardSubtotal(card, jobName);
-        updateSummaryCard();
-      });
-
-      input.addEventListener('blur', (e) => {
-        if (e.target.value.trim() === '') {
-          e.target.value = 0;
+    // Global listener to close popovers on click outside
+    if (!document._jobCalcTriageDocListenerAttached) {
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.job-calc-triage-wrap')) {
+          document.querySelectorAll('.job-calc-triage-popover:not(.hidden)').forEach((p) => {
+            p.classList.add('hidden');
+            const parentCard = p.closest('.job-calc-task-card');
+            if (parentCard) parentCard.classList.remove('popover-open');
+          });
         }
       });
-    });
+      document._jobCalcTriageDocListenerAttached = true;
+    }
 
-    // 3. Hourly rate input
-    listEl.querySelectorAll('.job-calc-rate-input').forEach((input) => {
-      input.addEventListener('input', (e) => {
-        const card = e.target.closest('.job-calc-task-card');
-        const jobName = card.dataset.jobName;
-        const setting = getJobSetting(jobName);
-        const val = parseFloat(e.target.value);
-        setting.hourlyRate = isNaN(val) ? 0 : Math.max(0, val);
-        saveSettings();
-        updateCardSubtotal(card, jobName);
-        updateSummaryCard();
-      });
-
-      input.addEventListener('blur', (e) => {
-        if (e.target.value.trim() === '') {
-          e.target.value = 0;
-        }
-      });
-    });
+    // 2. Calendar Job Grouped / Default inputs and Rate inputs
+    bindGroupInputs(listEl);
 
     // 4. Accordion Toggle
     listEl.querySelectorAll('.job-calc-accordion-btn').forEach((btn) => {
@@ -1102,7 +1900,7 @@
       });
     });
 
-    // 5. Per-date hour override (smooth in-place editing, no DOM recreation)
+    // 5. Per-date hour override
     listEl.querySelectorAll('.job-calc-occ-hours-input').forEach((input) => {
       input.addEventListener('input', (e) => {
         const card = e.target.closest('.job-calc-task-card');
@@ -1128,7 +1926,6 @@
         updateCardSubtotal(card, jobName);
         updateSummaryCard();
 
-        // Update reset button in-place without touching input focus
         const resetBtn = occRow.querySelector('.job-calc-occ-reset-btn');
         if (resetBtn) {
           const currentNumericVal = (rawVal === '' || isNaN(val)) ? 0 : val;
@@ -1148,7 +1945,6 @@
         const defaultHours = parseFloat(setting.defaultHours) || 0;
 
         if (e.target.value.trim() === '') {
-          // If deleted/blank, explicitly set to 0 (never revert to default automatically)
           if (!setting.dateOverrides) setting.dateOverrides = {};
           setting.dateOverrides[occKey] = 0;
           e.target.value = 0;
@@ -1158,6 +1954,7 @@
           const resetBtn = occRow.querySelector('.job-calc-occ-reset-btn');
           if (resetBtn) resetBtn.style.display = (0 !== defaultHours) ? '' : 'none';
         }
+        refreshCardGroups(card, jobName);
       });
     });
 
@@ -1179,7 +1976,6 @@
 
         saveSettings();
 
-        // Update the input value in this row in-place
         const hoursInput = occRow.querySelector('.job-calc-occ-hours-input');
         if (hoursInput) {
           hoursInput.value = defaultHours;
@@ -1188,8 +1984,381 @@
 
         updateCardSubtotal(card, jobName);
         updateSummaryCard();
+        refreshCardGroups(card, jobName);
       });
     });
+
+    // 7. Calendar Task Expense amount input
+    listEl.querySelectorAll('.job-calc-calendar-expense-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const setting = getJobSetting(jobName);
+        const val = parseFloat(e.target.value);
+        setting.expenseAmount = isNaN(val) ? 0 : Math.max(0, val);
+        saveSettings();
+
+        // Update occurrence rows that don't have overrides
+        card.querySelectorAll('.job-calc-occ-row').forEach((occRow) => {
+          const occKey = occRow.dataset.occKey;
+          if (!setting.expenseOverrides || typeof setting.expenseOverrides[occKey] !== 'number') {
+            const occInput = occRow.querySelector('.job-calc-occ-expense-input');
+            if (occInput) occInput.value = setting.expenseAmount;
+          }
+        });
+
+        updateCardExpenseBadge(card, jobName);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+          const card = e.target.closest('.job-calc-task-card');
+          if (!card) return;
+          const jobName = card.dataset.jobName;
+          const setting = getJobSetting(jobName);
+          setting.expenseAmount = 0;
+          saveSettings();
+          updateCardExpenseBadge(card, jobName);
+          updateSummaryCard();
+        }
+      });
+    });
+
+    // 7b. Per-date expense override
+    listEl.querySelectorAll('.job-calc-occ-expense-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        const occRow = e.target.closest('.job-calc-occ-row');
+        if (!card || !occRow) return;
+
+        const jobName = card.dataset.jobName;
+        const occKey = occRow.dataset.occKey;
+        const setting = getJobSetting(jobName);
+        const defaultExp = parseFloat(setting.expenseAmount) || 0;
+
+        const rawVal = e.target.value.trim();
+        const val = parseFloat(rawVal);
+        if (!setting.expenseOverrides) setting.expenseOverrides = {};
+
+        if (rawVal === '' || isNaN(val)) {
+          setting.expenseOverrides[occKey] = 0;
+        } else {
+          setting.expenseOverrides[occKey] = Math.max(0, val);
+        }
+
+        saveSettings();
+        updateCardExpenseBadge(card, jobName);
+        updateSummaryCard();
+
+        const resetBtn = occRow.querySelector('.job-calc-occ-expense-reset-btn');
+        if (resetBtn) {
+          const currentNumericVal = (rawVal === '' || isNaN(val)) ? 0 : val;
+          const isDifferent = currentNumericVal !== defaultExp;
+          resetBtn.style.display = isDifferent ? '' : 'none';
+        }
+      });
+
+      input.addEventListener('blur', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        const occRow = e.target.closest('.job-calc-occ-row');
+        if (!card || !occRow) return;
+
+        const jobName = card.dataset.jobName;
+        const occKey = occRow.dataset.occKey;
+        const setting = getJobSetting(jobName);
+        const defaultExp = parseFloat(setting.expenseAmount) || 0;
+
+        if (e.target.value.trim() === '') {
+          if (!setting.expenseOverrides) setting.expenseOverrides = {};
+          setting.expenseOverrides[occKey] = 0;
+          e.target.value = 0;
+          saveSettings();
+          updateCardExpenseBadge(card, jobName);
+          updateSummaryCard();
+          const resetBtn = occRow.querySelector('.job-calc-occ-expense-reset-btn');
+          if (resetBtn) resetBtn.style.display = (0 !== defaultExp) ? '' : 'none';
+        }
+      });
+    });
+
+    // 7c. Reset expense override button
+    listEl.querySelectorAll('.job-calc-occ-expense-reset-btn').forEach((resetBtn) => {
+      resetBtn.addEventListener('click', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        const occRow = e.target.closest('.job-calc-occ-row');
+        if (!card || !occRow) return;
+
+        const jobName = card.dataset.jobName;
+        const occKey = occRow.dataset.occKey;
+        const setting = getJobSetting(jobName);
+        const defaultExp = parseFloat(setting.expenseAmount) || 0;
+
+        if (setting.expenseOverrides) {
+          delete setting.expenseOverrides[occKey];
+        }
+
+        saveSettings();
+
+        const expInput = occRow.querySelector('.job-calc-occ-expense-input');
+        if (expInput) {
+          expInput.value = defaultExp;
+        }
+        resetBtn.style.display = 'none';
+
+        updateCardExpenseBadge(card, jobName);
+        updateSummaryCard();
+      });
+    });
+
+    // 8. Custom Job Name input
+    listEl.querySelectorAll('.job-calc-custom-name-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        if (cJob) {
+          cJob.name = e.target.value.trim() || 'Untitled';
+          saveSettings();
+        }
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (!e.target.value.trim()) {
+          e.target.value = 'Untitled';
+          const card = e.target.closest('.job-calc-custom-card');
+          if (!card) return;
+          const customId = card.dataset.customId;
+          const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+          if (cJob) {
+            cJob.name = 'Untitled';
+            saveSettings();
+          }
+        }
+      });
+    });
+
+    // 9. Custom Job Shifts Count input
+    listEl.querySelectorAll('.job-calc-custom-shifts-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        if (cJob) {
+          const val = parseInt(e.target.value, 10);
+          cJob.shiftsCount = isNaN(val) ? 1 : Math.max(1, val);
+          saveSettings();
+          updateCustomCardSubtotal(card, customId);
+          updateSummaryCard();
+        }
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '' || parseInt(e.target.value, 10) < 1) {
+          e.target.value = 1;
+        }
+      });
+    });
+
+    // 10. Custom Job Hours input
+    listEl.querySelectorAll('.job-calc-custom-hours-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        if (cJob) {
+          const val = parseFloat(e.target.value);
+          cJob.hoursPerShift = isNaN(val) ? 0 : Math.max(0, val);
+          saveSettings();
+          updateCustomCardSubtotal(card, customId);
+          updateSummaryCard();
+        }
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+        }
+      });
+    });
+
+    // 11. Custom Job Rate input
+    listEl.querySelectorAll('.job-calc-custom-rate-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        if (cJob) {
+          const val = parseFloat(e.target.value);
+          cJob.hourlyRate = isNaN(val) ? 0 : Math.max(0, val);
+          saveSettings();
+          updateCustomCardSubtotal(card, customId);
+          updateSummaryCard();
+        }
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+        }
+      });
+    });
+
+    // 12. Custom Job Delete button
+    listEl.querySelectorAll('.job-calc-custom-delete-btn, [data-action="delete-custom-job"]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        if (state.settings.customJobs) {
+          state.settings.customJobs = state.settings.customJobs.filter((c) => c.id !== customId);
+          saveSettings();
+          renderTasksList();
+          updateSummaryCard();
+        }
+      });
+    });
+
+    // 13. Calendar Job Taxable Checkbox
+    listEl.querySelectorAll('.job-calc-taxable-checkbox').forEach((checkbox) => {
+      checkbox.addEventListener('change', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const setting = getJobSetting(jobName);
+        setting.isTaxable = e.target.checked;
+        saveSettings();
+        updateSummaryCard();
+      });
+    });
+
+    // 14. Custom Job Taxable Checkbox
+    listEl.querySelectorAll('.job-calc-custom-taxable-checkbox').forEach((checkbox) => {
+      checkbox.addEventListener('change', (e) => {
+        const card = e.target.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        if (cJob) {
+          cJob.isTaxable = e.target.checked;
+          saveSettings();
+          updateSummaryCard();
+        }
+      });
+    });
+
+    // 15. Custom Expense Delete box button
+    listEl.querySelectorAll('[data-action="delete-custom-expense"]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        state.settings.customExpenses = (state.settings.customExpenses || []).filter((c) => c.id !== expId);
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+      });
+    });
+
+    // 16. Custom Expense Name input
+    listEl.querySelectorAll('.job-calc-expense-name-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        if (cExp) {
+          cExp.name = e.target.value.trim() || 'Untitled';
+          saveSettings();
+        }
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (!e.target.value.trim()) {
+          e.target.value = 'Untitled';
+          const card = e.target.closest('.job-calc-expense-card');
+          if (!card) return;
+          const expId = card.dataset.expenseId;
+          const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+          if (cExp) {
+            cExp.name = 'Untitled';
+            saveSettings();
+          }
+        }
+      });
+    });
+
+    // 17. Custom Expense Amount input
+    listEl.querySelectorAll('.job-calc-expense-amount-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        if (cExp) {
+          const val = parseFloat(e.target.value);
+          cExp.amount = isNaN(val) ? 0 : Math.max(0, val);
+          saveSettings();
+          updateCustomExpenseBadge(card, expId);
+          updateSummaryCard();
+        }
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+          const card = e.target.closest('.job-calc-expense-card');
+          if (!card) return;
+          const expId = card.dataset.expenseId;
+          const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+          if (cExp) {
+            cExp.amount = 0;
+            saveSettings();
+            updateCustomExpenseBadge(card, expId);
+            updateSummaryCard();
+          }
+        }
+      });
+    });
+  }
+
+  function updateCardExpenseBadge(card, jobName) {
+    const job = scannedJobs[jobName];
+    const setting = getJobSetting(jobName);
+    if (!job || !setting) return;
+
+    const defaultExpAmt = parseFloat(setting.expenseAmount) || 0;
+    let jobExpenseTotal = 0;
+    job.occurrences.forEach((occ) => {
+      const overrideVal = setting.expenseOverrides?.[occ.occKey];
+      const occExp = (typeof overrideVal === 'number' && !isNaN(overrideVal))
+        ? overrideVal
+        : defaultExpAmt;
+      jobExpenseTotal += occExp;
+    });
+
+    const amountEl = card.querySelector('.job-calc-subtotal-badge.job-calc-expense-badge .job-calc-subtotal-amount');
+    if (amountEl) {
+      amountEl.textContent = `-$${jobExpenseTotal.toFixed(2)}`;
+    }
+  }
+
+  function updateCustomExpenseBadge(card, customId) {
+    const cExp = (state.settings.customExpenses || []).find((c) => c.id === customId);
+    if (!cExp) return;
+    const amt = parseFloat(cExp.amount) || 0;
+    const amountEl = card.querySelector('.job-calc-subtotal-badge.job-calc-expense-badge .job-calc-subtotal-amount');
+    if (amountEl) {
+      amountEl.textContent = `-$${amt.toFixed(2)}`;
+    }
   }
 
   function updateCardSubtotal(card, jobName) {
@@ -1216,6 +2385,22 @@
     if (hoursEl) hoursEl.textContent = `${hours.toFixed(1)} hrs`;
   }
 
+  function updateCustomCardSubtotal(card, customId) {
+    const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+    if (!cJob) return;
+
+    const count = parseInt(cJob.shiftsCount, 10) || 1;
+    const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
+    const rate = parseFloat(cJob.hourlyRate) || 0;
+    const totalHours = count * hoursPerShift;
+    const subtotal = totalHours * rate;
+
+    const amountEl = card.querySelector('.job-calc-subtotal-amount');
+    const hoursEl = card.querySelector('.job-calc-subtotal-hours');
+    if (amountEl) amountEl.textContent = `$${subtotal.toFixed(2)}`;
+    if (hoursEl) hoursEl.textContent = `${totalHours.toFixed(1)} hrs`;
+  }
+
   function updateSummaryCard() {
     const container = document.getElementById('job-calculator-container');
     if (!container) return;
@@ -1225,6 +2410,7 @@
       totalHours,
       grossEarnings,
       taxDeductionAmount,
+      totalExpenses,
       netTakeHome
     } = calculateTotals();
 
@@ -1232,6 +2418,7 @@
     const sumSessions = container.querySelector('#job-calc-sum-sessions');
     const sumHours = container.querySelector('#job-calc-sum-hours');
     const sumGross = container.querySelector('#job-calc-sum-gross');
+    const sumExpenses = container.querySelector('#job-calc-sum-expenses');
     const sumNet = container.querySelector('#job-calc-sum-net');
     const taxAmountEl = container.querySelector('#job-calc-tax-amount');
     const taxInput = container.querySelector('#job-calc-tax-input');
@@ -1241,8 +2428,30 @@
     if (sumSessions) sumSessions.textContent = `${totalSessions}x`;
     if (sumHours) sumHours.textContent = `${totalHours.toFixed(1)} hrs`;
     if (sumGross) sumGross.textContent = `$${grossEarnings.toFixed(2)}`;
+
+    // Conditionally include Expenses in the summary (hide if $0)
+    const expenseRow = container.querySelector('#job-calc-expense-summary-row');
+    if (expenseRow) {
+      expenseRow.style.display = totalExpenses > 0 ? 'flex' : 'none';
+    }
+    if (sumExpenses) sumExpenses.textContent = `-$${totalExpenses.toFixed(2)}`;
+
     if (sumNet) sumNet.textContent = `$${netTakeHome.toFixed(2)}`;
     if (taxAmountEl) taxAmountEl.textContent = `-$${taxDeductionAmount.toFixed(2)}`;
+
+    // Sync Net sublabel dynamically
+    const netSublabelEl = container.querySelector('.job-calc-net-sublabel');
+    if (netSublabelEl) {
+      if (taxDeductionAmount > 0 && totalExpenses > 0) {
+        netSublabelEl.textContent = 'After tax & expenses';
+      } else if (taxDeductionAmount > 0) {
+        netSublabelEl.textContent = 'After tax deduction';
+      } else if (totalExpenses > 0) {
+        netSublabelEl.textContent = 'After expenses';
+      } else {
+        netSublabelEl.textContent = 'Estimated take-home';
+      }
+    }
 
     // Sync tax input & modes
     const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
@@ -1281,8 +2490,11 @@
       totalSessions,
       totalHours,
       grossEarnings,
+      taxableEarnings,
       taxDeductionAmount,
-      netTakeHome
+      totalExpenses,
+      netTakeHome,
+      jobResults
     } = calculateTotals();
 
     // 1. Update Receipt Header Date Info
@@ -1305,16 +2517,19 @@
 
     if (shiftsListEl) {
       const paidNames = Object.keys(scannedJobs).filter((name) => getJobSetting(name).isPaid);
-      if (paidNames.length === 0) {
+      const paidCustom = (state.settings.customJobs || []).filter((c) => c.isPaid !== false);
+
+      if (paidNames.length === 0 && paidCustom.length === 0) {
         shiftsListEl.innerHTML = `
           <div class="receipt-item-row receipt-item-muted">
-            <span>No paid jobs selected</span>
+            <span>No earnings selected</span>
             <span>$0.00</span>
           </div>
         `;
       } else {
         const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
         let shiftsHtml = '';
+
         paidNames.forEach((name) => {
           const job = scannedJobs[name];
           const setting = getJobSetting(name);
@@ -1327,16 +2542,20 @@
           });
           const subtotal = hours * rate;
 
-          const jobTax = taxDeductionAmount > 0
+          const isTaxable = setting.isTaxable !== false;
+          const jobTax = (taxDeductionAmount > 0 && isTaxable)
             ? (taxSetting.type === 'percent'
                 ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
-                : (grossEarnings > 0 ? (subtotal / grossEarnings) * taxDeductionAmount : 0))
+                : (taxableEarnings > 0 ? (subtotal / taxableEarnings) * taxDeductionAmount : 0))
             : 0;
           const jobNet = Math.max(0, subtotal - jobTax);
 
-          const taxSublineHtml = taxDeductionAmount > 0
-            ? `<span class="receipt-item-tax-detail">Tax: -$${jobTax.toFixed(2)} <span class="receipt-item-tax-net">· Net: $${jobNet.toFixed(2)}</span></span>`
-            : '';
+          let taxSublineHtml = '';
+          if (taxDeductionAmount > 0) {
+            taxSublineHtml = isTaxable
+              ? `<span class="receipt-item-tax-detail">Tax: -$${jobTax.toFixed(2)} <span class="receipt-item-tax-net">· Net: $${jobNet.toFixed(2)}</span></span>`
+              : `<span class="receipt-item-tax-detail receipt-item-untaxed-detail">Untaxed <span class="receipt-item-tax-net">· Net: $${subtotal.toFixed(2)}</span></span>`;
+          }
 
           shiftsHtml += `
             <div class="receipt-item-row">
@@ -1349,6 +2568,41 @@
             </div>
           `;
         });
+
+        paidCustom.forEach((cJob) => {
+          const count = parseInt(cJob.shiftsCount, 10) || 1;
+          const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
+          const rate = parseFloat(cJob.hourlyRate) || 0;
+          const hours = count * hoursPerShift;
+          const subtotal = hours * rate;
+
+          const isTaxable = cJob.isTaxable === true;
+          const jobTax = (taxDeductionAmount > 0 && isTaxable)
+            ? (taxSetting.type === 'percent'
+                ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
+                : (taxableEarnings > 0 ? (subtotal / taxableEarnings) * taxDeductionAmount : 0))
+            : 0;
+          const jobNet = Math.max(0, subtotal - jobTax);
+
+          let taxSublineHtml = '';
+          if (taxDeductionAmount > 0) {
+            taxSublineHtml = isTaxable
+              ? `<span class="receipt-item-tax-detail">Tax: -$${jobTax.toFixed(2)} <span class="receipt-item-tax-net">· Net: $${jobNet.toFixed(2)}</span></span>`
+              : `<span class="receipt-item-tax-detail receipt-item-untaxed-detail">Untaxed <span class="receipt-item-tax-net">· Net: $${subtotal.toFixed(2)}</span></span>`;
+          }
+
+          shiftsHtml += `
+            <div class="receipt-item-row">
+              <div class="receipt-item-title-col">
+                <span class="receipt-item-name">${escapeHtml(cJob.name || 'Untitled')} <span class="receipt-item-tag-custom">EARNINGS</span></span>
+                <span class="receipt-item-detail">${hours.toFixed(1)}h (${count}x) @ $${rate.toFixed(2)}/hr</span>
+                ${taxSublineHtml}
+              </div>
+              <span class="receipt-item-amount">$${subtotal.toFixed(2)}</span>
+            </div>
+          `;
+        });
+
         shiftsListEl.innerHTML = shiftsHtml;
       }
     }
@@ -1357,7 +2611,63 @@
     const grossAmountEl = container.querySelector('#receipt-gross-amount');
     if (grossAmountEl) grossAmountEl.textContent = `$${grossEarnings.toFixed(2)}`;
 
-    // 4. Tax Deduction
+    // 4. Work Expenses Section
+    const expSection = container.querySelector('#receipt-expenses-section');
+    const expCountEl = container.querySelector('#receipt-expenses-count');
+    const expSubtotalEl = container.querySelector('#receipt-expenses-subtotal');
+    const expListEl = container.querySelector('#receipt-expenses-list');
+
+    if (totalExpenses > 0) {
+      if (expSection) expSection.style.display = 'block';
+      const expCalendarNames = Object.keys(scannedJobs).filter((name) => {
+        const s = getJobSetting(name);
+        const res = jobResults[name];
+        return s.isExpense && ((res?.expenseTotal || 0) > 0 || (parseFloat(s.expenseAmount) || 0) > 0);
+      });
+      const customExps = (state.settings.customExpenses || []).filter((e) => (parseFloat(e.amount) || 0) > 0);
+      const totalExpItemsCount = expCalendarNames.length + customExps.length;
+
+      if (expCountEl) expCountEl.textContent = `${totalExpItemsCount}x`;
+      if (expSubtotalEl) expSubtotalEl.textContent = `-$${totalExpenses.toFixed(2)}`;
+
+      if (expListEl) {
+        let expHtml = '';
+        expCalendarNames.forEach((name) => {
+          const setting = getJobSetting(name);
+          const res = jobResults[name];
+          const count = scannedJobs[name]?.occurrences.length || 1;
+          const totalAmt = res?.expenseTotal !== undefined ? res.expenseTotal : ((parseFloat(setting.expenseAmount) || 0) * count);
+          expHtml += `
+            <div class="receipt-item-row">
+              <div class="receipt-item-title-col">
+                <span class="receipt-item-name">${escapeHtml(name)}</span>
+                <span class="receipt-item-detail">Calendar expense (${count}x)</span>
+              </div>
+              <span class="receipt-item-amount receipt-item-deduction">-$${totalAmt.toFixed(2)}</span>
+            </div>
+          `;
+        });
+
+        customExps.forEach((cExp) => {
+          const amt = parseFloat(cExp.amount) || 0;
+          expHtml += `
+            <div class="receipt-item-row">
+              <div class="receipt-item-title-col">
+                <span class="receipt-item-name">${escapeHtml(cExp.name || 'Untitled')} <span class="receipt-item-tag-expense">EXPENSES</span></span>
+                <span class="receipt-item-detail">Custom Expense</span>
+              </div>
+              <span class="receipt-item-amount receipt-item-deduction">-$${amt.toFixed(2)}</span>
+            </div>
+          `;
+        });
+
+        expListEl.innerHTML = expHtml;
+      }
+    } else {
+      if (expSection) expSection.style.display = 'none';
+    }
+
+    // 5. Tax Deduction
     const taxSection = container.querySelector('#receipt-tax-section');
     const taxDetailEl = container.querySelector('#receipt-tax-detail');
     const taxAmountEl = container.querySelector('#receipt-tax-amount');
@@ -1367,7 +2677,7 @@
       if (taxSection) taxSection.style.display = 'block';
       if (taxDetailEl) {
         taxDetailEl.textContent = taxSetting.type === 'percent'
-          ? `(${taxSetting.value}% of gross)`
+          ? `(${taxSetting.value}% of taxable)`
           : `(Flat deduction)`;
       }
       if (taxAmountEl) taxAmountEl.textContent = `-$${taxDeductionAmount.toFixed(2)}`;
@@ -1375,7 +2685,7 @@
       if (taxSection) taxSection.style.display = 'none';
     }
 
-    // 5. Net Take-Home Hero Row
+    // 6. Net Take-Home Hero Row
     const netAmountEl = container.querySelector('#receipt-net-amount');
     if (netAmountEl) netAmountEl.textContent = `$${netTakeHome.toFixed(2)}`;
   }
@@ -1411,10 +2721,12 @@
     out.push(row('PERIOD', rangeStr));
     out.push(divider);
 
-    // Paid Calendar Jobs
+    // Paid Calendar Jobs & Custom Jobs
     const paidJobs = Object.keys(scannedJobs).filter((name) => getJobSetting(name).isPaid);
-    if (paidJobs.length > 0) {
-      out.push('CALENDAR SHIFTS:');
+    const paidCustom = (state.settings.customJobs || []).filter((c) => c.isPaid !== false);
+
+    if (paidJobs.length > 0 || paidCustom.length > 0) {
+      out.push('SHIFTS & WORK:');
       paidJobs.forEach((name) => {
         const job = scannedJobs[name];
         const setting = getJobSetting(name);
@@ -1430,13 +2742,42 @@
         out.push(row(detailStr, `$${subtotal.toFixed(2)}`));
 
         if (totals.taxDeductionAmount > 0) {
-          const jobTax = taxSetting.type === 'percent'
-            ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
-            : (totals.grossEarnings > 0 ? (subtotal / totals.grossEarnings) * totals.taxDeductionAmount : 0);
-          const jobNet = Math.max(0, subtotal - jobTax);
-          out.push(`    Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}`);
+          const isTaxable = setting.isTaxable !== false;
+          if (isTaxable) {
+            const jobTax = taxSetting.type === 'percent'
+              ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
+              : (totals.taxableEarnings > 0 ? (subtotal / totals.taxableEarnings) * totals.taxDeductionAmount : 0);
+            const jobNet = Math.max(0, subtotal - jobTax);
+            out.push(`    Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}`);
+          } else {
+            out.push(`    Untaxed · Net: $${subtotal.toFixed(2)}`);
+          }
         }
       });
+
+      paidCustom.forEach((cJob) => {
+        const count = parseInt(cJob.shiftsCount, 10) || 1;
+        const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
+        const rate = parseFloat(cJob.hourlyRate) || 0;
+        const hours = count * hoursPerShift;
+        const subtotal = hours * rate;
+        const detailStr = `  ${cJob.name || 'Untitled'} [Earnings] (${hours.toFixed(1)}h · ${count}x)`;
+        out.push(row(detailStr, `$${subtotal.toFixed(2)}`));
+
+        if (totals.taxDeductionAmount > 0) {
+          const isTaxable = cJob.isTaxable === true;
+          if (isTaxable) {
+            const jobTax = taxSetting.type === 'percent'
+              ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
+              : (totals.taxableEarnings > 0 ? (subtotal / totals.taxableEarnings) * totals.taxDeductionAmount : 0);
+            const jobNet = Math.max(0, subtotal - jobTax);
+            out.push(`    Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}`);
+          } else {
+            out.push(`    Untaxed · Net: $${subtotal.toFixed(2)}`);
+          }
+        }
+      });
+
       out.push(row('  Total Shift Hours', `${totals.totalHours.toFixed(1)} hrs`));
       out.push(row('  Shifts Subtotal', `$${totals.grossEarnings.toFixed(2)}`));
       out.push(divider);
@@ -1449,6 +2790,32 @@
       const typeLabel = taxSetting.type === 'percent' ? ` (${taxSetting.value}%)` : '';
       out.push(row(`  Total Tax Deduction${typeLabel}`, `-$${totals.taxDeductionAmount.toFixed(2)}`));
     }
+
+    // Expenses (if any)
+    if (totals.totalExpenses > 0) {
+      out.push(divider);
+      out.push('EXPENSES:');
+      const expCalendarNames = Object.keys(scannedJobs).filter((name) => {
+        const s = getJobSetting(name);
+        const res = totals.jobResults[name];
+        return s.isExpense && ((res?.expenseTotal || 0) > 0 || (parseFloat(s.expenseAmount) || 0) > 0);
+      });
+      expCalendarNames.forEach((name) => {
+        const res = totals.jobResults[name];
+        const count = scannedJobs[name]?.occurrences.length || 1;
+        const totalAmt = res?.expenseTotal || 0;
+        out.push(row(`  ${name} (${count}x)`, `-$${totalAmt.toFixed(2)}`));
+      });
+
+      (state.settings.customExpenses || []).forEach((cExp) => {
+        const amt = parseFloat(cExp.amount) || 0;
+        if (amt > 0) {
+          out.push(row(`  ${cExp.name || 'Untitled'} [Expenses]`, `-$${amt.toFixed(2)}`));
+        }
+      });
+      out.push(row('  Total Expenses', `-$${totals.totalExpenses.toFixed(2)}`));
+    }
+
     out.push(doubleDivider);
 
     out.push(row('NET TAKE-HOME', `$${totals.netTakeHome.toFixed(2)}`));
