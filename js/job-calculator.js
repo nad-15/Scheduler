@@ -386,6 +386,8 @@
    * ========================================================================== */
 
   function calculateTotals() {
+    const roundCents = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+
     let totalSessions = 0;
     let totalHours = 0;
     let grossEarnings = 0;
@@ -426,7 +428,7 @@
           });
         }
 
-        jobSubtotal = jobHours * rate;
+        jobSubtotal = roundCents(jobHours * rate);
 
         totalSessions += jobSessions;
         totalHours += jobHours;
@@ -450,6 +452,7 @@
           jobExpenseTotal += occExp;
         });
 
+        jobExpenseTotal = roundCents(jobExpenseTotal);
         totalExpenses += jobExpenseTotal;
       }
 
@@ -486,7 +489,7 @@
           totalCustomHours = count * hoursPerShift;
         }
 
-        const customSubtotal = totalCustomHours * rate;
+        const customSubtotal = roundCents(totalCustomHours * rate);
         const isTaxable = cJob.isTaxable === true; // Default false for custom jobs
 
         totalSessions += count;
@@ -512,7 +515,7 @@
     // Custom / Off-calendar expenses
     const customExpenseResults = {};
     (state.settings.customExpenses || []).forEach((cExp) => {
-      const amt = parseFloat(cExp.amount) || 0;
+      const amt = roundCents(parseFloat(cExp.amount) || 0);
       totalExpenses += amt;
       customExpenseResults[cExp.id] = {
         id: cExp.id,
@@ -529,16 +532,20 @@
     if (taxVal > 0) {
       if (taxSetting.type === 'percent') {
         if (taxableEarnings > 0) {
-          taxDeductionAmount = (taxableEarnings * taxVal) / 100;
+          taxDeductionAmount = roundCents((taxableEarnings * taxVal) / 100);
         }
       } else {
-        taxDeductionAmount = Math.min(grossEarnings, taxVal);
+        taxDeductionAmount = Math.min(taxableEarnings, roundCents(taxVal));
       }
-      taxDeductionAmount = Math.max(0, taxDeductionAmount);
+      taxDeductionAmount = Math.min(taxableEarnings, Math.max(0, taxDeductionAmount));
     }
 
+    grossEarnings = roundCents(grossEarnings);
+    taxableEarnings = roundCents(taxableEarnings);
+    totalExpenses = roundCents(totalExpenses);
+
     // Net Take-Home: Gross - Tax Deduction - Total Expenses
-    const netTakeHome = Math.max(0, grossEarnings - taxDeductionAmount - totalExpenses);
+    const netTakeHome = Math.max(0, roundCents(grossEarnings - taxDeductionAmount - totalExpenses));
 
     return {
       totalSessions,
@@ -900,9 +907,16 @@
     const toInput = container.querySelector('#job-calc-to-date');
 
     const handleCustomDateChange = () => {
-      const fromVal = fromInput?.value;
-      const toVal = toInput?.value;
+      let fromVal = fromInput?.value;
+      let toVal = toInput?.value;
       if (fromVal && toVal) {
+        if (fromVal > toVal) {
+          const tmp = fromVal;
+          fromVal = toVal;
+          toVal = tmp;
+          if (fromInput) fromInput.value = fromVal;
+          if (toInput) toInput.value = toVal;
+        }
         state.fromDate = fromVal;
         state.toDate = toVal;
         state.activePreset = 'custom';
@@ -1273,7 +1287,7 @@
         (c.name || 'Untitled').toLowerCase().includes(state.searchQuery)
       );
       visibleCustomExpenses = visibleCustomExpenses.filter((e) =>
-        (e.name || 'Custom Expenses').toLowerCase().includes(state.searchQuery)
+        (e.name || 'Untitled').toLowerCase().includes(state.searchQuery)
       );
     }
 
@@ -2412,7 +2426,7 @@
     });
 
     // 4c. Split Mode: Add Split Row Button
-    listEl.querySelectorAll('.job-calc-add-split-btn').forEach((btn) => {
+    listEl.querySelectorAll('.job-calc-task-card:not(.job-calc-custom-card) .job-calc-add-split-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const card = e.target.closest('.job-calc-task-card');
@@ -3077,12 +3091,23 @@
       });
     }
 
-    const subtotal = hours * rate;
+    const roundCents = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+    const subtotal = roundCents(hours * rate);
 
     const amountEl = card.querySelector('.job-calc-subtotal-amount');
     const hoursEl = card.querySelector('.job-calc-subtotal-hours');
+    const badgeEl = card.querySelector('.job-calc-session-badge');
     if (amountEl) amountEl.textContent = `$${subtotal.toFixed(2)}`;
     if (hoursEl) hoursEl.textContent = `${hours.toFixed(1)} hrs`;
+    if (badgeEl) {
+      if (setting.adjustMode === 'split' && Array.isArray(setting.splits) && setting.splits.length > 0) {
+        let splitAllocated = 0;
+        setting.splits.forEach((s) => { splitAllocated += (parseInt(s.shifts, 10) || 0); });
+        badgeEl.textContent = `${splitAllocated > 0 ? splitAllocated : count}x`;
+      } else {
+        badgeEl.textContent = `${count}x`;
+      }
+    }
   }
 
   function updateCustomCardSubtotal(card, customId) {
@@ -3106,7 +3131,7 @@
       totalHours = totalShifts * hoursPerShift;
     }
 
-    const subtotal = totalHours * rate;
+    const subtotal = Math.round((totalHours * rate + Number.EPSILON) * 100) / 100;
 
     const amountEl = card.querySelector('.job-calc-subtotal-amount');
     const hoursEl = card.querySelector('.job-calc-subtotal-hours');
@@ -3209,7 +3234,8 @@
       taxDeductionAmount,
       totalExpenses,
       netTakeHome,
-      jobResults
+      jobResults,
+      customResults
     } = calculateTotals();
 
     // 1. Update Receipt Header Date Info
@@ -3246,16 +3272,12 @@
         let shiftsHtml = '';
 
         paidNames.forEach((name) => {
-          const job = scannedJobs[name];
           const setting = getJobSetting(name);
-          const defaultHours = parseFloat(setting.defaultHours) || 0;
+          const res = jobResults?.[name] || { count: 0, totalHours: 0, subtotal: 0 };
           const rate = parseFloat(setting.hourlyRate) || 0;
-          let hours = 0;
-          job.occurrences.forEach((occ) => {
-            const overrideVal = setting.dateOverrides?.[occ.occKey];
-            hours += (typeof overrideVal === 'number' && !isNaN(overrideVal)) ? overrideVal : defaultHours;
-          });
-          const subtotal = hours * rate;
+          const hours = res.totalHours;
+          const count = res.count;
+          const subtotal = res.subtotal;
 
           const isTaxable = setting.isTaxable !== false;
           const jobTax = (taxDeductionAmount > 0 && isTaxable)
@@ -3276,7 +3298,7 @@
             <div class="receipt-item-row">
               <div class="receipt-item-title-col">
                 <span class="receipt-item-name">${escapeHtml(name)}</span>
-                <span class="receipt-item-detail">${hours.toFixed(1)}h (${job.occurrences.length}x) @ $${rate.toFixed(2)}/hr</span>
+                <span class="receipt-item-detail">${hours.toFixed(1)}h (${count}x) @ $${rate.toFixed(2)}/hr</span>
                 ${taxSublineHtml}
               </div>
               <span class="receipt-item-amount">$${subtotal.toFixed(2)}</span>
@@ -3285,11 +3307,11 @@
         });
 
         paidCustom.forEach((cJob) => {
-          const count = parseInt(cJob.shiftsCount, 10) || 1;
-          const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
+          const res = customResults?.[cJob.id] || { count: 1, totalHours: 0, subtotal: 0 };
           const rate = parseFloat(cJob.hourlyRate) || 0;
-          const hours = count * hoursPerShift;
-          const subtotal = hours * rate;
+          const hours = res.totalHours;
+          const count = res.count;
+          const subtotal = res.subtotal;
 
           const isTaxable = cJob.isTaxable === true;
           const jobTax = (taxDeductionAmount > 0 && isTaxable)
@@ -3443,17 +3465,13 @@
     if (paidJobs.length > 0 || paidCustom.length > 0) {
       out.push('SHIFTS & WORK:');
       paidJobs.forEach((name) => {
-        const job = scannedJobs[name];
         const setting = getJobSetting(name);
-        const defaultHours = parseFloat(setting.defaultHours) || 0;
+        const res = totals.jobResults?.[name] || { count: 0, totalHours: 0, subtotal: 0 };
         const rate = parseFloat(setting.hourlyRate) || 0;
-        let hours = 0;
-        job.occurrences.forEach((occ) => {
-          const overrideVal = setting.dateOverrides?.[occ.occKey];
-          hours += (typeof overrideVal === 'number' && !isNaN(overrideVal)) ? overrideVal : defaultHours;
-        });
-        const subtotal = hours * rate;
-        const detailStr = `  ${name} (${hours.toFixed(1)}h · ${job.occurrences.length}x)`;
+        const hours = res.totalHours;
+        const count = res.count;
+        const subtotal = res.subtotal;
+        const detailStr = `  ${name} (${hours.toFixed(1)}h · ${count}x)`;
         out.push(row(detailStr, `$${subtotal.toFixed(2)}`));
 
         if (totals.taxDeductionAmount > 0) {
@@ -3471,11 +3489,10 @@
       });
 
       paidCustom.forEach((cJob) => {
-        const count = parseInt(cJob.shiftsCount, 10) || 1;
-        const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
-        const rate = parseFloat(cJob.hourlyRate) || 0;
-        const hours = count * hoursPerShift;
-        const subtotal = hours * rate;
+        const res = totals.customResults?.[cJob.id] || { count: 1, totalHours: 0, subtotal: 0 };
+        const hours = res.totalHours;
+        const count = res.count;
+        const subtotal = res.subtotal;
         const detailStr = `  ${cJob.name || 'Untitled'} [Earnings] (${hours.toFixed(1)}h · ${count}x)`;
         out.push(row(detailStr, `$${subtotal.toFixed(2)}`));
 
