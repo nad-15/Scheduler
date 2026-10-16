@@ -11620,7 +11620,7 @@ ic {
     }
 }
 
-/* Sleek Compact One-Row Taxable Checkbox */
+/* Sleek Compact One-Row Taxable Checkbox (Yellow / Amber Theme) */
 .job-calc-taxable-check-row {
     display: inline-flex;
     align-items: center;
@@ -11628,10 +11628,23 @@ ic {
     cursor: pointer;
     user-select: none;
     width: fit-content;
-    padding: 0;
-    margin-top: -4px;
-    margin-bottom: -1px;
+    padding: 1.5px 5px;
+    margin-top: 2px;
+    margin-bottom: 0;
     line-height: 1;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.job-calc-taxable-check-row:hover {
+    background: #fefce8;
+}
+
+.job-calc-taxable-check-row:has(.job-calc-taxable-checkbox:checked),
+.job-calc-taxable-check-row:has(.job-calc-custom-taxable-checkbox:checked) {
+    background: #fffbeb;
+    border-color: #fde68a;
 }
 
 .job-calc-taxable-checkbox,
@@ -11660,13 +11673,13 @@ ic {
 }
 
 .job-calc-taxable-check-row:hover .job-calc-taxable-check-box {
-    border-color: #16a34a;
+    border-color: #f59e0b;
 }
 
 .job-calc-taxable-checkbox:checked + .job-calc-taxable-check-box,
 .job-calc-custom-taxable-checkbox:checked + .job-calc-taxable-check-box {
-    background: #16a34a;
-    border-color: #16a34a;
+    background: #f59e0b;
+    border-color: #d97706;
 }
 
 .job-calc-taxable-checkbox:checked + .job-calc-taxable-check-box::after,
@@ -11692,12 +11705,16 @@ ic {
 }
 
 .job-calc-taxable-check-row:hover .job-calc-taxable-check-text {
-    color: #334155;
+    color: #b45309;
 }
 
 .job-calc-taxable-checkbox:checked ~ .job-calc-taxable-check-text,
 .job-calc-custom-taxable-checkbox:checked ~ .job-calc-taxable-check-text {
-    color: #15803d;
+    color: #b45309;
+}
+
+.job-calc-expense-group-row {
+    grid-template-columns: 0.8fr 1.2fr;
 }
 
 .job-calc-input-block {
@@ -11773,16 +11790,22 @@ ic {
 }
 
 .job-calc-hours-input,
-.job-calc-custom-hours-input {
+.job-calc-custom-hours-input,
+.job-calc-split-hours-input,
+.job-calc-group-hours-input {
     padding-right: 32px;
 }
 
-.job-calc-custom-shifts-input {
+.job-calc-custom-shifts-input,
+.job-calc-split-shifts-input,
+.job-calc-group-shifts-input {
     padding-right: 24px;
 }
 
 .job-calc-calendar-expense-input,
-.job-calc-expense-amount-input {
+.job-calc-group-expense-input,
+.job-calc-expense-amount-input,
+.job-calc-input-wrapper:has(.job-calc-prefix) .job-calc-num-input {
     padding-left: 20px;
     padding-right: 10px;
 }
@@ -11794,6 +11817,127 @@ ic {
     font-weight: 600;
     color: #94a3b8;
     pointer-events: none;
+}
+
+/* Accordion Bar & Mode Swapper */
+.job-calc-adjust-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: nowrap;
+}
+
+.job-calc-adjust-bar .job-calc-accordion-btn {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-calc-mode-swap-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+
+.job-calc-mode-swap-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.job-calc-mode-swap-btn .material-symbols-outlined {
+    font-size: 14px;
+    color: #059669;
+}
+
+/* Inline Split Rows & Controls */
+.job-calc-split-bar-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.job-calc-add-split-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px dashed #10b981;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 0.73rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1.2;
+}
+
+.job-calc-add-split-btn:hover {
+    background: #d1fae5;
+    border-color: #059669;
+    color: #047857;
+}
+
+.job-calc-add-split-btn .material-symbols-outlined {
+    font-size: 14px;
+}
+
+.job-calc-split-tag {
+    font-size: 0.70rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.job-calc-split-tag.is-complete {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.job-calc-split-tag.is-pending {
+    background: #fffbeb;
+    color: #d97706;
+}
+
+.job-calc-split-tag.is-over {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+@keyframes splitRowFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.job-calc-split-row {
+    animation: splitRowFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Accordion Toggle */

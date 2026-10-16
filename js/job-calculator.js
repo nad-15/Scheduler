@@ -109,6 +109,22 @@
           cleanJob.hourlyRate = typeof job.hourlyRate === 'number' ? job.hourlyRate : 25;
           cleanJob.isTaxable = job.isTaxable !== false;
 
+          // Preserve split mode allocation if in split mode
+          if (job.adjustMode === 'split') {
+            cleanJob.adjustMode = 'split';
+            if (Array.isArray(job.splits)) {
+              const validSplits = job.splits
+                .map((s) => ({
+                  shifts: parseInt(s.shifts, 10) || 0,
+                  hours: parseFloat(s.hours) || 0
+                }))
+                .filter((s) => s.shifts > 0);
+              if (validSplits.length > 0) {
+                cleanJob.splits = validSplits;
+              }
+            }
+          }
+
           // Only store date overrides if they actually differ from the job's default hours
           if (job.dateOverrides && typeof job.dateOverrides === 'object') {
             const validOverrides = {};
@@ -173,6 +189,8 @@
         defaultHours: 4,
         hourlyRate: 25,
         isTaxable: true,
+        adjustMode: 'date',
+        splits: [],
         dateOverrides: {},
         expenseOverrides: {}
       };
@@ -185,6 +203,12 @@
       }
       if (state.settings.jobs[jobName].expenseAmount === undefined) {
         state.settings.jobs[jobName].expenseAmount = 0;
+      }
+      if (!state.settings.jobs[jobName].adjustMode) {
+        state.settings.jobs[jobName].adjustMode = 'date';
+      }
+      if (!Array.isArray(state.settings.jobs[jobName].splits)) {
+        state.settings.jobs[jobName].splits = [];
       }
       if (!state.settings.jobs[jobName].dateOverrides) {
         state.settings.jobs[jobName].dateOverrides = {};
@@ -377,23 +401,34 @@
       let jobHours = 0;
       let jobSubtotal = 0;
       const count = job.occurrences.length;
+      let jobSessions = count;
 
       if (setting.isPaid) {
         const defaultHours = parseFloat(setting.defaultHours) || 0;
         const rate = parseFloat(setting.hourlyRate) || 0;
 
-        job.occurrences.forEach((occ) => {
-          const overrideVal = setting.dateOverrides?.[occ.occKey];
-          const occHours = (typeof overrideVal === 'number' && !isNaN(overrideVal))
-            ? overrideVal
-            : defaultHours;
+        if (setting.adjustMode === 'split' && Array.isArray(setting.splits) && setting.splits.length > 0) {
+          jobSessions = 0;
+          setting.splits.forEach((s) => {
+            const sCount = parseInt(s.shifts, 10) || 0;
+            const sHours = parseFloat(s.hours) || 0;
+            jobHours += (sCount * sHours);
+            jobSessions += sCount;
+          });
+        } else {
+          job.occurrences.forEach((occ) => {
+            const overrideVal = setting.dateOverrides?.[occ.occKey];
+            const occHours = (typeof overrideVal === 'number' && !isNaN(overrideVal))
+              ? overrideVal
+              : defaultHours;
 
-          jobHours += occHours;
-        });
+            jobHours += occHours;
+          });
+        }
 
         jobSubtotal = jobHours * rate;
 
-        totalSessions += count;
+        totalSessions += jobSessions;
         totalHours += jobHours;
         grossEarnings += jobSubtotal;
 
@@ -424,7 +459,7 @@
         expenseAmount: parseFloat(setting.expenseAmount) || 0,
         expenseTotal: jobExpenseTotal,
         isTaxable: setting.isTaxable !== false,
-        count: count,
+        count: (setting.isPaid && setting.adjustMode === 'split') ? jobSessions : count,
         totalHours: jobHours,
         subtotal: jobSubtotal
       };
@@ -434,10 +469,23 @@
     const customResults = {};
     (state.settings.customJobs || []).forEach((cJob) => {
       if (cJob.isPaid !== false) {
-        const count = parseInt(cJob.shiftsCount, 10) || 1;
-        const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
         const rate = parseFloat(cJob.hourlyRate) || 0;
-        const totalCustomHours = count * hoursPerShift;
+        let count = 0;
+        let totalCustomHours = 0;
+
+        if (Array.isArray(cJob.splits) && cJob.splits.length > 0) {
+          cJob.splits.forEach((s) => {
+            const sCount = parseInt(s.shifts, 10) || 0;
+            const sHours = parseFloat(s.hours) || 0;
+            totalCustomHours += (sCount * sHours);
+            count += sCount;
+          });
+        } else {
+          count = parseInt(cJob.shiftsCount, 10) || 1;
+          const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
+          totalCustomHours = count * hoursPerShift;
+        }
+
         const customSubtotal = totalCustomHours * rate;
         const isTaxable = cJob.isTaxable === true; // Default false for custom jobs
 
@@ -453,7 +501,6 @@
           id: cJob.id,
           name: cJob.name || 'Untitled',
           count: count,
-          hoursPerShift: hoursPerShift,
           totalHours: totalCustomHours,
           hourlyRate: rate,
           isTaxable: isTaxable,
@@ -1088,7 +1135,8 @@
       hoursPerShift: 4,
       hourlyRate: 25,
       isPaid: true,
-      isTaxable: false
+      isTaxable: false,
+      splits: [{ shifts: 1, hours: 4 }]
     });
     saveSettings();
 
@@ -1323,7 +1371,7 @@
               <div class="job-calc-title-row">
                 <input type="text" class="job-calc-expense-name-input" value="${escapeHtml(cExp.name || 'Untitled')}" placeholder="Untitled">
               </div>
-              <div class="job-calc-tagline">Custom Expenses</div>
+              <div class="job-calc-tagline">Expenses</div>
             </div>
 
             <!-- Subtotal Pill -->
@@ -1351,9 +1399,67 @@
 
     // 2. Render Custom Jobs (in Paid or All tab)
     visibleCustomJobs.forEach((cJob) => {
+      if (!Array.isArray(cJob.splits) || cJob.splits.length === 0) {
+        cJob.splits = [{
+          shifts: parseInt(cJob.shiftsCount, 10) || 1,
+          hours: typeof cJob.hoursPerShift === 'number' ? cJob.hoursPerShift : 4
+        }];
+      }
+
+      let customTotalShifts = 0;
+      let customRowsHtml = '';
+      cJob.splits.forEach((s, idx) => {
+        const sShifts = parseInt(s.shifts, 10) || 0;
+        customTotalShifts += sShifts;
+        customRowsHtml += `
+          <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-split-row" data-split-index="${idx}">
+            <div class="job-calc-input-block">
+              <label>Shifts</label>
+              <div class="job-calc-input-wrapper">
+                <input type="number" 
+                       class="job-calc-custom-split-shifts-input job-calc-num-input" 
+                       data-split-index="${idx}" 
+                       min="0" 
+                       step="1" 
+                       value="${s.shifts}" 
+                       title="Enter shifts (type 0 to remove this row)">
+                <span class="job-calc-unit">x</span>
+              </div>
+            </div>
+
+            <div class="job-calc-input-block">
+              <label>Hours / Shift</label>
+              <div class="job-calc-input-wrapper">
+                <input type="number" 
+                       class="job-calc-custom-split-hours-input job-calc-num-input" 
+                       data-split-index="${idx}" 
+                       min="0" 
+                       step="0.25" 
+                       value="${s.hours}">
+                <span class="job-calc-unit">hrs</span>
+              </div>
+            </div>
+
+            <div class="job-calc-input-block">
+              <label>Rate ($/hr)</label>
+              <div class="job-calc-input-wrapper">
+                <span class="job-calc-prefix">$</span>
+                <input type="number" 
+                       class="job-calc-custom-rate-input job-calc-num-input" 
+                       min="0" 
+                       step="0.5" 
+                       value="${cJob.hourlyRate ?? 25}" 
+                       placeholder="25">
+                <span class="job-calc-unit">/hr</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
       const cRes = customResults?.[cJob.id] || {
-        totalHours: (cJob.shiftsCount || 1) * (cJob.hoursPerShift || 4),
-        subtotal: (cJob.shiftsCount || 1) * (cJob.hoursPerShift || 4) * (cJob.hourlyRate || 25)
+        totalHours: 0,
+        subtotal: 0
       };
 
       html += `
@@ -1376,8 +1482,13 @@
             <div class="job-calc-card-info">
               <div class="job-calc-title-row">
                 <input type="text" class="job-calc-custom-name-input" value="${escapeHtml(cJob.name || 'Untitled')}" placeholder="Untitled">
+                <span class="job-calc-session-badge">${customTotalShifts}x</span>
               </div>
-              <div class="job-calc-tagline">Custom Earnings</div>
+              <label class="job-calc-taxable-check-row" title="${cJob.isTaxable === true ? 'Subject to tax deduction' : 'Untaxed earnings'}">
+                <input type="checkbox" class="job-calc-custom-taxable-checkbox" ${cJob.isTaxable === true ? 'checked' : ''}>
+                <span class="job-calc-taxable-check-box"></span>
+                <span class="job-calc-taxable-check-text">Taxable</span>
+              </label>
             </div>
 
             <!-- Subtotal Pill -->
@@ -1389,38 +1500,19 @@
 
           <!-- Config Section -->
           <div class="job-calc-card-config">
-            <div class="job-calc-inputs-row job-calc-custom-inputs-row">
-              <div class="job-calc-input-block">
-                <label>Shifts</label>
-                <div class="job-calc-input-wrapper">
-                  <input type="number" class="job-calc-custom-shifts-input job-calc-num-input" min="1" step="1" value="${cJob.shiftsCount ?? 1}">
-                  <span class="job-calc-unit">x</span>
-                </div>
-              </div>
-
-              <div class="job-calc-input-block">
-                <label>Hours / Shift</label>
-                <div class="job-calc-input-wrapper">
-                  <input type="number" class="job-calc-custom-hours-input job-calc-num-input" min="0" step="0.25" value="${cJob.hoursPerShift ?? 4}">
-                  <span class="job-calc-unit">hrs</span>
-                </div>
-              </div>
-
-              <div class="job-calc-input-block">
-                <label>Rate ($/hr)</label>
-                <div class="job-calc-input-wrapper">
-                  <span class="job-calc-prefix">$</span>
-                  <input type="number" class="job-calc-custom-rate-input job-calc-num-input" min="0" step="0.5" value="${cJob.hourlyRate ?? 25}">
-                  <span class="job-calc-unit">/hr</span>
-                </div>
-              </div>
+            <div class="job-calc-groups-wrap">
+              ${customRowsHtml}
             </div>
 
-            <label class="job-calc-taxable-check-row" title="${cJob.isTaxable === true ? 'Subject to tax deduction' : 'Untaxed earnings'}">
-              <input type="checkbox" class="job-calc-custom-taxable-checkbox" ${cJob.isTaxable === true ? 'checked' : ''}>
-              <span class="job-calc-taxable-check-box"></span>
-              <span class="job-calc-taxable-check-text">Taxable</span>
-            </label>
+            <!-- Add Split Button for Custom Earnings -->
+            <div class="job-calc-adjust-bar is-split-mode">
+              <div class="job-calc-split-bar-left">
+                <button type="button" class="job-calc-add-custom-split-btn job-calc-add-split-btn" title="Add another shift split row">
+                  <span class="material-symbols-outlined">add</span>
+                  <span>Add Split</span>
+                </button>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -1437,6 +1529,13 @@
       const count = job.occurrences.length;
       const result = jobResults[name] || { totalHours: 0, subtotal: 0, expenseTotal: 0 };
       const isAccordionOpen = state.expandedJobs.has(name);
+      const isSplitMode = isPaid && setting.adjustMode === 'split';
+      let splitAllocated = 0;
+      if (Array.isArray(setting.splits)) {
+        setting.splits.forEach((s) => { splitAllocated += (parseInt(s.shifts, 10) || 0); });
+      }
+      const splitRemaining = count - splitAllocated;
+      const displayCount = (isSplitMode && splitAllocated > 0) ? splitAllocated : count;
 
       let cardClass = 'job-calc-task-card';
       if (isPaid) cardClass += ' is-paid';
@@ -1492,11 +1591,19 @@
             <div class="job-calc-card-info">
               <div class="job-calc-title-row">
                 <span class="job-calc-job-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
-                <span class="job-calc-session-badge">${count}x</span>
+                <span class="job-calc-session-badge">${displayCount}x</span>
               </div>
-              <div class="job-calc-tagline">
-                ${tagline}
-              </div>
+              ${isPaid ? `
+                <label class="job-calc-taxable-check-row" title="${setting.isTaxable !== false ? 'Subject to tax deduction' : 'Untaxed earnings'}">
+                  <input type="checkbox" class="job-calc-taxable-checkbox" ${setting.isTaxable !== false ? 'checked' : ''}>
+                  <span class="job-calc-taxable-check-box"></span>
+                  <span class="job-calc-taxable-check-text">Taxable</span>
+                </label>
+              ` : `
+                <div class="job-calc-tagline">
+                  ${tagline}
+                </div>
+              `}
             </div>
 
             <!-- Subtotal Badge for Paid or Expense -->
@@ -1522,24 +1629,52 @@
                   ${renderJobInputsHtml(name, job, setting)}
                 </div>
 
-                <label class="job-calc-taxable-check-row" title="${setting.isTaxable !== false ? 'Subject to tax deduction' : 'Untaxed earnings'}">
-                  <input type="checkbox" class="job-calc-taxable-checkbox" ${setting.isTaxable !== false ? 'checked' : ''}>
-                  <span class="job-calc-taxable-check-box"></span>
-                  <span class="job-calc-taxable-check-text">Taxable</span>
-                </label>
+                <!-- Adjust Bar: In Split Mode shows Add Split and By Date swapper (NO accordion) -->
+                ${isSplitMode ? `
+                  <div class="job-calc-adjust-bar is-split-mode">
+                    <div class="job-calc-split-bar-left">
+                      <button type="button" class="job-calc-add-split-btn" title="Add another split row">
+                        <span class="material-symbols-outlined">add</span>
+                        <span>Add Split</span>
+                      </button>
+                      <span class="job-calc-split-tag ${splitRemaining === 0 ? 'is-complete' : (splitRemaining > 0 ? 'is-pending' : 'is-over')}">
+                        ${splitRemaining === 0 ? `${count} shifts ✔` : `${splitAllocated}/${count} shifts`}
+                      </span>
+                    </div>
 
-                <!-- Accordion Toggle Button -->
-                <button type="button" class="job-calc-accordion-btn ${isAccordionOpen ? 'active' : ''}">
-                  <span class="material-symbols-outlined job-calc-accordion-arrow">
-                    ${isAccordionOpen ? 'expand_less' : 'expand_more'}
-                  </span>
-                  <span>View & Adjust Specific Dates (${count})</span>
-                </button>
+                    <button type="button" 
+                            class="job-calc-mode-swap-btn" 
+                            data-mode="date" 
+                            title="Switch back to individual calendar dates">
+                      <span class="material-symbols-outlined">swap_horiz</span>
+                      <span>By Date</span>
+                    </button>
+                  </div>
+                ` : `
+                  <div class="job-calc-adjust-bar">
+                    <button type="button" class="job-calc-accordion-btn ${isAccordionOpen ? 'active' : ''}">
+                      <span class="material-symbols-outlined job-calc-accordion-arrow">
+                        ${isAccordionOpen ? 'expand_less' : 'expand_more'}
+                      </span>
+                      <span>Adjust Dates (${count})</span>
+                    </button>
 
-                <!-- Accordion Dates List -->
-                <div class="job-calc-dates-accordion ${isAccordionOpen ? '' : 'hidden'}">
-                  ${renderJobOccurrencesHtml(job, setting)}
-                </div>
+                    ${count > 1 ? `
+                      <button type="button" 
+                              class="job-calc-mode-swap-btn" 
+                              data-mode="split" 
+                              title="Switch to split shifts">
+                        <span class="material-symbols-outlined">swap_horiz</span>
+                        <span>Split</span>
+                      </button>
+                    ` : ''}
+                  </div>
+
+                  <!-- Accordion Dates List -->
+                  <div class="job-calc-dates-accordion ${isAccordionOpen ? '' : 'hidden'}">
+                    ${renderJobOccurrencesHtml(job, setting)}
+                  </div>
+                `}
               </div>
             ` : ''
           }
@@ -1548,14 +1683,8 @@
           ${
             isExpense ? `
               <div class="job-calc-card-config">
-                <div class="job-calc-inputs-row">
-                  <div class="job-calc-input-block" style="flex: 1;">
-                    <label>Cost / Occurrence ($)</label>
-                    <div class="job-calc-input-wrapper">
-                      <span class="job-calc-prefix">$</span>
-                      <input type="number" class="job-calc-calendar-expense-input job-calc-num-input" min="0" step="0.5" value="${setting.expenseAmount ?? 0}">
-                    </div>
-                  </div>
+                <div class="job-calc-groups-wrap">
+                  ${renderExpenseInputsHtml(name, job, setting)}
                 </div>
 
                 <!-- Accordion Toggle Button -->
@@ -1563,7 +1692,7 @@
                   <span class="material-symbols-outlined job-calc-accordion-arrow">
                     ${isAccordionOpen ? 'expand_less' : 'expand_more'}
                   </span>
-                  <span>View & Adjust Specific Dates (${count})</span>
+                  <span>Adjust Dates (${count})</span>
                 </button>
 
                 <!-- Accordion Dates List -->
@@ -1613,8 +1742,67 @@
   }
 
   function renderJobInputsHtml(jobName, job, setting) {
-    const groups = getJobHoursGroups(job, setting);
     const hourlyRate = setting.hourlyRate ?? 25;
+
+    // Split Mode: Render each split tier as a directly editable 3-column row
+    if (setting.adjustMode === 'split') {
+      const count = (job.occurrences || []).length;
+      if (!Array.isArray(setting.splits) || setting.splits.length === 0) {
+        setting.splits = [{ shifts: count > 0 ? count : 1, hours: setting.defaultHours ?? 4 }];
+      }
+
+      let splitRowsHtml = '';
+      setting.splits.forEach((s, idx) => {
+        splitRowsHtml += `
+          <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-split-row" data-split-index="${idx}">
+            <div class="job-calc-input-block">
+              <label>Shifts</label>
+              <div class="job-calc-input-wrapper">
+                <input type="number" 
+                       class="job-calc-split-shifts-input job-calc-num-input" 
+                       data-split-index="${idx}"
+                       min="0" 
+                       step="1" 
+                       value="${s.shifts}" 
+                       title="Enter shifts (type 0 to remove this row)">
+                <span class="job-calc-unit">x</span>
+              </div>
+            </div>
+
+            <div class="job-calc-input-block">
+              <label>Hours / Shift</label>
+              <div class="job-calc-input-wrapper">
+                <input type="number" 
+                       class="job-calc-split-hours-input job-calc-num-input" 
+                       data-split-index="${idx}"
+                       min="0" 
+                       step="0.25" 
+                       value="${s.hours}">
+                <span class="job-calc-unit">hrs</span>
+              </div>
+            </div>
+
+            <div class="job-calc-input-block">
+              <label>Rate ($/hr)</label>
+              <div class="job-calc-input-wrapper">
+                <span class="job-calc-prefix">$</span>
+                <input type="number" 
+                       class="job-calc-rate-input job-calc-num-input" 
+                       min="0" 
+                       step="0.5" 
+                       value="${hourlyRate}" 
+                       placeholder="25">
+                <span class="job-calc-unit">/hr</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      return splitRowsHtml;
+    }
+
+    const groups = getJobHoursGroups(job, setting);
 
     // Happy case: all occurrences have the exact same hours (or zero occurrences)
     if (groups.length <= 1) {
@@ -1806,6 +1994,200 @@
     });
   }
 
+  function getJobExpenseGroups(job, setting) {
+    const defaultExp = typeof setting.expenseAmount === 'number' ? setting.expenseAmount : 0;
+    const groupsMap = new Map();
+
+    (job.occurrences || []).forEach((occ) => {
+      const hasOverride = typeof setting.expenseOverrides?.[occ.occKey] === 'number';
+      const expVal = hasOverride ? setting.expenseOverrides[occ.occKey] : defaultExp;
+
+      if (!groupsMap.has(expVal)) {
+        groupsMap.set(expVal, {
+          amount: expVal,
+          count: 0,
+          occKeys: [],
+          isDefault: expVal === defaultExp
+        });
+      }
+      const g = groupsMap.get(expVal);
+      g.count += 1;
+      g.occKeys.push(occ.occKey);
+    });
+
+    const groups = Array.from(groupsMap.values());
+    groups.sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      return b.amount - a.amount;
+    });
+
+    return groups;
+  }
+
+  function renderExpenseInputsHtml(jobName, job, setting) {
+    const defaultExp = setting.expenseAmount ?? 0;
+    const groups = getJobExpenseGroups(job, setting);
+
+    // Happy case: all occurrences have the exact same cost (or zero occurrences)
+    if (groups.length <= 1) {
+      const amountVal = groups.length === 1 ? groups[0].amount : defaultExp;
+      return `
+        <div class="job-calc-inputs-row">
+          <div class="job-calc-input-block" style="flex: 1; grid-column: 1 / -1;">
+            <label>Cost / Occurrence ($)</label>
+            <div class="job-calc-input-wrapper">
+              <span class="job-calc-prefix">$</span>
+              <input type="number" class="job-calc-calendar-expense-input job-calc-num-input" min="0" step="0.5" value="${amountVal}">
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Customized dates case: multiple groups with different cost
+    let rowsHtml = '';
+    groups.forEach((g) => {
+      rowsHtml += `
+        <div class="job-calc-inputs-row job-calc-group-row job-calc-expense-group-row" data-expense-group="${g.amount}">
+          <div class="job-calc-input-block">
+            <label>Shifts</label>
+            <div class="job-calc-input-wrapper">
+              <input type="number" class="job-calc-group-shifts-input job-calc-num-input" value="${g.count}" readonly tabindex="-1" style="cursor: default;" title="${g.count} shifts are $${g.amount.toFixed(2)}">
+              <span class="job-calc-unit">x</span>
+            </div>
+          </div>
+
+          <div class="job-calc-input-block">
+            <label>Cost / Occurrence ($)</label>
+            <div class="job-calc-input-wrapper">
+              <span class="job-calc-prefix">$</span>
+              <input type="number" class="job-calc-group-expense-input job-calc-num-input" min="0" step="0.5" value="${g.amount}" data-original-amount="${g.amount}">
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    return rowsHtml;
+  }
+
+  function refreshExpenseCardGroups(card, jobName) {
+    if (!card) return;
+    const setting = getJobSetting(jobName);
+    const job = scannedJobs[jobName];
+    if (!job || !setting.isExpense) return;
+
+    const wrap = card.querySelector('.job-calc-groups-wrap');
+    if (!wrap) return;
+
+    wrap.innerHTML = renderExpenseInputsHtml(jobName, job, setting);
+    bindExpenseGroupInputs(card);
+  }
+
+  function bindExpenseGroupInputs(scope) {
+    // 1. Single default expense input (Happy Case)
+    scope.querySelectorAll('.job-calc-calendar-expense-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const setting = getJobSetting(jobName);
+        const val = parseFloat(e.target.value);
+        const newExp = isNaN(val) ? 0 : Math.max(0, val);
+        setting.expenseAmount = newExp;
+        if (setting.expenseOverrides) {
+          Object.keys(setting.expenseOverrides).forEach((k) => delete setting.expenseOverrides[k]);
+        }
+        saveSettings();
+
+        // Update occurrence rows that don't have overrides
+        card.querySelectorAll('.job-calc-occ-row').forEach((occRow) => {
+          const occInput = occRow.querySelector('.job-calc-occ-expense-input');
+          if (occInput) occInput.value = setting.expenseAmount;
+          const resetBtn = occRow.querySelector('.job-calc-occ-expense-reset-btn');
+          if (resetBtn) resetBtn.style.display = 'none';
+        });
+
+        updateCardExpenseBadge(card, jobName);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+          const card = e.target.closest('.job-calc-task-card');
+          if (!card) return;
+          const jobName = card.dataset.jobName;
+          const setting = getJobSetting(jobName);
+          setting.expenseAmount = 0;
+          saveSettings();
+          updateCardExpenseBadge(card, jobName);
+          updateSummaryCard();
+        }
+        const card = e.target.closest('.job-calc-task-card');
+        if (card) {
+          refreshExpenseCardGroups(card, card.dataset.jobName);
+        }
+      });
+    });
+
+    // 2. Grouped expense input (Multiple Different Expense Amounts)
+    scope.querySelectorAll('.job-calc-group-expense-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        const setting = getJobSetting(jobName);
+        if (!job || !setting) return;
+
+        const origAmount = parseFloat(input.dataset.originalAmount);
+        const rawVal = e.target.value.trim();
+        const val = parseFloat(rawVal);
+        const newAmount = (rawVal === '' || isNaN(val)) ? 0 : Math.max(0, val);
+        const defaultExp = typeof setting.expenseAmount === 'number' ? setting.expenseAmount : 0;
+
+        let defaultUpdated = false;
+        (job.occurrences || []).forEach((occ) => {
+          const hasOverride = typeof setting.expenseOverrides?.[occ.occKey] === 'number';
+          const occExp = hasOverride ? setting.expenseOverrides[occ.occKey] : defaultExp;
+
+          if (occExp === origAmount) {
+            if (!hasOverride && !defaultUpdated) {
+              setting.expenseAmount = newAmount;
+              defaultUpdated = true;
+            } else {
+              if (!setting.expenseOverrides) setting.expenseOverrides = {};
+              setting.expenseOverrides[occ.occKey] = newAmount;
+            }
+
+            const occRow = card.querySelector(`.job-calc-occ-row[data-occ-key="${occ.occKey}"]`);
+            if (occRow) {
+              const occInput = occRow.querySelector('.job-calc-occ-expense-input');
+              if (occInput) occInput.value = newAmount;
+              const resetBtn = occRow.querySelector('.job-calc-occ-expense-reset-btn');
+              if (resetBtn) {
+                resetBtn.style.display = (newAmount !== (setting.expenseAmount ?? 0)) ? '' : 'none';
+              }
+            }
+          }
+        });
+
+        input.dataset.originalAmount = newAmount;
+        saveSettings();
+        updateCardExpenseBadge(card, jobName);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        refreshExpenseCardGroups(card, jobName);
+      });
+    });
+  }
+
   function renderExpenseOccurrencesHtml(job, setting) {
     const defaultExp = parseFloat(setting.expenseAmount) || 0;
 
@@ -1870,6 +2252,30 @@
     });
 
     return rowsHtml;
+  }
+
+  function updateCardSplitTag(card, job, setting) {
+    if (!card || !job || !setting) return;
+    const tagEl = card.querySelector('.job-calc-split-tag');
+    if (!tagEl) return;
+    const count = job.occurrences ? job.occurrences.length : 0;
+    let allocated = 0;
+    (setting.splits || []).forEach((s) => {
+      allocated += (parseInt(s.shifts, 10) || 0);
+    });
+    const remaining = count - allocated;
+
+    tagEl.className = 'job-calc-split-tag';
+    if (remaining === 0) {
+      tagEl.classList.add('is-complete');
+      tagEl.textContent = `${count} shifts ✔`;
+    } else if (remaining > 0) {
+      tagEl.classList.add('is-pending');
+      tagEl.textContent = `${allocated}/${count} shifts`;
+    } else {
+      tagEl.classList.add('is-over');
+      tagEl.textContent = `${allocated}/${count} shifts`;
+    }
   }
 
   function bindCardEvents(listEl) {
@@ -1948,6 +2354,7 @@
 
     // 2. Calendar Job Grouped / Default inputs and Rate inputs
     bindGroupInputs(listEl);
+    bindExpenseGroupInputs(listEl);
 
     // 4. Accordion Toggle
     listEl.querySelectorAll('.job-calc-accordion-btn').forEach((btn) => {
@@ -1967,6 +2374,165 @@
           accordion.classList.remove('hidden');
           btn.classList.add('active');
           if (arrow) arrow.textContent = 'expand_less';
+        }
+      });
+    });
+
+    // 4b. Mode Swapper (By Date vs Split)
+    listEl.querySelectorAll('.job-calc-mode-swap-btn, .job-calc-mode-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        if (!job) return;
+        const setting = getJobSetting(jobName);
+        const mode = btn.dataset.mode;
+
+        if (setting.adjustMode === mode) return;
+
+        setting.adjustMode = mode;
+        if (mode === 'split') {
+          const count = job.occurrences ? job.occurrences.length : 0;
+          if (!Array.isArray(setting.splits) || setting.splits.length === 0) {
+            const groups = getJobHoursGroups(job, setting);
+            if (groups.length > 0) {
+              setting.splits = groups.map((g) => ({ shifts: g.count, hours: g.hours }));
+            } else {
+              setting.splits = [{ shifts: count > 0 ? count : 1, hours: setting.defaultHours ?? 4 }];
+            }
+          }
+        }
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+      });
+    });
+
+    // 4c. Split Mode: Add Split Row Button
+    listEl.querySelectorAll('.job-calc-add-split-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        if (!job) return;
+        const setting = getJobSetting(jobName);
+        const count = job.occurrences ? job.occurrences.length : 0;
+
+        if (!Array.isArray(setting.splits)) setting.splits = [];
+
+        let allocated = 0;
+        setting.splits.forEach((s) => { allocated += (parseInt(s.shifts, 10) || 0); });
+        const remaining = count - allocated;
+        const newShifts = remaining > 0 ? remaining : 1;
+
+        setting.splits.push({
+          shifts: newShifts,
+          hours: setting.defaultHours ?? 4
+        });
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+      });
+    });
+
+    // 4d. Split Mode: Shifts Input (Live editing & Auto-remove on 0)
+    listEl.querySelectorAll('.job-calc-split-shifts-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        const setting = getJobSetting(jobName);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!setting.splits || !setting.splits[idx]) return;
+
+        const val = parseInt(e.target.value, 10);
+        setting.splits[idx].shifts = isNaN(val) ? 0 : Math.max(0, val);
+
+        updateCardSplitTag(card, job, setting);
+        saveSettings();
+        updateCardSubtotal(card, jobName);
+        updateSummaryCard();
+      });
+
+      const handleRemoveOnZero = () => {
+        const card = input.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const setting = getJobSetting(jobName);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!setting.splits || !setting.splits[idx]) return;
+
+        const val = parseInt(input.value, 10);
+        // Auto-remove row if shifts is 0 or empty (keeping at least one row)
+        if (val === 0 || isNaN(val) || input.value.trim() === '' || input.value.trim() === '0') {
+          if (setting.splits.length > 1) {
+            setting.splits.splice(idx, 1);
+            saveSettings();
+            renderTasksList();
+            updateSummaryCard();
+            return;
+          } else {
+            setting.splits[0].shifts = 1;
+            input.value = 1;
+            saveSettings();
+            updateCardSubtotal(card, jobName);
+            updateSummaryCard();
+            const job = scannedJobs[jobName];
+            if (job) updateCardSplitTag(card, job, setting);
+          }
+        }
+      };
+
+      input.addEventListener('change', handleRemoveOnZero);
+      input.addEventListener('blur', handleRemoveOnZero);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        }
+      });
+    });
+
+    // 4e. Split Mode: Hours Input
+    listEl.querySelectorAll('.job-calc-split-hours-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const setting = getJobSetting(jobName);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!setting.splits || !setting.splits[idx]) return;
+
+        const val = parseFloat(e.target.value);
+        setting.splits[idx].hours = isNaN(val) ? 0 : Math.max(0, val);
+
+        saveSettings();
+        updateCardSubtotal(card, jobName);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+          const card = e.target.closest('.job-calc-task-card');
+          if (card) {
+            const jobName = card.dataset.jobName;
+            const setting = getJobSetting(jobName);
+            const idx = parseInt(input.dataset.splitIndex, 10);
+            if (setting.splits && setting.splits[idx]) {
+              setting.splits[idx].hours = 0;
+              saveSettings();
+              updateCardSubtotal(card, jobName);
+              updateSummaryCard();
+            }
+          }
         }
       });
     });
@@ -2059,46 +2625,7 @@
       });
     });
 
-    // 7. Calendar Task Expense amount input
-    listEl.querySelectorAll('.job-calc-calendar-expense-input').forEach((input) => {
-      input.addEventListener('input', (e) => {
-        const card = e.target.closest('.job-calc-task-card');
-        if (!card) return;
-        const jobName = card.dataset.jobName;
-        const setting = getJobSetting(jobName);
-        const val = parseFloat(e.target.value);
-        setting.expenseAmount = isNaN(val) ? 0 : Math.max(0, val);
-        saveSettings();
-
-        // Update occurrence rows that don't have overrides
-        card.querySelectorAll('.job-calc-occ-row').forEach((occRow) => {
-          const occKey = occRow.dataset.occKey;
-          if (!setting.expenseOverrides || typeof setting.expenseOverrides[occKey] !== 'number') {
-            const occInput = occRow.querySelector('.job-calc-occ-expense-input');
-            if (occInput) occInput.value = setting.expenseAmount;
-          }
-        });
-
-        updateCardExpenseBadge(card, jobName);
-        updateSummaryCard();
-      });
-
-      input.addEventListener('blur', (e) => {
-        if (e.target.value.trim() === '') {
-          e.target.value = 0;
-          const card = e.target.closest('.job-calc-task-card');
-          if (!card) return;
-          const jobName = card.dataset.jobName;
-          const setting = getJobSetting(jobName);
-          setting.expenseAmount = 0;
-          saveSettings();
-          updateCardExpenseBadge(card, jobName);
-          updateSummaryCard();
-        }
-      });
-    });
-
-    // 7b. Per-date expense override
+    // 7b. Per-date expense override (Accordion Dates)
     listEl.querySelectorAll('.job-calc-occ-expense-input').forEach((input) => {
       input.addEventListener('input', (e) => {
         const card = e.target.closest('.job-calc-task-card');
@@ -2152,6 +2679,20 @@
           const resetBtn = occRow.querySelector('.job-calc-occ-expense-reset-btn');
           if (resetBtn) resetBtn.style.display = (0 !== defaultExp) ? '' : 'none';
         }
+        refreshExpenseCardGroups(card, jobName);
+      });
+
+      input.addEventListener('change', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        refreshExpenseCardGroups(card, card.dataset.jobName);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.target.blur();
+        }
       });
     });
 
@@ -2181,6 +2722,7 @@
 
         updateCardExpenseBadge(card, jobName);
         updateSummaryCard();
+        refreshExpenseCardGroups(card, jobName);
       });
     });
 
@@ -2212,53 +2754,128 @@
       });
     });
 
-    // 9. Custom Job Shifts Count input
-    listEl.querySelectorAll('.job-calc-custom-shifts-input').forEach((input) => {
+    // 9. Custom Job: Add Split Row Button
+    listEl.querySelectorAll('.job-calc-add-custom-split-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        if (!cJob) return;
+
+        if (!Array.isArray(cJob.splits)) {
+          cJob.splits = [{ shifts: parseInt(cJob.shiftsCount, 10) || 1, hours: parseFloat(cJob.hoursPerShift) || 4 }];
+        }
+
+        cJob.splits.push({
+          shifts: 1,
+          hours: cJob.splits.length > 0 ? cJob.splits[0].hours : 4
+        });
+        cJob.shiftsCount = cJob.splits.reduce((acc, s) => acc + (parseInt(s.shifts, 10) || 0), 0);
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+      });
+    });
+
+    // 10. Custom Job: Split Shifts Input (with Auto-remove on 0)
+    listEl.querySelectorAll('.job-calc-custom-split-shifts-input').forEach((input) => {
       input.addEventListener('input', (e) => {
         const card = e.target.closest('.job-calc-custom-card');
         if (!card) return;
         const customId = card.dataset.customId;
         const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
-        if (cJob) {
-          const val = parseInt(e.target.value, 10);
-          cJob.shiftsCount = isNaN(val) ? 1 : Math.max(1, val);
-          saveSettings();
-          updateCustomCardSubtotal(card, customId);
-          updateSummaryCard();
-        }
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!cJob || !cJob.splits || !cJob.splits[idx]) return;
+
+        const val = parseInt(e.target.value, 10);
+        cJob.splits[idx].shifts = isNaN(val) ? 0 : Math.max(0, val);
+        cJob.shiftsCount = cJob.splits.reduce((acc, s) => acc + (parseInt(s.shifts, 10) || 0), 0);
+
+        saveSettings();
+        updateCustomCardSubtotal(card, customId);
+        updateSummaryCard();
       });
 
-      input.addEventListener('blur', (e) => {
-        if (e.target.value.trim() === '' || parseInt(e.target.value, 10) < 1) {
-          e.target.value = 1;
+      const handleRemoveOnZero = () => {
+        const card = input.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!cJob || !cJob.splits || !cJob.splits[idx]) return;
+
+        const val = parseInt(input.value, 10);
+        if (val === 0 || isNaN(val) || input.value.trim() === '' || input.value.trim() === '0') {
+          if (cJob.splits.length > 1) {
+            cJob.splits.splice(idx, 1);
+            cJob.shiftsCount = cJob.splits.reduce((acc, s) => acc + (parseInt(s.shifts, 10) || 0), 0);
+            saveSettings();
+            renderTasksList();
+            updateSummaryCard();
+            return;
+          } else {
+            cJob.splits[0].shifts = 1;
+            cJob.shiftsCount = 1;
+            input.value = 1;
+            saveSettings();
+            updateCustomCardSubtotal(card, customId);
+            updateSummaryCard();
+          }
+        }
+      };
+
+      input.addEventListener('change', handleRemoveOnZero);
+      input.addEventListener('blur', handleRemoveOnZero);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
         }
       });
     });
 
-    // 10. Custom Job Hours input
-    listEl.querySelectorAll('.job-calc-custom-hours-input').forEach((input) => {
+    // 11. Custom Job: Split Hours Input
+    listEl.querySelectorAll('.job-calc-custom-split-hours-input').forEach((input) => {
       input.addEventListener('input', (e) => {
         const card = e.target.closest('.job-calc-custom-card');
         if (!card) return;
         const customId = card.dataset.customId;
         const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
-        if (cJob) {
-          const val = parseFloat(e.target.value);
-          cJob.hoursPerShift = isNaN(val) ? 0 : Math.max(0, val);
-          saveSettings();
-          updateCustomCardSubtotal(card, customId);
-          updateSummaryCard();
-        }
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!cJob || !cJob.splits || !cJob.splits[idx]) return;
+
+        const val = parseFloat(e.target.value);
+        cJob.splits[idx].hours = isNaN(val) ? 0 : Math.max(0, val);
+        if (idx === 0) cJob.hoursPerShift = cJob.splits[0].hours;
+
+        saveSettings();
+        updateCustomCardSubtotal(card, customId);
+        updateSummaryCard();
       });
 
       input.addEventListener('blur', (e) => {
         if (e.target.value.trim() === '') {
           e.target.value = 0;
+          const card = e.target.closest('.job-calc-custom-card');
+          if (card) {
+            const customId = card.dataset.customId;
+            const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+            const idx = parseInt(input.dataset.splitIndex, 10);
+            if (cJob && cJob.splits && cJob.splits[idx]) {
+              cJob.splits[idx].hours = 0;
+              saveSettings();
+              updateCustomCardSubtotal(card, customId);
+              updateSummaryCard();
+            }
+          }
         }
       });
     });
 
-    // 11. Custom Job Rate input
+    // 12. Custom Job: Rate input (syncs all rate inputs on that card)
     listEl.querySelectorAll('.job-calc-custom-rate-input').forEach((input) => {
       input.addEventListener('input', (e) => {
         const card = e.target.closest('.job-calc-custom-card');
@@ -2269,6 +2886,9 @@
           const val = parseFloat(e.target.value);
           cJob.hourlyRate = isNaN(val) ? 0 : Math.max(0, val);
           saveSettings();
+          card.querySelectorAll('.job-calc-custom-rate-input').forEach((r) => {
+            if (r !== e.target) r.value = e.target.value;
+          });
           updateCustomCardSubtotal(card, customId);
           updateSummaryCard();
         }
@@ -2439,14 +3059,23 @@
 
     const defaultHours = parseFloat(setting.defaultHours) || 0;
     const rate = parseFloat(setting.hourlyRate) || 0;
-
+    const count = job.occurrences ? job.occurrences.length : 0;
     let hours = 0;
-    job.occurrences.forEach((occ) => {
-      const overrideVal = setting.dateOverrides?.[occ.occKey];
-      hours += (typeof overrideVal === 'number' && !isNaN(overrideVal))
-        ? overrideVal
-        : defaultHours;
-    });
+
+    if (setting.adjustMode === 'split' && Array.isArray(setting.splits) && setting.splits.length > 0) {
+      setting.splits.forEach((s) => {
+        const sCount = parseInt(s.shifts, 10) || 0;
+        const sHours = parseFloat(s.hours) || 0;
+        hours += (sCount * sHours);
+      });
+    } else {
+      job.occurrences.forEach((occ) => {
+        const overrideVal = setting.dateOverrides?.[occ.occKey];
+        hours += (typeof overrideVal === 'number' && !isNaN(overrideVal))
+          ? overrideVal
+          : defaultHours;
+      });
+    }
 
     const subtotal = hours * rate;
 
@@ -2460,16 +3089,31 @@
     const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
     if (!cJob) return;
 
-    const count = parseInt(cJob.shiftsCount, 10) || 1;
-    const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
     const rate = parseFloat(cJob.hourlyRate) || 0;
-    const totalHours = count * hoursPerShift;
+    let totalHours = 0;
+    let totalShifts = 0;
+
+    if (Array.isArray(cJob.splits) && cJob.splits.length > 0) {
+      cJob.splits.forEach((s) => {
+        const sCount = parseInt(s.shifts, 10) || 0;
+        const sHours = parseFloat(s.hours) || 0;
+        totalHours += (sCount * sHours);
+        totalShifts += sCount;
+      });
+    } else {
+      totalShifts = parseInt(cJob.shiftsCount, 10) || 1;
+      const hoursPerShift = parseFloat(cJob.hoursPerShift) || 0;
+      totalHours = totalShifts * hoursPerShift;
+    }
+
     const subtotal = totalHours * rate;
 
     const amountEl = card.querySelector('.job-calc-subtotal-amount');
     const hoursEl = card.querySelector('.job-calc-subtotal-hours');
+    const badgeEl = card.querySelector('.job-calc-session-badge');
     if (amountEl) amountEl.textContent = `$${subtotal.toFixed(2)}`;
     if (hoursEl) hoursEl.textContent = `${totalHours.toFixed(1)} hrs`;
+    if (badgeEl) badgeEl.textContent = `${totalShifts}x`;
   }
 
   function updateSummaryCard() {
