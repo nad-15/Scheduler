@@ -62,12 +62,22 @@
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
+          // Only load categorized tasks into memory (prunes any legacy ghost entries)
+          const loadedJobs = {};
+          if (parsed.jobs && typeof parsed.jobs === 'object') {
+            for (const [name, job] of Object.entries(parsed.jobs)) {
+              if (job && (job.isPaid === true || job.isExpense === true)) {
+                loadedJobs[name] = job;
+              }
+            }
+          }
+
           state.settings = {
             tax: {
               type: parsed.tax?.type === 'amount' ? 'amount' : 'percent',
               value: typeof parsed.tax?.value === 'number' ? parsed.tax.value : (parseFloat(parsed.tax?.value) || 0)
             },
-            jobs: parsed.jobs && typeof parsed.jobs === 'object' ? parsed.jobs : {},
+            jobs: loadedJobs,
             customJobs: Array.isArray(parsed.customJobs) ? parsed.customJobs : [],
             customExpenses: Array.isArray(parsed.customExpenses) ? parsed.customExpenses : []
           };
@@ -78,9 +88,77 @@
     }
   }
 
+  function getCleanSettingsForStorage() {
+    const cleanJobs = {};
+    const jobs = state.settings.jobs || {};
+
+    for (const [name, job] of Object.entries(jobs)) {
+      if (!job) continue;
+      const isPaid = job.isPaid === true;
+      const isExpense = job.isExpense === true;
+
+      // Zero-Waste: Only serialize tasks the user actively categorized as Earnings or Expense
+      if (isPaid || isExpense) {
+        const cleanJob = {
+          isPaid,
+          isExpense
+        };
+
+        if (isPaid) {
+          cleanJob.defaultHours = typeof job.defaultHours === 'number' ? job.defaultHours : 4;
+          cleanJob.hourlyRate = typeof job.hourlyRate === 'number' ? job.hourlyRate : 25;
+          cleanJob.isTaxable = job.isTaxable !== false;
+
+          // Only store date overrides if they actually differ from the job's default hours
+          if (job.dateOverrides && typeof job.dateOverrides === 'object') {
+            const validOverrides = {};
+            for (const [key, val] of Object.entries(job.dateOverrides)) {
+              if (typeof val === 'number' && !isNaN(val) && val !== cleanJob.defaultHours) {
+                validOverrides[key] = val;
+              }
+            }
+            if (Object.keys(validOverrides).length > 0) {
+              cleanJob.dateOverrides = validOverrides;
+            }
+          }
+        }
+
+        if (isExpense) {
+          cleanJob.expenseAmount = typeof job.expenseAmount === 'number' ? job.expenseAmount : 0;
+
+          // Only store expense overrides if they actually differ from the default expense amount
+          if (job.expenseOverrides && typeof job.expenseOverrides === 'object') {
+            const validExpOverrides = {};
+            for (const [key, val] of Object.entries(job.expenseOverrides)) {
+              if (typeof val === 'number' && !isNaN(val) && val !== cleanJob.expenseAmount) {
+                validExpOverrides[key] = val;
+              }
+            }
+            if (Object.keys(validExpOverrides).length > 0) {
+              cleanJob.expenseOverrides = validExpOverrides;
+            }
+          }
+        }
+
+        cleanJobs[name] = cleanJob;
+      }
+    }
+
+    return {
+      tax: {
+        type: state.settings.tax?.type === 'amount' ? 'amount' : 'percent',
+        value: typeof state.settings.tax?.value === 'number' ? state.settings.tax.value : (parseFloat(state.settings.tax?.value) || 0)
+      },
+      jobs: cleanJobs,
+      customJobs: Array.isArray(state.settings.customJobs) ? state.settings.customJobs : [],
+      customExpenses: Array.isArray(state.settings.customExpenses) ? state.settings.customExpenses : []
+    };
+  }
+
   function saveSettings() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.settings));
+      const payload = getCleanSettingsForStorage();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch (e) {
       console.warn('[JobCalculator] Failed to save settings to localStorage:', e);
     }
@@ -516,13 +594,13 @@
           <div class="job-calc-controls-bar">
             <div class="job-calc-tabs">
               <button type="button" class="job-calc-tab active" data-tab="paid" id="job-calc-tab-paid">
-                Earnings (<span id="job-calc-count-paid">0</span>)
+                <span>Earnings (<span id="job-calc-count-paid">0</span>)</span>
               </button>
               <button type="button" class="job-calc-tab" data-tab="expenses" id="job-calc-tab-expenses">
-                Expenses (<span id="job-calc-count-expenses">0</span>)
+                <span>Expenses (<span id="job-calc-count-expenses">0</span>)</span>
               </button>
               <button type="button" class="job-calc-tab" data-tab="all" id="job-calc-tab-all">
-                All (<span id="job-calc-count-all">0</span>)
+                <span>All (<span id="job-calc-count-all">0</span>)</span>
               </button>
             </div>
             <div class="job-calc-search-box">
@@ -1168,7 +1246,7 @@
       listEl.innerHTML = `
         <div class="job-calc-empty-state">
           <span class="material-symbols-outlined job-calc-empty-icon">
-            ${isPaidTab ? 'account_balance_wallet' : (isExpTab ? 'receipt_long' : 'event_busy')}
+            ${isPaidTab ? 'trending_up' : (isExpTab ? 'trending_down' : 'event_busy')}
           </span>
           <p class="job-calc-empty-title">
             ${
@@ -1365,11 +1443,12 @@
       else if (isExpense) cardClass += ' is-expense';
       else cardClass += ' is-unpaid';
 
-      let tagline = 'Personal / Errand (Excluded)';
-      if (isPaid) tagline = 'Earnings / Job';
-      else if (isExpense) tagline = 'Expenses / Deduction';
+      let tagline = 'Excluded';
+      if (isPaid) tagline = 'Earnings';
+      else if (isExpense) tagline = 'Expenses';
 
       const checkClass = isPaid ? 'is-paid' : (isExpense ? 'is-expense' : 'is-unmarked');
+      const triageIcon = isPaid ? 'trending_up' : (isExpense ? 'trending_down' : 'add');
 
       html += `
         <div class="${cardClass}" data-job-name="${escapeHtml(name)}">
@@ -1382,36 +1461,27 @@
                       class="job-calc-triage-btn ${checkClass}" 
                       data-action="open-triage-menu" 
                       title="${isPaid ? 'Earnings (Click to change or exclude)' : (isExpense ? 'Expenses (Click to change or exclude)' : 'Categorize Task')}">
-                <span class="material-symbols-outlined job-calc-triage-icon">check</span>
+                <span class="material-symbols-outlined job-calc-triage-icon" style="font-size: 15px !important;">${triageIcon}</span>
               </button>
 
               <!-- Popover Menu -->
               <div class="job-calc-triage-popover hidden">
                 <div class="job-calc-triage-popover-header">Categorize Task</div>
                 <button type="button" class="job-calc-triage-option option-paid ${isPaid ? 'selected' : ''}" data-triage-type="paid">
-                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">work</span></div>
-                  <div class="job-calc-triage-option-info">
-                    <span class="job-calc-triage-option-title">Earnings</span>
-                    <span class="job-calc-triage-option-desc">Earn income (Hours × Rate)</span>
-                  </div>
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">trending_up</span></div>
+                  <span class="job-calc-triage-option-title">Earnings</span>
                   ${isPaid ? '<span class="material-symbols-outlined job-calc-option-check">check</span>' : ''}
                 </button>
                 <button type="button" class="job-calc-triage-option option-expense ${isExpense ? 'selected' : ''}" data-triage-type="expense">
-                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">receipt_long</span></div>
-                  <div class="job-calc-triage-option-info">
-                    <span class="job-calc-triage-option-title">Expenses</span>
-                    <span class="job-calc-triage-option-desc">Out-of-pocket cost deduction</span>
-                  </div>
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">trending_down</span></div>
+                  <span class="job-calc-triage-option-title">Expenses</span>
                   ${isExpense ? '<span class="material-symbols-outlined job-calc-option-check">check</span>' : ''}
                 </button>
                 ${isMarked ? `
                   <div class="job-calc-triage-popover-divider"></div>
                   <button type="button" class="job-calc-triage-option option-unmark" data-triage-type="unmark">
                     <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">cancel</span></div>
-                    <div class="job-calc-triage-option-info">
-                      <span class="job-calc-triage-option-title">Exclude Task</span>
-                      <span class="job-calc-triage-option-desc">Mark as personal / remove computation</span>
-                    </div>
+                    <span class="job-calc-triage-option-title">Exclude</span>
                   </button>
                 ` : ''}
               </div>
@@ -1853,6 +1923,7 @@
         } else if (type === 'unmark') {
           setting.isPaid = false;
           setting.isExpense = false;
+          delete state.settings.jobs[jobName];
         }
 
         saveSettings();

@@ -11031,13 +11031,15 @@ ic {
     border: none;
     background: transparent;
     border-radius: 9px;
-    padding: 7px 8px;
+    padding: 7px 10px;
     font-size: 0.8rem;
     font-weight: 600;
     color: #64748b;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -11327,11 +11329,15 @@ ic {
     box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
 }
 
-.job-calc-triage-icon {
-    font-size: 15px;
-    font-weight: 800;
+.job-calc-triage-btn .job-calc-triage-icon,
+.material-symbols-outlined.job-calc-triage-icon {
+    font-size: 15px !important;
+    font-weight: 700;
+    font-variation-settings: 'wght' 700;
     line-height: 1;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     user-select: none;
     transition: all 0.15s ease;
 }
@@ -11366,15 +11372,15 @@ ic {
     top: calc(100% + 8px);
     left: 0;
     z-index: 150;
-    min-width: 250px;
+    min-width: 175px;
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.16), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
-    padding: 6px;
+    padding: 5px;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
     animation: jobCalcPopIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -11394,8 +11400,8 @@ ic {
 }
 
 .job-calc-triage-popover-header {
-    padding: 6px 10px 4px 10px;
-    font-size: 0.68rem;
+    padding: 5px 8px 3px 8px;
+    font-size: 0.65rem;
     font-weight: 700;
     color: #94a3b8;
     text-transform: uppercase;
@@ -11405,9 +11411,9 @@ ic {
 .job-calc-triage-option {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 8px;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 7px;
     border: none;
     background: transparent;
     cursor: pointer;
@@ -11415,6 +11421,7 @@ ic {
     width: 100%;
     transition: background 0.15s ease;
     font-family: inherit;
+    box-sizing: border-box;
 }
 
 .job-calc-triage-option:hover {
@@ -11422,9 +11429,9 @@ ic {
 }
 
 .job-calc-triage-option-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -11432,7 +11439,7 @@ ic {
 }
 
 .job-calc-triage-option-icon .material-symbols-outlined {
-    font-size: 17px;
+    font-size: 16px;
 }
 
 .job-calc-triage-option.option-paid .job-calc-triage-option-icon {
@@ -11462,29 +11469,16 @@ ic {
     background: #fef2f2;
 }
 
-.job-calc-triage-option-info {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-
 .job-calc-triage-option-title {
     font-size: 0.82rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #0f172a;
-}
-
-.job-calc-triage-option-desc {
-    font-size: 0.68rem;
-    color: #64748b;
-    line-height: 1.2;
+    flex: 1;
 }
 
 .job-calc-option-check {
     margin-left: auto;
-    font-size: 17px;
+    font-size: 16px;
     color: #16a34a;
     flex-shrink: 0;
 }
