@@ -849,37 +849,39 @@
       <!-- Scrollable Main Content -->
       <div class="job-calc-body">
         
-        <!-- 1. Date Range Filter Card -->
-        <section class="job-calc-card job-calc-date-card">
-          <div class="job-calc-card-header">
+        <!-- 1. Date Range Section -->
+        <section class="job-calc-date-section">
+          <div class="job-calc-section-header">
             <span class="material-symbols-outlined job-calc-card-icon">calendar_month</span>
             <span class="job-calc-card-title">Date Range</span>
           </div>
           
-          <div class="job-calc-date-presets" id="job-calc-date-presets">
-            <button type="button" class="job-calc-pill active" data-preset="this-month">This Month</button>
-            <button type="button" class="job-calc-pill" data-preset="last-month">Last Month</button>
-            <button type="button" class="job-calc-pill" data-preset="first-half">1st - 15th</button>
-            <button type="button" class="job-calc-pill" data-preset="second-half">16th - End</button>
-            <button type="button" class="job-calc-pill" data-preset="last-30">Past 30 Days</button>
-          </div>
-
-          <div class="job-calc-date-inputs">
-            <div class="job-calc-date-field">
-              <label for="job-calc-from-date">From</label>
-              <input type="date" id="job-calc-from-date" class="job-calc-date-picker">
+          <div class="job-calc-card job-calc-date-card">
+            <div class="job-calc-date-presets" id="job-calc-date-presets">
+              <button type="button" class="job-calc-pill active" data-preset="this-month">This Month</button>
+              <button type="button" class="job-calc-pill" data-preset="last-month">Last Month</button>
+              <button type="button" class="job-calc-pill" data-preset="first-half">1st - 15th</button>
+              <button type="button" class="job-calc-pill" data-preset="second-half">16th - End</button>
+              <button type="button" class="job-calc-pill" data-preset="last-30">Past 30 Days</button>
             </div>
-            <span class="job-calc-date-sep">→</span>
-            <div class="job-calc-date-field">
-              <label for="job-calc-to-date">To</label>
-              <input type="date" id="job-calc-to-date" class="job-calc-date-picker">
+
+            <div class="job-calc-date-inputs">
+              <div class="job-calc-date-field">
+                <label for="job-calc-from-date">From</label>
+                <input type="date" id="job-calc-from-date" class="job-calc-date-picker">
+              </div>
+              <span class="job-calc-date-sep">→</span>
+              <div class="job-calc-date-field">
+                <label for="job-calc-to-date">To</label>
+                <input type="date" id="job-calc-to-date" class="job-calc-date-picker">
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- 2. Schedules Card (Containerized Work Section) -->
-        <section class="job-calc-card job-calc-jobs-card" id="job-calc-jobs-card">
-          <div class="job-calc-card-header job-calc-jobs-header">
+        <!-- 2. Schedules Section (Un-containerized Work Section) -->
+        <section class="job-calc-jobs-section" id="job-calc-jobs-card">
+          <div class="job-calc-section-header job-calc-jobs-header">
             <div class="job-calc-header-title-wrap">
               <span class="material-symbols-outlined job-calc-card-icon">calendar_today</span>
               <span class="job-calc-card-title">Schedules</span>
@@ -916,73 +918,75 @@
           </div>
         </section>
 
-        <!-- 3. Financial Summary & Tax Deduction Card -->
-        <section class="job-calc-card job-calc-summary-card" id="job-calc-summary-card">
-          <div class="job-calc-card-header">
+        <!-- 3. Financial Summary & Tax Deduction Section -->
+        <section class="job-calc-summary-section">
+          <div class="job-calc-section-header" id="job-calc-summary-header">
             <span class="material-symbols-outlined job-calc-card-icon">receipt_long</span>
             <span class="job-calc-card-title">Financial Summary</span>
           </div>
 
-          <div class="job-calc-summary-metrics">
-            <div class="job-calc-metric">
-              <span class="job-calc-metric-label">Earning Shifts</span>
-              <span class="job-calc-metric-val" id="job-calc-sum-sessions">0x</span>
-            </div>
-            <div class="job-calc-metric">
-              <span class="job-calc-metric-label">Total Hours</span>
-              <span class="job-calc-metric-val" id="job-calc-sum-hours">0.0 hrs</span>
-            </div>
-          </div>
-
-          <div class="job-calc-summary-rows">
-            <div class="job-calc-summary-row">
-              <span class="job-calc-row-title">Gross Earnings</span>
-              <span class="job-calc-sum-bold" id="job-calc-sum-gross">$0.00</span>
+          <div class="job-calc-card job-calc-summary-card" id="job-calc-summary-card">
+            <div class="job-calc-summary-metrics">
+              <div class="job-calc-metric">
+                <span class="job-calc-metric-label">Earning Shifts</span>
+                <span class="job-calc-metric-val" id="job-calc-sum-sessions">0x</span>
+              </div>
+              <div class="job-calc-metric">
+                <span class="job-calc-metric-label">Total Hours</span>
+                <span class="job-calc-metric-val" id="job-calc-sum-hours">0.0 hrs</span>
+              </div>
             </div>
 
-            <!-- Tax Deduction Row -->
-            <div class="job-calc-tax-row">
-              <div class="job-calc-tax-label-group">
-                <span class="job-calc-tax-title">Tax Deduction</span>
-                <div class="job-calc-tax-mode-toggle" id="job-calc-tax-mode-toggle">
-                  <button type="button" class="job-calc-tax-mode-btn active" data-mode="percent">%</button>
-                  <button type="button" class="job-calc-tax-mode-btn" data-mode="amount">$</button>
+            <div class="job-calc-summary-rows">
+              <div class="job-calc-summary-row">
+                <span class="job-calc-row-title">Gross Earnings</span>
+                <span class="job-calc-sum-bold" id="job-calc-sum-gross">$0.00</span>
+              </div>
+
+              <!-- Tax Deduction Row -->
+              <div class="job-calc-tax-row">
+                <div class="job-calc-tax-label-group">
+                  <span class="job-calc-tax-title">Tax Deduction</span>
+                  <div class="job-calc-tax-mode-toggle" id="job-calc-tax-mode-toggle">
+                    <button type="button" class="job-calc-tax-mode-btn active" data-mode="percent">%</button>
+                    <button type="button" class="job-calc-tax-mode-btn" data-mode="amount">$</button>
+                  </div>
+                </div>
+                <div class="job-calc-tax-input-group">
+                  <div class="job-calc-tax-field mode-percent" id="job-calc-tax-field">
+                    <span class="job-calc-tax-symbol-prefix" id="job-calc-tax-symbol-prefix" style="display: none;">$</span>
+                    <input type="number" id="job-calc-tax-input" class="job-calc-num-input job-calc-tax-val-input" min="0" step="1" placeholder="0">
+                    <span class="job-calc-tax-symbol-suffix" id="job-calc-tax-symbol-suffix">%</span>
+                  </div>
+                  <span class="job-calc-tax-deduction-amount" id="job-calc-tax-amount">-$0.00</span>
                 </div>
               </div>
-              <div class="job-calc-tax-input-group">
-                <div class="job-calc-tax-field mode-percent" id="job-calc-tax-field">
-                  <span class="job-calc-tax-symbol-prefix" id="job-calc-tax-symbol-prefix" style="display: none;">$</span>
-                  <input type="number" id="job-calc-tax-input" class="job-calc-num-input job-calc-tax-val-input" min="0" step="1" placeholder="0">
-                  <span class="job-calc-tax-symbol-suffix" id="job-calc-tax-symbol-suffix">%</span>
+
+              <!-- Expenses Row (Included only when expenses exist) -->
+              <div class="job-calc-summary-row" id="job-calc-expense-summary-row" style="display: none;">
+                <span class="job-calc-row-title">Expenses</span>
+                <span class="job-calc-expense-amount" id="job-calc-sum-expenses">-$0.00</span>
+              </div>
+
+              <div class="job-calc-divider"></div>
+
+              <!-- Net Take-Home Row -->
+              <div class="job-calc-summary-row job-calc-net-row">
+                <div class="job-calc-net-label-wrap">
+                  <span class="job-calc-net-label">Net Take-Home Pay</span>
+                  <span class="job-calc-net-sublabel">After tax & expenses</span>
                 </div>
-                <span class="job-calc-tax-deduction-amount" id="job-calc-tax-amount">-$0.00</span>
+                <span class="job-calc-net-val" id="job-calc-sum-net">$0.00</span>
               </div>
             </div>
 
-            <!-- Expenses Row (Included only when expenses exist) -->
-            <div class="job-calc-summary-row" id="job-calc-expense-summary-row" style="display: none;">
-              <span class="job-calc-row-title">Expenses</span>
-              <span class="job-calc-expense-amount" id="job-calc-sum-expenses">-$0.00</span>
+            <!-- Actions -->
+            <div class="job-calc-actions-row">
+              <button type="button" class="job-calc-action-btn job-calc-btn-view-receipt" id="job-calc-btn-view-receipt" title="View Breakdown Ticket">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>View Breakdown</span>
+              </button>
             </div>
-
-            <div class="job-calc-divider"></div>
-
-            <!-- Net Take-Home Row -->
-            <div class="job-calc-summary-row job-calc-net-row">
-              <div class="job-calc-net-label-wrap">
-                <span class="job-calc-net-label">Net Take-Home Pay</span>
-                <span class="job-calc-net-sublabel">After tax & expenses</span>
-              </div>
-              <span class="job-calc-net-val" id="job-calc-sum-net">$0.00</span>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="job-calc-actions-row">
-            <button type="button" class="job-calc-action-btn job-calc-btn-view-receipt" id="job-calc-btn-view-receipt" title="View Breakdown Ticket">
-              <span class="material-symbols-outlined">receipt_long</span>
-              <span>View Breakdown</span>
-            </button>
           </div>
         </section>
 
@@ -1308,8 +1312,12 @@
     function swapToReceiptTicket() {
       const currentSummary = container.querySelector('#job-calc-summary-card') || container.querySelector('.job-calc-summary-card');
       const currentReceipt = container.querySelector('#job-calc-receipt-wrapper') || container.querySelector('.job-calc-receipt-wrapper');
+      const currentHeader = container.querySelector('#job-calc-summary-header');
       if (currentSummary) {
         currentSummary.style.display = 'none';
+      }
+      if (currentHeader) {
+        currentHeader.style.display = 'none';
       }
       if (currentReceipt) {
         currentReceipt.style.display = 'flex';
@@ -1326,12 +1334,16 @@
       if (currentReceipt) {
         currentReceipt.style.display = 'none';
       }
+      const currentHeader = container.querySelector('#job-calc-summary-header');
       if (currentSummary) {
         currentSummary.style.display = '';
-        try {
-          currentSummary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } catch (_) {}
       }
+      if (currentHeader) {
+        currentHeader.style.display = '';
+      }
+      try {
+        (currentSummary || currentHeader).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (_) {}
     }
 
     // Direct event bindings
@@ -5063,8 +5075,10 @@
     const container = document.getElementById('job-calculator-container');
     if (container) {
       const summaryCard = container.querySelector('#job-calc-summary-card, .job-calc-summary-card');
+      const summaryHeader = container.querySelector('#job-calc-summary-header');
       const receiptWrapper = container.querySelector('#job-calc-receipt-wrapper, .job-calc-receipt-wrapper');
       if (summaryCard) summaryCard.style.display = '';
+      if (summaryHeader) summaryHeader.style.display = '';
       if (receiptWrapper) receiptWrapper.style.display = 'none';
 
       container.style.display = 'flex';

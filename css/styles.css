@@ -10825,11 +10825,16 @@ ic {
     gap: 12px;
 }
 
-.job-calc-card-header {
+.job-calc-card-header,
+.job-calc-section-header {
     display: flex;
     align-items: center;
     gap: 8px;
     color: #0f172a;
+}
+
+.job-calc-section-header {
+    padding: 2px 2px;
 }
 
 .job-calc-card-icon {
@@ -10948,6 +10953,33 @@ ic {
     color: #94a3b8;
     margin-top: 18px;
     flex-shrink: 0;
+}
+
+/* Section Containers (Consistent external header + container) */
+.job-calc-date-section,
+.job-calc-summary-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Schedules Section (Un-containerized) */
+.job-calc-jobs-section,
+.job-calc-card.job-calc-jobs-card,
+.job-calc-jobs-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+.job-calc-jobs-section .job-calc-jobs-header,
+.job-calc-jobs-card .job-calc-jobs-header {
+    padding: 2px 2px;
 }
 
 /* Jobs Card Header & Add Custom Button */
