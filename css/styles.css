@@ -11604,7 +11604,8 @@ ic {
     gap: 8px;
 }
 
-.job-calc-groups-wrap .job-calc-inputs-row:not(:first-child) label {
+.job-calc-groups-wrap .job-calc-inputs-row:not(:first-child) label,
+.job-calc-groups-wrap .job-calc-split-row-item:not(:first-child) label {
     display: none;
 }
 
@@ -11940,8 +11941,112 @@ ic {
     }
 }
 
-.job-calc-split-row {
+/* Split Mode Headers Row */
+.job-calc-split-headers-row {
+    display: grid;
+    grid-template-columns: 0.85fr 1fr 1fr;
+    gap: 10px;
+    padding: 0 2px 2px 2px;
+}
+
+.job-calc-split-col-header {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.4px;
+}
+
+@media (max-width: 540px) {
+    .job-calc-split-headers-row {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+/* Swipeable Split Row Item */
+.job-calc-split-row-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8fafc;
+    touch-action: pan-y;
+    max-height: 80px;
+    transition: opacity 0.15s ease, max-height 0.18s ease;
     animation: splitRowFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.job-calc-split-row-item.is-swipeable {
+    cursor: default;
+}
+
+.job-calc-split-row-item .job-calc-split-row {
+    position: relative;
+    z-index: 2;
+    background: #f8fafc;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+}
+
+.job-calc-split-row-item.is-swiped .job-calc-split-row {
+    transform: translateX(-70px);
+}
+
+/* Red Delete Action Revealed Behind the Row (Hidden & 0 opacity until swiped) */
+.job-calc-split-delete-action {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 62px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background: transparent;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.job-calc-split-row-item.is-swiped .job-calc-split-delete-action,
+.job-calc-split-row-item.is-swiping .job-calc-split-delete-action {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.job-calc-split-delete-btn {
+    width: 46px;
+    height: 38px;
+    border-radius: 8px;
+    border: none;
+    background: #ef4444;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    margin-right: 2px;
+    box-shadow: 0 1px 3px rgba(239, 68, 68, 0.25);
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.job-calc-split-delete-btn:hover {
+    background: #dc2626;
+}
+
+.job-calc-split-delete-btn:active {
+    background: #b91c1c;
+    transform: scale(0.96);
+}
+
+.job-calc-split-delete-btn .material-symbols-outlined {
+    font-size: 1.25rem;
+    font-variation-settings: 'FILL' 1;
+    color: #ffffff;
+    pointer-events: none;
 }
 
 /* Accordion Toggle */

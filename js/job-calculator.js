@@ -1421,54 +1421,71 @@
       }
 
       let customTotalShifts = 0;
-      let customRowsHtml = '';
+      let customRowsHtml = `
+        <div class="job-calc-split-headers-row">
+          <span class="job-calc-split-col-header">Shifts</span>
+          <span class="job-calc-split-col-header">Hours / Shift</span>
+          <span class="job-calc-split-col-header">Rate ($/hr)</span>
+        </div>
+      `;
+      const canDeleteCustomSplit = Array.isArray(cJob.splits) && cJob.splits.length > 1;
+
       cJob.splits.forEach((s, idx) => {
         const sShifts = parseInt(s.shifts, 10) || 0;
         customTotalShifts += sShifts;
-        const showLabels = idx === 0;
         customRowsHtml += `
-          <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-split-row" data-split-index="${idx}">
-            <div class="job-calc-input-block">
-              ${showLabels ? '<label>Shifts</label>' : ''}
-              <div class="job-calc-input-wrapper">
-                <input type="number" 
-                       class="job-calc-custom-split-shifts-input job-calc-num-input" 
-                       data-split-index="${idx}" 
-                       min="0" 
-                       step="1" 
-                       value="${s.shifts}" 
-                       aria-label="Shifts"
-                       title="Enter shifts (type 0 to remove this row)">
-                <span class="job-calc-unit">x</span>
+          <div class="job-calc-split-row-item ${canDeleteCustomSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteCustomSplit ? 'Swipe left to delete this split row (or type 0 in shifts)' : ''}">
+            ${canDeleteCustomSplit ? `
+              <div class="job-calc-split-delete-action">
+                <button type="button" 
+                        class="job-calc-custom-split-delete-btn job-calc-split-delete-btn" 
+                        data-split-index="${idx}" 
+                        title="Delete split row" 
+                        aria-label="Delete split row">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
               </div>
-            </div>
-
-            <div class="job-calc-input-block">
-              ${showLabels ? '<label>Hours / Shift</label>' : ''}
-              <div class="job-calc-input-wrapper">
-                <input type="number" 
-                       class="job-calc-custom-split-hours-input job-calc-num-input" 
-                       data-split-index="${idx}" 
-                       min="0" 
-                       step="0.25" 
-                       value="${s.hours}"
-                       aria-label="Hours per shift">
-                <span class="job-calc-unit">hrs</span>
+            ` : ''}
+            <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-split-row" data-split-index="${idx}">
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <input type="number" 
+                         class="job-calc-custom-split-shifts-input job-calc-num-input" 
+                         data-split-index="${idx}" 
+                         min="0" 
+                         step="1" 
+                         value="${s.shifts}" 
+                         aria-label="Shifts"
+                         title="Enter shifts (swipe left or type 0 to remove this row)">
+                  <span class="job-calc-unit">x</span>
+                </div>
               </div>
-            </div>
 
-            <div class="job-calc-input-block">
-              ${showLabels ? '<label>Rate ($/hr)</label>' : ''}
-              <div class="job-calc-input-wrapper">
-                <span class="job-calc-prefix">$</span>
-                <input type="number" 
-                       class="job-calc-custom-rate-input job-calc-num-input" 
-                       min="0" 
-                       step="0.5" 
-                       value="${cJob.hourlyRate ?? 25}" 
-                       placeholder="25"
-                       aria-label="Hourly rate">
-                <span class="job-calc-unit">/hr</span>
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <input type="number" 
+                         class="job-calc-custom-split-hours-input job-calc-num-input" 
+                         data-split-index="${idx}" 
+                         min="0" 
+                         step="0.25" 
+                         value="${s.hours}"
+                         aria-label="Hours per shift">
+                  <span class="job-calc-unit">hrs</span>
+                </div>
+              </div>
+
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <span class="job-calc-prefix">$</span>
+                  <input type="number" 
+                         class="job-calc-custom-rate-input job-calc-num-input" 
+                         min="0" 
+                         step="0.5" 
+                         value="${cJob.hourlyRate ?? 25}" 
+                         placeholder="25"
+                         aria-label="Hourly rate">
+                  <span class="job-calc-unit">/hr</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1769,52 +1786,69 @@
         setting.splits = [{ shifts: count > 0 ? count : 1, hours: setting.defaultHours ?? 4 }];
       }
 
-      let splitRowsHtml = '';
+      const canDeleteSplit = setting.splits.length > 1;
+      let splitRowsHtml = `
+        <div class="job-calc-split-headers-row">
+          <span class="job-calc-split-col-header">Shifts</span>
+          <span class="job-calc-split-col-header">Hours / Shift</span>
+          <span class="job-calc-split-col-header">Rate ($/hr)</span>
+        </div>
+      `;
+
       setting.splits.forEach((s, idx) => {
-        const showLabels = idx === 0;
         splitRowsHtml += `
-          <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-split-row" data-split-index="${idx}">
-            <div class="job-calc-input-block">
-              ${showLabels ? '<label>Shifts</label>' : ''}
-              <div class="job-calc-input-wrapper">
-                <input type="number" 
-                       class="job-calc-split-shifts-input job-calc-num-input" 
-                       data-split-index="${idx}"
-                       min="0" 
-                       step="1" 
-                       value="${s.shifts}" 
-                       aria-label="Shifts"
-                       title="Enter shifts (type 0 to remove this row)">
-                <span class="job-calc-unit">x</span>
+          <div class="job-calc-split-row-item ${canDeleteSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteSplit ? 'Swipe left to delete this split row (or type 0 in shifts)' : ''}">
+            ${canDeleteSplit ? `
+              <div class="job-calc-split-delete-action">
+                <button type="button" 
+                        class="job-calc-calendar-split-delete-btn job-calc-split-delete-btn" 
+                        data-split-index="${idx}" 
+                        title="Delete split row" 
+                        aria-label="Delete split row">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
               </div>
-            </div>
-
-            <div class="job-calc-input-block">
-              ${showLabels ? '<label>Hours / Shift</label>' : ''}
-              <div class="job-calc-input-wrapper">
-                <input type="number" 
-                       class="job-calc-split-hours-input job-calc-num-input" 
-                       data-split-index="${idx}"
-                       min="0" 
-                       step="0.25" 
-                       value="${s.hours}"
-                       aria-label="Hours per shift">
-                <span class="job-calc-unit">hrs</span>
+            ` : ''}
+            <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-split-row" data-split-index="${idx}">
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <input type="number" 
+                         class="job-calc-split-shifts-input job-calc-num-input" 
+                         data-split-index="${idx}"
+                         min="0" 
+                         step="1" 
+                         value="${s.shifts}" 
+                         aria-label="Shifts"
+                         title="Enter shifts (swipe left or type 0 to remove this row)">
+                  <span class="job-calc-unit">x</span>
+                </div>
               </div>
-            </div>
 
-            <div class="job-calc-input-block">
-              ${showLabels ? '<label>Rate ($/hr)</label>' : ''}
-              <div class="job-calc-input-wrapper">
-                <span class="job-calc-prefix">$</span>
-                <input type="number" 
-                       class="job-calc-rate-input job-calc-num-input" 
-                       min="0" 
-                       step="0.5" 
-                       value="${hourlyRate}" 
-                       placeholder="25"
-                       aria-label="Hourly rate">
-                <span class="job-calc-unit">/hr</span>
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <input type="number" 
+                         class="job-calc-split-hours-input job-calc-num-input" 
+                         data-split-index="${idx}"
+                         min="0" 
+                         step="0.25" 
+                         value="${s.hours}"
+                         aria-label="Hours per shift">
+                  <span class="job-calc-unit">hrs</span>
+                </div>
+              </div>
+
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <span class="job-calc-prefix">$</span>
+                  <input type="number" 
+                         class="job-calc-rate-input job-calc-num-input" 
+                         min="0" 
+                         step="0.5" 
+                         value="${hourlyRate}" 
+                         placeholder="25"
+                         aria-label="Hourly rate">
+                  <span class="job-calc-unit">/hr</span>
+                </div>
               </div>
             </div>
           </div>
@@ -2561,6 +2595,38 @@
       });
     });
 
+    // 4f. Split Mode: Delete Row Button (via swipe reveal)
+    listEl.querySelectorAll('.job-calc-calendar-split-delete-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const setting = getJobSetting(jobName);
+        const idx = parseInt(btn.dataset.splitIndex, 10);
+        if (!setting.splits || setting.splits.length <= 1) return; // Keep at least 1 row
+        if (isNaN(idx) || idx < 0 || idx >= setting.splits.length) return;
+
+        const rowItem = btn.closest('.job-calc-split-row-item');
+        if (rowItem) {
+          rowItem.style.transition = 'opacity 0.15s ease, max-height 0.18s ease';
+          rowItem.style.opacity = '0';
+          rowItem.style.maxHeight = '0px';
+          setTimeout(() => {
+            setting.splits.splice(idx, 1);
+            saveSettings();
+            renderTasksList();
+            updateSummaryCard();
+          }, 150);
+        } else {
+          setting.splits.splice(idx, 1);
+          saveSettings();
+          renderTasksList();
+          updateSummaryCard();
+        }
+      });
+    });
+
     // 5. Per-date hour override
     listEl.querySelectorAll('.job-calc-occ-hours-input').forEach((input) => {
       input.addEventListener('input', (e) => {
@@ -2899,6 +2965,40 @@
       });
     });
 
+    // 11b. Custom Split Mode: Delete Row Button (via swipe reveal)
+    listEl.querySelectorAll('.job-calc-custom-split-delete-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        const idx = parseInt(btn.dataset.splitIndex, 10);
+        if (!cJob || !cJob.splits || cJob.splits.length <= 1) return; // Keep at least 1 row
+        if (isNaN(idx) || idx < 0 || idx >= cJob.splits.length) return;
+
+        const rowItem = btn.closest('.job-calc-split-row-item');
+        if (rowItem) {
+          rowItem.style.transition = 'opacity 0.15s ease, max-height 0.18s ease';
+          rowItem.style.opacity = '0';
+          rowItem.style.maxHeight = '0px';
+          setTimeout(() => {
+            cJob.splits.splice(idx, 1);
+            cJob.shiftsCount = cJob.splits.reduce((acc, s) => acc + (parseInt(s.shifts, 10) || 0), 0);
+            saveSettings();
+            renderTasksList();
+            updateSummaryCard();
+          }, 150);
+        } else {
+          cJob.splits.splice(idx, 1);
+          cJob.shiftsCount = cJob.splits.reduce((acc, s) => acc + (parseInt(s.shifts, 10) || 0), 0);
+          saveSettings();
+          renderTasksList();
+          updateSummaryCard();
+        }
+      });
+    });
+
     // 12. Custom Job: Rate input (syncs all rate inputs on that card)
     listEl.querySelectorAll('.job-calc-custom-rate-input').forEach((input) => {
       input.addEventListener('input', (e) => {
@@ -3043,6 +3143,216 @@
         }
       });
     });
+
+    // 18. Bind swipe gestures for split rows
+    bindSplitRowSwipeGestures(listEl);
+  }
+
+  function bindSplitRowSwipeGestures(listEl) {
+    const swipeableRows = listEl.querySelectorAll('.job-calc-split-row-item.is-swipeable');
+    if (swipeableRows.length === 0) return;
+
+    const closeAllSwipedRows = (exceptItem = null) => {
+      listEl.querySelectorAll('.job-calc-split-row-item.is-swiped, .job-calc-split-row-item.is-swiping').forEach((item) => {
+        if (item !== exceptItem) {
+          item.classList.remove('is-swiped');
+          item.classList.remove('is-swiping');
+          const innerRow = item.querySelector('.job-calc-split-row');
+          if (innerRow) {
+            innerRow.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+            innerRow.style.transform = 'translateX(0px)';
+          }
+        }
+      });
+    };
+
+    swipeableRows.forEach((item) => {
+      const innerRow = item.querySelector('.job-calc-split-row');
+      if (!innerRow) return;
+
+      // When any input inside focuses, close swiped state
+      item.querySelectorAll('input').forEach((input) => {
+        input.addEventListener('focus', () => {
+          if (item.classList.contains('is-swiped') || item.classList.contains('is-swiping')) {
+            item.classList.remove('is-swiped');
+            item.classList.remove('is-swiping');
+            innerRow.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+            innerRow.style.transform = 'translateX(0px)';
+          }
+        });
+      });
+
+      // --- Touch Swiping (Mobile / Tablets) ---
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      let isSwiping = false;
+      let initialOffset = 0;
+
+      item.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+        isSwiping = false;
+        initialOffset = item.classList.contains('is-swiped') ? -70 : 0;
+      }, { passive: true });
+
+      item.addEventListener('touchmove', (e) => {
+        if (e.touches.length !== 1) return;
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const dx = currentX - touchStartX;
+        const dy = currentY - touchStartY;
+
+        if (!isSwiping) {
+          if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.1) {
+            isSwiping = true;
+            item.classList.add('is-swiping');
+            closeAllSwipedRows(item);
+          } else if (Math.abs(dy) > 8) {
+            return;
+          }
+        }
+
+        if (isSwiping) {
+          if (e.cancelable) e.preventDefault();
+          const targetOffset = Math.max(-82, Math.min(0, initialOffset + dx));
+          innerRow.style.transition = 'none';
+          innerRow.style.transform = `translateX(${targetOffset}px)`;
+        }
+      }, { passive: false });
+
+      const handleTouchFinish = (e) => {
+        if (!isSwiping) return;
+        isSwiping = false;
+        item.classList.remove('is-swiping');
+        const touch = e.changedTouches ? e.changedTouches[0] : null;
+        if (!touch) return;
+        const dx = touch.clientX - touchStartX;
+        const duration = Date.now() - touchStartTime;
+
+        innerRow.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+
+        if (initialOffset === 0) {
+          if (dx <= -25 || (dx < -15 && duration < 250)) {
+            item.classList.add('is-swiped');
+            innerRow.style.transform = 'translateX(-70px)';
+          } else {
+            item.classList.remove('is-swiped');
+            innerRow.style.transform = 'translateX(0px)';
+          }
+        } else {
+          if (dx >= 20 || (dx > 10 && duration < 250)) {
+            item.classList.remove('is-swiped');
+            innerRow.style.transform = 'translateX(0px)';
+          } else {
+            item.classList.add('is-swiped');
+            innerRow.style.transform = 'translateX(-70px)';
+          }
+        }
+      };
+
+      item.addEventListener('touchend', handleTouchFinish, { passive: true });
+      item.addEventListener('touchcancel', () => {
+        if (isSwiping) {
+          isSwiping = false;
+          item.classList.remove('is-swiping');
+          innerRow.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+          innerRow.style.transform = item.classList.contains('is-swiped') ? 'translateX(-70px)' : 'translateX(0px)';
+        }
+      }, { passive: true });
+
+      // --- Pointer / Mouse Drag Swiping (Desktop) ---
+      item.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch') return;
+        if (e.target.closest('input') || e.target.closest('.job-calc-split-delete-btn')) return;
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startTime = Date.now();
+        let isPointerSwiping = false;
+        const initOffset = item.classList.contains('is-swiped') ? -70 : 0;
+
+        const onPointerMove = (pe) => {
+          const dx = pe.clientX - startX;
+          const dy = pe.clientY - startY;
+
+          if (!isPointerSwiping) {
+            if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) {
+              isPointerSwiping = true;
+              item.classList.add('is-swiping');
+              closeAllSwipedRows(item);
+            } else if (Math.abs(dy) > 6) {
+              cleanup();
+              return;
+            }
+          }
+
+          if (isPointerSwiping) {
+            const targetOffset = Math.max(-82, Math.min(0, initOffset + dx));
+            innerRow.style.transition = 'none';
+            innerRow.style.transform = `translateX(${targetOffset}px)`;
+          }
+        };
+
+        const onPointerUp = (pe) => {
+          cleanup();
+          if (!isPointerSwiping) return;
+          item.classList.remove('is-swiping');
+
+          const dx = pe.clientX - startX;
+          const duration = Date.now() - startTime;
+          innerRow.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+
+          if (initOffset === 0) {
+            if (dx <= -25 || (dx < -15 && duration < 250)) {
+              item.classList.add('is-swiped');
+              innerRow.style.transform = 'translateX(-70px)';
+            } else {
+              item.classList.remove('is-swiped');
+              innerRow.style.transform = 'translateX(0px)';
+            }
+          } else {
+            if (dx >= 20 || (dx > 10 && duration < 250)) {
+              item.classList.remove('is-swiped');
+              innerRow.style.transform = 'translateX(0px)';
+            } else {
+              item.classList.add('is-swiped');
+              innerRow.style.transform = 'translateX(-70px)';
+            }
+          }
+        };
+
+        const cleanup = () => {
+          window.removeEventListener('pointermove', onPointerMove);
+          window.removeEventListener('pointerup', onPointerUp);
+          window.removeEventListener('pointercancel', onPointerUp);
+        };
+
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
+      });
+    });
+
+    // Dismiss any swiped row when clicking outside
+    if (!document._jobCalcSplitSwipeListenerAttached) {
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.job-calc-split-row-item')) {
+          document.querySelectorAll('.job-calc-split-row-item.is-swiped, .job-calc-split-row-item.is-swiping').forEach((item) => {
+            item.classList.remove('is-swiped');
+            item.classList.remove('is-swiping');
+            const innerRow = item.querySelector('.job-calc-split-row');
+            if (innerRow) {
+              innerRow.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+              innerRow.style.transform = 'translateX(0px)';
+            }
+          });
+        }
+      }, { capture: true });
+      document._jobCalcSplitSwipeListenerAttached = true;
+    }
   }
 
   function updateCardExpenseBadge(card, jobName) {
