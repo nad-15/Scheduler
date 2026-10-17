@@ -169,6 +169,283 @@
   }
 
   /**
+   * Helper: Normalize jobCalculatorSettings into a well-formed object
+   */
+  function normalizeCalculatorSettings(val) {
+    const parsed = safeParse(val, null);
+    if (!parsed || typeof parsed !== 'object') {
+      return {
+        tax: { type: 'percent', value: 0 },
+        jobs: {},
+        customJobs: [],
+        customExpenses: []
+      };
+    }
+    const tax = {
+      type: parsed.tax && parsed.tax.type === 'amount' ? 'amount' : 'percent',
+      value: typeof (parsed.tax && parsed.tax.value) === 'number'
+        ? parsed.tax.value
+        : (parseFloat(parsed.tax && parsed.tax.value) || 0)
+    };
+    const jobs = {};
+    if (parsed.jobs && typeof parsed.jobs === 'object') {
+      for (const [name, job] of Object.entries(parsed.jobs)) {
+        if (!job || typeof job !== 'object') continue;
+        if (job.isPaid === true || job.isExpense === true) {
+          jobs[name] = {
+            isPaid: Boolean(job.isPaid),
+            isExpense: Boolean(job.isExpense),
+            defaultHours: typeof job.defaultHours === 'number' ? job.defaultHours : (parseFloat(job.defaultHours) || 4),
+            hourlyRate: typeof job.hourlyRate === 'number' ? job.hourlyRate : (parseFloat(job.hourlyRate) || 25),
+            isTaxable: job.isTaxable !== false,
+            expenseAmount: typeof job.expenseAmount === 'number' ? job.expenseAmount : (parseFloat(job.expenseAmount) || 0),
+            adjustMode: job.adjustMode === 'date' ? 'date' : 'split',
+            expenseAdjustMode: job.expenseAdjustMode === 'date' ? 'date' : 'split',
+            splitsByRange: (job.splitsByRange && typeof job.splitsByRange === 'object') ? job.splitsByRange : {},
+            expenseSplitsByRange: (job.expenseSplitsByRange && typeof job.expenseSplitsByRange === 'object') ? job.expenseSplitsByRange : {},
+            dateOverrides: (job.dateOverrides && typeof job.dateOverrides === 'object') ? job.dateOverrides : {},
+            expenseOverrides: (job.expenseOverrides && typeof job.expenseOverrides === 'object') ? job.expenseOverrides : {}
+          };
+        }
+      }
+    }
+    const customJobs = Array.isArray(parsed.customJobs) ? parsed.customJobs.map(c => ({
+      id: c.id || String(Date.now() + Math.random()),
+      name: c.name || 'Untitled',
+      isPaid: c.isPaid !== false,
+      isTaxable: c.isTaxable === true,
+      hourlyRate: typeof c.hourlyRate === 'number' ? c.hourlyRate : (parseFloat(c.hourlyRate) || 25),
+      shiftsCount: parseInt(c.shiftsCount, 10) || 1,
+      hoursPerShift: typeof c.hoursPerShift === 'number' ? c.hoursPerShift : (parseFloat(c.hoursPerShift) || 4),
+      splits: Array.isArray(c.splits) ? c.splits : []
+    })) : [];
+
+    const customExpenses = Array.isArray(parsed.customExpenses) ? parsed.customExpenses.map(e => ({
+      id: e.id || String(Date.now() + Math.random()),
+      name: e.name || 'Untitled',
+      isExpense: e.isExpense !== false,
+      amount: typeof e.amount === 'number' ? e.amount : (parseFloat(e.amount) || 0),
+      splits: Array.isArray(e.splits) ? e.splits : []
+    })) : [];
+
+    return { tax, jobs, customJobs, customExpenses };
+  }
+
+  /**
+   * Helper: Check if calculator settings contains any configured jobs or taxes
+   */
+  function isCalculatorSettingsEmpty(calc) {
+    if (!calc) return true;
+    const hasJobs = calc.jobs && Object.keys(calc.jobs).length > 0;
+    const hasCustomJobs = Array.isArray(calc.customJobs) && calc.customJobs.length > 0;
+    const hasCustomExpenses = Array.isArray(calc.customExpenses) && calc.customExpenses.length > 0;
+    const hasTax = calc.tax && typeof calc.tax.value === 'number' && calc.tax.value > 0;
+    return !hasJobs && !hasCustomJobs && !hasCustomExpenses && !hasTax;
+  }
+
+  /**
+   * Helper: Check semantic equality between two calculator settings
+   */
+  function areCalculatorSettingsEqual(calcA, calcB) {
+    const a = normalizeCalculatorSettings(calcA);
+    const b = normalizeCalculatorSettings(calcB);
+
+    if (a.tax.type !== b.tax.type || a.tax.value !== b.tax.value) return false;
+
+    const jobsA = Object.keys(a.jobs);
+    const jobsB = Object.keys(b.jobs);
+    if (jobsA.length !== jobsB.length) return false;
+
+    for (const name of jobsA) {
+      if (!b.jobs[name]) return false;
+      const jA = a.jobs[name];
+      const jB = b.jobs[name];
+      if (jA.isPaid !== jB.isPaid) return false;
+      if (jA.isExpense !== jB.isExpense) return false;
+      if (jA.hourlyRate !== jB.hourlyRate) return false;
+      if (jA.defaultHours !== jB.defaultHours) return false;
+      if (jA.expenseAmount !== jB.expenseAmount) return false;
+      if (jA.isTaxable !== jB.isTaxable) return false;
+      if (jA.adjustMode !== jB.adjustMode) return false;
+      if (jA.expenseAdjustMode !== jB.expenseAdjustMode) return false;
+      if (JSON.stringify(jA.dateOverrides || {}) !== JSON.stringify(jB.dateOverrides || {})) return false;
+      if (JSON.stringify(jA.expenseOverrides || {}) !== JSON.stringify(jB.expenseOverrides || {})) return false;
+      if (JSON.stringify(jA.splitsByRange || {}) !== JSON.stringify(jB.splitsByRange || {})) return false;
+      if (JSON.stringify(jA.expenseSplitsByRange || {}) !== JSON.stringify(jB.expenseSplitsByRange || {})) return false;
+    }
+
+    if (JSON.stringify(a.customJobs) !== JSON.stringify(b.customJobs)) return false;
+    if (JSON.stringify(a.customExpenses) !== JSON.stringify(b.customExpenses)) return false;
+
+    return true;
+  }
+
+  /**
+   * Helper: Produce human-readable diff items between two calculator settings
+   */
+  function getCalculatorDiffs(localCalc, incomingCalc) {
+    const a = normalizeCalculatorSettings(localCalc);
+    const b = normalizeCalculatorSettings(incomingCalc);
+    const diffs = [];
+
+    // 1. Tax difference
+    if (a.tax.type !== b.tax.type || a.tax.value !== b.tax.value) {
+      const formatTax = t => t.value > 0 ? (t.type === 'amount' ? `$${t.value}` : `${t.value}%`) : 'None (0%)';
+      diffs.push({
+        field: 'Tax Deduction',
+        localVal: formatTax(a.tax),
+        incomingVal: formatTax(b.tax)
+      });
+    }
+
+    // 2. Jobs difference
+    const allJobNames = Array.from(new Set([...Object.keys(a.jobs), ...Object.keys(b.jobs)]));
+    allJobNames.forEach(name => {
+      const jA = a.jobs[name];
+      const jB = b.jobs[name];
+
+      const formatJob = j => {
+        if (!j) return '(Not configured)';
+        const parts = [];
+        if (j.isPaid) parts.push(`$${j.hourlyRate}/hr (${j.defaultHours}h default)`);
+        if (j.isExpense) parts.push(`Expense: $${j.expenseAmount}`);
+        if (!j.isPaid && !j.isExpense) parts.push('Inactive');
+        return parts.join(' | ') || '(Not configured)';
+      };
+
+      if (!jA) {
+        diffs.push({
+          field: `Job: "${name}"`,
+          localVal: '(Not on device)',
+          incomingVal: formatJob(jB)
+        });
+      } else if (!jB) {
+        diffs.push({
+          field: `Job: "${name}"`,
+          localVal: formatJob(jA),
+          incomingVal: '(Not in backup)'
+        });
+      } else {
+        const strA = formatJob(jA);
+        const strB = formatJob(jB);
+        if (strA !== strB ||
+            JSON.stringify(jA.dateOverrides || {}) !== JSON.stringify(jB.dateOverrides || {}) ||
+            JSON.stringify(jA.splitsByRange || {}) !== JSON.stringify(jB.splitsByRange || {})) {
+          diffs.push({
+            field: `Job: "${name}"`,
+            localVal: strA,
+            incomingVal: strB
+          });
+        }
+      }
+    });
+
+    // 3. Custom Jobs difference
+    if (JSON.stringify(a.customJobs) !== JSON.stringify(b.customJobs)) {
+      const summaryA = a.customJobs.length > 0
+        ? `${a.customJobs.length} custom job(s): ` + a.customJobs.map(c => `${c.name} ($${c.hourlyRate}/hr)`).join(', ')
+        : 'None';
+      const summaryB = b.customJobs.length > 0
+        ? `${b.customJobs.length} custom job(s): ` + b.customJobs.map(c => `${c.name} ($${c.hourlyRate}/hr)`).join(', ')
+        : 'None';
+      diffs.push({
+        field: 'Custom Jobs',
+        localVal: summaryA,
+        incomingVal: summaryB
+      });
+    }
+
+    // 4. Custom Expenses difference
+    if (JSON.stringify(a.customExpenses) !== JSON.stringify(b.customExpenses)) {
+      const summaryA = a.customExpenses.length > 0
+        ? `${a.customExpenses.length} custom expense(s): ` + a.customExpenses.map(e => `${e.name} ($${e.amount})`).join(', ')
+        : 'None';
+      const summaryB = b.customExpenses.length > 0
+        ? `${b.customExpenses.length} custom expense(s): ` + b.customExpenses.map(e => `${e.name} ($${e.amount})`).join(', ')
+        : 'None';
+      diffs.push({
+        field: 'Custom Expenses',
+        localVal: summaryA,
+        incomingVal: summaryB
+      });
+    }
+
+    return diffs;
+  }
+
+  /**
+   * Helper: Non-destructively merge both calculator settings without losing jobs
+   */
+  function combineCalculatorSettings(localCalc, incomingCalc) {
+    const a = normalizeCalculatorSettings(localCalc);
+    const b = normalizeCalculatorSettings(incomingCalc);
+
+    // 1. Tax: if local has tax set (> 0), preserve local tax; otherwise adopt incoming tax
+    const combinedTax = (a.tax && a.tax.value > 0) ? { ...a.tax } : { ...b.tax };
+
+    // 2. Jobs: union of all jobs from both sides
+    const combinedJobs = { ...a.jobs };
+    for (const [name, jB] of Object.entries(b.jobs)) {
+      if (!combinedJobs[name]) {
+        // Job only exists in backup -> add it seamlessly
+        combinedJobs[name] = { ...jB };
+      } else {
+        // Exists in both: keep local base rates, but merge range splits, date overrides, and expense splits from backup
+        const jA = combinedJobs[name];
+        const mergedSplitsByRange = { ...(jB.splitsByRange || {}), ...(jA.splitsByRange || {}) };
+        const mergedExpSplits = { ...(jB.expenseSplitsByRange || {}), ...(jA.expenseSplitsByRange || {}) };
+        const mergedDateOverrides = { ...(jB.dateOverrides || {}), ...(jA.dateOverrides || {}) };
+        const mergedExpOverrides = { ...(jB.expenseOverrides || {}), ...(jA.expenseOverrides || {}) };
+
+        combinedJobs[name] = {
+          ...jA,
+          splitsByRange: mergedSplitsByRange,
+          expenseSplitsByRange: mergedExpSplits,
+          dateOverrides: mergedDateOverrides,
+          expenseOverrides: mergedExpOverrides
+        };
+      }
+    }
+
+    // 3. Custom Jobs: union without duplicate names/IDs
+    const combinedCustomJobs = [...a.customJobs];
+    (b.customJobs || []).forEach(inCJ => {
+      const exists = combinedCustomJobs.some(locCJ =>
+        (locCJ.id && inCJ.id && String(locCJ.id) === String(inCJ.id)) ||
+        ((locCJ.name || '').trim().toLowerCase() === (inCJ.name || '').trim().toLowerCase())
+      );
+      if (!exists) {
+        combinedCustomJobs.push({
+          ...inCJ,
+          id: inCJ.id || ('cj_' + Date.now() + '_' + Math.floor(Math.random() * 10000))
+        });
+      }
+    });
+
+    // 4. Custom Expenses: union without duplicate names/IDs
+    const combinedCustomExpenses = [...a.customExpenses];
+    (b.customExpenses || []).forEach(inCE => {
+      const exists = combinedCustomExpenses.some(locCE =>
+        (locCE.id && inCE.id && String(locCE.id) === String(inCE.id)) ||
+        ((locCE.name || '').trim().toLowerCase() === (inCE.name || '').trim().toLowerCase())
+      );
+      if (!exists) {
+        combinedCustomExpenses.push({
+          ...inCE,
+          id: inCE.id || ('ce_' + Date.now() + '_' + Math.floor(Math.random() * 10000))
+        });
+      }
+    });
+
+    return {
+      tax: combinedTax,
+      jobs: combinedJobs,
+      customJobs: combinedCustomJobs,
+      customExpenses: combinedCustomExpenses
+    };
+  }
+
+  /**
    * Escape HTML for safe rendering
    */
   function escapeHtml(str) {
@@ -431,7 +708,12 @@
     let stagedTheme = localTheme;
 
     // Check if the local device has any customized user data
-    const isDeviceEmpty = Object.keys(localTasks).length === 0 && localTodos.length === 0 && localTemplates.length === 0;
+    const rawLocalCalc = localStorage.getItem('jobCalculatorSettings');
+    const localCalc = normalizeCalculatorSettings(rawLocalCalc);
+    const isDeviceEmpty = Object.keys(localTasks).length === 0 &&
+                          localTodos.length === 0 &&
+                          localTemplates.length === 0 &&
+                          isCalculatorSettingsEmpty(localCalc);
 
     // Helper to check if localSettings contains only untouched default values
     const isPristineLocalSettings = () => {
@@ -457,8 +739,10 @@
     } else {
       // Existing device with custom user settings: detect genuine differences
       const settingsDiffs = [];
+      const DEPRECATED_SETTINGS = new Set(['add-task-modal', 'banner-mode', 'sliding-templates-row']);
       if (incomingSettings && typeof incomingSettings === 'object') {
         Object.keys(incomingSettings).forEach(key => {
+          if (key === 'theme' || DEPRECATED_SETTINGS.has(key)) return;
           const localVal = localSettings[key];
           const inVal = incomingSettings[key];
           if (localVal === undefined) {
@@ -525,10 +809,41 @@
       }
     }
 
-    // 6. Generic other keys
+    // 6. Job Calculator Settings
+    const hasIncomingCalc = Object.prototype.hasOwnProperty.call(backupData, 'jobCalculatorSettings') &&
+                            backupData.jobCalculatorSettings !== null &&
+                            backupData.jobCalculatorSettings !== undefined;
+    const incomingCalc = hasIncomingCalc ? normalizeCalculatorSettings(backupData.jobCalculatorSettings) : null;
+    let stagedCalculator = null;
+
+    if (hasIncomingCalc && incomingCalc) {
+      if (rawLocalCalc === null || isCalculatorSettingsEmpty(localCalc) || (isDeviceEmpty && isPristineLocalSettings())) {
+        // Clean / untouched device or no local calc data: seamlessly adopt incoming settings
+        stagedCalculator = incomingCalc;
+      } else if (!areCalculatorSettingsEqual(localCalc, incomingCalc)) {
+        const calcDiffs = getCalculatorDiffs(localCalc, incomingCalc);
+        if (calcDiffs.length > 0) {
+          conflicts.push({
+            category: 'calculator',
+            id: 'jobCalculatorSettings',
+            title: 'Schedule Calculator Rates & Settings',
+            subtitle: `${calcDiffs.length} rate or job preference(s) differ`,
+            diffs: calcDiffs,
+            local: localCalc,
+            incoming: incomingCalc
+          });
+        }
+      } else {
+        // Identical settings: stage incoming
+        stagedCalculator = incomingCalc;
+      }
+    }
+
+    // 7. Generic other keys
     const handledKeys = new Set([
       'tasks', 'todos', 'taskClipboard', 'appSettings',
-      'scheduler_weather_state', 'signature', 'version', 'createdAt',
+      'scheduler_weather_state', 'jobCalculatorSettings',
+      'signature', 'version', 'createdAt',
       'pwa-installed',
       // Legacy standalone keys (no longer used, but skip them in 'other' bucket if found in old backups)
       'theme', 'hideAllButtons'
@@ -564,6 +879,7 @@
       stagedSettings,
       stagedTheme,
       stagedWeather,
+      stagedCalculator,
       stagedOtherKeys,
       incomingTasks,
       incomingTodos,
@@ -579,7 +895,7 @@
   function commitMerge(session) {
     // 1. Snapshot existing keys so we can roll back cleanly if storage quota is exceeded
     const rollbackKeys = [
-      'tasks', 'todos', 'taskClipboard', 'appSettings', 'theme', 'scheduler_weather_state'
+      'tasks', 'todos', 'taskClipboard', 'appSettings', 'theme', 'scheduler_weather_state', 'jobCalculatorSettings'
     ];
     if (session.stagedOtherKeys) {
       Object.keys(session.stagedOtherKeys).forEach(k => {
@@ -613,7 +929,12 @@
         localStorage.setItem('scheduler_weather_state', JSON.stringify(session.stagedWeather));
       }
 
-      // 7. Other keys
+      // 7. Job Calculator
+      if (session.stagedCalculator) {
+        localStorage.setItem('jobCalculatorSettings', JSON.stringify(session.stagedCalculator));
+      }
+
+      // 8. Other keys
       if (session.stagedOtherKeys) {
         Object.keys(session.stagedOtherKeys).forEach(k => {
           localStorage.setItem(k, session.stagedOtherKeys[k]);
@@ -890,6 +1211,26 @@
   }
 
   /**
+   * Render Schedule Calculator Comparison
+   */
+  function renderCalculatorComparison(diffs, leftEl, rightEl, noteEl) {
+    let leftHtml = '';
+    let rightHtml = '';
+
+    (diffs || []).forEach(d => {
+      leftHtml += `<div class="bcm-diff-field-row"><span class="bcm-diff-field-name">${escapeHtml(d.field)}:</span> <b>${escapeHtml(d.localVal)}</b></div>`;
+      rightHtml += `<div class="bcm-diff-field-row"><span class="bcm-diff-field-name">${escapeHtml(d.field)}:</span> <b>${escapeHtml(d.incomingVal)}</b></div>`;
+    });
+
+    if (leftEl) leftEl.innerHTML = leftHtml || '<div class="bcm-diff-empty-text">No differences</div>';
+    if (rightEl) rightEl.innerHTML = rightHtml || '<div class="bcm-diff-empty-text">No differences</div>';
+    if (noteEl) {
+      noteEl.innerHTML = '';
+      noteEl.style.display = 'none';
+    }
+  }
+
+  /**
    * Render Generic / Weather Comparison
    */
   function renderGenericComparison(locVal, inVal, leftEl, rightEl, noteEl) {
@@ -960,6 +1301,7 @@
       template: 'Template',
       settings: 'Settings',
       weather: 'Weather',
+      calculator: 'Schedule Calculator',
       other: 'Data'
     };
 
@@ -995,6 +1337,11 @@
       renderGenericComparison(c.localCity, c.incomingCity, leftContentEl, rightContentEl, unchangedNoteEl);
       if (combineBtn) combineBtn.style.display = 'none';
       if (applyAllLabel) applyAllLabel.textContent = "Apply to all Weather differences";
+
+    } else if (c.category === 'calculator') {
+      renderCalculatorComparison(c.diffs, leftContentEl, rightContentEl, unchangedNoteEl);
+      if (combineBtn) combineBtn.style.display = 'inline-flex'; // Merging calculator rates and jobs is supported!
+      if (applyAllLabel) applyAllLabel.textContent = "Apply to all remaining Schedule Calculator differences";
 
     } else {
       renderGenericComparison(c.localVal, c.incomingVal, leftContentEl, rightContentEl, unchangedNoteEl);
@@ -1082,6 +1429,15 @@
         mergeSession.stagedWeather = conflict.incomingWeather;
       }
 
+    } else if (conflict.category === 'calculator') {
+      if (action === 'keep_local') {
+        mergeSession.stagedCalculator = conflict.local;
+      } else if (action === 'replace') {
+        mergeSession.stagedCalculator = conflict.incoming;
+      } else if (action === 'combine') {
+        mergeSession.stagedCalculator = combineCalculatorSettings(conflict.local, conflict.incoming);
+      }
+
     } else if (conflict.category === 'other') {
       if (action === 'replace') {
         mergeSession.stagedOtherKeys[conflict.key] = conflict.incomingVal;
@@ -1151,6 +1507,7 @@
             stagedSettings: analysis.stagedSettings,
             stagedTheme: analysis.stagedTheme,
             stagedWeather: analysis.stagedWeather,
+            stagedCalculator: analysis.stagedCalculator,
             stagedOtherKeys: analysis.stagedOtherKeys
           });
           return;
@@ -1282,7 +1639,10 @@
     analyzeBackup,
     combineTaskDays,
     areTaskDaysEqual,
-    renderTasksComparison
+    renderTasksComparison,
+    normalizeCalculatorSettings,
+    areCalculatorSettingsEqual,
+    combineCalculatorSettings
   };
 
 })();
