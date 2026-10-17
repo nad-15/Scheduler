@@ -813,7 +813,7 @@
 
   function ensureCalculatorDOM() {
     const existing = document.getElementById('job-calculator-container');
-    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator')) {
+    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator') && !existing.querySelector('#job-calc-btn-quick-copy') && existing.querySelector('#job-calc-net-status-icon') && existing.querySelector('#job-calc-tax-symbol-toggle') && !existing.querySelector('#job-calc-tax-mode-toggle')) {
       return;
     }
 
@@ -928,35 +928,40 @@
           <div class="job-calc-card job-calc-summary-card" id="job-calc-summary-card">
             <div class="job-calc-summary-metrics">
               <div class="job-calc-metric">
-                <span class="job-calc-metric-label">Earning Shifts</span>
+                <div class="job-calc-metric-header">
+                  <span class="material-symbols-outlined job-calc-metric-icon">event_available</span>
+                  <span class="job-calc-metric-label">Earning Shifts</span>
+                </div>
                 <span class="job-calc-metric-val" id="job-calc-sum-sessions">0x</span>
               </div>
               <div class="job-calc-metric">
-                <span class="job-calc-metric-label">Total Hours</span>
+                <div class="job-calc-metric-header">
+                  <span class="material-symbols-outlined job-calc-metric-icon">schedule</span>
+                  <span class="job-calc-metric-label">Total Hours</span>
+                </div>
                 <span class="job-calc-metric-val" id="job-calc-sum-hours">0.0 hrs</span>
               </div>
             </div>
 
             <div class="job-calc-summary-rows">
               <div class="job-calc-summary-row">
-                <span class="job-calc-row-title">Gross Earnings</span>
+                <div class="job-calc-row-title-wrap">
+                  <span class="job-calc-flow-dot flow-gross"></span>
+                  <span class="job-calc-row-title">Gross Earnings</span>
+                </div>
                 <span class="job-calc-sum-bold" id="job-calc-sum-gross">$0.00</span>
               </div>
 
               <!-- Tax Deduction Row -->
-              <div class="job-calc-tax-row">
-                <div class="job-calc-tax-label-group">
+              <div class="job-calc-summary-row job-calc-tax-row">
+                <div class="job-calc-row-title-wrap">
+                  <span class="job-calc-flow-dot flow-tax"></span>
                   <span class="job-calc-tax-title">Tax Deduction</span>
-                  <div class="job-calc-tax-mode-toggle" id="job-calc-tax-mode-toggle">
-                    <button type="button" class="job-calc-tax-mode-btn active" data-mode="percent">%</button>
-                    <button type="button" class="job-calc-tax-mode-btn" data-mode="amount">$</button>
-                  </div>
                 </div>
                 <div class="job-calc-tax-input-group">
                   <div class="job-calc-tax-field mode-percent" id="job-calc-tax-field">
-                    <span class="job-calc-tax-symbol-prefix" id="job-calc-tax-symbol-prefix" style="display: none;">$</span>
                     <input type="number" id="job-calc-tax-input" class="job-calc-num-input job-calc-tax-val-input" min="0" step="1" placeholder="0">
-                    <span class="job-calc-tax-symbol-suffix" id="job-calc-tax-symbol-suffix">%</span>
+                    <button type="button" class="job-calc-tax-symbol-toggle" id="job-calc-tax-symbol-toggle" title="Currently Percent (%) — click to switch to Dollar ($)">%</button>
                   </div>
                   <span class="job-calc-tax-deduction-amount" id="job-calc-tax-amount">-$0.00</span>
                 </div>
@@ -964,17 +969,25 @@
 
               <!-- Expenses Row (Included only when expenses exist) -->
               <div class="job-calc-summary-row" id="job-calc-expense-summary-row" style="display: none;">
-                <span class="job-calc-row-title">Expenses</span>
+                <div class="job-calc-row-title-wrap">
+                  <span class="job-calc-flow-dot flow-expense"></span>
+                  <span class="job-calc-row-title">Expenses</span>
+                </div>
                 <span class="job-calc-expense-amount" id="job-calc-sum-expenses">-$0.00</span>
               </div>
 
               <div class="job-calc-divider"></div>
 
               <!-- Net Take-Home Row -->
-              <div class="job-calc-summary-row job-calc-net-row">
-                <div class="job-calc-net-label-wrap">
-                  <span class="job-calc-net-label">Net Take-Home Pay</span>
-                  <span class="job-calc-net-sublabel">After tax & expenses</span>
+              <div class="job-calc-summary-row job-calc-net-row" id="job-calc-net-row">
+                <div class="job-calc-net-left">
+                  <div class="job-calc-net-icon-wrap">
+                    <span class="material-symbols-outlined job-calc-net-status-icon" id="job-calc-net-status-icon">trending_up</span>
+                  </div>
+                  <div class="job-calc-net-label-wrap">
+                    <span class="job-calc-net-label">Net Take-Home Pay</span>
+                    <span class="job-calc-net-sublabel">After tax & expenses</span>
+                  </div>
                 </div>
                 <span class="job-calc-net-val" id="job-calc-sum-net">$0.00</span>
               </div>
@@ -1258,35 +1271,41 @@
       });
     }
 
-    // Tax Mode Toggle (% vs $)
-    const taxToggleWrap = container.querySelector('#job-calc-tax-mode-toggle');
+    // Tax Symbol Toggle (% vs $) inside input box
+    const taxSymbolBtn = container.querySelector('#job-calc-tax-symbol-toggle');
     const taxInput = container.querySelector('#job-calc-tax-input');
+
+    function toggleTaxMode() {
+      const currentMode = state.settings.tax?.type === 'amount' ? 'amount' : 'percent';
+      const newMode = currentMode === 'percent' ? 'amount' : 'percent';
+      state.settings.tax.type = newMode;
+      syncTaxModeUI(newMode);
+      saveSettings();
+      updateSummaryCard();
+    }
 
     function syncTaxModeUI(mode) {
       const taxField = container.querySelector('#job-calc-tax-field');
-      const prefix = container.querySelector('#job-calc-tax-symbol-prefix');
-      const suffix = container.querySelector('#job-calc-tax-symbol-suffix');
+      const symbolBtn = container.querySelector('#job-calc-tax-symbol-toggle');
 
       if (taxField) {
         taxField.classList.toggle('mode-percent', mode === 'percent');
         taxField.classList.toggle('mode-amount', mode === 'amount');
       }
-      if (prefix) prefix.style.display = mode === 'amount' ? 'inline' : 'none';
-      if (suffix) suffix.style.display = mode === 'percent' ? 'inline' : 'none';
+      if (symbolBtn) {
+        symbolBtn.textContent = mode === 'amount' ? '$' : '%';
+        symbolBtn.title = mode === 'amount'
+          ? 'Currently Dollar ($) — click to switch to Percent (%)'
+          : 'Currently Percent (%) — click to switch to Dollar ($)';
+        symbolBtn.setAttribute('aria-label', symbolBtn.title);
+      }
     }
 
-    if (taxToggleWrap) {
-      taxToggleWrap.addEventListener('click', (e) => {
-        const btn = e.target.closest('.job-calc-tax-mode-btn');
-        if (!btn) return;
-        const mode = btn.dataset.mode;
-        state.settings.tax.type = mode;
-        taxToggleWrap.querySelectorAll('.job-calc-tax-mode-btn').forEach((b) => {
-          b.classList.toggle('active', b === btn);
-        });
-        syncTaxModeUI(mode);
-        saveSettings();
-        updateSummaryCard();
+    if (taxSymbolBtn) {
+      taxSymbolBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTaxMode();
       });
     }
 
@@ -1370,6 +1389,10 @@
         swapToBreakdownSummary();
       } else if (e.target.closest('#receipt-btn-copy, .receipt-btn-copy')) {
         handleCopyReceipt();
+      } else if (e.target.closest('#job-calc-tax-symbol-toggle, .job-calc-tax-symbol-toggle')) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTaxMode();
       }
     });
   }
@@ -4507,7 +4530,6 @@
     const taxAmountEl = container.querySelector('#job-calc-tax-amount');
     const taxInput = container.querySelector('#job-calc-tax-input');
     const taxSymbol = container.querySelector('#job-calc-tax-symbol');
-    const taxToggleWrap = container.querySelector('#job-calc-tax-mode-toggle');
 
     if (sumSessions) sumSessions.textContent = `${totalSessions}x`;
     if (sumHours) sumHours.textContent = `${totalHours.toFixed(1)} hrs`;
@@ -4529,6 +4551,11 @@
     const netRowEl = container.querySelector('.job-calc-net-row');
     if (netRowEl) {
       netRowEl.classList.toggle('is-deficit', isDeficit);
+    }
+
+    const netIconEl = container.querySelector('#job-calc-net-status-icon');
+    if (netIconEl) {
+      netIconEl.textContent = isDeficit ? 'trending_down' : 'trending_up';
     }
 
     const netLabelEl = container.querySelector('.job-calc-net-label');
@@ -4558,19 +4585,16 @@
       taxInput.value = taxSetting.value > 0 ? taxSetting.value : '';
     }
     const taxField = container.querySelector('#job-calc-tax-field');
-    const prefix = container.querySelector('#job-calc-tax-symbol-prefix');
-    const suffix = container.querySelector('#job-calc-tax-symbol-suffix');
+    const symbolBtn = container.querySelector('#job-calc-tax-symbol-toggle');
     if (taxField) {
       taxField.classList.toggle('mode-percent', taxSetting.type === 'percent');
       taxField.classList.toggle('mode-amount', taxSetting.type === 'amount');
     }
-    if (prefix) prefix.style.display = taxSetting.type === 'amount' ? 'inline' : 'none';
-    if (suffix) suffix.style.display = taxSetting.type === 'percent' ? 'inline' : 'none';
-
-    if (taxToggleWrap) {
-      taxToggleWrap.querySelectorAll('.job-calc-tax-mode-btn').forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.mode === taxSetting.type);
-      });
+    if (symbolBtn) {
+      symbolBtn.textContent = taxSetting.type === 'amount' ? '$' : '%';
+      symbolBtn.title = taxSetting.type === 'amount'
+        ? 'Currently Dollar ($) — click to switch to Percent (%)'
+        : 'Currently Percent (%) — click to switch to Dollar ($)';
     }
 
     // Keep the receipt ticket synced with current data

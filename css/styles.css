@@ -12376,8 +12376,13 @@ ic {
 /* Summary Card */
 .job-calc-summary-card {
     background: #ffffff;
-    border: 1px solid #cbd5e1;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .job-calc-summary-metrics {
@@ -12388,58 +12393,112 @@ ic {
 
 .job-calc-metric {
     background: #f8fafc;
-    border-radius: 10px;
-    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 14px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.job-calc-metric:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.job-calc-metric-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.job-calc-metric-icon {
+    font-size: 15px;
+    color: #0284c7;
 }
 
 .job-calc-metric-label {
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.68rem;
+    font-weight: 700;
     text-transform: uppercase;
     color: #64748b;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.5px;
 }
 
 .job-calc-metric-val {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: #0f172a;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.3px;
 }
 
 .job-calc-summary-rows {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 8px 0;
+    gap: 8px;
+    padding: 2px 0;
 }
 
 .job-calc-summary-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
+    padding: 6px 4px;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+
+.job-calc-summary-row:hover {
+    background: #f8fafc;
+}
+
+.job-calc-row-title-wrap {
+    display: flex;
+    align-items: center;
     gap: 8px;
-    flex-wrap: nowrap;
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.job-calc-flow-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.job-calc-flow-dot.flow-gross {
+    background: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.job-calc-flow-dot.flow-tax {
+    background: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+}
+
+.job-calc-flow-dot.flow-expense {
+    background: #f97316;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
 }
 
 .job-calc-row-title {
     font-size: 0.88rem;
     font-weight: 600;
-    color: #475569;
+    color: #334155;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
 }
 
 .job-calc-sum-bold {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: #059669;
     white-space: nowrap;
     flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
 }
 
 .job-calc-expense-amount {
@@ -12448,6 +12507,7 @@ ic {
     color: #dc2626;
     white-space: nowrap;
     flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Tax Deduction Row */
@@ -12455,50 +12515,21 @@ ic {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 6px 0;
-    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 6px 4px;
+    border-radius: 8px;
+    transition: background 0.15s ease;
 }
 
-.job-calc-tax-label-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    flex-shrink: 1;
+.job-calc-tax-row:hover {
+    background: #f8fafc;
 }
 
 .job-calc-tax-title {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    color: #475569;
+    color: #334155;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.job-calc-tax-mode-toggle {
-    display: flex;
-    background: #e2e8f0;
-    border-radius: 8px;
-    padding: 2px;
-    gap: 2px;
-}
-
-.job-calc-tax-mode-btn {
-    border: none;
-    background: transparent;
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #64748b;
-    cursor: pointer;
-}
-
-.job-calc-tax-mode-btn.active {
-    background: #0284c7;
-    color: white;
 }
 
 .job-calc-tax-input-group {
@@ -12508,73 +12539,138 @@ ic {
 }
 
 .job-calc-tax-field {
-    position: relative;
     display: inline-flex;
     align-items: center;
-    width: 78px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0 4px 0 6px;
+    height: 32px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    gap: 4px;
 }
 
-.job-calc-tax-symbol-prefix {
-    position: absolute;
-    left: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #64748b;
-    pointer-events: none;
-}
-
-.job-calc-tax-symbol-suffix {
-    position: absolute;
-    right: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #64748b;
-    pointer-events: none;
+.job-calc-tax-field:focus-within {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
 }
 
 .job-calc-tax-val-input {
-    width: 100%;
-    height: 32px;
-    box-sizing: border-box;
-    font-size: 0.88rem;
-    font-weight: 600;
+    width: 44px;
+    height: 100%;
+    border: none !important;
+    background: transparent !important;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
     text-align: right;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    background: #ffffff;
+    padding: 0;
+    outline: none !important;
+    box-shadow: none !important;
+    font-variant-numeric: tabular-nums;
+    font-family: inherit;
 }
 
-/* Mode-specific padding */
-.job-calc-tax-field.mode-percent .job-calc-tax-val-input {
-    padding-left: 8px;
-    padding-right: 24px;
+/* Chrome, Safari, Edge, Opera spin buttons hidden for sleek look */
+.job-calc-tax-val-input::-webkit-outer-spin-button,
+.job-calc-tax-val-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+.job-calc-tax-val-input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield;
 }
 
-.job-calc-tax-field.mode-amount .job-calc-tax-val-input {
-    padding-left: 20px;
-    padding-right: 8px;
+/* Integrated Tax Symbol Toggle Button */
+.job-calc-tax-symbol-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 4px;
+    border: 1px solid #fde68a;
+    background: #fffbeb;
+    color: #b45309;
+    border-radius: 5px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: inherit;
+    line-height: 1;
+}
+
+.job-calc-tax-symbol-toggle:hover {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+    transform: scale(1.08);
+    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.2);
+}
+
+.job-calc-tax-symbol-toggle:active {
+    transform: scale(0.92);
 }
 
 .job-calc-tax-deduction-amount {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    color: #dc2626;
-    min-width: 65px;
+    color: #d97706;
+    min-width: 68px;
     text-align: right;
+    font-variant-numeric: tabular-nums;
 }
 
 .job-calc-divider {
     height: 1px;
     background: #e2e8f0;
-    margin: 2px 0;
+    margin: 4px 0;
 }
 
-/* Net Row */
+/* Net Hero Row */
 .job-calc-net-row {
-    background: #ecfdf5;
+    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
     border: 1px solid #a7f3d0;
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+    transition: all 0.25s ease;
+}
+
+.job-calc-net-row:hover {
+    background: linear-gradient(135deg, #e6fcf1 0%, #edfbf2 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+}
+
+.job-calc-net-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.job-calc-net-icon-wrap {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #d1fae5;
+    color: #059669;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.job-calc-net-icon-wrap .material-symbols-outlined {
+    font-size: 20px;
 }
 
 .job-calc-net-label-wrap {
@@ -12586,24 +12682,38 @@ ic {
     font-size: 0.95rem;
     font-weight: 800;
     color: #065f46;
+    letter-spacing: -0.2px;
 }
 
 .job-calc-net-sublabel {
     font-size: 0.7rem;
     color: #047857;
+    font-weight: 500;
 }
 
 .job-calc-net-val {
-    font-size: 1.45rem;
+    font-size: 1.55rem;
     font-weight: 900;
     color: #047857;
     letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
     transition: color 0.2s ease;
 }
 
 .job-calc-net-row.is-deficit {
-    background: #fef2f2;
+    background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
     border-color: #fecaca;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.08);
+}
+
+.job-calc-net-row.is-deficit:hover {
+    background: linear-gradient(135deg, #fee2e2 0%, #ffe4e6 100%);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12);
+}
+
+.job-calc-net-row.is-deficit .job-calc-net-icon-wrap {
+    background: #fee2e2;
+    color: #dc2626;
 }
 
 .job-calc-net-row.is-deficit .job-calc-net-label {
@@ -12630,33 +12740,38 @@ ic {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: 7px;
+    padding: 11px 14px;
     border-radius: 12px;
     border: none;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: inherit;
 }
 
-.job-calc-btn-copy,
+.job-calc-action-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
 .job-calc-btn-view-receipt {
-    background: #0284c7;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    box-shadow: 0 3px 10px rgba(2, 132, 199, 0.25);
 }
 
-.job-calc-btn-copy:hover,
 .job-calc-btn-view-receipt:hover {
-    background: #0369a1;
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
     transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(2, 132, 199, 0.35);
 }
 
-.job-calc-btn-copy:active,
 .job-calc-btn-view-receipt:active {
     transform: scale(0.98);
 }
+
+
 
 .job-calc-btn-back-summary {
     background: #f1f5f9;
@@ -12907,7 +13022,7 @@ ic {
 
 .receipt-item-tax-detail {
     font-size: 0.68rem;
-    color: #dc2626;
+    color: #d97706;
     margin-top: 1px;
     font-weight: 600;
 }
@@ -12925,6 +13040,10 @@ ic {
 
 .receipt-item-deduction {
     color: #dc2626;
+}
+
+#receipt-tax-amount {
+    color: #d97706;
 }
 
 .receipt-item-muted {
