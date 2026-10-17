@@ -11171,15 +11171,18 @@ ic {
 .job-calc-custom-name-input {
     border: 1px solid transparent;
     border-radius: 6px;
-    padding: 2px 6px;
+    padding: 2px 4px;
+    margin-left: -4px;
     font-size: 0.94rem;
     font-weight: 700;
     color: #0f172a;
     background: transparent;
     font-family: inherit;
-    flex: 1 1 0;
-    min-width: 0;
-    max-width: 140px;
+    flex: 0 1 auto;
+    width: auto;
+    field-sizing: content;
+    min-width: 40px;
+    max-width: calc(100% - 40px);
     transition: all 0.2s ease;
 }
 
@@ -11227,15 +11230,18 @@ ic {
 .job-calc-expense-name-input {
     border: 1px solid transparent;
     border-radius: 6px;
-    padding: 2px 6px;
+    padding: 2px 4px;
+    margin-left: -4px;
     font-size: 0.94rem;
     font-weight: 700;
     color: #0f172a;
     background: transparent;
     font-family: inherit;
-    flex: 1 1 0;
-    min-width: 0;
-    max-width: 140px;
+    flex: 0 1 auto;
+    width: auto;
+    field-sizing: content;
+    min-width: 40px;
+    max-width: calc(100% - 40px);
     transition: all 0.2s ease;
     white-space: nowrap;
     overflow: hidden;
@@ -11987,9 +11993,20 @@ ic {
     letter-spacing: 0.4px;
 }
 
+.job-calc-split-headers-row.is-two-col {
+    grid-template-columns: 1fr 1fr;
+}
+
+.job-calc-inputs-row.is-two-col {
+    grid-template-columns: 1fr 1fr;
+}
+
 @media (max-width: 540px) {
     .job-calc-split-headers-row {
         grid-template-columns: 1fr 1fr 1fr;
+    }
+    .job-calc-split-headers-row.is-two-col {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
@@ -12133,8 +12150,9 @@ ic {
     overflow-y: auto;
 }
 
-.job-calc-dates-accordion.hidden {
-    display: none;
+.job-calc-dates-accordion.hidden,
+.job-calc-custom-accordion.hidden {
+    display: none !important;
 }
 
 .job-calc-occ-row {

@@ -70,6 +70,9 @@
                 if (!job.splitsByRange || typeof job.splitsByRange !== 'object') {
                   job.splitsByRange = {};
                 }
+                if (!job.expenseSplitsByRange || typeof job.expenseSplitsByRange !== 'object') {
+                  job.expenseSplitsByRange = {};
+                }
                 loadedJobs[name] = job;
               }
             }
@@ -81,8 +84,17 @@
               value: typeof parsed.tax?.value === 'number' ? parsed.tax.value : (parseFloat(parsed.tax?.value) || 0)
             },
             jobs: loadedJobs,
-            customJobs: Array.isArray(parsed.customJobs) ? parsed.customJobs : [],
-            customExpenses: Array.isArray(parsed.customExpenses) ? parsed.customExpenses : []
+            customJobs: Array.isArray(parsed.customJobs) ? parsed.customJobs.map((c) => ({
+              ...c,
+              splits: Array.isArray(c.splits) && c.splits.length > 0 ? c.splits : [{
+                shifts: parseInt(c.shiftsCount, 10) || 1,
+                hours: typeof c.hoursPerShift === 'number' ? c.hoursPerShift : (parseFloat(c.hoursPerShift) || 4)
+              }]
+            })) : [],
+            customExpenses: Array.isArray(parsed.customExpenses) ? parsed.customExpenses.map((e) => ({
+              ...e,
+              splits: Array.isArray(e.splits) && e.splits.length > 0 ? e.splits : [{ qty: 1, amount: typeof e.amount === 'number' ? e.amount : (parseFloat(e.amount) || 25) }]
+            })) : []
           };
         }
       }
@@ -157,6 +169,28 @@
 
         if (isExpense) {
           cleanJob.expenseAmount = typeof job.expenseAmount === 'number' ? job.expenseAmount : 0;
+          cleanJob.expenseAdjustMode = job.expenseAdjustMode === 'date' ? 'date' : 'split';
+
+          // Persist range-scoped expense splits so other months never inherit old shift counts
+          if (job.expenseSplitsByRange && typeof job.expenseSplitsByRange === 'object') {
+            const cleanExpSplitsByRange = {};
+            for (const [rKey, rSplits] of Object.entries(job.expenseSplitsByRange)) {
+              if (Array.isArray(rSplits)) {
+                const validSplits = rSplits
+                  .map((s) => ({
+                    shifts: parseInt(s.shifts, 10) || 0,
+                    amount: parseFloat(s.amount) || 0
+                  }))
+                  .filter((s) => s.shifts > 0 || rSplits.length === 1);
+                if (validSplits.length > 0) {
+                  cleanExpSplitsByRange[rKey] = validSplits;
+                }
+              }
+            }
+            if (Object.keys(cleanExpSplitsByRange).length > 0) {
+              cleanJob.expenseSplitsByRange = cleanExpSplitsByRange;
+            }
+          }
 
           // Only store expense overrides if they actually differ from the default expense amount
           if (job.expenseOverrides && typeof job.expenseOverrides === 'object') {
@@ -190,13 +224,23 @@
         hourlyRate: typeof c.hourlyRate === 'number' ? c.hourlyRate : (parseFloat(c.hourlyRate) || 25),
         shiftsCount: parseInt(c.shiftsCount, 10) || 1,
         hoursPerShift: typeof c.hoursPerShift === 'number' ? c.hoursPerShift : (parseFloat(c.hoursPerShift) || 4),
-        splits: Array.isArray(c.splits) ? c.splits.map((s) => ({ shifts: parseInt(s.shifts, 10) || 0, hours: parseFloat(s.hours) || 0 })) : []
+        splits: Array.isArray(c.splits) && c.splits.length > 0 ? c.splits.map((s) => ({
+          shifts: parseInt(s.shifts, 10) || 0,
+          hours: parseFloat(s.hours) || 0
+        })) : [{
+          shifts: parseInt(c.shiftsCount, 10) || 1,
+          hours: typeof c.hoursPerShift === 'number' ? c.hoursPerShift : (parseFloat(c.hoursPerShift) || 4)
+        }]
       })),
       customExpenses: (state.settings.customExpenses || []).map((e) => ({
         id: e.id,
         name: e.name || 'Untitled',
         isExpense: e.isExpense !== false,
-        amount: typeof e.amount === 'number' ? e.amount : (parseFloat(e.amount) || 0)
+        amount: typeof e.amount === 'number' ? e.amount : (parseFloat(e.amount) || 0),
+        splits: Array.isArray(e.splits) && e.splits.length > 0 ? e.splits.map((s) => ({
+          qty: parseInt(s.qty, 10) || 1,
+          amount: typeof s.amount === 'number' ? s.amount : (parseFloat(s.amount) || 0)
+        })) : [{ qty: 1, amount: typeof e.amount === 'number' ? e.amount : (parseFloat(e.amount) || 25) }]
       }))
     };
   }
@@ -216,6 +260,8 @@
         isPaid: false,
         isExpense: false,
         expenseAmount: 0,
+        expenseAdjustMode: 'split',
+        expenseSplitsByRange: {},
         defaultHours: 4,
         hourlyRate: 25,
         isTaxable: true,
@@ -234,6 +280,12 @@
       }
       if (state.settings.jobs[jobName].expenseAmount === undefined) {
         state.settings.jobs[jobName].expenseAmount = 0;
+      }
+      if (!state.settings.jobs[jobName].expenseAdjustMode) {
+        state.settings.jobs[jobName].expenseAdjustMode = 'split';
+      }
+      if (!state.settings.jobs[jobName].expenseSplitsByRange || typeof state.settings.jobs[jobName].expenseSplitsByRange !== 'object') {
+        state.settings.jobs[jobName].expenseSplitsByRange = {};
       }
       if (!state.settings.jobs[jobName].adjustMode) {
         state.settings.jobs[jobName].adjustMode = 'split';
@@ -270,6 +322,10 @@
 
   function pad(num) {
     return String(num).padStart(2, '0');
+  }
+
+  function roundCents(n) {
+    return Math.round((Number(n) + Number.EPSILON) * 100) / 100;
   }
 
   function formatDateIso(date) {
@@ -390,15 +446,49 @@
       return rangeSplits;
     }
 
-    // If single split row, always keep shifts in 1-to-1 sync with current range count!
-    if (rangeSplits.length === 1) {
-      rangeSplits[0].shifts = safeCount;
-      if (rangeSplits[0].hours === undefined) {
-        rangeSplits[0].hours = safeHours;
-      }
-    }
+    // Ensure all existing split rows have valid numeric values without overwriting user input
+    rangeSplits.forEach((s) => {
+      const numShifts = parseInt(s.shifts, 10);
+      s.shifts = (!isNaN(numShifts) && numShifts >= 0) ? numShifts : safeCount;
+      const numHours = parseFloat(s.hours);
+      s.hours = (!isNaN(numHours) && numHours >= 0) ? numHours : safeHours;
+    });
 
     setting.splits = rangeSplits;
+    return rangeSplits;
+  }
+
+  /**
+   * Retrieves or initializes expense splits for a calendar task in the current active range.
+   * If single-tier (default), its shift/occurrence count dynamically matches the scanned count
+   * in the active range, eliminating hardcoded shift count carry-over across months.
+   */
+  function getJobExpenseSplits(job, setting, count, defaultExpense) {
+    const safeCount = typeof count === 'number' && !isNaN(count) ? count : 0;
+    const safeAmount = typeof defaultExpense === 'number' && !isNaN(defaultExpense) ? defaultExpense : (setting?.expenseAmount ?? 25);
+    const rangeKey = getActiveRangeKey();
+
+    if (!setting.expenseSplitsByRange || typeof setting.expenseSplitsByRange !== 'object') {
+      setting.expenseSplitsByRange = {};
+    }
+
+    let rangeSplits = setting.expenseSplitsByRange[rangeKey];
+
+    // If still no valid splits for this range, initialize single row with current range count
+    if (!rangeSplits || !Array.isArray(rangeSplits) || rangeSplits.length === 0) {
+      rangeSplits = [{ shifts: safeCount, amount: safeAmount }];
+      setting.expenseSplitsByRange[rangeKey] = rangeSplits;
+      return rangeSplits;
+    }
+
+    // Ensure all existing split rows have valid numeric values without overwriting user input
+    rangeSplits.forEach((s) => {
+      const numShifts = parseInt(s.shifts, 10);
+      s.shifts = (!isNaN(numShifts) && numShifts >= 0) ? numShifts : safeCount;
+      const numAmount = parseFloat(s.amount);
+      s.amount = (!isNaN(numAmount) && numAmount >= 0) ? numAmount : safeAmount;
+    });
+
     return rangeSplits;
   }
 
@@ -487,8 +577,6 @@
    * ========================================================================== */
 
   function calculateTotals() {
-    const roundCents = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
-
     let totalSessions = 0;
     let totalHours = 0;
     let grossEarnings = 0;
@@ -543,22 +631,42 @@
 
       // Check if calendar task is marked as an Expense
       let jobExpenseTotal = 0;
+      let expSessions = count;
       if (setting.isExpense) {
         const defaultExpAmt = parseFloat(setting.expenseAmount) || 0;
-        job.occurrences.forEach((occ) => {
-          const overrideVal = setting.expenseOverrides?.[occ.occKey];
-          const occExp = (typeof overrideVal === 'number' && !isNaN(overrideVal))
-            ? overrideVal
-            : defaultExpAmt;
+        if (setting.expenseAdjustMode !== 'date') {
+          const expSplits = getJobExpenseSplits(job, setting, count, defaultExpAmt);
+          expSessions = 0;
+          expSplits.forEach((s) => {
+            const sCount = parseInt(s.shifts, 10) || 0;
+            const sAmount = parseFloat(s.amount) || 0;
+            jobExpenseTotal += (sCount * sAmount);
+            expSessions += sCount;
+          });
+        } else {
+          job.occurrences.forEach((occ) => {
+            const overrideVal = setting.expenseOverrides?.[occ.occKey];
+            const occExp = (typeof overrideVal === 'number' && !isNaN(overrideVal))
+              ? overrideVal
+              : defaultExpAmt;
 
-          jobExpenseTotal += occExp;
-        });
+            jobExpenseTotal += occExp;
+          });
+        }
 
         jobExpenseTotal = roundCents(jobExpenseTotal);
         totalExpenses += jobExpenseTotal;
       }
 
       const activeSplits = (setting.isPaid && setting.adjustMode === 'split') ? getJobSplits(job, setting, count, parseFloat(setting.defaultHours) || 0) : null;
+      const activeExpSplits = (setting.isExpense && setting.expenseAdjustMode !== 'date') ? getJobExpenseSplits(job, setting, count, parseFloat(setting.expenseAmount) || 0) : null;
+
+      let displayCountVal = count;
+      if (setting.isPaid && activeSplits && activeSplits.length > 0) {
+        displayCountVal = jobSessions;
+      } else if (setting.isExpense && activeExpSplits && activeExpSplits.length > 0) {
+        displayCountVal = expSessions;
+      }
 
       jobResults[name] = {
         isPaid: setting.isPaid === true,
@@ -566,7 +674,7 @@
         expenseAmount: parseFloat(setting.expenseAmount) || 0,
         expenseTotal: jobExpenseTotal,
         isTaxable: setting.isTaxable !== false,
-        count: (activeSplits && activeSplits.length > 1) ? jobSessions : count,
+        count: displayCountVal,
         totalHours: jobHours,
         subtotal: jobSubtotal
       };
@@ -630,19 +738,33 @@
     // Custom / Off-calendar expenses
     const customExpenseResults = {};
     (state.settings.customExpenses || []).forEach((cExp) => {
+      const splits = Array.isArray(cExp.splits) && cExp.splits.length > 0 ? cExp.splits : [{ qty: 1, amount: parseFloat(cExp.amount) || 0 }];
+      let totalQty = 0;
+      let totalExpAmt = 0;
+      splits.forEach((s) => {
+        const q = parseInt(s.qty, 10) || 0;
+        const a = parseFloat(s.amount) || 0;
+        totalQty += q;
+        totalExpAmt += (q * a);
+      });
+      totalExpAmt = roundCents(totalExpAmt);
+
       if (cExp.isExpense !== false) {
-        const amt = roundCents(parseFloat(cExp.amount) || 0);
-        totalExpenses += amt;
+        totalExpenses += totalExpAmt;
         customExpenseResults[cExp.id] = {
           id: cExp.id,
           name: cExp.name || 'Expense',
-          amount: amt
+          count: totalQty,
+          amount: totalExpAmt,
+          splits: splits
         };
       } else {
         customExpenseResults[cExp.id] = {
           id: cExp.id,
           name: cExp.name || 'Expense',
+          count: totalQty,
           amount: 0,
+          splits: splits,
           isExcluded: true
         };
       }
@@ -1276,6 +1398,7 @@
       isTaxable: false,
       splits: [{ shifts: 1, hours: 4 }]
     });
+    state.expandedJobs.add(newId);
     saveSettings();
 
     // If on All or Expenses tab, switch to Paid tab so user sees new card immediately
@@ -1308,8 +1431,11 @@
     state.settings.customExpenses.unshift({
       id: newId,
       name: 'Untitled',
-      amount: 25
+      amount: 25,
+      isExpense: true,
+      splits: [{ qty: 1, amount: 25 }]
     });
+    state.expandedJobs.add(newId);
     saveSettings();
 
     // If not on Expenses tab, switch to Expenses tab so user sees new card immediately
@@ -1482,14 +1608,90 @@
       return;
     }
 
-    const { jobResults, customResults } = calculateTotals();
+    const { jobResults, customResults, customExpenseResults } = calculateTotals();
 
     let html = '';
+    const isAllTab = state.activeTab === 'all';
 
     // 1. Render Custom Expenses (in Expenses or All tab)
     visibleCustomExpenses.forEach((cExp) => {
+      if (!Array.isArray(cExp.splits) || cExp.splits.length === 0) {
+        cExp.splits = [{
+          qty: 1,
+          amount: typeof cExp.amount === 'number' ? cExp.amount : 25
+        }];
+      }
+
+      let customExpTotalQty = 0;
+      let customExpTotalAmt = 0;
+      const canDeleteCustomExpSplit = cExp.splits.length > 1;
+      const isExpAccordionOpen = state.expandedJobs.has(cExp.id);
+
+      let customExpRowsHtml = `
+        <div class="job-calc-split-headers-row is-two-col">
+          <span class="job-calc-split-col-header">Qty</span>
+          <span class="job-calc-split-col-header">Cost ($)</span>
+        </div>
+      `;
+
+      cExp.splits.forEach((s, idx) => {
+        const sQty = parseInt(s.qty, 10) || 0;
+        const sAmt = parseFloat(s.amount) || 0;
+        customExpTotalQty += sQty;
+        customExpTotalAmt += (sQty * sAmt);
+
+        customExpRowsHtml += `
+          <div class="job-calc-split-row-item ${canDeleteCustomExpSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteCustomExpSplit ? 'Swipe left to delete this split row (or type 0 in qty)' : ''}">
+            ${canDeleteCustomExpSplit ? `
+              <div class="job-calc-split-delete-action">
+                <button type="button" 
+                        class="job-calc-custom-exp-split-delete-btn job-calc-split-delete-btn" 
+                        data-split-index="${idx}" 
+                        title="Delete split row" 
+                        aria-label="Delete split row">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            ` : ''}
+            <div class="job-calc-inputs-row is-two-col job-calc-split-row" data-split-index="${idx}">
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <input type="number" 
+                         class="job-calc-custom-exp-split-qty-input job-calc-num-input" 
+                         data-split-index="${idx}" 
+                         min="0" 
+                         step="1" 
+                         value="${s.qty ?? 1}" 
+                         aria-label="Quantity"
+                         title="Enter quantity (swipe left or type 0 to remove this row)">
+                  <span class="job-calc-unit">x</span>
+                </div>
+              </div>
+
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <span class="job-calc-prefix">$</span>
+                  <input type="number" 
+                         class="job-calc-custom-exp-split-amount-input job-calc-num-input" 
+                         data-split-index="${idx}" 
+                         min="0" 
+                         step="0.5" 
+                         value="${s.amount ?? 25}" 
+                         placeholder="25"
+                         aria-label="Cost">
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      const cExpRes = customExpenseResults?.[cExp.id] || {
+        amount: customExpTotalAmt,
+        count: customExpTotalQty
+      };
+
       const isCustomExpense = cExp.isExpense !== false;
-      const amt = parseFloat(cExp.amount) || 0;
       const expCheckClass = isCustomExpense ? 'is-expense' : 'is-unmarked';
       const expTriageIcon = isCustomExpense ? 'trending_down' : 'add';
       let expCardClass = 'job-calc-task-card job-calc-expense-card';
@@ -1535,29 +1737,66 @@
 
             <div class="job-calc-card-info">
               <div class="job-calc-title-row">
-                <input type="text" class="job-calc-expense-name-input" value="${escapeHtml(cExp.name || 'Untitled')}" placeholder="Untitled">
+                <input type="text" 
+                       class="job-calc-expense-name-input" 
+                       value="${escapeHtml(cExp.name || 'Untitled')}" 
+                       placeholder="Untitled" 
+                       size="${Math.max(1, (cExp.name || 'Untitled').length)}">
+                <span class="job-calc-session-badge">${customExpTotalQty}x</span>
               </div>
-              <div class="job-calc-tagline">${isCustomExpense ? 'Expenses' : 'Excluded'}</div>
+              ${!isCustomExpense ? '<div class="job-calc-tagline">Excluded</div>' : ''}
             </div>
 
             <!-- Subtotal Pill -->
-            <div class="job-calc-subtotal-badge job-calc-expense-badge">
-              <span class="job-calc-subtotal-amount">${isCustomExpense ? `-$${amt.toFixed(2)}` : 'Excluded'}</span>
-            </div>
+            ${isCustomExpense ? `
+              <div class="job-calc-subtotal-badge job-calc-expense-badge">
+                <span class="job-calc-subtotal-amount">-$${cExpRes.amount.toFixed(2)}</span>
+              </div>
+            ` : ''}
           </div>
 
-          <!-- Config Section -->
-          <div class="job-calc-card-config">
-            <div class="job-calc-inputs-row">
-              <div class="job-calc-input-block" style="flex: 1;">
-                <label>Cost ($)</label>
-                <div class="job-calc-input-wrapper">
-                  <span class="job-calc-prefix">$</span>
-                  <input type="number" class="job-calc-expense-amount-input job-calc-num-input" min="0" step="0.5" value="${cExp.amount ?? 25}">
+          <!-- Config Section (Visible when Active Expense) -->
+          ${isCustomExpense ? `
+            <div class="job-calc-card-config">
+              ${isAllTab ? `
+                <div class="job-calc-adjust-bar">
+                  <button type="button" 
+                          class="job-calc-accordion-btn job-calc-custom-exp-accordion-btn ${isExpAccordionOpen ? 'active' : ''}" 
+                          title="Toggle split details">
+                    <span class="material-symbols-outlined job-calc-accordion-arrow">
+                      ${isExpAccordionOpen ? 'expand_less' : 'expand_more'}
+                    </span>
+                    <span>Adjust Splits (${cExp.splits.length})</span>
+                  </button>
                 </div>
-              </div>
+                <div class="job-calc-custom-accordion ${isExpAccordionOpen ? '' : 'hidden'}" style="margin-top: 8px;">
+                  <div class="job-calc-groups-wrap">
+                    ${customExpRowsHtml}
+                  </div>
+                  <div class="job-calc-adjust-bar is-split-mode">
+                    <div class="job-calc-split-bar-left">
+                      <button type="button" class="job-calc-add-custom-exp-split-btn job-calc-add-split-btn" title="Add another expense split row">
+                        <span class="material-symbols-outlined">add</span>
+                        <span>Add Split</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ` : `
+                <div class="job-calc-groups-wrap">
+                  ${customExpRowsHtml}
+                </div>
+                <div class="job-calc-adjust-bar is-split-mode">
+                  <div class="job-calc-split-bar-left">
+                    <button type="button" class="job-calc-add-custom-exp-split-btn job-calc-add-split-btn" title="Add another expense split row">
+                      <span class="material-symbols-outlined">add</span>
+                      <span>Add Split</span>
+                    </button>
+                  </div>
+                </div>
+              `}
             </div>
-          </div>
+          ` : ''}
 
         </div>
       `;
@@ -1655,6 +1894,7 @@
       let customCardClass = 'job-calc-task-card job-calc-custom-card';
       if (isCustomPaid) customCardClass += ' is-paid';
       else customCardClass += ' is-unpaid is-excluded';
+      const isJobAccordionOpen = state.expandedJobs.has(cJob.id);
 
       html += `
         <div class="${customCardClass}" data-custom-id="${escapeHtml(cJob.id)}">
@@ -1695,42 +1935,75 @@
 
             <div class="job-calc-card-info">
               <div class="job-calc-title-row">
-                <input type="text" class="job-calc-custom-name-input" value="${escapeHtml(cJob.name || 'Untitled')}" placeholder="Untitled">
+                <input type="text" 
+                       class="job-calc-custom-name-input" 
+                       value="${escapeHtml(cJob.name || 'Untitled')}" 
+                       placeholder="Untitled"
+                       size="${Math.max(1, (cJob.name || 'Untitled').length)}">
                 <span class="job-calc-session-badge">${customTotalShifts}x</span>
               </div>
-              <div class="job-calc-tagline">${isCustomPaid ? 'Earnings' : 'Excluded'}</div>
               ${isCustomPaid ? `
                 <label class="job-calc-taxable-check-row" title="${cJob.isTaxable === true ? 'Subject to tax deduction' : 'Untaxed earnings'}">
                   <input type="checkbox" class="job-calc-custom-taxable-checkbox" ${cJob.isTaxable === true ? 'checked' : ''}>
                   <span class="job-calc-taxable-check-box"></span>
                   <span class="job-calc-taxable-check-text">Taxable</span>
                 </label>
-              ` : ''}
+              ` : `
+                <div class="job-calc-tagline">Excluded</div>
+              `}
             </div>
 
             <!-- Subtotal Pill -->
-            <div class="job-calc-subtotal-badge">
-              <span class="job-calc-subtotal-amount">${isCustomPaid ? `$${cRes.subtotal.toFixed(2)}` : 'Excluded'}</span>
-              ${isCustomPaid ? `<span class="job-calc-subtotal-hours">${cRes.totalHours.toFixed(1)} hrs</span>` : ''}
-            </div>
-          </div>
-
-          <!-- Config Section -->
-          <div class="job-calc-card-config">
-            <div class="job-calc-groups-wrap">
-              ${customRowsHtml}
-            </div>
-
-            <!-- Add Split Button for Custom Earnings -->
-            <div class="job-calc-adjust-bar is-split-mode">
-              <div class="job-calc-split-bar-left">
-                <button type="button" class="job-calc-add-custom-split-btn job-calc-add-split-btn" title="Add another shift split row">
-                  <span class="material-symbols-outlined">add</span>
-                  <span>Add Split</span>
-                </button>
+            ${isCustomPaid ? `
+              <div class="job-calc-subtotal-badge">
+                <span class="job-calc-subtotal-amount">$${cRes.subtotal.toFixed(2)}</span>
+                <span class="job-calc-subtotal-hours">${cRes.totalHours.toFixed(1)} hrs</span>
               </div>
-            </div>
+            ` : ''}
           </div>
+
+          <!-- Config Section (Visible when Active Paid) -->
+          ${isCustomPaid ? `
+            <div class="job-calc-card-config">
+              ${isAllTab ? `
+                <div class="job-calc-adjust-bar">
+                  <button type="button" 
+                          class="job-calc-accordion-btn job-calc-custom-job-accordion-btn ${isJobAccordionOpen ? 'active' : ''}" 
+                          title="Toggle split details">
+                    <span class="material-symbols-outlined job-calc-accordion-arrow">
+                      ${isJobAccordionOpen ? 'expand_less' : 'expand_more'}
+                    </span>
+                    <span>Adjust Splits (${cJob.splits.length})</span>
+                  </button>
+                </div>
+                <div class="job-calc-custom-accordion ${isJobAccordionOpen ? '' : 'hidden'}" style="margin-top: 8px;">
+                  <div class="job-calc-groups-wrap">
+                    ${customRowsHtml}
+                  </div>
+                  <div class="job-calc-adjust-bar is-split-mode">
+                    <div class="job-calc-split-bar-left">
+                      <button type="button" class="job-calc-add-custom-split-btn job-calc-add-split-btn" title="Add another shift split row">
+                        <span class="material-symbols-outlined">add</span>
+                        <span>Add Split</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ` : `
+                <div class="job-calc-groups-wrap">
+                  ${customRowsHtml}
+                </div>
+                <div class="job-calc-adjust-bar is-split-mode">
+                  <div class="job-calc-split-bar-left">
+                    <button type="button" class="job-calc-add-custom-split-btn job-calc-add-split-btn" title="Add another shift split row">
+                      <span class="material-symbols-outlined">add</span>
+                      <span>Add Split</span>
+                    </button>
+                  </div>
+                </div>
+              `}
+            </div>
+          ` : ''}
 
         </div>
       `;
@@ -1751,16 +2024,20 @@
       const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
       splits.forEach((s) => { splitAllocated += (parseInt(s.shifts, 10) || 0); });
       const splitRemaining = count - splitAllocated;
-      const displayCount = (isSplitMode && splits.length > 1 && splitAllocated > 0) ? splitAllocated : count;
+      const displayCount = (isSplitMode && splitAllocated > 0) ? splitAllocated : count;
+
+      const isExpSplitMode = isExpense && setting.expenseAdjustMode !== 'date';
+      let expSplitAllocated = 0;
+      const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+      expSplits.forEach((s) => { expSplitAllocated += (parseInt(s.shifts, 10) || 0); });
+      const expSplitRemaining = count - expSplitAllocated;
+      const displayExpCount = (isExpSplitMode && expSplitAllocated > 0) ? expSplitAllocated : count;
+      const finalDisplayCount = isExpense ? displayExpCount : displayCount;
 
       let cardClass = 'job-calc-task-card';
       if (isPaid) cardClass += ' is-paid';
       else if (isExpense) cardClass += ' is-expense';
       else cardClass += ' is-unpaid';
-
-      let tagline = 'Excluded';
-      if (isPaid) tagline = 'Earnings';
-      else if (isExpense) tagline = 'Expenses';
 
       const checkClass = isPaid ? 'is-paid' : (isExpense ? 'is-expense' : 'is-unmarked');
       const triageIcon = isPaid ? 'trending_up' : (isExpense ? 'trending_down' : 'add');
@@ -1807,7 +2084,7 @@
             <div class="job-calc-card-info">
               <div class="job-calc-title-row">
                 <span class="job-calc-job-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
-                <span class="job-calc-session-badge">${displayCount}x</span>
+                <span class="job-calc-session-badge">${finalDisplayCount}x</span>
               </div>
               ${isPaid ? `
                 <label class="job-calc-taxable-check-row" title="${setting.isTaxable !== false ? 'Subject to tax deduction' : 'Untaxed earnings'}">
@@ -1815,11 +2092,11 @@
                   <span class="job-calc-taxable-check-box"></span>
                   <span class="job-calc-taxable-check-text">Taxable</span>
                 </label>
-              ` : `
+              ` : (isExpense ? '' : `
                 <div class="job-calc-tagline">
-                  ${tagline}
+                  Excluded
                 </div>
-              `}
+              `)}
             </div>
 
             <!-- Subtotal Badge for Paid or Expense -->
@@ -1849,7 +2126,7 @@
                 ${isSplitMode ? `
                   <div class="job-calc-adjust-bar is-split-mode">
                     <div class="job-calc-split-bar-left">
-                      <button type="button" class="job-calc-add-split-btn" title="Add another split row">
+                      <button type="button" class="job-calc-calendar-add-split-btn job-calc-add-split-btn" title="Add another split row">
                         <span class="material-symbols-outlined">add</span>
                         <span>Add Split</span>
                       </button>
@@ -1859,7 +2136,7 @@
                     </div>
 
                     <button type="button" 
-                            class="job-calc-mode-swap-btn" 
+                            class="job-calc-calendar-mode-swap-btn job-calc-mode-swap-btn" 
                             data-mode="date" 
                             title="Switch back to individual calendar dates">
                       <span class="material-symbols-outlined">swap_horiz</span>
@@ -1868,7 +2145,7 @@
                   </div>
                 ` : `
                   <div class="job-calc-adjust-bar">
-                    <button type="button" class="job-calc-accordion-btn ${isAccordionOpen ? 'active' : ''}">
+                    <button type="button" class="job-calc-accordion-btn job-calc-calendar-accordion-btn ${isAccordionOpen ? 'active' : ''}">
                       <span class="material-symbols-outlined job-calc-accordion-arrow">
                         ${isAccordionOpen ? 'expand_less' : 'expand_more'}
                       </span>
@@ -1877,7 +2154,7 @@
 
                     ${count > 1 ? `
                       <button type="button" 
-                              class="job-calc-mode-swap-btn" 
+                              class="job-calc-calendar-mode-swap-btn job-calc-mode-swap-btn" 
                               data-mode="split" 
                               title="Switch to split shifts">
                         <span class="material-symbols-outlined">swap_horiz</span>
@@ -1903,18 +2180,52 @@
                   ${renderExpenseInputsHtml(name, job, setting)}
                 </div>
 
-                <!-- Accordion Toggle Button -->
-                <button type="button" class="job-calc-accordion-btn ${isAccordionOpen ? 'active' : ''}">
-                  <span class="material-symbols-outlined job-calc-accordion-arrow">
-                    ${isAccordionOpen ? 'expand_less' : 'expand_more'}
-                  </span>
-                  <span>Adjust Dates (${count})</span>
-                </button>
+                <!-- Adjust Bar: In Split Mode shows Add Split and By Date swapper (NO accordion) -->
+                ${isExpSplitMode ? `
+                  <div class="job-calc-adjust-bar is-split-mode">
+                    <div class="job-calc-split-bar-left">
+                      <button type="button" class="job-calc-add-calendar-exp-split-btn job-calc-add-split-btn" title="Add another expense split row">
+                        <span class="material-symbols-outlined">add</span>
+                        <span>Add Split</span>
+                      </button>
+                      <span class="job-calc-split-tag ${expSplitRemaining === 0 ? 'is-complete' : (expSplitRemaining > 0 ? 'is-pending' : 'is-over')}">
+                        ${expSplitRemaining === 0 ? `${count} events ✔` : `${expSplitAllocated}/${count} events`}
+                      </span>
+                    </div>
 
-                <!-- Accordion Dates List -->
-                <div class="job-calc-dates-accordion ${isAccordionOpen ? '' : 'hidden'}">
-                  ${renderExpenseOccurrencesHtml(job, setting)}
-                </div>
+                    <button type="button" 
+                            class="job-calc-exp-mode-swap-btn job-calc-mode-swap-btn" 
+                            data-mode="date" 
+                            title="Switch back to individual calendar dates">
+                      <span class="material-symbols-outlined">swap_horiz</span>
+                      <span>By Date</span>
+                    </button>
+                  </div>
+                ` : `
+                  <div class="job-calc-adjust-bar">
+                    <button type="button" class="job-calc-accordion-btn job-calc-calendar-accordion-btn ${isAccordionOpen ? 'active' : ''}">
+                      <span class="material-symbols-outlined job-calc-accordion-arrow">
+                        ${isAccordionOpen ? 'expand_less' : 'expand_more'}
+                      </span>
+                      <span>Adjust Dates (${count})</span>
+                    </button>
+
+                    ${count > 1 ? `
+                      <button type="button" 
+                              class="job-calc-exp-mode-swap-btn job-calc-mode-swap-btn" 
+                              data-mode="split" 
+                              title="Switch to split shifts">
+                        <span class="material-symbols-outlined">swap_horiz</span>
+                        <span>Split</span>
+                      </button>
+                    ` : ''}
+                  </div>
+
+                  <!-- Accordion Dates List -->
+                  <div class="job-calc-dates-accordion ${isAccordionOpen ? '' : 'hidden'}">
+                    ${renderExpenseOccurrencesHtml(job, setting)}
+                  </div>
+                `}
               </div>
             ` : ''
           }
@@ -2261,51 +2572,82 @@
   }
 
   function renderExpenseInputsHtml(jobName, job, setting) {
-    const defaultExp = setting.expenseAmount ?? 0;
-    const groups = getJobExpenseGroups(job, setting);
+    const count = (job.occurrences || []).length;
+    const defaultExp = typeof setting.expenseAmount === 'number' ? setting.expenseAmount : 25;
 
-    // Happy case: all occurrences have the exact same cost (or zero occurrences)
-    if (groups.length <= 1) {
-      const amountVal = groups.length === 1 ? groups[0].amount : defaultExp;
-      return `
-        <div class="job-calc-inputs-row">
-          <div class="job-calc-input-block" style="flex: 1; grid-column: 1 / -1;">
-            <label>Cost / Occurrence ($)</label>
-            <div class="job-calc-input-wrapper">
-              <span class="job-calc-prefix">$</span>
-              <input type="number" class="job-calc-calendar-expense-input job-calc-num-input" min="0" step="0.5" value="${amountVal}">
-            </div>
-          </div>
+    // Split Mode:
+    if (setting.expenseAdjustMode !== 'date') {
+      const expSplits = getJobExpenseSplits(job, setting, count, defaultExp);
+      const canDeleteExpSplit = expSplits.length > 1;
+
+      let splitRowsHtml = `
+        <div class="job-calc-split-headers-row is-two-col">
+          <span class="job-calc-split-col-header">Events</span>
+          <span class="job-calc-split-col-header">Cost / Event ($)</span>
         </div>
       `;
+
+      expSplits.forEach((s, idx) => {
+        splitRowsHtml += `
+          <div class="job-calc-split-row-item ${canDeleteExpSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteExpSplit ? 'Swipe left to delete this split row (or type 0 in shifts)' : ''}">
+            ${canDeleteExpSplit ? `
+              <div class="job-calc-split-delete-action">
+                <button type="button" 
+                        class="job-calc-calendar-exp-split-delete-btn job-calc-split-delete-btn" 
+                        data-split-index="${idx}" 
+                        title="Delete split row" 
+                        aria-label="Delete split row">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            ` : ''}
+            <div class="job-calc-inputs-row is-two-col job-calc-split-row" data-split-index="${idx}">
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <input type="number" 
+                         class="job-calc-calendar-exp-split-shifts-input job-calc-num-input" 
+                         data-split-index="${idx}" 
+                         min="0" 
+                         step="1" 
+                         value="${s.shifts}" 
+                         aria-label="Events"
+                         title="Enter events (swipe left or type 0 to remove this row)">
+                  <span class="job-calc-unit">x</span>
+                </div>
+              </div>
+
+              <div class="job-calc-input-block">
+                <div class="job-calc-input-wrapper">
+                  <span class="job-calc-prefix">$</span>
+                  <input type="number" 
+                         class="job-calc-calendar-exp-split-amount-input job-calc-num-input" 
+                         data-split-index="${idx}" 
+                         min="0" 
+                         step="0.5" 
+                         value="${s.amount ?? defaultExp}" 
+                         aria-label="Cost per event">
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      return splitRowsHtml;
     }
 
-    // Customized dates case: multiple groups with different cost
-    let rowsHtml = '';
-    groups.forEach((g, idx) => {
-      const showLabels = idx === 0;
-      rowsHtml += `
-        <div class="job-calc-inputs-row job-calc-group-row job-calc-expense-group-row" data-expense-group="${g.amount}">
-          <div class="job-calc-input-block">
-            ${showLabels ? '<label>Shifts</label>' : ''}
-            <div class="job-calc-input-wrapper">
-              <input type="number" class="job-calc-group-shifts-input job-calc-num-input" value="${g.count}" readonly tabindex="-1" style="cursor: default;" title="${g.count} shifts are $${g.amount.toFixed(2)}" aria-label="Shifts">
-              <span class="job-calc-unit">x</span>
-            </div>
-          </div>
-
-          <div class="job-calc-input-block">
-            ${showLabels ? '<label>Cost / Occurrence ($)</label>' : ''}
-            <div class="job-calc-input-wrapper">
-              <span class="job-calc-prefix">$</span>
-              <input type="number" class="job-calc-group-expense-input job-calc-num-input" min="0" step="0.5" value="${g.amount}" data-original-amount="${g.amount}" aria-label="Cost per occurrence">
-            </div>
+    // By Date Mode (single default input)
+    return `
+      <div class="job-calc-inputs-row">
+        <div class="job-calc-input-block" style="flex: 1; grid-column: 1 / -1;">
+          <label>Default Cost / Event ($)</label>
+          <div class="job-calc-input-wrapper">
+            <span class="job-calc-prefix">$</span>
+            <input type="number" class="job-calc-calendar-expense-input job-calc-num-input" min="0" step="0.5" value="${defaultExp}">
           </div>
         </div>
-      `;
-    });
-
-    return rowsHtml;
+      </div>
+    `;
   }
 
   function refreshExpenseCardGroups(card, jobName) {
@@ -2516,6 +2858,31 @@
     }
   }
 
+  function updateCardExpenseSplitTag(card, job, setting) {
+    if (!card || !job || !setting) return;
+    const tagEl = card.querySelector('.job-calc-split-tag');
+    if (!tagEl) return;
+    const count = job.occurrences ? job.occurrences.length : 0;
+    let allocated = 0;
+    const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+    (expSplits || []).forEach((s) => {
+      allocated += (parseInt(s.shifts, 10) || 0);
+    });
+    const remaining = count - allocated;
+
+    tagEl.className = 'job-calc-split-tag';
+    if (remaining === 0) {
+      tagEl.classList.add('is-complete');
+      tagEl.textContent = `${count} events ✔`;
+    } else if (remaining > 0) {
+      tagEl.classList.add('is-pending');
+      tagEl.textContent = `${allocated}/${count} events`;
+    } else {
+      tagEl.classList.add('is-over');
+      tagEl.textContent = `${allocated}/${count} events`;
+    }
+  }
+
   function bindCardEvents(listEl) {
     // 1. Triage Actions (Open Menu, Fast Unmark, Popover Option Select)
     listEl.querySelectorAll('[data-action="open-triage-menu"]').forEach((btn) => {
@@ -2598,12 +2965,14 @@
     bindGroupInputs(listEl);
     bindExpenseGroupInputs(listEl);
 
-    // 4. Accordion Toggle
-    listEl.querySelectorAll('.job-calc-accordion-btn').forEach((btn) => {
+    // 4. Calendar Accordion Toggle
+    listEl.querySelectorAll('.job-calc-calendar-accordion-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
         const jobName = card.dataset.jobName;
         const accordion = card.querySelector('.job-calc-dates-accordion');
+        if (!accordion) return;
         const arrow = btn.querySelector('.job-calc-accordion-arrow');
 
         if (state.expandedJobs.has(jobName)) {
@@ -2620,8 +2989,8 @@
       });
     });
 
-    // 4b. Mode Swapper (By Date vs Split)
-    listEl.querySelectorAll('.job-calc-mode-swap-btn, .job-calc-mode-btn').forEach((btn) => {
+    // 4b. Calendar Mode Swapper (By Date vs Split)
+    listEl.querySelectorAll('.job-calc-calendar-mode-swap-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const card = e.target.closest('.job-calc-task-card');
@@ -2646,8 +3015,8 @@
       });
     });
 
-    // 4c. Split Mode: Add Split Row Button
-    listEl.querySelectorAll('.job-calc-task-card:not(.job-calc-custom-card) .job-calc-add-split-btn').forEach((btn) => {
+    // 4c. Calendar Split Mode: Add Split Row Button
+    listEl.querySelectorAll('.job-calc-calendar-add-split-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const card = e.target.closest('.job-calc-task-card');
@@ -2809,6 +3178,187 @@
           }, 150);
         } else {
           splits.splice(idx, 1);
+          saveSettings();
+          renderTasksList();
+          updateSummaryCard();
+        }
+      });
+    });
+
+    // 4g. Calendar Expense Mode Swapper (By Date vs Split)
+    listEl.querySelectorAll('.job-calc-exp-mode-swap-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        if (!job) return;
+        const setting = getJobSetting(jobName);
+        const mode = btn.dataset.mode;
+
+        if (setting.expenseAdjustMode === mode) return;
+
+        setting.expenseAdjustMode = mode;
+        if (mode === 'split') {
+          const count = job.occurrences ? job.occurrences.length : 0;
+          getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+        }
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+      });
+    });
+
+    // 4h. Calendar Expense Split Mode: Add Split Row Button
+    listEl.querySelectorAll('.job-calc-add-calendar-exp-split-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        if (!job) return;
+        const setting = getJobSetting(jobName);
+        const count = job.occurrences ? job.occurrences.length : 0;
+        const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+
+        let allocated = 0;
+        expSplits.forEach((s) => { allocated += (parseInt(s.shifts, 10) || 0); });
+        const remaining = count - allocated;
+        const newShifts = remaining > 0 ? remaining : 1;
+        const defaultAmt = expSplits[expSplits.length - 1]?.amount ?? (setting.expenseAmount ?? 25);
+
+        expSplits.push({
+          shifts: newShifts,
+          amount: defaultAmt
+        });
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+      });
+    });
+
+    // 4i. Calendar Expense Split Mode: Shifts Input
+    listEl.querySelectorAll('.job-calc-calendar-exp-split-shifts-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        const setting = getJobSetting(jobName);
+        const count = job.occurrences ? job.occurrences.length : 0;
+        const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!expSplits || !expSplits[idx]) return;
+
+        const val = parseInt(e.target.value, 10);
+        expSplits[idx].shifts = isNaN(val) ? 0 : Math.max(0, val);
+
+        updateCardExpenseSplitTag(card, job, setting);
+        saveSettings();
+        updateCardExpenseBadge(card, jobName);
+        updateSummaryCard();
+      });
+
+      const handleRemoveOnZero = () => {
+        const card = input.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        const setting = getJobSetting(jobName);
+        const count = job.occurrences ? job.occurrences.length : 0;
+        const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!expSplits || !expSplits[idx]) return;
+
+        const val = parseInt(input.value, 10);
+        if (val === 0 || isNaN(val) || input.value.trim() === '' || input.value.trim() === '0') {
+          if (expSplits.length > 1) {
+            expSplits.splice(idx, 1);
+            saveSettings();
+            renderTasksList();
+            updateSummaryCard();
+            return;
+          } else {
+            expSplits[0].shifts = count > 0 ? count : 1;
+            input.value = expSplits[0].shifts;
+            updateCardExpenseSplitTag(card, job, setting);
+            saveSettings();
+            updateCardExpenseBadge(card, jobName);
+            updateSummaryCard();
+          }
+        }
+      };
+
+      input.addEventListener('change', handleRemoveOnZero);
+      input.addEventListener('blur', handleRemoveOnZero);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        }
+      });
+    });
+
+    // 4j. Calendar Expense Split Mode: Amount Input
+    listEl.querySelectorAll('.job-calc-calendar-exp-split-amount-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        const setting = getJobSetting(jobName);
+        const count = job.occurrences ? job.occurrences.length : 0;
+        const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!expSplits || !expSplits[idx]) return;
+
+        const val = parseFloat(e.target.value);
+        expSplits[idx].amount = isNaN(val) ? 0 : Math.max(0, val);
+
+        saveSettings();
+        updateCardExpenseBadge(card, jobName);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+        }
+      });
+    });
+
+    // 4k. Calendar Expense Split Mode: Delete Row Button
+    listEl.querySelectorAll('.job-calc-calendar-exp-split-delete-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.job-calc-task-card');
+        if (!card) return;
+        const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
+        const setting = getJobSetting(jobName);
+        const count = job ? (job.occurrences ? job.occurrences.length : 0) : 0;
+        const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+        const idx = parseInt(btn.dataset.splitIndex, 10);
+        if (!expSplits || expSplits.length <= 1) return; // Keep at least 1 row
+        if (isNaN(idx) || idx < 0 || idx >= expSplits.length) return;
+
+        const rowItem = btn.closest('.job-calc-split-row-item');
+        if (rowItem) {
+          rowItem.style.transition = 'opacity 0.15s ease, max-height 0.18s ease';
+          rowItem.style.opacity = '0';
+          rowItem.style.maxHeight = '0px';
+          setTimeout(() => {
+            expSplits.splice(idx, 1);
+            saveSettings();
+            renderTasksList();
+            updateSummaryCard();
+          }, 150);
+        } else {
+          expSplits.splice(idx, 1);
           saveSettings();
           renderTasksList();
           updateSummaryCard();
@@ -3008,6 +3558,7 @@
     // 8. Custom Job Name input
     listEl.querySelectorAll('.job-calc-custom-name-input').forEach((input) => {
       input.addEventListener('input', (e) => {
+        input.size = Math.max(1, e.target.value.length);
         const card = e.target.closest('.job-calc-custom-card');
         if (!card) return;
         const customId = card.dataset.customId;
@@ -3033,6 +3584,30 @@
       });
     });
 
+    // 8b. Custom Job: Accordion Button (in ALL tab)
+    listEl.querySelectorAll('.job-calc-custom-job-accordion-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const accordion = card.querySelector('.job-calc-custom-accordion');
+        const arrow = btn.querySelector('.job-calc-accordion-arrow');
+
+        if (state.expandedJobs.has(customId)) {
+          state.expandedJobs.delete(customId);
+          if (accordion) accordion.classList.add('hidden');
+          btn.classList.remove('active');
+          if (arrow) arrow.textContent = 'expand_more';
+        } else {
+          state.expandedJobs.add(customId);
+          if (accordion) accordion.classList.remove('hidden');
+          btn.classList.add('active');
+          if (arrow) arrow.textContent = 'expand_less';
+        }
+      });
+    });
+
     // 9. Custom Job: Add Split Row Button
     listEl.querySelectorAll('.job-calc-add-custom-split-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
@@ -3040,6 +3615,7 @@
         const card = e.target.closest('.job-calc-custom-card');
         if (!card) return;
         const customId = card.dataset.customId;
+        state.expandedJobs.add(customId);
         const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
         if (!cJob) return;
 
@@ -3226,10 +3802,13 @@
         if (triage === 'paid') {
           cJob.isPaid = true;
           cJob.isExpense = false;
+          state.expandedJobs.add(customId);
         } else if (triage === 'exclude') {
           cJob.isPaid = false;
           cJob.isExpense = false;
+          state.expandedJobs.delete(customId);
         } else if (triage === 'delete') {
+          state.expandedJobs.delete(customId);
           state.settings.customJobs = (state.settings.customJobs || []).filter((c) => c.id !== customId);
         }
 
@@ -3250,9 +3829,12 @@
 
         if (triage === 'expense') {
           cExp.isExpense = true;
+          state.expandedJobs.add(expId);
         } else if (triage === 'exclude') {
           cExp.isExpense = false;
+          state.expandedJobs.delete(expId);
         } else if (triage === 'delete') {
+          state.expandedJobs.delete(expId);
           state.settings.customExpenses = (state.settings.customExpenses || []).filter((c) => c.id !== expId);
         }
 
@@ -3269,6 +3851,7 @@
         const card = e.target.closest('.job-calc-custom-card');
         if (!card) return;
         const customId = card.dataset.customId;
+        state.expandedJobs.delete(customId);
         if (state.settings.customJobs) {
           state.settings.customJobs = state.settings.customJobs.filter((c) => c.id !== customId);
           saveSettings();
@@ -3313,6 +3896,7 @@
         const card = e.target.closest('.job-calc-expense-card');
         if (!card) return;
         const expId = card.dataset.expenseId;
+        state.expandedJobs.delete(expId);
         state.settings.customExpenses = (state.settings.customExpenses || []).filter((c) => c.id !== expId);
         saveSettings();
         renderTasksList();
@@ -3323,6 +3907,7 @@
     // 16. Custom Expense Name input
     listEl.querySelectorAll('.job-calc-expense-name-input').forEach((input) => {
       input.addEventListener('input', (e) => {
+        input.size = Math.max(1, e.target.value.length);
         const card = e.target.closest('.job-calc-expense-card');
         if (!card) return;
         const expId = card.dataset.expenseId;
@@ -3348,36 +3933,177 @@
       });
     });
 
-    // 17. Custom Expense Amount input
-    listEl.querySelectorAll('.job-calc-expense-amount-input').forEach((input) => {
+    // 17. Custom Expense: Split Qty input (with auto-remove on 0)
+    listEl.querySelectorAll('.job-calc-custom-exp-split-qty-input').forEach((input) => {
       input.addEventListener('input', (e) => {
         const card = e.target.closest('.job-calc-expense-card');
         if (!card) return;
         const expId = card.dataset.expenseId;
         const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
-        if (cExp) {
-          const val = parseFloat(e.target.value);
-          cExp.amount = isNaN(val) ? 0 : Math.max(0, val);
-          saveSettings();
-          updateCustomExpenseBadge(card, expId);
-          updateSummaryCard();
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!cExp || !cExp.splits || !cExp.splits[idx]) return;
+
+        const val = parseInt(e.target.value, 10);
+        cExp.splits[idx].qty = isNaN(val) ? 0 : Math.max(0, val);
+
+        saveSettings();
+        updateCustomExpenseBadge(card, expId);
+        updateSummaryCard();
+      });
+
+      const handleRemoveOnZero = () => {
+        const card = input.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!cExp || !cExp.splits || !cExp.splits[idx]) return;
+
+        const val = parseInt(input.value, 10);
+        if (val === 0 || isNaN(val) || input.value.trim() === '' || input.value.trim() === '0') {
+          if (cExp.splits.length > 1) {
+            cExp.splits.splice(idx, 1);
+            saveSettings();
+            renderTasksList();
+            updateSummaryCard();
+            return;
+          } else {
+            cExp.splits[0].qty = 1;
+            input.value = 1;
+            saveSettings();
+            updateCustomExpenseBadge(card, expId);
+            updateSummaryCard();
+          }
         }
+      };
+
+      input.addEventListener('change', handleRemoveOnZero);
+      input.addEventListener('blur', handleRemoveOnZero);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        }
+      });
+    });
+
+    // 17b. Custom Expense: Split Amount input
+    listEl.querySelectorAll('.job-calc-custom-exp-split-amount-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        const idx = parseInt(input.dataset.splitIndex, 10);
+        if (!cExp || !cExp.splits || !cExp.splits[idx]) return;
+
+        const val = parseFloat(e.target.value);
+        cExp.splits[idx].amount = isNaN(val) ? 0 : Math.max(0, val);
+
+        saveSettings();
+        updateCustomExpenseBadge(card, expId);
+        updateSummaryCard();
       });
 
       input.addEventListener('blur', (e) => {
         if (e.target.value.trim() === '') {
           e.target.value = 0;
           const card = e.target.closest('.job-calc-expense-card');
-          if (!card) return;
-          const expId = card.dataset.expenseId;
-          const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
-          if (cExp) {
-            cExp.amount = 0;
-            saveSettings();
-            updateCustomExpenseBadge(card, expId);
-            updateSummaryCard();
+          if (card) {
+            const expId = card.dataset.expenseId;
+            const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+            const idx = parseInt(input.dataset.splitIndex, 10);
+            if (cExp && cExp.splits && cExp.splits[idx]) {
+              cExp.splits[idx].amount = 0;
+              saveSettings();
+              updateCustomExpenseBadge(card, expId);
+              updateSummaryCard();
+            }
           }
         }
+      });
+    });
+
+    // 17c. Custom Expense: Delete Row Button (via swipe reveal)
+    listEl.querySelectorAll('.job-calc-custom-exp-split-delete-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        const idx = parseInt(btn.dataset.splitIndex, 10);
+        if (!cExp || !cExp.splits || cExp.splits.length <= 1) return; // Keep at least 1 row
+        if (isNaN(idx) || idx < 0 || idx >= cExp.splits.length) return;
+
+        const rowItem = btn.closest('.job-calc-split-row-item');
+        if (rowItem) {
+          rowItem.style.transition = 'opacity 0.15s ease, max-height 0.18s ease';
+          rowItem.style.opacity = '0';
+          rowItem.style.maxHeight = '0px';
+          setTimeout(() => {
+            cExp.splits.splice(idx, 1);
+            saveSettings();
+            renderTasksList();
+            updateSummaryCard();
+          }, 150);
+        } else {
+          cExp.splits.splice(idx, 1);
+          saveSettings();
+          renderTasksList();
+          updateSummaryCard();
+        }
+      });
+    });
+
+    // 17c. Custom Expense: Accordion Button (in ALL tab)
+    listEl.querySelectorAll('.job-calc-custom-exp-accordion-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const accordion = card.querySelector('.job-calc-custom-accordion');
+        const arrow = btn.querySelector('.job-calc-accordion-arrow');
+
+        if (state.expandedJobs.has(expId)) {
+          state.expandedJobs.delete(expId);
+          if (accordion) accordion.classList.add('hidden');
+          btn.classList.remove('active');
+          if (arrow) arrow.textContent = 'expand_more';
+        } else {
+          state.expandedJobs.add(expId);
+          if (accordion) accordion.classList.remove('hidden');
+          btn.classList.add('active');
+          if (arrow) arrow.textContent = 'expand_less';
+        }
+      });
+    });
+
+    // 17d. Custom Expense: Add Split Row Button
+    listEl.querySelectorAll('.job-calc-add-custom-exp-split-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        state.expandedJobs.add(expId);
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        if (!cExp) return;
+
+        if (!Array.isArray(cExp.splits)) {
+          cExp.splits = [{ qty: 1, amount: typeof cExp.amount === 'number' ? cExp.amount : 25 }];
+        }
+
+        const defaultAmt = cExp.splits.length > 0 ? cExp.splits[cExp.splits.length - 1].amount : 25;
+        cExp.splits.push({
+          qty: 1,
+          amount: defaultAmt
+        });
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
       });
     });
 
@@ -3597,29 +4323,67 @@
     const setting = getJobSetting(jobName);
     if (!job || !setting) return;
 
-    const defaultExpAmt = parseFloat(setting.expenseAmount) || 0;
+    const count = (job.occurrences || []).length;
     let jobExpenseTotal = 0;
-    job.occurrences.forEach((occ) => {
-      const overrideVal = setting.expenseOverrides?.[occ.occKey];
-      const occExp = (typeof overrideVal === 'number' && !isNaN(overrideVal))
-        ? overrideVal
-        : defaultExpAmt;
-      jobExpenseTotal += occExp;
-    });
+    if (setting.expenseAdjustMode !== 'date') {
+      const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+      expSplits.forEach((s) => {
+        const sCount = parseInt(s.shifts, 10) || 0;
+        const sAmount = parseFloat(s.amount) || 0;
+        jobExpenseTotal += (sCount * sAmount);
+      });
+    } else {
+      const defaultExpAmt = parseFloat(setting.expenseAmount) || 0;
+      job.occurrences.forEach((occ) => {
+        const overrideVal = setting.expenseOverrides?.[occ.occKey];
+        const occExp = (typeof overrideVal === 'number' && !isNaN(overrideVal))
+          ? overrideVal
+          : defaultExpAmt;
+        jobExpenseTotal += occExp;
+      });
+    }
+
+    jobExpenseTotal = roundCents(jobExpenseTotal);
 
     const amountEl = card.querySelector('.job-calc-subtotal-badge.job-calc-expense-badge .job-calc-subtotal-amount');
     if (amountEl) {
       amountEl.textContent = `-$${jobExpenseTotal.toFixed(2)}`;
+    }
+    const badgeEl = card.querySelector('.job-calc-session-badge');
+    if (badgeEl) {
+      if (setting.expenseAdjustMode !== 'date') {
+        const expSplits = getJobExpenseSplits(job, setting, count, setting.expenseAmount ?? 25);
+        let expAllocated = 0;
+        expSplits.forEach((s) => { expAllocated += (parseInt(s.shifts, 10) || 0); });
+        badgeEl.textContent = `${expAllocated > 0 ? expAllocated : count}x`;
+      } else {
+        badgeEl.textContent = `${count}x`;
+      }
     }
   }
 
   function updateCustomExpenseBadge(card, customId) {
     const cExp = (state.settings.customExpenses || []).find((c) => c.id === customId);
     if (!cExp) return;
-    const amt = parseFloat(cExp.amount) || 0;
+    let totalAmt = 0;
+    let totalQty = 0;
+    const splits = Array.isArray(cExp.splits) && cExp.splits.length > 0 ? cExp.splits : [{ qty: 1, amount: parseFloat(cExp.amount) || 0 }];
+    splits.forEach((s) => {
+      const q = parseInt(s.qty, 10) || 0;
+      const a = parseFloat(s.amount) || 0;
+      totalQty += q;
+      totalAmt += (q * a);
+    });
+    totalAmt = roundCents(totalAmt);
+    cExp.amount = totalAmt;
+
     const amountEl = card.querySelector('.job-calc-subtotal-badge.job-calc-expense-badge .job-calc-subtotal-amount');
     if (amountEl) {
-      amountEl.textContent = `-$${amt.toFixed(2)}`;
+      amountEl.textContent = `-$${totalAmt.toFixed(2)}`;
+    }
+    const badgeEl = card.querySelector('.job-calc-session-badge');
+    if (badgeEl) {
+      badgeEl.textContent = `${totalQty}x`;
     }
   }
 
@@ -3649,7 +4413,6 @@
       });
     }
 
-    const roundCents = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
     const subtotal = roundCents(hours * rate);
 
     const amountEl = card.querySelector('.job-calc-subtotal-amount');
@@ -3662,7 +4425,7 @@
         const splits = getJobSplits(job, setting, count, defaultHours);
         let splitAllocated = 0;
         splits.forEach((s) => { splitAllocated += (parseInt(s.shifts, 10) || 0); });
-        badgeEl.textContent = `${splits.length > 1 && splitAllocated > 0 ? splitAllocated : count}x`;
+        badgeEl.textContent = `${splitAllocated > 0 ? splitAllocated : count}x`;
       } else {
         badgeEl.textContent = `${count}x`;
       }
@@ -3691,6 +4454,10 @@
     }
 
     const subtotal = Math.round((totalHours * rate + Number.EPSILON) * 100) / 100;
+
+    const amountEl = card.querySelector('.job-calc-subtotal-amount');
+    const hoursEl = card.querySelector('.job-calc-subtotal-hours');
+    const badgeEl = card.querySelector('.job-calc-session-badge');
 
     if (cJob.isPaid !== false) {
       if (amountEl) amountEl.textContent = `$${subtotal.toFixed(2)}`;
@@ -3796,7 +4563,8 @@
       totalExpenses,
       netTakeHome,
       jobResults,
-      customResults
+      customResults,
+      customExpenseResults
     } = calculateTotals();
 
     // 1. Update Receipt Header Date Info
@@ -3843,10 +4611,10 @@
           const isTaxable = setting.isTaxable !== false;
           const jobTax = (taxDeductionAmount > 0 && isTaxable)
             ? (taxSetting.type === 'percent'
-                ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
-                : (taxableEarnings > 0 ? (subtotal / taxableEarnings) * taxDeductionAmount : 0))
+                ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+                : (taxableEarnings > 0 ? roundCents((subtotal / taxableEarnings) * taxDeductionAmount) : 0))
             : 0;
-          const jobNet = Math.max(0, subtotal - jobTax);
+          const jobNet = Math.max(0, roundCents(subtotal - jobTax));
 
           let taxSublineHtml = '';
           if (taxDeductionAmount > 0) {
@@ -3877,10 +4645,10 @@
           const isTaxable = cJob.isTaxable === true;
           const jobTax = (taxDeductionAmount > 0 && isTaxable)
             ? (taxSetting.type === 'percent'
-                ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
-                : (taxableEarnings > 0 ? (subtotal / taxableEarnings) * taxDeductionAmount : 0))
+                ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+                : (taxableEarnings > 0 ? roundCents((subtotal / taxableEarnings) * taxDeductionAmount) : 0))
             : 0;
-          const jobNet = Math.max(0, subtotal - jobTax);
+          const jobNet = Math.max(0, roundCents(subtotal - jobTax));
 
           let taxSublineHtml = '';
           if (taxDeductionAmount > 0) {
@@ -3920,9 +4688,9 @@
       const expCalendarNames = Object.keys(scannedJobs).filter((name) => {
         const s = getJobSetting(name);
         const res = jobResults[name];
-        return s.isExpense && ((res?.expenseTotal || 0) > 0 || (parseFloat(s.expenseAmount) || 0) > 0);
+        return s.isExpense && ((res?.expenseTotal || 0) > 0);
       });
-      const customExps = (state.settings.customExpenses || []).filter((e) => e.isExpense !== false && (parseFloat(e.amount) || 0) > 0);
+      const customExps = (state.settings.customExpenses || []).filter((e) => e.isExpense !== false && ((customExpenseResults?.[e.id]?.amount || 0) > 0));
       const totalExpItemsCount = expCalendarNames.length + customExps.length;
 
       if (expCountEl) expCountEl.textContent = `${totalExpItemsCount}x`;
@@ -3933,30 +4701,36 @@
         expCalendarNames.forEach((name) => {
           const setting = getJobSetting(name);
           const res = jobResults[name];
-          const count = scannedJobs[name]?.occurrences.length || 1;
+          const count = res?.count || (scannedJobs[name]?.occurrences.length || 1);
           const totalAmt = res?.expenseTotal !== undefined ? res.expenseTotal : ((parseFloat(setting.expenseAmount) || 0) * count);
-          expHtml += `
-            <div class="receipt-item-row">
-              <div class="receipt-item-title-col">
-                <span class="receipt-item-name">${escapeHtml(name)}</span>
-                <span class="receipt-item-detail">Calendar expense (${count}x)</span>
+          if (totalAmt > 0) {
+            expHtml += `
+              <div class="receipt-item-row">
+                <div class="receipt-item-title-col">
+                  <span class="receipt-item-name">${escapeHtml(name)}</span>
+                  <span class="receipt-item-detail">Calendar expense (${count}x)</span>
+                </div>
+                <span class="receipt-item-amount receipt-item-deduction">-$${totalAmt.toFixed(2)}</span>
               </div>
-              <span class="receipt-item-amount receipt-item-deduction">-$${totalAmt.toFixed(2)}</span>
-            </div>
-          `;
+            `;
+          }
         });
 
         customExps.forEach((cExp) => {
-          const amt = parseFloat(cExp.amount) || 0;
-          expHtml += `
-            <div class="receipt-item-row">
-              <div class="receipt-item-title-col">
-                <span class="receipt-item-name">${escapeHtml(cExp.name || 'Untitled')} <span class="receipt-item-tag-expense">EXPENSES</span></span>
-                <span class="receipt-item-detail">Custom Expense</span>
+          const res = customExpenseResults?.[cExp.id];
+          const amt = res ? res.amount : (parseFloat(cExp.amount) || 0);
+          const count = res?.count ?? 1;
+          if (amt > 0) {
+            expHtml += `
+              <div class="receipt-item-row">
+                <div class="receipt-item-title-col">
+                  <span class="receipt-item-name">${escapeHtml(cExp.name || 'Untitled')} <span class="receipt-item-tag-expense">EXPENSES</span></span>
+                  <span class="receipt-item-detail">Custom Expense (${count}x)</span>
+                </div>
+                <span class="receipt-item-amount receipt-item-deduction">-$${amt.toFixed(2)}</span>
               </div>
-              <span class="receipt-item-amount receipt-item-deduction">-$${amt.toFixed(2)}</span>
-            </div>
-          `;
+            `;
+          }
         });
 
         expListEl.innerHTML = expHtml;
@@ -4011,6 +4785,8 @@
       ? `${formatDisplayDate(parseIsoDate(state.fromDate))} — ${formatDisplayDate(parseIsoDate(state.toDate))}`
       : 'Selected Period';
 
+    const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
+
     let out = [];
     out.push(doubleDivider);
     out.push(center('PAYSLIP'));
@@ -4039,9 +4815,9 @@
           const isTaxable = setting.isTaxable !== false;
           if (isTaxable) {
             const jobTax = taxSetting.type === 'percent'
-              ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
-              : (totals.taxableEarnings > 0 ? (subtotal / totals.taxableEarnings) * totals.taxDeductionAmount : 0);
-            const jobNet = Math.max(0, subtotal - jobTax);
+              ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+              : (totals.taxableEarnings > 0 ? roundCents((subtotal / totals.taxableEarnings) * totals.taxDeductionAmount) : 0);
+            const jobNet = Math.max(0, roundCents(subtotal - jobTax));
             out.push(`    Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}`);
           } else {
             out.push(`    Untaxed · Net: $${subtotal.toFixed(2)}`);
@@ -4061,9 +4837,9 @@
           const isTaxable = cJob.isTaxable === true;
           if (isTaxable) {
             const jobTax = taxSetting.type === 'percent'
-              ? (subtotal * (parseFloat(taxSetting.value) || 0)) / 100
-              : (totals.taxableEarnings > 0 ? (subtotal / totals.taxableEarnings) * totals.taxDeductionAmount : 0);
-            const jobNet = Math.max(0, subtotal - jobTax);
+              ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+              : (totals.taxableEarnings > 0 ? roundCents((subtotal / totals.taxableEarnings) * totals.taxDeductionAmount) : 0);
+            const jobNet = Math.max(0, roundCents(subtotal - jobTax));
             out.push(`    Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}`);
           } else {
             out.push(`    Untaxed · Net: $${subtotal.toFixed(2)}`);
@@ -4078,7 +4854,6 @@
 
     out.push(row('GROSS EARNINGS', `$${totals.grossEarnings.toFixed(2)}`));
 
-    const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
     if (totals.taxDeductionAmount > 0) {
       const typeLabel = taxSetting.type === 'percent' ? ` (${taxSetting.value}%)` : '';
       out.push(row(`  Total Tax Deduction${typeLabel}`, `-$${totals.taxDeductionAmount.toFixed(2)}`));
@@ -4090,21 +4865,25 @@
       out.push('EXPENSES:');
       const expCalendarNames = Object.keys(scannedJobs).filter((name) => {
         const s = getJobSetting(name);
-        const res = totals.jobResults[name];
-        return s.isExpense && ((res?.expenseTotal || 0) > 0 || (parseFloat(s.expenseAmount) || 0) > 0);
+        const res = totals.jobResults?.[name];
+        return s.isExpense && ((res?.expenseTotal || 0) > 0);
       });
       expCalendarNames.forEach((name) => {
-        const res = totals.jobResults[name];
-        const count = scannedJobs[name]?.occurrences.length || 1;
+        const res = totals.jobResults?.[name];
+        const count = res?.count || (scannedJobs[name]?.occurrences.length || 1);
         const totalAmt = res?.expenseTotal || 0;
-        out.push(row(`  ${name} (${count}x)`, `-$${totalAmt.toFixed(2)}`));
+        if (totalAmt > 0) {
+          out.push(row(`  ${name} (${count}x)`, `-$${totalAmt.toFixed(2)}`));
+        }
       });
 
       (state.settings.customExpenses || []).forEach((cExp) => {
         if (cExp.isExpense !== false) {
-          const amt = parseFloat(cExp.amount) || 0;
+          const res = totals.customExpenseResults?.[cExp.id];
+          const amt = res ? res.amount : (parseFloat(cExp.amount) || 0);
+          const count = res?.count ?? 1;
           if (amt > 0) {
-            out.push(row(`  ${cExp.name || 'Untitled'} [Expenses]`, `-$${amt.toFixed(2)}`));
+            out.push(row(`  ${cExp.name || 'Untitled'} [Expenses] (${count}x)`, `-$${amt.toFixed(2)}`));
           }
         }
       });
