@@ -813,7 +813,7 @@
 
   function ensureCalculatorDOM() {
     const existing = document.getElementById('job-calculator-container');
-    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.innerHTML.includes('Financial Summary')) {
+    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator')) {
       return;
     }
 
@@ -836,7 +836,7 @@
               <svg class="job-calc-header-icon" viewBox="0 -960 960 960" width="22" height="22" fill="currentColor">
                 <path d="M668.5-531.5Q680-543 680-560t-11.5-28.5Q657-600 640-600t-28.5 11.5Q600-577 600-560t11.5 28.5Q623-520 640-520t28.5-11.5ZM320-600h200v-80H320v80ZM180-120q-34-114-67-227.5T80-580q0-92 64-156t156-64h200q29-38 70.5-59t89.5-21q25 0 42.5 17.5T720-820q0 6-1.5 12t-3.5 11q-4 11-7.5 22.5T702-751l91 91h87v279l-113 37-67 224H480v-80h-80v80H180Zm60-80h80v-80h240v80h80l62-206 98-33v-141h-40L620-720q0-20 2.5-38.5T630-796q-29 8-51 27.5T547-720H300q-58 0-99 41t-41 99q0 98 27 191.5T240-200Zm240-298Z"/>
               </svg>
-              <h2 class="job-calc-title">Work & Earnings</h2>
+              <h2 class="job-calc-title">Schedule Calculator</h2>
             </div>
             <span class="job-calc-subtitle" id="job-calc-subtitle">Monthly Shift Calculator</span>
           </div>
@@ -1018,7 +1018,7 @@
               <!-- Calendar Shifts -->
               <div class="receipt-section" id="receipt-shifts-section">
                 <div class="receipt-section-header">
-                  <span>CALENDAR SHIFTS & WORK</span>
+                  <span>CALENDAR SHIFTS</span>
                   <span id="receipt-shifts-count">0x</span>
                 </div>
                 <div class="receipt-items-list" id="receipt-shifts-list">
@@ -4800,7 +4800,7 @@
     const paidCustom = (state.settings.customJobs || []).filter((c) => c.isPaid !== false);
 
     if (paidJobs.length > 0 || paidCustom.length > 0) {
-      out.push('SHIFTS & WORK:');
+      out.push('CALENDAR SHIFTS:');
       paidJobs.forEach((name) => {
         const setting = getJobSetting(name);
         const res = totals.jobResults?.[name] || { count: 0, totalHours: 0, subtotal: 0 };
