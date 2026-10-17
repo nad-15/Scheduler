@@ -67,6 +67,9 @@
           if (parsed.jobs && typeof parsed.jobs === 'object') {
             for (const [name, job] of Object.entries(parsed.jobs)) {
               if (job && (job.isPaid === true || job.isExpense === true)) {
+                if (!job.splitsByRange || typeof job.splitsByRange !== 'object') {
+                  job.splitsByRange = {};
+                }
                 loadedJobs[name] = job;
               }
             }
@@ -109,19 +112,32 @@
           cleanJob.hourlyRate = typeof job.hourlyRate === 'number' ? job.hourlyRate : 25;
           cleanJob.isTaxable = job.isTaxable !== false;
 
-          // Preserve split mode allocation if in split mode
-          if (job.adjustMode === 'split') {
+          // Default to split mode unless user explicitly has custom date overrides
+          const hasDateOverrides = job.dateOverrides && Object.keys(job.dateOverrides).length > 0;
+          if (job.adjustMode === 'date' && hasDateOverrides) {
+            cleanJob.adjustMode = 'date';
+          } else {
             cleanJob.adjustMode = 'split';
-            if (Array.isArray(job.splits)) {
-              const validSplits = job.splits
-                .map((s) => ({
-                  shifts: parseInt(s.shifts, 10) || 0,
-                  hours: parseFloat(s.hours) || 0
-                }))
-                .filter((s) => s.shifts > 0);
-              if (validSplits.length > 0) {
-                cleanJob.splits = validSplits;
+          }
+
+          // Persist range-scoped splits so other months never inherit old shift counts
+          if (job.splitsByRange && typeof job.splitsByRange === 'object') {
+            const cleanSplitsByRange = {};
+            for (const [rKey, rSplits] of Object.entries(job.splitsByRange)) {
+              if (Array.isArray(rSplits)) {
+                const validSplits = rSplits
+                  .map((s) => ({
+                    shifts: parseInt(s.shifts, 10) || 0,
+                    hours: parseFloat(s.hours) || 0
+                  }))
+                  .filter((s) => s.shifts > 0 || rSplits.length === 1);
+                if (validSplits.length > 0) {
+                  cleanSplitsByRange[rKey] = validSplits;
+                }
               }
+            }
+            if (Object.keys(cleanSplitsByRange).length > 0) {
+              cleanJob.splitsByRange = cleanSplitsByRange;
             }
           }
 
@@ -166,8 +182,22 @@
         value: typeof state.settings.tax?.value === 'number' ? state.settings.tax.value : (parseFloat(state.settings.tax?.value) || 0)
       },
       jobs: cleanJobs,
-      customJobs: Array.isArray(state.settings.customJobs) ? state.settings.customJobs : [],
-      customExpenses: Array.isArray(state.settings.customExpenses) ? state.settings.customExpenses : []
+      customJobs: (state.settings.customJobs || []).map((c) => ({
+        id: c.id,
+        name: c.name || 'Untitled',
+        isPaid: c.isPaid !== false,
+        isTaxable: c.isTaxable === true,
+        hourlyRate: typeof c.hourlyRate === 'number' ? c.hourlyRate : (parseFloat(c.hourlyRate) || 25),
+        shiftsCount: parseInt(c.shiftsCount, 10) || 1,
+        hoursPerShift: typeof c.hoursPerShift === 'number' ? c.hoursPerShift : (parseFloat(c.hoursPerShift) || 4),
+        splits: Array.isArray(c.splits) ? c.splits.map((s) => ({ shifts: parseInt(s.shifts, 10) || 0, hours: parseFloat(s.hours) || 0 })) : []
+      })),
+      customExpenses: (state.settings.customExpenses || []).map((e) => ({
+        id: e.id,
+        name: e.name || 'Untitled',
+        isExpense: e.isExpense !== false,
+        amount: typeof e.amount === 'number' ? e.amount : (parseFloat(e.amount) || 0)
+      }))
     };
   }
 
@@ -189,8 +219,9 @@
         defaultHours: 4,
         hourlyRate: 25,
         isTaxable: true,
-        adjustMode: 'date',
+        adjustMode: 'split',
         splits: [],
+        splitsByRange: {},
         dateOverrides: {},
         expenseOverrides: {}
       };
@@ -205,10 +236,13 @@
         state.settings.jobs[jobName].expenseAmount = 0;
       }
       if (!state.settings.jobs[jobName].adjustMode) {
-        state.settings.jobs[jobName].adjustMode = 'date';
+        state.settings.jobs[jobName].adjustMode = 'split';
       }
       if (!Array.isArray(state.settings.jobs[jobName].splits)) {
         state.settings.jobs[jobName].splits = [];
+      }
+      if (!state.settings.jobs[jobName].splitsByRange || typeof state.settings.jobs[jobName].splitsByRange !== 'object') {
+        state.settings.jobs[jobName].splitsByRange = {};
       }
       if (!state.settings.jobs[jobName].dateOverrides) {
         state.settings.jobs[jobName].dateOverrides = {};
@@ -264,8 +298,12 @@
    */
   function computePresetRange(presetName) {
     const now = (typeof AppTimezone !== 'undefined' && AppTimezone.now) ? AppTimezone.now() : new Date();
-    const year = (typeof currentYearVertView !== 'undefined' && currentYearVertView !== null) ? currentYearVertView : now.getFullYear();
-    const month = (typeof currentMonthVertView !== 'undefined' && currentMonthVertView !== null) ? currentMonthVertView : now.getMonth();
+    const year = (typeof currentYearValue !== 'undefined' && currentYearValue !== null)
+      ? currentYearValue
+      : ((typeof currentYearVertView !== 'undefined' && currentYearVertView !== null) ? currentYearVertView : now.getFullYear());
+    const month = (typeof currentMonthValue !== 'undefined' && currentMonthValue !== null)
+      ? currentMonthValue
+      : ((typeof currentMonthVertView !== 'undefined' && currentMonthVertView !== null) ? currentMonthVertView : now.getMonth());
 
     if (presetName === 'this-month') {
       const start = new Date(year, month, 1);
@@ -299,6 +337,69 @@
     }
 
     return null;
+  }
+
+  /**
+   * Helper to identify the active calculation range (e.g. "2026-10" or "2026-10-01_2026-10-15")
+   * to ensure split allocations are scoped properly and never bleed across months.
+   */
+  function getActiveRangeKey() {
+    if (state.fromDate && state.toDate) {
+      const fromM = state.fromDate.slice(0, 7);
+      const toM = state.toDate.slice(0, 7);
+      if (fromM === toM) return fromM;
+      return `${state.fromDate}_${state.toDate}`;
+    }
+    return 'default';
+  }
+
+  /**
+   * Retrieves or initializes splits for a job in the current active range.
+   * If single-tier (default), its shift count ALWAYS dynamically matches the scanned occurrences count
+   * in the active range, eliminating hardcoded shift count carry-over across months.
+   */
+  function getJobSplits(job, setting, count, defaultHours) {
+    const safeCount = typeof count === 'number' && !isNaN(count) ? count : 0;
+    const safeHours = typeof defaultHours === 'number' && !isNaN(defaultHours) ? defaultHours : (setting?.defaultHours ?? 4);
+    const rangeKey = getActiveRangeKey();
+
+    if (!setting.splitsByRange || typeof setting.splitsByRange !== 'object') {
+      setting.splitsByRange = {};
+    }
+
+    let rangeSplits = setting.splitsByRange[rangeKey];
+
+    // If not yet saved for this range, check if legacy setting.splits matches current count
+    if ((!rangeSplits || !Array.isArray(rangeSplits) || rangeSplits.length === 0) && Array.isArray(setting.splits) && setting.splits.length > 0) {
+      let legacyTotal = 0;
+      setting.splits.forEach((s) => { legacyTotal += (parseInt(s.shifts, 10) || 0); });
+      if (legacyTotal === safeCount && safeCount > 0) {
+        rangeSplits = setting.splits.map((s) => ({
+          shifts: parseInt(s.shifts, 10) || 0,
+          hours: parseFloat(s.hours) || 0
+        }));
+        setting.splitsByRange[rangeKey] = rangeSplits;
+      }
+    }
+
+    // If still no valid splits for this range, initialize single row with current range count
+    if (!rangeSplits || !Array.isArray(rangeSplits) || rangeSplits.length === 0) {
+      rangeSplits = [{ shifts: safeCount, hours: safeHours }];
+      setting.splitsByRange[rangeKey] = rangeSplits;
+      setting.splits = rangeSplits;
+      return rangeSplits;
+    }
+
+    // If single split row, always keep shifts in 1-to-1 sync with current range count!
+    if (rangeSplits.length === 1) {
+      rangeSplits[0].shifts = safeCount;
+      if (rangeSplits[0].hours === undefined) {
+        rangeSplits[0].hours = safeHours;
+      }
+    }
+
+    setting.splits = rangeSplits;
+    return rangeSplits;
   }
 
   /* ==========================================================================
@@ -409,9 +510,10 @@
         const defaultHours = parseFloat(setting.defaultHours) || 0;
         const rate = parseFloat(setting.hourlyRate) || 0;
 
-        if (setting.adjustMode === 'split' && Array.isArray(setting.splits) && setting.splits.length > 0) {
+        if (setting.adjustMode === 'split') {
+          const splits = getJobSplits(job, setting, count, defaultHours);
           jobSessions = 0;
-          setting.splits.forEach((s) => {
+          splits.forEach((s) => {
             const sCount = parseInt(s.shifts, 10) || 0;
             const sHours = parseFloat(s.hours) || 0;
             jobHours += (sCount * sHours);
@@ -456,13 +558,15 @@
         totalExpenses += jobExpenseTotal;
       }
 
+      const activeSplits = (setting.isPaid && setting.adjustMode === 'split') ? getJobSplits(job, setting, count, parseFloat(setting.defaultHours) || 0) : null;
+
       jobResults[name] = {
         isPaid: setting.isPaid === true,
         isExpense: setting.isExpense === true,
         expenseAmount: parseFloat(setting.expenseAmount) || 0,
         expenseTotal: jobExpenseTotal,
         isTaxable: setting.isTaxable !== false,
-        count: (setting.isPaid && setting.adjustMode === 'split') ? jobSessions : count,
+        count: (activeSplits && activeSplits.length > 1) ? jobSessions : count,
         totalHours: jobHours,
         subtotal: jobSubtotal
       };
@@ -509,19 +613,39 @@
           isTaxable: isTaxable,
           subtotal: customSubtotal
         };
+      } else {
+        customResults[cJob.id] = {
+          id: cJob.id,
+          name: cJob.name || 'Untitled',
+          count: parseInt(cJob.shiftsCount, 10) || 1,
+          totalHours: 0,
+          hourlyRate: parseFloat(cJob.hourlyRate) || 0,
+          isTaxable: cJob.isTaxable === true,
+          subtotal: 0,
+          isExcluded: true
+        };
       }
     });
 
     // Custom / Off-calendar expenses
     const customExpenseResults = {};
     (state.settings.customExpenses || []).forEach((cExp) => {
-      const amt = roundCents(parseFloat(cExp.amount) || 0);
-      totalExpenses += amt;
-      customExpenseResults[cExp.id] = {
-        id: cExp.id,
-        name: cExp.name || 'Expense',
-        amount: amt
-      };
+      if (cExp.isExpense !== false) {
+        const amt = roundCents(parseFloat(cExp.amount) || 0);
+        totalExpenses += amt;
+        customExpenseResults[cExp.id] = {
+          id: cExp.id,
+          name: cExp.name || 'Expense',
+          amount: amt
+        };
+      } else {
+        customExpenseResults[cExp.id] = {
+          id: cExp.id,
+          name: cExp.name || 'Expense',
+          amount: 0,
+          isExcluded: true
+        };
+      }
     });
 
     // Tax calculation based on TAXABLE earnings
@@ -1253,10 +1377,11 @@
     const paidCustomJobs = customJobs.filter((c) => c.isPaid !== false);
 
     const customExpenses = state.settings.customExpenses || [];
+    const activeCustomExpenses = customExpenses.filter((e) => e.isExpense !== false);
 
     if (countAllEl) countAllEl.textContent = allNames.length + customJobs.length + customExpenses.length;
     if (countPaidEl) countPaidEl.textContent = paidNames.length + paidCustomJobs.length;
-    if (countExpensesEl) countExpensesEl.textContent = expenseNames.length + customExpenses.length;
+    if (countExpensesEl) countExpensesEl.textContent = expenseNames.length + activeCustomExpenses.length;
 
     // Filter by tab
     let visibleNames = [];
@@ -1270,7 +1395,7 @@
     } else if (state.activeTab === 'expenses') {
       visibleNames = [...expenseNames];
       visibleCustomJobs = [];
-      visibleCustomExpenses = [...customExpenses];
+      visibleCustomExpenses = [...activeCustomExpenses];
     } else {
       // 'all'
       visibleNames = [...allNames];
@@ -1363,34 +1488,61 @@
 
     // 1. Render Custom Expenses (in Expenses or All tab)
     visibleCustomExpenses.forEach((cExp) => {
+      const isCustomExpense = cExp.isExpense !== false;
       const amt = parseFloat(cExp.amount) || 0;
+      const expCheckClass = isCustomExpense ? 'is-expense' : 'is-unmarked';
+      const expTriageIcon = isCustomExpense ? 'trending_down' : 'add';
+      let expCardClass = 'job-calc-task-card job-calc-expense-card';
+      if (isCustomExpense) expCardClass += ' is-expense';
+      else expCardClass += ' is-unpaid is-excluded';
+
       html += `
-        <div class="job-calc-task-card job-calc-expense-card is-expense" data-expense-id="${escapeHtml(cExp.id)}">
+        <div class="${expCardClass}" data-expense-id="${escapeHtml(cExp.id)}">
           
           <!-- Card Header / Main Row -->
           <div class="job-calc-card-main">
-            <!-- Delete Box -->
+            <!-- Triage Box with Popover Menu -->
             <div class="job-calc-triage-wrap">
               <button type="button" 
-                      class="job-calc-triage-btn is-expense job-calc-custom-expense-delete-box" 
-                      data-action="delete-custom-expense" 
-                      title="Remove custom expenses">
-                <span class="material-symbols-outlined job-calc-triage-icon">delete</span>
+                      class="job-calc-triage-btn ${expCheckClass}" 
+                      data-action="open-triage-menu" 
+                      title="${isCustomExpense ? 'Expenses (Click to change or exclude)' : 'Categorize Custom Expense'}">
+                <span class="material-symbols-outlined job-calc-triage-icon" style="font-size: 15px !important;">${expTriageIcon}</span>
               </button>
+
+              <!-- Popover Menu -->
+              <div class="job-calc-triage-popover hidden">
+                <div class="job-calc-triage-popover-header">Custom Expense</div>
+                <button type="button" class="job-calc-triage-option option-expense ${isCustomExpense ? 'selected' : ''}" data-custom-exp-triage="expense" data-expense-id="${escapeHtml(cExp.id)}">
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">trending_down</span></div>
+                  <span class="job-calc-triage-option-title">Expenses</span>
+                  ${isCustomExpense ? '<span class="material-symbols-outlined job-calc-option-check">check</span>' : ''}
+                </button>
+                <div class="job-calc-triage-popover-divider"></div>
+                <button type="button" class="job-calc-triage-option option-unmark ${!isCustomExpense ? 'selected' : ''}" data-custom-exp-triage="exclude" data-expense-id="${escapeHtml(cExp.id)}">
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">cancel</span></div>
+                  <span class="job-calc-triage-option-title">Exclude</span>
+                  ${!isCustomExpense ? '<span class="material-symbols-outlined job-calc-option-check">check</span>' : ''}
+                </button>
+                <button type="button" class="job-calc-triage-option option-delete" data-custom-exp-triage="delete" data-expense-id="${escapeHtml(cExp.id)}">
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">delete</span></div>
+                  <span class="job-calc-triage-option-title">Delete Permanently</span>
+                </button>
+              </div>
             </div>
 
-            <div class="job-calc-color-indicator job-calc-expense-indicator" title="Custom Expenses"></div>
+            <div class="job-calc-color-indicator job-calc-expense-indicator ${!isCustomExpense ? 'is-excluded' : ''}" title="Custom Expenses"></div>
 
             <div class="job-calc-card-info">
               <div class="job-calc-title-row">
                 <input type="text" class="job-calc-expense-name-input" value="${escapeHtml(cExp.name || 'Untitled')}" placeholder="Untitled">
               </div>
-              <div class="job-calc-tagline">Expenses</div>
+              <div class="job-calc-tagline">${isCustomExpense ? 'Expenses' : 'Excluded'}</div>
             </div>
 
             <!-- Subtotal Pill -->
             <div class="job-calc-subtotal-badge job-calc-expense-badge">
-              <span class="job-calc-subtotal-amount">-$${amt.toFixed(2)}</span>
+              <span class="job-calc-subtotal-amount">${isCustomExpense ? `-$${amt.toFixed(2)}` : 'Excluded'}</span>
             </div>
           </div>
 
@@ -1497,39 +1649,69 @@
         subtotal: 0
       };
 
+      const isCustomPaid = cJob.isPaid !== false;
+      const customCheckClass = isCustomPaid ? 'is-paid' : 'is-unmarked';
+      const customTriageIcon = isCustomPaid ? 'trending_up' : 'add';
+      let customCardClass = 'job-calc-task-card job-calc-custom-card';
+      if (isCustomPaid) customCardClass += ' is-paid';
+      else customCardClass += ' is-unpaid is-excluded';
+
       html += `
-        <div class="job-calc-task-card job-calc-custom-card is-paid" data-custom-id="${escapeHtml(cJob.id)}">
+        <div class="${customCardClass}" data-custom-id="${escapeHtml(cJob.id)}">
           
           <!-- Card Header / Main Row -->
           <div class="job-calc-card-main">
-            <!-- Delete Box -->
+            <!-- Triage Box with Popover Menu -->
             <div class="job-calc-triage-wrap">
               <button type="button" 
-                      class="job-calc-triage-btn is-paid job-calc-custom-earnings-delete-box" 
-                      data-action="delete-custom-job"
-                      title="Remove custom earnings">
-                <span class="material-symbols-outlined job-calc-triage-icon">delete</span>
+                      class="job-calc-triage-btn ${customCheckClass}" 
+                      data-action="open-triage-menu" 
+                      title="${isCustomPaid ? 'Earnings (Click to change or exclude)' : 'Categorize Custom Earnings'}">
+                <span class="material-symbols-outlined job-calc-triage-icon" style="font-size: 15px !important;">${customTriageIcon}</span>
               </button>
+
+              <!-- Popover Menu -->
+              <div class="job-calc-triage-popover hidden">
+                <div class="job-calc-triage-popover-header">Custom Earnings</div>
+                <button type="button" class="job-calc-triage-option option-paid ${isCustomPaid ? 'selected' : ''}" data-custom-job-triage="paid" data-custom-id="${escapeHtml(cJob.id)}">
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">trending_up</span></div>
+                  <span class="job-calc-triage-option-title">Earnings</span>
+                  ${isCustomPaid ? '<span class="material-symbols-outlined job-calc-option-check">check</span>' : ''}
+                </button>
+                <div class="job-calc-triage-popover-divider"></div>
+                <button type="button" class="job-calc-triage-option option-unmark ${!isCustomPaid ? 'selected' : ''}" data-custom-job-triage="exclude" data-custom-id="${escapeHtml(cJob.id)}">
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">cancel</span></div>
+                  <span class="job-calc-triage-option-title">Exclude</span>
+                  ${!isCustomPaid ? '<span class="material-symbols-outlined job-calc-option-check">check</span>' : ''}
+                </button>
+                <button type="button" class="job-calc-triage-option option-delete" data-custom-job-triage="delete" data-custom-id="${escapeHtml(cJob.id)}">
+                  <div class="job-calc-triage-option-icon"><span class="material-symbols-outlined">delete</span></div>
+                  <span class="job-calc-triage-option-title">Delete Permanently</span>
+                </button>
+              </div>
             </div>
 
-            <div class="job-calc-color-indicator job-calc-custom-indicator" title="Custom Earnings"></div>
+            <div class="job-calc-color-indicator job-calc-custom-indicator ${!isCustomPaid ? 'is-excluded' : ''}" title="Custom Earnings"></div>
 
             <div class="job-calc-card-info">
               <div class="job-calc-title-row">
                 <input type="text" class="job-calc-custom-name-input" value="${escapeHtml(cJob.name || 'Untitled')}" placeholder="Untitled">
                 <span class="job-calc-session-badge">${customTotalShifts}x</span>
               </div>
-              <label class="job-calc-taxable-check-row" title="${cJob.isTaxable === true ? 'Subject to tax deduction' : 'Untaxed earnings'}">
-                <input type="checkbox" class="job-calc-custom-taxable-checkbox" ${cJob.isTaxable === true ? 'checked' : ''}>
-                <span class="job-calc-taxable-check-box"></span>
-                <span class="job-calc-taxable-check-text">Taxable</span>
-              </label>
+              <div class="job-calc-tagline">${isCustomPaid ? 'Earnings' : 'Excluded'}</div>
+              ${isCustomPaid ? `
+                <label class="job-calc-taxable-check-row" title="${cJob.isTaxable === true ? 'Subject to tax deduction' : 'Untaxed earnings'}">
+                  <input type="checkbox" class="job-calc-custom-taxable-checkbox" ${cJob.isTaxable === true ? 'checked' : ''}>
+                  <span class="job-calc-taxable-check-box"></span>
+                  <span class="job-calc-taxable-check-text">Taxable</span>
+                </label>
+              ` : ''}
             </div>
 
             <!-- Subtotal Pill -->
             <div class="job-calc-subtotal-badge">
-              <span class="job-calc-subtotal-amount">$${cRes.subtotal.toFixed(2)}</span>
-              <span class="job-calc-subtotal-hours">${cRes.totalHours.toFixed(1)} hrs</span>
+              <span class="job-calc-subtotal-amount">${isCustomPaid ? `$${cRes.subtotal.toFixed(2)}` : 'Excluded'}</span>
+              ${isCustomPaid ? `<span class="job-calc-subtotal-hours">${cRes.totalHours.toFixed(1)} hrs</span>` : ''}
             </div>
           </div>
 
@@ -1566,11 +1748,10 @@
       const isAccordionOpen = state.expandedJobs.has(name);
       const isSplitMode = isPaid && setting.adjustMode === 'split';
       let splitAllocated = 0;
-      if (Array.isArray(setting.splits)) {
-        setting.splits.forEach((s) => { splitAllocated += (parseInt(s.shifts, 10) || 0); });
-      }
+      const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
+      splits.forEach((s) => { splitAllocated += (parseInt(s.shifts, 10) || 0); });
       const splitRemaining = count - splitAllocated;
-      const displayCount = (isSplitMode && splitAllocated > 0) ? splitAllocated : count;
+      const displayCount = (isSplitMode && splits.length > 1 && splitAllocated > 0) ? splitAllocated : count;
 
       let cardClass = 'job-calc-task-card';
       if (isPaid) cardClass += ' is-paid';
@@ -1782,11 +1963,9 @@
     // Split Mode: Render each split tier as a directly editable 3-column row
     if (setting.adjustMode === 'split') {
       const count = (job.occurrences || []).length;
-      if (!Array.isArray(setting.splits) || setting.splits.length === 0) {
-        setting.splits = [{ shifts: count > 0 ? count : 1, hours: setting.defaultHours ?? 4 }];
-      }
+      const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
 
-      const canDeleteSplit = setting.splits.length > 1;
+      const canDeleteSplit = splits.length > 1;
       let splitRowsHtml = `
         <div class="job-calc-split-headers-row">
           <span class="job-calc-split-col-header">Shifts</span>
@@ -1795,7 +1974,7 @@
         </div>
       `;
 
-      setting.splits.forEach((s, idx) => {
+      splits.forEach((s, idx) => {
         splitRowsHtml += `
           <div class="job-calc-split-row-item ${canDeleteSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteSplit ? 'Swipe left to delete this split row (or type 0 in shifts)' : ''}">
             ${canDeleteSplit ? `
@@ -2318,7 +2497,8 @@
     if (!tagEl) return;
     const count = job.occurrences ? job.occurrences.length : 0;
     let allocated = 0;
-    (setting.splits || []).forEach((s) => {
+    const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
+    (splits || []).forEach((s) => {
       allocated += (parseInt(s.shifts, 10) || 0);
     });
     const remaining = count - allocated;
@@ -2378,6 +2558,10 @@
         if (type === 'paid') {
           setting.isPaid = true;
           setting.isExpense = false;
+          if (!setting.adjustMode) setting.adjustMode = 'split';
+          const job = scannedJobs[jobName];
+          const count = job && job.occurrences ? job.occurrences.length : 1;
+          getJobSplits(job, setting, count, setting.defaultHours ?? 4);
         } else if (type === 'expense') {
           setting.isExpense = true;
           setting.isPaid = false;
@@ -2453,14 +2637,7 @@
         setting.adjustMode = mode;
         if (mode === 'split') {
           const count = job.occurrences ? job.occurrences.length : 0;
-          if (!Array.isArray(setting.splits) || setting.splits.length === 0) {
-            const groups = getJobHoursGroups(job, setting);
-            if (groups.length > 0) {
-              setting.splits = groups.map((g) => ({ shifts: g.count, hours: g.hours }));
-            } else {
-              setting.splits = [{ shifts: count > 0 ? count : 1, hours: setting.defaultHours ?? 4 }];
-            }
-          }
+          getJobSplits(job, setting, count, setting.defaultHours ?? 4);
         }
 
         saveSettings();
@@ -2480,15 +2657,14 @@
         if (!job) return;
         const setting = getJobSetting(jobName);
         const count = job.occurrences ? job.occurrences.length : 0;
-
-        if (!Array.isArray(setting.splits)) setting.splits = [];
+        const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
 
         let allocated = 0;
-        setting.splits.forEach((s) => { allocated += (parseInt(s.shifts, 10) || 0); });
+        splits.forEach((s) => { allocated += (parseInt(s.shifts, 10) || 0); });
         const remaining = count - allocated;
         const newShifts = remaining > 0 ? remaining : 1;
 
-        setting.splits.push({
+        splits.push({
           shifts: newShifts,
           hours: setting.defaultHours ?? 4
         });
@@ -2507,11 +2683,13 @@
         const jobName = card.dataset.jobName;
         const job = scannedJobs[jobName];
         const setting = getJobSetting(jobName);
+        const count = job.occurrences ? job.occurrences.length : 0;
+        const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
         const idx = parseInt(input.dataset.splitIndex, 10);
-        if (!setting.splits || !setting.splits[idx]) return;
+        if (!splits || !splits[idx]) return;
 
         const val = parseInt(e.target.value, 10);
-        setting.splits[idx].shifts = isNaN(val) ? 0 : Math.max(0, val);
+        splits[idx].shifts = isNaN(val) ? 0 : Math.max(0, val);
 
         updateCardSplitTag(card, job, setting);
         saveSettings();
@@ -2523,26 +2701,28 @@
         const card = input.closest('.job-calc-task-card');
         if (!card) return;
         const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
         const setting = getJobSetting(jobName);
+        const count = job ? (job.occurrences ? job.occurrences.length : 0) : 0;
+        const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
         const idx = parseInt(input.dataset.splitIndex, 10);
-        if (!setting.splits || !setting.splits[idx]) return;
+        if (!splits || !splits[idx]) return;
 
         const val = parseInt(input.value, 10);
         // Auto-remove row if shifts is 0 or empty (keeping at least one row)
         if (val === 0 || isNaN(val) || input.value.trim() === '' || input.value.trim() === '0') {
-          if (setting.splits.length > 1) {
-            setting.splits.splice(idx, 1);
+          if (splits.length > 1) {
+            splits.splice(idx, 1);
             saveSettings();
             renderTasksList();
             updateSummaryCard();
             return;
           } else {
-            setting.splits[0].shifts = 1;
-            input.value = 1;
+            splits[0].shifts = count > 0 ? count : 1;
+            input.value = splits[0].shifts;
             saveSettings();
             updateCardSubtotal(card, jobName);
             updateSummaryCard();
-            const job = scannedJobs[jobName];
             if (job) updateCardSplitTag(card, job, setting);
           }
         }
@@ -2564,12 +2744,15 @@
         const card = e.target.closest('.job-calc-task-card');
         if (!card) return;
         const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
         const setting = getJobSetting(jobName);
+        const count = job ? (job.occurrences ? job.occurrences.length : 0) : 0;
+        const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
         const idx = parseInt(input.dataset.splitIndex, 10);
-        if (!setting.splits || !setting.splits[idx]) return;
+        if (!splits || !splits[idx]) return;
 
         const val = parseFloat(e.target.value);
-        setting.splits[idx].hours = isNaN(val) ? 0 : Math.max(0, val);
+        splits[idx].hours = isNaN(val) ? 0 : Math.max(0, val);
 
         saveSettings();
         updateCardSubtotal(card, jobName);
@@ -2582,10 +2765,13 @@
           const card = e.target.closest('.job-calc-task-card');
           if (card) {
             const jobName = card.dataset.jobName;
+            const job = scannedJobs[jobName];
             const setting = getJobSetting(jobName);
+            const count = job ? (job.occurrences ? job.occurrences.length : 0) : 0;
+            const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
             const idx = parseInt(input.dataset.splitIndex, 10);
-            if (setting.splits && setting.splits[idx]) {
-              setting.splits[idx].hours = 0;
+            if (splits && splits[idx]) {
+              splits[idx].hours = 0;
               saveSettings();
               updateCardSubtotal(card, jobName);
               updateSummaryCard();
@@ -2602,10 +2788,13 @@
         const card = btn.closest('.job-calc-task-card');
         if (!card) return;
         const jobName = card.dataset.jobName;
+        const job = scannedJobs[jobName];
         const setting = getJobSetting(jobName);
+        const count = job ? (job.occurrences ? job.occurrences.length : 0) : 0;
+        const splits = getJobSplits(job, setting, count, setting.defaultHours ?? 4);
         const idx = parseInt(btn.dataset.splitIndex, 10);
-        if (!setting.splits || setting.splits.length <= 1) return; // Keep at least 1 row
-        if (isNaN(idx) || idx < 0 || idx >= setting.splits.length) return;
+        if (!splits || splits.length <= 1) return; // Keep at least 1 row
+        if (isNaN(idx) || idx < 0 || idx >= splits.length) return;
 
         const rowItem = btn.closest('.job-calc-split-row-item');
         if (rowItem) {
@@ -2613,13 +2802,13 @@
           rowItem.style.opacity = '0';
           rowItem.style.maxHeight = '0px';
           setTimeout(() => {
-            setting.splits.splice(idx, 1);
+            splits.splice(idx, 1);
             saveSettings();
             renderTasksList();
             updateSummaryCard();
           }, 150);
         } else {
-          setting.splits.splice(idx, 1);
+          splits.splice(idx, 1);
           saveSettings();
           renderTasksList();
           updateSummaryCard();
@@ -3025,7 +3214,55 @@
       });
     });
 
-    // 12. Custom Job Delete button
+    // 12. Custom Job Triage (Earnings / Exclude / Delete Permanently)
+    listEl.querySelectorAll('[data-custom-job-triage]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const customId = btn.dataset.customId;
+        const triage = btn.dataset.customJobTriage;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        if (!cJob && triage !== 'delete') return;
+
+        if (triage === 'paid') {
+          cJob.isPaid = true;
+          cJob.isExpense = false;
+        } else if (triage === 'exclude') {
+          cJob.isPaid = false;
+          cJob.isExpense = false;
+        } else if (triage === 'delete') {
+          state.settings.customJobs = (state.settings.customJobs || []).filter((c) => c.id !== customId);
+        }
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+      });
+    });
+
+    // 12b. Custom Expense Triage (Expenses / Exclude / Delete Permanently)
+    listEl.querySelectorAll('[data-custom-exp-triage]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const expId = btn.dataset.expenseId;
+        const triage = btn.dataset.customExpTriage;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        if (!cExp && triage !== 'delete') return;
+
+        if (triage === 'expense') {
+          cExp.isExpense = true;
+        } else if (triage === 'exclude') {
+          cExp.isExpense = false;
+        } else if (triage === 'delete') {
+          state.settings.customExpenses = (state.settings.customExpenses || []).filter((c) => c.id !== expId);
+        }
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+      });
+    });
+
+    // 12c. Custom Job Delete button fallback
     listEl.querySelectorAll('.job-calc-custom-delete-btn, [data-action="delete-custom-job"]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -3069,7 +3306,7 @@
       });
     });
 
-    // 15. Custom Expense Delete box button
+    // 15. Custom Expense Delete box button fallback
     listEl.querySelectorAll('[data-action="delete-custom-expense"]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -3396,8 +3633,9 @@
     const count = job.occurrences ? job.occurrences.length : 0;
     let hours = 0;
 
-    if (setting.adjustMode === 'split' && Array.isArray(setting.splits) && setting.splits.length > 0) {
-      setting.splits.forEach((s) => {
+    if (setting.adjustMode === 'split') {
+      const splits = getJobSplits(job, setting, count, defaultHours);
+      splits.forEach((s) => {
         const sCount = parseInt(s.shifts, 10) || 0;
         const sHours = parseFloat(s.hours) || 0;
         hours += (sCount * sHours);
@@ -3420,10 +3658,11 @@
     if (amountEl) amountEl.textContent = `$${subtotal.toFixed(2)}`;
     if (hoursEl) hoursEl.textContent = `${hours.toFixed(1)} hrs`;
     if (badgeEl) {
-      if (setting.adjustMode === 'split' && Array.isArray(setting.splits) && setting.splits.length > 0) {
+      if (setting.adjustMode === 'split') {
+        const splits = getJobSplits(job, setting, count, defaultHours);
         let splitAllocated = 0;
-        setting.splits.forEach((s) => { splitAllocated += (parseInt(s.shifts, 10) || 0); });
-        badgeEl.textContent = `${splitAllocated > 0 ? splitAllocated : count}x`;
+        splits.forEach((s) => { splitAllocated += (parseInt(s.shifts, 10) || 0); });
+        badgeEl.textContent = `${splits.length > 1 && splitAllocated > 0 ? splitAllocated : count}x`;
       } else {
         badgeEl.textContent = `${count}x`;
       }
@@ -3453,11 +3692,13 @@
 
     const subtotal = Math.round((totalHours * rate + Number.EPSILON) * 100) / 100;
 
-    const amountEl = card.querySelector('.job-calc-subtotal-amount');
-    const hoursEl = card.querySelector('.job-calc-subtotal-hours');
-    const badgeEl = card.querySelector('.job-calc-session-badge');
-    if (amountEl) amountEl.textContent = `$${subtotal.toFixed(2)}`;
-    if (hoursEl) hoursEl.textContent = `${totalHours.toFixed(1)} hrs`;
+    if (cJob.isPaid !== false) {
+      if (amountEl) amountEl.textContent = `$${subtotal.toFixed(2)}`;
+      if (hoursEl) hoursEl.textContent = `${totalHours.toFixed(1)} hrs`;
+    } else {
+      if (amountEl) amountEl.textContent = 'Excluded';
+      if (hoursEl) hoursEl.textContent = '0.0 hrs';
+    }
     if (badgeEl) badgeEl.textContent = `${totalShifts}x`;
   }
 
@@ -3681,7 +3922,7 @@
         const res = jobResults[name];
         return s.isExpense && ((res?.expenseTotal || 0) > 0 || (parseFloat(s.expenseAmount) || 0) > 0);
       });
-      const customExps = (state.settings.customExpenses || []).filter((e) => (parseFloat(e.amount) || 0) > 0);
+      const customExps = (state.settings.customExpenses || []).filter((e) => e.isExpense !== false && (parseFloat(e.amount) || 0) > 0);
       const totalExpItemsCount = expCalendarNames.length + customExps.length;
 
       if (expCountEl) expCountEl.textContent = `${totalExpItemsCount}x`;
@@ -3860,9 +4101,11 @@
       });
 
       (state.settings.customExpenses || []).forEach((cExp) => {
-        const amt = parseFloat(cExp.amount) || 0;
-        if (amt > 0) {
-          out.push(row(`  ${cExp.name || 'Untitled'} [Expenses]`, `-$${amt.toFixed(2)}`));
+        if (cExp.isExpense !== false) {
+          const amt = parseFloat(cExp.amount) || 0;
+          if (amt > 0) {
+            out.push(row(`  ${cExp.name || 'Untitled'} [Expenses]`, `-$${amt.toFixed(2)}`));
+          }
         }
       });
       out.push(row('  Total Expenses', `-$${totals.totalExpenses.toFixed(2)}`));
@@ -3984,8 +4227,8 @@
     if (todo) todo.classList.remove('active');
     if (typeof pauseWeatherTicker === 'function') pauseWeatherTicker();
 
-    // Compute active date range if not set
-    if (!state.fromDate || !state.toDate) {
+    // Re-sync active date range with currently active calendar month (or preset) upon opening
+    if (!state.fromDate || !state.toDate || state.activePreset === 'this-month' || state.activePreset === 'last-month') {
       const defaultRange = computePresetRange(state.activePreset || 'this-month');
       if (defaultRange) {
         state.fromDate = defaultRange.from;

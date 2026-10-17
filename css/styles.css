@@ -11493,6 +11493,36 @@ ic {
     margin: 3px 6px;
 }
 
+.job-calc-triage-option.option-delete .job-calc-triage-option-icon {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.job-calc-triage-option.option-delete:hover {
+    background: #fef2f2;
+}
+
+.job-calc-triage-option.option-delete .job-calc-triage-option-title {
+    color: #ef4444;
+}
+
+.job-calc-task-card.job-calc-custom-card.is-unpaid,
+.job-calc-task-card.job-calc-expense-card.is-unpaid {
+    border-left: 3px solid #cbd5e1 !important;
+    background: #fafaf9;
+    opacity: 0.72;
+}
+
+.job-calc-task-card.job-calc-custom-card.is-unpaid:hover,
+.job-calc-task-card.job-calc-expense-card.is-unpaid:hover {
+    opacity: 0.95;
+}
+
+.job-calc-color-indicator.job-calc-custom-indicator.is-excluded,
+.job-calc-color-indicator.job-calc-expense-indicator.is-excluded {
+    background-color: #94a3b8 !important;
+}
+
 /* Color Indicator Strip */
 .job-calc-color-indicator {
     width: 5px;
