@@ -1505,9 +1505,13 @@
     const customExpenses = state.settings.customExpenses || [];
     const activeCustomExpenses = customExpenses.filter((e) => e.isExpense !== false);
 
-    if (countAllEl) countAllEl.textContent = allNames.length + customJobs.length + customExpenses.length;
-    if (countPaidEl) countPaidEl.textContent = paidNames.length + paidCustomJobs.length;
-    if (countExpensesEl) countExpensesEl.textContent = expenseNames.length + activeCustomExpenses.length;
+    const totalAllCount = allNames.length + customJobs.length + customExpenses.length;
+    const totalPaidCount = paidNames.length + paidCustomJobs.length;
+    const totalExpensesCount = expenseNames.length + activeCustomExpenses.length;
+
+    if (countAllEl) countAllEl.textContent = totalAllCount;
+    if (countPaidEl) countPaidEl.textContent = totalPaidCount;
+    if (countExpensesEl) countExpensesEl.textContent = totalExpensesCount;
 
     // Filter by tab
     let visibleNames = [];
@@ -1585,9 +1589,9 @@
           </p>
           <div class="job-calc-empty-actions">
             ${
-              (isPaidTab || isExpTab) && !state.searchQuery && allNames.length > 0
+              (isPaidTab || isExpTab) && !state.searchQuery && totalAllCount > 0
                 ? `<button type="button" class="job-calc-empty-action-btn" id="job-calc-switch-to-all">
-                     Browse All (${allNames.length}) →
+                     Browse All (${totalAllCount}) →
                    </button>`
                 : ''
             }
