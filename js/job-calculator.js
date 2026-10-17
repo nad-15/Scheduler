@@ -1425,10 +1425,11 @@
       cJob.splits.forEach((s, idx) => {
         const sShifts = parseInt(s.shifts, 10) || 0;
         customTotalShifts += sShifts;
+        const showLabels = idx === 0;
         customRowsHtml += `
           <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-split-row" data-split-index="${idx}">
             <div class="job-calc-input-block">
-              <label>Shifts</label>
+              ${showLabels ? '<label>Shifts</label>' : ''}
               <div class="job-calc-input-wrapper">
                 <input type="number" 
                        class="job-calc-custom-split-shifts-input job-calc-num-input" 
@@ -1436,26 +1437,28 @@
                        min="0" 
                        step="1" 
                        value="${s.shifts}" 
+                       aria-label="Shifts"
                        title="Enter shifts (type 0 to remove this row)">
                 <span class="job-calc-unit">x</span>
               </div>
             </div>
 
             <div class="job-calc-input-block">
-              <label>Hours / Shift</label>
+              ${showLabels ? '<label>Hours / Shift</label>' : ''}
               <div class="job-calc-input-wrapper">
                 <input type="number" 
                        class="job-calc-custom-split-hours-input job-calc-num-input" 
                        data-split-index="${idx}" 
                        min="0" 
                        step="0.25" 
-                       value="${s.hours}">
+                       value="${s.hours}"
+                       aria-label="Hours per shift">
                 <span class="job-calc-unit">hrs</span>
               </div>
             </div>
 
             <div class="job-calc-input-block">
-              <label>Rate ($/hr)</label>
+              ${showLabels ? '<label>Rate ($/hr)</label>' : ''}
               <div class="job-calc-input-wrapper">
                 <span class="job-calc-prefix">$</span>
                 <input type="number" 
@@ -1463,7 +1466,8 @@
                        min="0" 
                        step="0.5" 
                        value="${cJob.hourlyRate ?? 25}" 
-                       placeholder="25">
+                       placeholder="25"
+                       aria-label="Hourly rate">
                 <span class="job-calc-unit">/hr</span>
               </div>
             </div>
@@ -1767,10 +1771,11 @@
 
       let splitRowsHtml = '';
       setting.splits.forEach((s, idx) => {
+        const showLabels = idx === 0;
         splitRowsHtml += `
           <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-split-row" data-split-index="${idx}">
             <div class="job-calc-input-block">
-              <label>Shifts</label>
+              ${showLabels ? '<label>Shifts</label>' : ''}
               <div class="job-calc-input-wrapper">
                 <input type="number" 
                        class="job-calc-split-shifts-input job-calc-num-input" 
@@ -1778,26 +1783,28 @@
                        min="0" 
                        step="1" 
                        value="${s.shifts}" 
+                       aria-label="Shifts"
                        title="Enter shifts (type 0 to remove this row)">
                 <span class="job-calc-unit">x</span>
               </div>
             </div>
 
             <div class="job-calc-input-block">
-              <label>Hours / Shift</label>
+              ${showLabels ? '<label>Hours / Shift</label>' : ''}
               <div class="job-calc-input-wrapper">
                 <input type="number" 
                        class="job-calc-split-hours-input job-calc-num-input" 
                        data-split-index="${idx}"
                        min="0" 
                        step="0.25" 
-                       value="${s.hours}">
+                       value="${s.hours}"
+                       aria-label="Hours per shift">
                 <span class="job-calc-unit">hrs</span>
               </div>
             </div>
 
             <div class="job-calc-input-block">
-              <label>Rate ($/hr)</label>
+              ${showLabels ? '<label>Rate ($/hr)</label>' : ''}
               <div class="job-calc-input-wrapper">
                 <span class="job-calc-prefix">$</span>
                 <input type="number" 
@@ -1805,7 +1812,8 @@
                        min="0" 
                        step="0.5" 
                        value="${hourlyRate}" 
-                       placeholder="25">
+                       placeholder="25"
+                       aria-label="Hourly rate">
                 <span class="job-calc-unit">/hr</span>
               </div>
             </div>
@@ -1845,30 +1853,31 @@
 
     // Customized dates case: multiple groups with different hours
     let rowsHtml = '';
-    groups.forEach((g) => {
+    groups.forEach((g, idx) => {
+      const showLabels = idx === 0;
       rowsHtml += `
         <div class="job-calc-inputs-row job-calc-custom-inputs-row job-calc-group-row" data-hours-group="${g.hours}">
           <div class="job-calc-input-block">
-            <label>Shifts</label>
+            ${showLabels ? '<label>Shifts</label>' : ''}
             <div class="job-calc-input-wrapper">
-              <input type="number" class="job-calc-group-shifts-input job-calc-num-input" value="${g.count}" readonly tabindex="-1" style="cursor: default;" title="${g.count} shifts are ${g.hours} hrs">
+              <input type="number" class="job-calc-group-shifts-input job-calc-num-input" value="${g.count}" readonly tabindex="-1" style="cursor: default;" title="${g.count} shifts are ${g.hours} hrs" aria-label="Shifts">
               <span class="job-calc-unit">x</span>
             </div>
           </div>
 
           <div class="job-calc-input-block">
-            <label>Hours / Shift</label>
+            ${showLabels ? '<label>Hours / Shift</label>' : ''}
             <div class="job-calc-input-wrapper">
-              <input type="number" class="job-calc-group-hours-input job-calc-num-input" min="0" step="0.25" value="${g.hours}" data-original-hours="${g.hours}">
+              <input type="number" class="job-calc-group-hours-input job-calc-num-input" min="0" step="0.25" value="${g.hours}" data-original-hours="${g.hours}" aria-label="Hours per shift">
               <span class="job-calc-unit">hrs</span>
             </div>
           </div>
 
           <div class="job-calc-input-block">
-            <label>Rate ($/hr)</label>
+            ${showLabels ? '<label>Rate ($/hr)</label>' : ''}
             <div class="job-calc-input-wrapper">
               <span class="job-calc-prefix">$</span>
-              <input type="number" class="job-calc-rate-input job-calc-num-input" min="0" step="0.5" value="${hourlyRate}" placeholder="25">
+              <input type="number" class="job-calc-rate-input job-calc-num-input" min="0" step="0.5" value="${hourlyRate}" placeholder="25" aria-label="Hourly rate">
               <span class="job-calc-unit">/hr</span>
             </div>
           </div>
@@ -2060,22 +2069,23 @@
 
     // Customized dates case: multiple groups with different cost
     let rowsHtml = '';
-    groups.forEach((g) => {
+    groups.forEach((g, idx) => {
+      const showLabels = idx === 0;
       rowsHtml += `
         <div class="job-calc-inputs-row job-calc-group-row job-calc-expense-group-row" data-expense-group="${g.amount}">
           <div class="job-calc-input-block">
-            <label>Shifts</label>
+            ${showLabels ? '<label>Shifts</label>' : ''}
             <div class="job-calc-input-wrapper">
-              <input type="number" class="job-calc-group-shifts-input job-calc-num-input" value="${g.count}" readonly tabindex="-1" style="cursor: default;" title="${g.count} shifts are $${g.amount.toFixed(2)}">
+              <input type="number" class="job-calc-group-shifts-input job-calc-num-input" value="${g.count}" readonly tabindex="-1" style="cursor: default;" title="${g.count} shifts are $${g.amount.toFixed(2)}" aria-label="Shifts">
               <span class="job-calc-unit">x</span>
             </div>
           </div>
 
           <div class="job-calc-input-block">
-            <label>Cost / Occurrence ($)</label>
+            ${showLabels ? '<label>Cost / Occurrence ($)</label>' : ''}
             <div class="job-calc-input-wrapper">
               <span class="job-calc-prefix">$</span>
-              <input type="number" class="job-calc-group-expense-input job-calc-num-input" min="0" step="0.5" value="${g.amount}" data-original-amount="${g.amount}">
+              <input type="number" class="job-calc-group-expense-input job-calc-num-input" min="0" step="0.5" value="${g.amount}" data-original-amount="${g.amount}" aria-label="Cost per occurrence">
             </div>
           </div>
         </div>

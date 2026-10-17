@@ -11604,6 +11604,10 @@ ic {
     gap: 8px;
 }
 
+.job-calc-groups-wrap .job-calc-inputs-row:not(:first-child) label {
+    display: none;
+}
+
 .job-calc-group-row .job-calc-num-input[readonly] {
     background: #f1f5f9;
     color: #475569;
