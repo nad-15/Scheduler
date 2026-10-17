@@ -12566,6 +12566,24 @@ ic {
     font-weight: 900;
     color: #047857;
     letter-spacing: -0.5px;
+    transition: color 0.2s ease;
+}
+
+.job-calc-net-row.is-deficit {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.job-calc-net-row.is-deficit .job-calc-net-label {
+    color: #991b1b;
+}
+
+.job-calc-net-row.is-deficit .job-calc-net-sublabel {
+    color: #b91c1c;
+}
+
+.job-calc-net-row.is-deficit .job-calc-net-val {
+    color: #dc2626;
 }
 
 /* Actions Row */
@@ -12939,6 +12957,24 @@ ic {
     font-weight: 900;
     color: #047857;
     letter-spacing: -0.5px;
+    transition: color 0.2s ease;
+}
+
+.receipt-net-row.is-deficit {
+    background: #fef2f2;
+    border-color: #f87171;
+}
+
+.receipt-net-row.is-deficit .receipt-net-main-label {
+    color: #991b1b;
+}
+
+.receipt-net-row.is-deficit .receipt-net-sublabel {
+    color: #b91c1c;
+}
+
+.receipt-net-row.is-deficit .receipt-net-amount {
+    color: #dc2626;
 }
 
 /* Footer */

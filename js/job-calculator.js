@@ -790,8 +790,8 @@
     taxableEarnings = roundCents(taxableEarnings);
     totalExpenses = roundCents(totalExpenses);
 
-    // Net Take-Home: Gross - Tax Deduction - Total Expenses
-    const netTakeHome = Math.max(0, roundCents(grossEarnings - taxDeductionAmount - totalExpenses));
+    // Net Take-Home: Gross - Tax Deduction - Total Expenses (supports negative balance / deficit)
+    const netTakeHome = roundCents(grossEarnings - taxDeductionAmount - totalExpenses);
 
     return {
       totalSessions,
@@ -4508,13 +4508,28 @@
     }
     if (sumExpenses) sumExpenses.textContent = `-$${totalExpenses.toFixed(2)}`;
 
-    if (sumNet) sumNet.textContent = `$${netTakeHome.toFixed(2)}`;
+    const isDeficit = netTakeHome < 0;
+    if (sumNet) {
+      sumNet.textContent = isDeficit ? `-$${Math.abs(netTakeHome).toFixed(2)}` : `$${netTakeHome.toFixed(2)}`;
+    }
     if (taxAmountEl) taxAmountEl.textContent = `-$${taxDeductionAmount.toFixed(2)}`;
+
+    const netRowEl = container.querySelector('.job-calc-net-row');
+    if (netRowEl) {
+      netRowEl.classList.toggle('is-deficit', isDeficit);
+    }
+
+    const netLabelEl = container.querySelector('.job-calc-net-label');
+    if (netLabelEl) {
+      netLabelEl.textContent = isDeficit ? 'Net Deficit' : 'Net Take-Home Pay';
+    }
 
     // Sync Net sublabel dynamically
     const netSublabelEl = container.querySelector('.job-calc-net-sublabel');
     if (netSublabelEl) {
-      if (taxDeductionAmount > 0 && totalExpenses > 0) {
+      if (isDeficit) {
+        netSublabelEl.textContent = 'Expenses exceed earnings';
+      } else if (taxDeductionAmount > 0 && totalExpenses > 0) {
         netSublabelEl.textContent = 'After tax & expenses';
       } else if (taxDeductionAmount > 0) {
         netSublabelEl.textContent = 'After tax deduction';
@@ -4763,7 +4778,23 @@
 
     // 6. Net Take-Home Hero Row
     const netAmountEl = container.querySelector('#receipt-net-amount');
-    if (netAmountEl) netAmountEl.textContent = `$${netTakeHome.toFixed(2)}`;
+    const receiptNetRow = container.querySelector('.receipt-net-row');
+    const receiptNetLabel = container.querySelector('.receipt-net-main-label');
+    const receiptNetSublabel = container.querySelector('.receipt-net-sublabel');
+    const isDeficit = netTakeHome < 0;
+
+    if (netAmountEl) {
+      netAmountEl.textContent = isDeficit ? `-$${Math.abs(netTakeHome).toFixed(2)}` : `$${netTakeHome.toFixed(2)}`;
+    }
+    if (receiptNetRow) {
+      receiptNetRow.classList.toggle('is-deficit', isDeficit);
+    }
+    if (receiptNetLabel) {
+      receiptNetLabel.textContent = isDeficit ? 'NET DEFICIT' : 'NET TAKE-HOME';
+    }
+    if (receiptNetSublabel) {
+      receiptNetSublabel.textContent = isDeficit ? 'Expenses exceed earnings' : 'Total pocket earnings';
+    }
   }
 
   function formatReceiptText(totals) {
@@ -4896,10 +4927,17 @@
 
     out.push(doubleDivider);
 
-    out.push(row('NET TAKE-HOME', `$${totals.netTakeHome.toFixed(2)}`));
+    const isDeficit = totals.netTakeHome < 0;
+    const netFormatted = isDeficit ? `-$${Math.abs(totals.netTakeHome).toFixed(2)}` : `$${totals.netTakeHome.toFixed(2)}`;
+    out.push(row(isDeficit ? 'NET DEFICIT' : 'NET TAKE-HOME', netFormatted));
     out.push(doubleDivider);
-    out.push(center('THANK YOU FOR YOUR WORK!'));
-    out.push(center('EVERY SHIFT ADDS UP 🐷'));
+    if (isDeficit) {
+      out.push(center('NET DEFICIT PERIOD'));
+      out.push(center('EXPENSES EXCEEDED EARNINGS ⚠️'));
+    } else {
+      out.push(center('THANK YOU FOR YOUR WORK!'));
+      out.push(center('EVERY SHIFT ADDS UP 🐷'));
+    }
     out.push(doubleDivider);
 
     return out.join('\n');
