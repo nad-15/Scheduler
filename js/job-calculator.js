@@ -1797,43 +1797,17 @@
           <!-- Config Section (Visible when Active Expense) -->
           ${isCustomExpense ? `
             <div class="job-calc-card-config">
-              ${isAllTab ? `
-                <div class="job-calc-adjust-bar">
-                  <button type="button" 
-                          class="job-calc-accordion-btn job-calc-custom-exp-accordion-btn ${isExpAccordionOpen ? 'active' : ''}" 
-                          title="Toggle split details">
-                    <span class="material-symbols-outlined job-calc-accordion-arrow">
-                      ${isExpAccordionOpen ? 'expand_less' : 'expand_more'}
-                    </span>
-                    <span>Adjust Splits (${cExp.splits.length})</span>
+              <div class="job-calc-groups-wrap">
+                ${customExpRowsHtml}
+              </div>
+              <div class="job-calc-adjust-bar is-split-mode">
+                <div class="job-calc-split-bar-left">
+                  <button type="button" class="job-calc-add-custom-exp-split-btn job-calc-add-split-btn" title="Add another expense split row">
+                    <span class="material-symbols-outlined">add</span>
+                    <span>Add Split</span>
                   </button>
                 </div>
-                <div class="job-calc-custom-accordion ${isExpAccordionOpen ? '' : 'hidden'}" style="margin-top: 8px;">
-                  <div class="job-calc-groups-wrap">
-                    ${customExpRowsHtml}
-                  </div>
-                  <div class="job-calc-adjust-bar is-split-mode">
-                    <div class="job-calc-split-bar-left">
-                      <button type="button" class="job-calc-add-custom-exp-split-btn job-calc-add-split-btn" title="Add another expense split row">
-                        <span class="material-symbols-outlined">add</span>
-                        <span>Add Split</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ` : `
-                <div class="job-calc-groups-wrap">
-                  ${customExpRowsHtml}
-                </div>
-                <div class="job-calc-adjust-bar is-split-mode">
-                  <div class="job-calc-split-bar-left">
-                    <button type="button" class="job-calc-add-custom-exp-split-btn job-calc-add-split-btn" title="Add another expense split row">
-                      <span class="material-symbols-outlined">add</span>
-                      <span>Add Split</span>
-                    </button>
-                  </div>
-                </div>
-              `}
+              </div>
             </div>
           ` : ''}
 
@@ -2004,43 +1978,17 @@
           <!-- Config Section (Visible when Active Paid) -->
           ${isCustomPaid ? `
             <div class="job-calc-card-config">
-              ${isAllTab ? `
-                <div class="job-calc-adjust-bar">
-                  <button type="button" 
-                          class="job-calc-accordion-btn job-calc-custom-job-accordion-btn ${isJobAccordionOpen ? 'active' : ''}" 
-                          title="Toggle split details">
-                    <span class="material-symbols-outlined job-calc-accordion-arrow">
-                      ${isJobAccordionOpen ? 'expand_less' : 'expand_more'}
-                    </span>
-                    <span>Adjust Splits (${cJob.splits.length})</span>
+              <div class="job-calc-groups-wrap">
+                ${customRowsHtml}
+              </div>
+              <div class="job-calc-adjust-bar is-split-mode">
+                <div class="job-calc-split-bar-left">
+                  <button type="button" class="job-calc-add-custom-split-btn job-calc-add-split-btn" title="Add another shift split row">
+                    <span class="material-symbols-outlined">add</span>
+                    <span>Add Split</span>
                   </button>
                 </div>
-                <div class="job-calc-custom-accordion ${isJobAccordionOpen ? '' : 'hidden'}" style="margin-top: 8px;">
-                  <div class="job-calc-groups-wrap">
-                    ${customRowsHtml}
-                  </div>
-                  <div class="job-calc-adjust-bar is-split-mode">
-                    <div class="job-calc-split-bar-left">
-                      <button type="button" class="job-calc-add-custom-split-btn job-calc-add-split-btn" title="Add another shift split row">
-                        <span class="material-symbols-outlined">add</span>
-                        <span>Add Split</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ` : `
-                <div class="job-calc-groups-wrap">
-                  ${customRowsHtml}
-                </div>
-                <div class="job-calc-adjust-bar is-split-mode">
-                  <div class="job-calc-split-bar-left">
-                    <button type="button" class="job-calc-add-custom-split-btn job-calc-add-split-btn" title="Add another shift split row">
-                      <span class="material-symbols-outlined">add</span>
-                      <span>Add Split</span>
-                    </button>
-                  </div>
-                </div>
-              `}
+              </div>
             </div>
           ` : ''}
 
