@@ -12924,6 +12924,15 @@ ic {
     transform: scale(0.96);
 }
 
+.receipt-action-btn.receipt-btn-download:hover {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.receipt-action-btn.receipt-btn-download:hover span.material-symbols-outlined {
+    color: #166534;
+}
 /* Jagged Tear-off Edge */
 .receipt-edge {
     height: 9px;

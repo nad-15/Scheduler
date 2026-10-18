@@ -835,7 +835,7 @@
 
   function ensureCalculatorDOM() {
     const existing = document.getElementById('job-calculator-container');
-    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#job-calc-post-tax-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.querySelector('#receipt-post-tax-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator') && !existing.querySelector('#job-calc-btn-quick-copy') && existing.querySelector('#job-calc-net-status-icon') && existing.querySelector('#job-calc-tax-symbol-toggle') && !existing.querySelector('#job-calc-tax-mode-toggle') && !existing.querySelector('#job-calc-tax-field #job-calc-tax-symbol-toggle')) {
+    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('EARNINGS STATEMENT') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#job-calc-post-tax-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.querySelector('#receipt-post-tax-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator') && !existing.querySelector('#job-calc-btn-quick-copy') && existing.querySelector('#job-calc-net-status-icon') && existing.querySelector('#job-calc-tax-symbol-toggle') && !existing.querySelector('#job-calc-tax-mode-toggle') && !existing.querySelector('#job-calc-tax-field #job-calc-tax-symbol-toggle') && existing.querySelector('#receipt-btn-download')) {
       return;
     }
 
@@ -1037,11 +1037,11 @@
         <!-- Retro "Receipt Ticket" Section (Swapped when user clicks View Breakdown) -->
         <section class="job-calc-receipt-wrapper" id="job-calc-receipt-wrapper" style="display: none;">
           <div class="job-calc-receipt-ticket" id="job-calc-receipt-ticket">
-            <!-- Top-Right Actions: Subtle Copy button -->
+            <!-- Top-Right Actions: Download Image button -->
             <div class="receipt-top-actions">
-              <button type="button" class="receipt-action-btn receipt-btn-copy" id="receipt-btn-copy" title="Copy breakdown ticket">
-                <span class="material-symbols-outlined">content_copy</span>
-                <span class="receipt-action-btn-text">Copy</span>
+              <button type="button" class="receipt-action-btn receipt-btn-download" id="receipt-btn-download" title="Save breakdown as image">
+                <span class="material-symbols-outlined">download</span>
+                <span class="receipt-action-btn-text">Save Image</span>
               </button>
             </div>
 
@@ -1051,12 +1051,16 @@
             <div class="receipt-inner">
               <!-- Header -->
               <div class="receipt-header">
-                <div class="receipt-brand">PAYSLIP</div>
-                <div class="receipt-badge">★ SHIFT BREAKDOWN ★</div>
+                <div class="receipt-brand">EARNINGS STATEMENT</div>
+                <div class="receipt-badge">★ SHIFT & EXPENSE BREAKDOWN ★</div>
                 <div class="receipt-meta">
                   <div class="receipt-meta-row">
                     <span>PERIOD:</span>
                     <span id="receipt-date-range">Selected Period</span>
+                  </div>
+                  <div class="receipt-meta-row">
+                    <span>GENERATED:</span>
+                    <span id="receipt-generated-date">Oct 18, 2026, 11:41 AM</span>
                   </div>
                 </div>
               </div>
@@ -1416,6 +1420,11 @@
       backSummaryBtn.addEventListener('click', swapToBreakdownSummary);
     }
 
+    const receiptDownloadBtn = container.querySelector('#receipt-btn-download');
+    if (receiptDownloadBtn) {
+      receiptDownloadBtn.addEventListener('click', handleDownloadReceiptImage);
+    }
+
     const receiptCopyBtn = container.querySelector('#receipt-btn-copy');
     if (receiptCopyBtn) {
       receiptCopyBtn.addEventListener('click', handleCopyReceipt);
@@ -1427,6 +1436,8 @@
         swapToReceiptTicket();
       } else if (e.target.closest('#job-calc-btn-back-summary, .job-calc-btn-back-summary')) {
         swapToBreakdownSummary();
+      } else if (e.target.closest('#receipt-btn-download, .receipt-btn-download')) {
+        handleDownloadReceiptImage();
       } else if (e.target.closest('#receipt-btn-copy, .receipt-btn-copy')) {
         handleCopyReceipt();
       } else if (e.target.closest('#job-calc-tax-symbol-toggle, .job-calc-tax-symbol-toggle')) {
@@ -4778,6 +4789,10 @@
       const t = parseIsoDate(state.toDate);
       rangeEl.textContent = `${formatDisplayDate(f)} — ${formatDisplayDate(t)}`;
     }
+    const genDateEl = container.querySelector('#receipt-generated-date');
+    if (genDateEl) {
+      genDateEl.textContent = formatGeneratedDate();
+    }
 
     // 2. Calendar Shifts Section
     const shiftsCountEl = container.querySelector('#receipt-shifts-count');
@@ -5022,10 +5037,11 @@
 
     let out = [];
     out.push(doubleDivider);
-    out.push(center('PAYSLIP'));
-    out.push(center('★ SHIFT BREAKDOWN ★'));
+    out.push(center('EARNINGS STATEMENT'));
+    out.push(center('★ SHIFT & EXPENSE BREAKDOWN ★'));
     out.push(doubleDivider);
     out.push(row('PERIOD', rangeStr));
+    out.push(row('GENERATED', formatGeneratedDate()));
     out.push(divider);
 
     // Paid Calendar Jobs & Custom Jobs
@@ -5141,6 +5157,710 @@
     out.push(doubleDivider);
 
     return out.join('\n');
+  }
+
+  /* ==========================================================================
+   * 8. Retro Receipt Canvas Image Generator & Download
+   * ========================================================================== */
+
+  function formatGeneratedDate(d = new Date()) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[d.getMonth()];
+    const day = d.getDate();
+    const year = d.getFullYear();
+    let hours = d.getHours();
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${month} ${day}, ${year}, ${hours}:${minutes} ${ampm}`;
+  }
+
+  function renderReceiptToCanvas() {
+    const totals = calculateTotals();
+    const {
+      totalHours,
+      grossEarnings,
+      taxableEarnings,
+      taxDeductionAmount,
+      postTaxIncome,
+      totalExpenses,
+      netTakeHome,
+      totalSessions,
+      jobResults,
+      customResults,
+      customExpenseResults
+    } = totals;
+
+    const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
+    const rangeEl = document.querySelector('#receipt-date-range');
+    const periodText = (rangeEl && rangeEl.textContent) ? rangeEl.textContent.trim() : 'Selected Period';
+    const genDateText = formatGeneratedDate();
+
+    // Prepare shift lines
+    const paidNames = Object.keys(scannedJobs).filter((name) => getJobSetting(name).isPaid);
+    const paidCustom = (state.settings.customJobs || []).filter((c) => c.isPaid !== false);
+
+    const shiftItems = [];
+    paidNames.forEach((name) => {
+      const setting = getJobSetting(name);
+      const res = jobResults?.[name] || { count: 0, totalHours: 0, subtotal: 0 };
+      const rate = parseFloat(setting.hourlyRate) || 0;
+      const hours = res.totalHours;
+      const count = res.count;
+      const subtotal = res.subtotal;
+      const isTaxable = setting.isTaxable !== false;
+
+      const jobTax = (taxDeductionAmount > 0 && isTaxable)
+        ? (taxSetting.type === 'percent'
+            ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+            : (taxableEarnings > 0 ? roundCents((subtotal / taxableEarnings) * taxDeductionAmount) : 0))
+        : 0;
+      const jobNet = Math.max(0, roundCents(subtotal - jobTax));
+
+      shiftItems.push({
+        name,
+        detail: `${hours.toFixed(1)}h (${count}x) @ $${rate.toFixed(2)}/hr`,
+        taxSubline: taxDeductionAmount > 0
+          ? (isTaxable ? `Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}` : `Untaxed · Net: $${subtotal.toFixed(2)}`)
+          : null,
+        amount: `$${subtotal.toFixed(2)}`,
+        isCustom: false,
+        isUntaxed: !isTaxable
+      });
+    });
+
+    paidCustom.forEach((cJob) => {
+      const res = customResults?.[cJob.id] || { count: 1, totalHours: 0, subtotal: 0 };
+      const hours = res.totalHours;
+      const rate = parseFloat(cJob.hourlyRate) || 0;
+      const count = res.count;
+      const subtotal = res.subtotal;
+      const isTaxable = cJob.isTaxable === true;
+
+      const jobTax = (taxDeductionAmount > 0 && isTaxable)
+        ? (taxSetting.type === 'percent'
+            ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+            : (taxableEarnings > 0 ? roundCents((subtotal / taxableEarnings) * taxDeductionAmount) : 0))
+        : 0;
+      const jobNet = Math.max(0, roundCents(subtotal - jobTax));
+
+      shiftItems.push({
+        name: cJob.name || 'Untitled',
+        detail: `${hours.toFixed(1)}h (${count}x) @ $${rate.toFixed(2)}/hr`,
+        taxSubline: taxDeductionAmount > 0
+          ? (isTaxable ? `Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}` : `Untaxed · Net: $${subtotal.toFixed(2)}`)
+          : null,
+        amount: `$${subtotal.toFixed(2)}`,
+        isCustom: true,
+        tag: 'EARNINGS',
+        isUntaxed: !isTaxable
+      });
+    });
+
+    // Prepare expense lines
+    const expItems = [];
+    if (totalExpenses > 0) {
+      const expCalendarNames = Object.keys(scannedJobs).filter((name) => {
+        const s = getJobSetting(name);
+        const res = jobResults[name];
+        return s.isExpense && ((res?.expenseTotal || 0) > 0);
+      });
+      const customExps = (state.settings.customExpenses || []).filter((e) => e.isExpense !== false && ((customExpenseResults?.[e.id]?.amount || 0) > 0));
+
+      expCalendarNames.forEach((name) => {
+        const res = jobResults[name];
+        const count = res?.count || (scannedJobs[name]?.occurrences.length || 1);
+        const amt = res?.expenseTotal || 0;
+        if (amt > 0) {
+          expItems.push({
+            name,
+            detail: `Calendar expense (${count}x)`,
+            amount: `-$${amt.toFixed(2)}`,
+            isCustom: false
+          });
+        }
+      });
+
+      customExps.forEach((cExp) => {
+        const res = customExpenseResults?.[cExp.id];
+        const amt = res ? res.amount : (parseFloat(cExp.amount) || 0);
+        const count = res?.count ?? 1;
+        const detail = res?.isPercent
+          ? `Custom Expense (${res.percentValue}% of post-tax)`
+          : `Custom Expense (${count}x)`;
+        if (amt > 0) {
+          expItems.push({
+            name: cExp.name || 'Untitled',
+            detail,
+            amount: `-$${amt.toFixed(2)}`,
+            isCustom: true,
+            tag: 'EXPENSES'
+          });
+        }
+      });
+    }
+
+    // Dynamic Height Calculation
+    const logicalWidth = 460;
+    const padX = 26;
+    const contentW = logicalWidth - padX * 2;
+    const dpr = 2; // Crisp 2x retina display
+
+    let totalHeight = 24; // Top padding & tear edge
+    totalHeight += 28;    // Brand title "EARNINGS STATEMENT"
+    totalHeight += 20;    // Badge "★ SHIFT & EXPENSE BREAKDOWN ★"
+    totalHeight += 12;    // Gap
+    totalHeight += 18;    // PERIOD row
+    totalHeight += 18;    // GENERATED row
+    totalHeight += 14;    // Gap before dash divider
+    totalHeight += 14;    // Dashed divider
+
+    // Shifts section
+    totalHeight += 24;    // Section header "CALENDAR SHIFTS"
+    if (shiftItems.length === 0) {
+      totalHeight += 26;
+    } else {
+      shiftItems.forEach((item) => {
+        totalHeight += item.taxSubline ? 52 : 36;
+      });
+    }
+    totalHeight += 26;    // Shifts subtotal row
+    totalHeight += 14;    // Gap & divider
+    totalHeight += 14;
+
+    // Gross row
+    totalHeight += 26;
+
+    // Tax Deduction & Post-Tax (if tax > 0)
+    if (taxDeductionAmount > 0) {
+      totalHeight += 14;  // divider
+      totalHeight += 38;  // tax deduction row + detail
+      totalHeight += 14;  // divider
+      totalHeight += 26;  // post-tax earnings row
+    }
+
+    // Expenses section (if expenses > 0)
+    if (totalExpenses > 0) {
+      totalHeight += 14;  // divider
+      totalHeight += 24;  // Expenses header
+      totalHeight += expItems.length * 36;
+      totalHeight += 26;  // Expenses subtotal row
+    }
+
+    // Double divider
+    totalHeight += 16;
+
+    // Net Take-Home Hero Box
+    totalHeight += 66;
+
+    // Double divider
+    totalHeight += 16;
+
+    // Footer
+    totalHeight += 36;   // Barcode
+    totalHeight += 18;   // "THANK YOU FOR YOUR HARD WORK!"
+    totalHeight += 18;   // "EVERY SHIFT ADDS UP 🐷"
+    totalHeight += 26;   // Bottom jagged edge & margin
+
+    // Setup Canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(logicalWidth * dpr);
+    canvas.height = Math.round(totalHeight * dpr);
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // Helpers
+    const fontPrimary = "'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+    const teethCount = Math.round(logicalWidth / 14);
+    const toothW = logicalWidth / teethCount;
+    const toothH = 6;
+    const topY = 10;
+    const botY = totalHeight - 12;
+
+    // 1. Draw Receipt Paper with Jagged Edges
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(0, topY);
+    for (let i = 0; i < teethCount; i++) {
+      const x = i * toothW;
+      ctx.lineTo(x + toothW / 2, topY - toothH);
+      ctx.lineTo(x + toothW, topY);
+    }
+    ctx.lineTo(logicalWidth, botY);
+    for (let i = teethCount - 1; i >= 0; i--) {
+      const x = i * toothW;
+      ctx.lineTo(x + toothW / 2, botY + toothH);
+      ctx.lineTo(x, botY);
+    }
+    ctx.closePath();
+
+    ctx.fillStyle = '#fffdf9';
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.stroke();
+    ctx.restore();
+
+    let currY = 34;
+
+    // 2. Header
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = `900 18px ${fontPrimary}`;
+    ctx.fillText('EARNINGS STATEMENT', logicalWidth / 2, currY);
+    currY += 19;
+
+    ctx.fillStyle = '#475569';
+    ctx.font = `700 10.5px ${fontPrimary}`;
+    ctx.fillText('★ SHIFT & EXPENSE BREAKDOWN ★', logicalWidth / 2, currY);
+    currY += 18;
+
+    // 3. Meta Rows
+    ctx.font = `600 11px ${fontPrimary}`;
+    // Period
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('PERIOD:', padX, currY);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#334155';
+    ctx.fillText(periodText, logicalWidth - padX, currY);
+    currY += 16;
+
+    // Generated
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('GENERATED:', padX, currY);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#334155';
+    ctx.fillText(genDateText, logicalWidth - padX, currY);
+    currY += 12;
+
+    function drawDashDivider(y) {
+      ctx.save();
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padX, y);
+      ctx.lineTo(logicalWidth - padX, y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawDoubleDivider(y) {
+      ctx.save();
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(padX, y);
+      ctx.lineTo(logicalWidth - padX, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(padX, y + 3);
+      ctx.lineTo(logicalWidth - padX, y + 3);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function truncate(text, maxW) {
+      if (ctx.measureText(text).width <= maxW) return text;
+      let s = text;
+      while (s.length > 0 && ctx.measureText(s + '...').width > maxW) {
+        s = s.slice(0, -1);
+      }
+      return s + '...';
+    }
+
+    // Divider
+    drawDashDivider(currY);
+    currY += 16;
+
+    // 4. Shifts Section Header
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#334155';
+    ctx.font = `800 11px ${fontPrimary}`;
+    ctx.fillText('CALENDAR SHIFTS', padX, currY);
+    ctx.textAlign = 'right';
+    ctx.font = `700 11px ${fontPrimary}`;
+    ctx.fillText(`${totalSessions}x`, logicalWidth - padX, currY);
+    currY += 18;
+
+    // Shift Items
+    if (shiftItems.length === 0) {
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = `italic 12px ${fontPrimary}`;
+      ctx.fillText('No earnings selected', padX, currY);
+      ctx.textAlign = 'right';
+      ctx.fillText('$0.00', logicalWidth - padX, currY);
+      currY += 22;
+    } else {
+      shiftItems.forEach((item) => {
+        // Line 1: Name, Tag, Amount
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#0f172a';
+        ctx.font = `700 12.5px ${fontPrimary}`;
+        const nameStr = truncate(item.name, contentW - (item.tag ? 150 : 90));
+        ctx.fillText(nameStr, padX, currY);
+
+        if (item.tag) {
+          ctx.save();
+          ctx.font = `700 8.5px ${fontPrimary}`;
+          const tagTextW = ctx.measureText(item.tag).width;
+          const nameTextW = ctx.measureText(nameStr).width;
+          const badgeX = padX + nameTextW + 6;
+          const badgeW = tagTextW + 8;
+          ctx.fillStyle = '#dcfce7';
+          if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(badgeX, currY - 9, badgeW, 12, 3);
+            ctx.fill();
+          } else {
+            ctx.fillRect(badgeX, currY - 9, badgeW, 12);
+          }
+          ctx.fillStyle = '#15803d';
+          ctx.fillText(item.tag, badgeX + 4, currY - 0.5);
+          ctx.restore();
+        }
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#0f172a';
+        ctx.font = `700 12.5px ${fontPrimary}`;
+        ctx.fillText(item.amount, logicalWidth - padX, currY);
+        currY += 15;
+
+        // Line 2: Detail
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#64748b';
+        ctx.font = `500 10.5px ${fontPrimary}`;
+        ctx.fillText(truncate(item.detail, contentW - 10), padX, currY);
+        currY += 14;
+
+        // Line 3 (if tax applied): Tax & Net subline
+        if (item.taxSubline) {
+          ctx.textAlign = 'left';
+          ctx.font = `600 10px ${fontPrimary}`;
+          if (item.isUntaxed) {
+            ctx.fillStyle = '#d97706';
+            ctx.fillText('Untaxed', padX, currY);
+            const utW = ctx.measureText('Untaxed').width;
+            ctx.fillStyle = '#64748b';
+            ctx.fillText(' · ', padX + utW, currY);
+            const dotW = ctx.measureText(' · ').width;
+            ctx.fillStyle = '#059669';
+            ctx.font = `700 10px ${fontPrimary}`;
+            ctx.fillText(`Net: ${item.amount}`, padX + utW + dotW, currY);
+          } else {
+            const parts = item.taxSubline.split('·');
+            const taxPart = (parts[0] || '').trim();
+            const netPart = (parts[1] || '').trim();
+            ctx.fillStyle = '#d97706';
+            ctx.fillText(taxPart, padX, currY);
+            const taxW = ctx.measureText(taxPart).width;
+            ctx.fillStyle = '#64748b';
+            ctx.fillText(' · ', padX + taxW, currY);
+            const dotW = ctx.measureText(' · ').width;
+            ctx.fillStyle = '#059669';
+            ctx.font = `700 10px ${fontPrimary}`;
+            ctx.fillText(netPart, padX + taxW + dotW, currY);
+          }
+          currY += 15;
+        }
+
+        currY += 6;
+      });
+    }
+
+    // Shifts Subtotal
+    ctx.save();
+    ctx.setLineDash([2, 3]);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.beginPath();
+    ctx.moveTo(padX, currY - 4);
+    ctx.lineTo(logicalWidth - padX, currY - 4);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#475569';
+    ctx.font = `700 11.5px ${fontPrimary}`;
+    ctx.fillText(`SHIFTS TOTAL (${totalHours.toFixed(1)}h)`, padX, currY + 10);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = `700 12px ${fontPrimary}`;
+    ctx.fillText(`$${grossEarnings.toFixed(2)}`, logicalWidth - padX, currY + 10);
+    currY += 22;
+
+    // Divider
+    drawDashDivider(currY);
+    currY += 16;
+
+    // 5. Gross Earnings Row
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = `900 13.5px ${fontPrimary}`;
+    ctx.fillText('GROSS EARNINGS', padX, currY);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#059669';
+    ctx.font = `900 14.5px ${fontPrimary}`;
+    ctx.fillText(`$${grossEarnings.toFixed(2)}`, logicalWidth - padX, currY);
+    currY += 14;
+
+    // 6. Tax Deduction & Post-Tax (if tax > 0)
+    if (taxDeductionAmount > 0) {
+      drawDashDivider(currY + 4);
+      currY += 18;
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = `700 12px ${fontPrimary}`;
+      ctx.fillText('Total Tax Deduction', padX, currY);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#d97706';
+      ctx.font = `700 12.5px ${fontPrimary}`;
+      ctx.fillText(`-$${taxDeductionAmount.toFixed(2)}`, logicalWidth - padX, currY);
+      currY += 14;
+
+      // Tax detail line (e.g. "(10% of taxable)" or "($25.00 flat)")
+      const taxDetailStr = taxSetting.type === 'percent'
+        ? `(${taxSetting.value}% of taxable)`
+        : `($${parseFloat(taxSetting.value || 0).toFixed(2)} flat)`;
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#64748b';
+      ctx.font = `500 10px ${fontPrimary}`;
+      ctx.fillText(taxDetailStr, padX, currY);
+      currY += 15;
+
+      drawDashDivider(currY + 4);
+      currY += 18;
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = `800 13px ${fontPrimary}`;
+      ctx.fillText('POST-TAX EARNINGS', padX, currY);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#0284c7';
+      ctx.font = `800 13.5px ${fontPrimary}`;
+      ctx.fillText(`$${postTaxIncome.toFixed(2)}`, logicalWidth - padX, currY);
+      currY += 14;
+    }
+
+    // 7. Expenses (if expenses > 0)
+    if (totalExpenses > 0) {
+      drawDashDivider(currY + 4);
+      currY += 18;
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#334155';
+      ctx.font = `800 11px ${fontPrimary}`;
+      ctx.fillText('EXPENSES', padX, currY);
+      ctx.textAlign = 'right';
+      ctx.font = `700 11px ${fontPrimary}`;
+      ctx.fillText(`${expItems.length}x`, logicalWidth - padX, currY);
+      currY += 18;
+
+      expItems.forEach((item) => {
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#0f172a';
+        ctx.font = `700 12.5px ${fontPrimary}`;
+        const nameStr = truncate(item.name, contentW - (item.tag ? 150 : 90));
+        ctx.fillText(nameStr, padX, currY);
+
+        if (item.tag) {
+          ctx.save();
+          ctx.font = `700 8.5px ${fontPrimary}`;
+          const tagTextW = ctx.measureText(item.tag).width;
+          const nameTextW = ctx.measureText(nameStr).width;
+          const badgeX = padX + nameTextW + 6;
+          const badgeW = tagTextW + 8;
+          ctx.fillStyle = '#ffedd5';
+          if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(badgeX, currY - 9, badgeW, 12, 3);
+            ctx.fill();
+          } else {
+            ctx.fillRect(badgeX, currY - 9, badgeW, 12);
+          }
+          ctx.fillStyle = '#c2410c';
+          ctx.fillText(item.tag, badgeX + 4, currY - 0.5);
+          ctx.restore();
+        }
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#dc2626';
+        ctx.font = `700 12.5px ${fontPrimary}`;
+        ctx.fillText(item.amount, logicalWidth - padX, currY);
+        currY += 15;
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#64748b';
+        ctx.font = `500 10.5px ${fontPrimary}`;
+        ctx.fillText(truncate(item.detail, contentW - 10), padX, currY);
+        currY += 18;
+      });
+
+      // Expenses Subtotal
+      ctx.save();
+      ctx.setLineDash([2, 3]);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.beginPath();
+      ctx.moveTo(padX, currY - 4);
+      ctx.lineTo(logicalWidth - padX, currY - 4);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#475569';
+      ctx.font = `700 11.5px ${fontPrimary}`;
+      ctx.fillText('EXPENSES TOTAL', padX, currY + 10);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#dc2626';
+      ctx.font = `700 12px ${fontPrimary}`;
+      ctx.fillText(`-$${totalExpenses.toFixed(2)}`, logicalWidth - padX, currY + 10);
+      currY += 22;
+    }
+
+    // 8. Double Divider before Net Box
+    currY += 6;
+    drawDoubleDivider(currY);
+    currY += 16;
+
+    // 9. Net Take-Home Hero Box
+    const isDeficit = netTakeHome < 0;
+    const boxH = 58;
+    const boxR = 6;
+
+    ctx.save();
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(padX, currY, contentW, boxH, boxR);
+    } else {
+      ctx.rect(padX, currY, contentW, boxH);
+    }
+    ctx.fillStyle = isDeficit ? '#fef2f2' : '#ecfdf5';
+    ctx.fill();
+
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = isDeficit ? '#f87171' : '#10b981';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+
+    // Box text
+    ctx.textAlign = 'left';
+    ctx.fillStyle = isDeficit ? '#991b1b' : '#065f46';
+    ctx.font = `900 13px ${fontPrimary}`;
+    ctx.fillText('NET TAKE-HOME', padX + 14, currY + 24);
+
+    ctx.fillStyle = isDeficit ? '#b91c1c' : '#047857';
+    ctx.font = `600 10px ${fontPrimary}`;
+    ctx.fillText('Total pocket earnings', padX + 14, currY + 42);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = isDeficit ? '#dc2626' : '#047857';
+    ctx.font = `900 20px ${fontPrimary}`;
+    ctx.fillText(`$${netTakeHome.toFixed(2)}`, logicalWidth - padX - 14, currY + 36);
+
+    currY += boxH + 12;
+
+    // 10. Double Divider after Net Box
+    drawDoubleDivider(currY);
+    currY += 18;
+
+    // 11. Footer: Barcode and Message
+    ctx.save();
+    const barcodeW = 240;
+    const barcodeX = (logicalWidth - barcodeW) / 2;
+    const barcodeH = 22;
+    ctx.fillStyle = '#334155';
+    const pattern = [3, 2, 1, 3, 2, 4, 1, 2, 3, 1, 4, 2, 1, 3, 2, 1, 4, 3, 2, 1, 3, 2, 4, 1, 2, 3, 1, 2, 4, 2, 1, 3, 2, 1, 4, 2];
+    let bx = barcodeX;
+    pattern.forEach((w, idx) => {
+      if (idx % 2 === 0) {
+        ctx.fillRect(bx, currY, w, barcodeH);
+      }
+      bx += w + 2;
+    });
+    ctx.restore();
+    currY += barcodeH + 16;
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#475569';
+    ctx.font = `800 10.5px ${fontPrimary}`;
+    ctx.fillText('THANK YOU FOR YOUR HARD WORK!', logicalWidth / 2, currY);
+    currY += 15;
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = `600 10px ${fontPrimary}`;
+    ctx.fillText('EVERY SHIFT ADDS UP 🐷', logicalWidth / 2, currY);
+
+    return canvas;
+  }
+
+  function handleDownloadReceiptImage() {
+    const btn = document.querySelector('#receipt-btn-download');
+    const originalHtml = btn ? btn.innerHTML : '';
+
+    if (btn) {
+      btn.innerHTML = `
+        <span class="material-symbols-outlined" style="font-size: 14px; color: #0284c7;">hourglass_empty</span>
+        <span class="receipt-action-btn-text" style="color: #0284c7;">Saving...</span>
+      `;
+    }
+
+    setTimeout(() => {
+      try {
+        const canvas = renderReceiptToCanvas();
+        const rangeEl = document.querySelector('#receipt-date-range');
+        const periodStr = (rangeEl?.textContent || 'statement')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+        const filename = `earnings-statement-${periodStr || 'breakdown'}.png`;
+
+        const finishDownloadSuccess = () => {
+          showToastNotification('Earnings Statement image saved! 📸');
+          if (btn) {
+            btn.innerHTML = `
+              <span class="material-symbols-outlined" style="font-size: 14px; color: #16a34a;">check</span>
+              <span class="receipt-action-btn-text" style="color: #16a34a;">Saved!</span>
+            `;
+            setTimeout(() => {
+              if (btn) btn.innerHTML = originalHtml;
+            }, 1800);
+          }
+        };
+
+        if (canvas.toBlob) {
+          canvas.toBlob((blob) => {
+            if (!blob) throw new Error('Blob creation failed');
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+            finishDownloadSuccess();
+          }, 'image/png');
+        } else {
+          const dataUrl = canvas.toDataURL('image/png');
+          const a = document.createElement('a');
+          a.href = dataUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          finishDownloadSuccess();
+        }
+      } catch (err) {
+        console.error('Failed to download earnings statement image:', err);
+        showToastNotification('Failed to generate image. Please try again.');
+        if (btn) btn.innerHTML = originalHtml;
+      }
+    }, 60);
   }
 
   function handleCopyReceipt() {
