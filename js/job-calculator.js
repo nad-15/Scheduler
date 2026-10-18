@@ -3654,16 +3654,24 @@
       });
 
       input.addEventListener('blur', (e) => {
-        if (!e.target.value.trim()) {
-          e.target.value = 'Untitled';
-          const card = e.target.closest('.job-calc-custom-card');
-          if (!card) return;
-          const customId = card.dataset.customId;
-          const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
-          if (cJob) {
-            cJob.name = 'Untitled';
-            saveSettings();
-          }
+        const val = e.target.value.trim();
+        const finalName = val || 'Untitled';
+        e.target.value = finalName;
+        const card = e.target.closest('.job-calc-custom-card');
+        if (!card) return;
+        const customId = card.dataset.customId;
+        const cJob = (state.settings.customJobs || []).find((c) => c.id === customId);
+        if (cJob) {
+          cJob.name = finalName;
+          saveSettings();
+          updateSummaryCard();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
         }
       });
     });
@@ -4003,16 +4011,24 @@
       });
 
       input.addEventListener('blur', (e) => {
-        if (!e.target.value.trim()) {
-          e.target.value = 'Untitled';
-          const card = e.target.closest('.job-calc-expense-card');
-          if (!card) return;
-          const expId = card.dataset.expenseId;
-          const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
-          if (cExp) {
-            cExp.name = 'Untitled';
-            saveSettings();
-          }
+        const val = e.target.value.trim();
+        const finalName = val || 'Untitled';
+        e.target.value = finalName;
+        const card = e.target.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        if (cExp) {
+          cExp.name = finalName;
+          saveSettings();
+          updateSummaryCard();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
         }
       });
     });
@@ -4761,6 +4777,49 @@
    * 8. Retro Receipt Ticket Updater & Export
    * ========================================================================== */
 
+  function getCalendarExpenseDetail(name, setting, count, totalAmt) {
+    if (setting && setting.expenseAdjustMode !== 'date') {
+      const splits = getJobExpenseSplits(scannedJobs[name], setting, count, parseFloat(setting.expenseAmount) || 0);
+      const activeSplits = (splits || []).filter((s) => (parseInt(s.shifts, 10) || 0) > 0);
+      if (activeSplits.length === 1) {
+        const rate = parseFloat(activeSplits[0].amount) || 0;
+        return `${count}x @ $${rate.toFixed(2)}`;
+      }
+      if (activeSplits.length > 1) {
+        return activeSplits.map((s) => `${s.shifts}x @ $${(parseFloat(s.amount) || 0).toFixed(2)}`).join(', ');
+      }
+    }
+    if (count > 0 && totalAmt > 0) {
+      const avg = totalAmt / count;
+      return `${count}x @ $${avg.toFixed(2)}`;
+    }
+    const defaultRate = parseFloat(setting?.expenseAmount) || 0;
+    return `${count || 1}x @ $${defaultRate.toFixed(2)}`;
+  }
+
+  function getCustomExpenseDetail(cExp, res, postTaxIncome) {
+    if (res?.isPercent || cExp.type === 'percent') {
+      const pct = res?.percentValue ?? (parseFloat(cExp.percentValue) || 10);
+      const base = typeof postTaxIncome === 'number' ? postTaxIncome : 0;
+      return base > 0 ? `${pct}% of post-tax ($${base.toFixed(2)})` : `${pct}% of post-tax`;
+    }
+
+    const splits = (res?.splits && res.splits.length > 0) ? res.splits : (cExp.splits || [{ qty: res?.count || 1, amount: parseFloat(cExp.amount) || 0 }]);
+    const activeSplits = splits.filter((s) => (parseInt(s.qty, 10) || 0) > 0);
+    if (activeSplits.length === 1) {
+      const q = parseInt(activeSplits[0].qty, 10) || 1;
+      const a = parseFloat(activeSplits[0].amount) || 0;
+      return `${q}x @ $${a.toFixed(2)}`;
+    }
+    if (activeSplits.length > 1) {
+      return activeSplits.map((s) => `${s.qty}x @ $${(parseFloat(s.amount) || 0).toFixed(2)}`).join(', ');
+    }
+
+    const count = res?.count ?? 1;
+    const amt = parseFloat(cExp.amount) || (res ? res.amount : 0);
+    return `${count}x @ $${amt.toFixed(2)}`;
+  }
+
   function updateReceiptTicket() {
     const container = document.getElementById('job-calculator-container');
     if (!container) return;
@@ -4920,11 +4979,12 @@
           const count = res?.count || (scannedJobs[name]?.occurrences.length || 1);
           const totalAmt = res?.expenseTotal !== undefined ? res.expenseTotal : ((parseFloat(setting.expenseAmount) || 0) * count);
           if (totalAmt > 0) {
+            const detailText = getCalendarExpenseDetail(name, setting, count, totalAmt);
             expHtml += `
               <div class="receipt-item-row">
                 <div class="receipt-item-title-col">
                   <span class="receipt-item-name">${escapeHtml(name)}</span>
-                  <span class="receipt-item-detail">Calendar expense (${count}x)</span>
+                  <span class="receipt-item-detail">${escapeHtml(detailText)}</span>
                 </div>
                 <span class="receipt-item-amount receipt-item-deduction">-$${totalAmt.toFixed(2)}</span>
               </div>
@@ -4935,16 +4995,13 @@
         customExps.forEach((cExp) => {
           const res = customExpenseResults?.[cExp.id];
           const amt = res ? res.amount : (parseFloat(cExp.amount) || 0);
-          const count = res?.count ?? 1;
-          const detailText = res?.isPercent
-            ? `Custom Expense (${res.percentValue}% of post-tax)`
-            : `Custom Expense (${count}x)`;
           if (amt > 0) {
+            const detailText = getCustomExpenseDetail(cExp, res, postTaxIncome);
             expHtml += `
               <div class="receipt-item-row">
                 <div class="receipt-item-title-col">
                   <span class="receipt-item-name">${escapeHtml(cExp.name || 'Untitled')} <span class="receipt-item-tag-expense">EXPENSES</span></span>
-                  <span class="receipt-item-detail">${detailText}</span>
+                  <span class="receipt-item-detail">${escapeHtml(detailText)}</span>
                 </div>
                 <span class="receipt-item-amount receipt-item-deduction">-$${amt.toFixed(2)}</span>
               </div>
@@ -5116,11 +5173,13 @@
         return s.isExpense && ((res?.expenseTotal || 0) > 0);
       });
       expCalendarNames.forEach((name) => {
+        const s = getJobSetting(name);
         const res = totals.jobResults?.[name];
         const count = res?.count || (scannedJobs[name]?.occurrences.length || 1);
         const totalAmt = res?.expenseTotal || 0;
         if (totalAmt > 0) {
-          out.push(row(`  ${name} (${count}x)`, `-$${totalAmt.toFixed(2)}`));
+          const detail = getCalendarExpenseDetail(name, s, count, totalAmt);
+          out.push(row(`  ${name} (${detail})`, `-$${totalAmt.toFixed(2)}`));
         }
       });
 
@@ -5128,10 +5187,9 @@
         if (cExp.isExpense !== false) {
           const res = totals.customExpenseResults?.[cExp.id];
           const amt = res ? res.amount : (parseFloat(cExp.amount) || 0);
-          const count = res?.count ?? 1;
-          const countOrPct = res?.isPercent ? `${res.percentValue}% of post-tax` : `${count}x`;
           if (amt > 0) {
-            out.push(row(`  ${cExp.name || 'Untitled'} [Expenses] (${countOrPct})`, `-$${amt.toFixed(2)}`));
+            const detail = getCustomExpenseDetail(cExp, res, totals.postTaxIncome);
+            out.push(row(`  ${cExp.name || 'Untitled'} [Expenses] (${detail})`, `-$${amt.toFixed(2)}`));
           }
         }
       });
@@ -5266,13 +5324,14 @@
       const customExps = (state.settings.customExpenses || []).filter((e) => e.isExpense !== false && ((customExpenseResults?.[e.id]?.amount || 0) > 0));
 
       expCalendarNames.forEach((name) => {
+        const s = getJobSetting(name);
         const res = jobResults[name];
         const count = res?.count || (scannedJobs[name]?.occurrences.length || 1);
         const amt = res?.expenseTotal || 0;
         if (amt > 0) {
           expItems.push({
             name,
-            detail: `Calendar expense (${count}x)`,
+            detail: getCalendarExpenseDetail(name, s, count, amt),
             amount: `-$${amt.toFixed(2)}`,
             isCustom: false
           });
@@ -5282,14 +5341,10 @@
       customExps.forEach((cExp) => {
         const res = customExpenseResults?.[cExp.id];
         const amt = res ? res.amount : (parseFloat(cExp.amount) || 0);
-        const count = res?.count ?? 1;
-        const detail = res?.isPercent
-          ? `Custom Expense (${res.percentValue}% of post-tax)`
-          : `Custom Expense (${count}x)`;
         if (amt > 0) {
           expItems.push({
             name: cExp.name || 'Untitled',
-            detail,
+            detail: getCustomExpenseDetail(cExp, res, postTaxIncome),
             amount: `-$${amt.toFixed(2)}`,
             isCustom: true,
             tag: 'EXPENSES'
