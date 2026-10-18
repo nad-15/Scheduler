@@ -12044,6 +12044,50 @@ ic {
     }
 }
 
+/* Percent-Based Custom Expense */
+.job-calc-percent-exp-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 0;
+}
+
+.job-calc-percent-of-wrap {
+    display: flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 4px;
+}
+
+.job-calc-percent-of-text {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-calc-percent-of-text strong {
+    color: #0f172a;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.job-calc-percent-calc-hint {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #94a3b8;
+    font-style: italic;
+    padding: 0 4px;
+}
+
+.job-calc-custom-exp-type-toggle .material-symbols-outlined {
+    color: #dc2626;
+}
+
 /* Swipeable Split Row Item */
 .job-calc-split-row-item {
     position: relative;

@@ -93,6 +93,8 @@
             })) : [],
             customExpenses: Array.isArray(parsed.customExpenses) ? parsed.customExpenses.map((e) => ({
               ...e,
+              type: e.type === 'percent' ? 'percent' : 'fixed',
+              percentValue: typeof e.percentValue === 'number' ? e.percentValue : (parseFloat(e.percentValue) || 10),
               splits: Array.isArray(e.splits) && e.splits.length > 0 ? e.splits : [{ qty: 1, amount: typeof e.amount === 'number' ? e.amount : (parseFloat(e.amount) || 25) }]
             })) : []
           };
@@ -236,6 +238,8 @@
         id: e.id,
         name: e.name || 'Untitled',
         isExpense: e.isExpense !== false,
+        type: e.type === 'percent' ? 'percent' : 'fixed',
+        percentValue: typeof e.percentValue === 'number' ? e.percentValue : (parseFloat(e.percentValue) || 10),
         amount: typeof e.amount === 'number' ? e.amount : (parseFloat(e.amount) || 0),
         splits: Array.isArray(e.splits) && e.splits.length > 0 ? e.splits.map((s) => ({
           qty: parseInt(s.qty, 10) || 1,
@@ -735,41 +739,6 @@
       }
     });
 
-    // Custom / Off-calendar expenses
-    const customExpenseResults = {};
-    (state.settings.customExpenses || []).forEach((cExp) => {
-      const splits = Array.isArray(cExp.splits) && cExp.splits.length > 0 ? cExp.splits : [{ qty: 1, amount: parseFloat(cExp.amount) || 0 }];
-      let totalQty = 0;
-      let totalExpAmt = 0;
-      splits.forEach((s) => {
-        const q = parseInt(s.qty, 10) || 0;
-        const a = parseFloat(s.amount) || 0;
-        totalQty += q;
-        totalExpAmt += (q * a);
-      });
-      totalExpAmt = roundCents(totalExpAmt);
-
-      if (cExp.isExpense !== false) {
-        totalExpenses += totalExpAmt;
-        customExpenseResults[cExp.id] = {
-          id: cExp.id,
-          name: cExp.name || 'Expense',
-          count: totalQty,
-          amount: totalExpAmt,
-          splits: splits
-        };
-      } else {
-        customExpenseResults[cExp.id] = {
-          id: cExp.id,
-          name: cExp.name || 'Expense',
-          count: totalQty,
-          amount: 0,
-          splits: splits,
-          isExcluded: true
-        };
-      }
-    });
-
     // Tax calculation based on TAXABLE earnings
     const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
     const taxVal = parseFloat(taxSetting.value) || 0;
@@ -786,6 +755,58 @@
       taxDeductionAmount = Math.min(taxableEarnings, Math.max(0, taxDeductionAmount));
     }
 
+    // Post-tax income: basis for percentage-based custom expenses
+    const postTaxIncome = Math.max(0, roundCents(grossEarnings - taxDeductionAmount));
+
+    // Custom / Off-calendar expenses
+    const customExpenseResults = {};
+    (state.settings.customExpenses || []).forEach((cExp) => {
+      const isPercent = cExp.type === 'percent';
+      const pctVal = typeof cExp.percentValue === 'number' ? cExp.percentValue : (parseFloat(cExp.percentValue) || 10);
+
+      const splits = Array.isArray(cExp.splits) && cExp.splits.length > 0 ? cExp.splits : [{ qty: 1, amount: parseFloat(cExp.amount) || 0 }];
+      let totalQty = 0;
+      let totalFixedAmt = 0;
+      splits.forEach((s) => {
+        const q = parseInt(s.qty, 10) || 0;
+        const a = parseFloat(s.amount) || 0;
+        totalQty += q;
+        totalFixedAmt += (q * a);
+      });
+      totalFixedAmt = roundCents(totalFixedAmt);
+
+      let totalExpAmt = 0;
+      if (isPercent) {
+        totalExpAmt = postTaxIncome > 0 ? roundCents((postTaxIncome * pctVal) / 100) : 0;
+      } else {
+        totalExpAmt = totalFixedAmt;
+      }
+
+      if (cExp.isExpense !== false) {
+        totalExpenses += totalExpAmt;
+        customExpenseResults[cExp.id] = {
+          id: cExp.id,
+          name: cExp.name || 'Expense',
+          count: isPercent ? 1 : totalQty,
+          amount: totalExpAmt,
+          splits: splits,
+          isPercent: isPercent,
+          percentValue: pctVal
+        };
+      } else {
+        customExpenseResults[cExp.id] = {
+          id: cExp.id,
+          name: cExp.name || 'Expense',
+          count: isPercent ? 1 : totalQty,
+          amount: 0,
+          splits: splits,
+          isExcluded: true,
+          isPercent: isPercent,
+          percentValue: pctVal
+        };
+      }
+    });
+
     grossEarnings = roundCents(grossEarnings);
     taxableEarnings = roundCents(taxableEarnings);
     totalExpenses = roundCents(totalExpenses);
@@ -799,6 +820,7 @@
       grossEarnings,
       taxableEarnings,
       taxDeductionAmount,
+      postTaxIncome,
       totalExpenses,
       netTakeHome,
       jobResults,
@@ -1466,6 +1488,8 @@
     state.settings.customExpenses.unshift({
       id: newId,
       name: 'Untitled',
+      type: 'fixed',
+      percentValue: 10,
       amount: 25,
       isExpense: true,
       splits: [{ qty: 1, amount: 25 }]
@@ -1647,13 +1671,16 @@
       return;
     }
 
-    const { jobResults, customResults, customExpenseResults } = calculateTotals();
+    const { jobResults, customResults, customExpenseResults, postTaxIncome } = calculateTotals();
 
     let html = '';
     const isAllTab = state.activeTab === 'all';
 
     // 1. Render Custom Expenses (in Expenses or All tab)
     visibleCustomExpenses.forEach((cExp) => {
+      const isPercentMode = cExp.type === 'percent';
+      const pctVal = typeof cExp.percentValue === 'number' ? cExp.percentValue : (parseFloat(cExp.percentValue) || 10);
+
       if (!Array.isArray(cExp.splits) || cExp.splits.length === 0) {
         cExp.splits = [{
           qty: 1,
@@ -1664,7 +1691,6 @@
       let customExpTotalQty = 0;
       let customExpTotalAmt = 0;
       const canDeleteCustomExpSplit = cExp.splits.length > 1;
-      const isExpAccordionOpen = state.expandedJobs.has(cExp.id);
 
       let customExpRowsHtml = `
         <div class="job-calc-split-headers-row is-two-col">
@@ -1726,8 +1752,8 @@
       });
 
       const cExpRes = customExpenseResults?.[cExp.id] || {
-        amount: customExpTotalAmt,
-        count: customExpTotalQty
+        amount: isPercentMode ? (postTaxIncome > 0 ? roundCents((postTaxIncome * pctVal) / 100) : 0) : customExpTotalAmt,
+        count: isPercentMode ? 1 : customExpTotalQty
       };
 
       const isCustomExpense = cExp.isExpense !== false;
@@ -1781,7 +1807,7 @@
                        value="${escapeHtml(cExp.name || 'Untitled')}" 
                        placeholder="Untitled" 
                        size="${Math.max(1, (cExp.name || 'Untitled').length)}">
-                <span class="job-calc-session-badge">${customExpTotalQty}x</span>
+                <span class="job-calc-session-badge">${isPercentMode ? `${pctVal}%` : `${customExpTotalQty}x`}</span>
               </div>
               ${!isCustomExpense ? '<div class="job-calc-tagline">Excluded</div>' : ''}
             </div>
@@ -1798,15 +1824,59 @@
           ${isCustomExpense ? `
             <div class="job-calc-card-config">
               <div class="job-calc-groups-wrap">
-                ${customExpRowsHtml}
+                ${isPercentMode ? `
+                  <div class="job-calc-percent-exp-wrap">
+                    <div class="job-calc-split-headers-row is-two-col">
+                      <span class="job-calc-split-col-header">% of Net Pay</span>
+                      <span class="job-calc-split-col-header">Post-Tax Net</span>
+                    </div>
+                    <div class="job-calc-inputs-row is-two-col">
+                      <div class="job-calc-input-block">
+                        <div class="job-calc-input-wrapper">
+                          <input type="number" 
+                                 class="job-calc-custom-exp-percent-input job-calc-num-input" 
+                                 min="0" 
+                                 max="100" 
+                                 step="0.5" 
+                                 value="${pctVal}" 
+                                 placeholder="10"
+                                 aria-label="Percentage of post-tax income">
+                          <span class="job-calc-unit">%</span>
+                        </div>
+                      </div>
+
+                      <div class="job-calc-input-block">
+                        <div class="job-calc-percent-of-wrap">
+                          <span class="job-calc-percent-of-text">of <strong>$${(postTaxIncome || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> net</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="job-calc-percent-calc-hint">
+                      Automatically calculated from your post-tax take-home pay.
+                    </div>
+                  </div>
+                ` : `
+                  ${customExpRowsHtml}
+                `}
               </div>
               <div class="job-calc-adjust-bar is-split-mode">
                 <div class="job-calc-split-bar-left">
-                  <button type="button" class="job-calc-add-custom-exp-split-btn job-calc-add-split-btn" title="Add another expense split row">
-                    <span class="material-symbols-outlined">add</span>
-                    <span>Add Split</span>
-                  </button>
+                  ${!isPercentMode ? `
+                    <button type="button" class="job-calc-add-custom-exp-split-btn job-calc-add-split-btn" title="Add another expense split row">
+                      <span class="material-symbols-outlined">add</span>
+                      <span>Add Split</span>
+                    </button>
+                  ` : `
+                    <span class="job-calc-split-tag is-complete">% of Post-Tax</span>
+                  `}
                 </div>
+
+                <button type="button" 
+                        class="job-calc-custom-exp-type-toggle job-calc-mode-swap-btn" 
+                        title="${isPercentMode ? 'Switch to Fixed Amount ($)' : 'Switch to Percentage of Post-Tax Income (%)'}">
+                  <span class="material-symbols-outlined">swap_horiz</span>
+                  <span>${isPercentMode ? 'Fixed ($)' : '% of Income'}</span>
+                </button>
               </div>
             </div>
           ` : ''}
@@ -1814,6 +1884,7 @@
         </div>
       `;
     });
+
 
     // 2. Render Custom Jobs (in Paid or All tab)
     visibleCustomJobs.forEach((cJob) => {
@@ -4094,6 +4165,76 @@
       });
     });
 
+    // 17e. Custom Expense: Percent Input
+    listEl.querySelectorAll('.job-calc-custom-exp-percent-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const card = e.target.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        if (!cExp) return;
+
+        const val = parseFloat(e.target.value);
+        cExp.percentValue = isNaN(val) ? 0 : Math.max(0, Math.min(100, val));
+
+        saveSettings();
+        updateCustomExpenseBadge(card, expId);
+        updateSummaryCard();
+      });
+
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim() === '') {
+          e.target.value = 0;
+          const card = e.target.closest('.job-calc-expense-card');
+          if (card) {
+            const expId = card.dataset.expenseId;
+            const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+            if (cExp) {
+              cExp.percentValue = 0;
+              saveSettings();
+              updateCustomExpenseBadge(card, expId);
+              updateSummaryCard();
+            }
+          }
+        }
+      });
+    });
+
+    // 17f. Custom Expense: Mode Swap Button (Fixed $ <-> % of Income)
+    listEl.querySelectorAll('.job-calc-custom-exp-type-toggle').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.job-calc-expense-card');
+        if (!card) return;
+        const expId = card.dataset.expenseId;
+        const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+        if (!cExp) return;
+
+        cExp.type = cExp.type === 'percent' ? 'fixed' : 'percent';
+        if (cExp.type === 'percent' && (cExp.percentValue === undefined || cExp.percentValue === null)) {
+          cExp.percentValue = 10;
+        }
+        if (cExp.type === 'fixed' && (!Array.isArray(cExp.splits) || cExp.splits.length === 0)) {
+          cExp.splits = [{ qty: 1, amount: typeof cExp.amount === 'number' ? cExp.amount : 25 }];
+        }
+
+        saveSettings();
+        renderTasksList();
+        updateSummaryCard();
+
+        if (cExp.type === 'percent') {
+          const updatedCard = listEl.querySelector(`[data-expense-id="${expId}"]`);
+          if (updatedCard) {
+            const pctInput = updatedCard.querySelector('.job-calc-custom-exp-percent-input');
+            if (pctInput) {
+              pctInput.focus();
+              pctInput.select();
+            }
+          }
+        }
+      });
+    });
+
     // 18. Bind swipe gestures for split rows
     bindSplitRowSwipeGestures(listEl);
   }
@@ -4352,6 +4493,28 @@
   function updateCustomExpenseBadge(card, customId) {
     const cExp = (state.settings.customExpenses || []).find((c) => c.id === customId);
     if (!cExp) return;
+
+    if (cExp.type === 'percent') {
+      const pct = typeof cExp.percentValue === 'number' ? cExp.percentValue : (parseFloat(cExp.percentValue) || 10);
+      const { postTaxIncome } = calculateTotals();
+      const totalAmt = postTaxIncome > 0 ? roundCents((postTaxIncome * pct) / 100) : 0;
+      cExp.amount = totalAmt;
+
+      const amountEl = card.querySelector('.job-calc-subtotal-badge.job-calc-expense-badge .job-calc-subtotal-amount');
+      if (amountEl) {
+        amountEl.textContent = `-$${totalAmt.toFixed(2)}`;
+      }
+      const badgeEl = card.querySelector('.job-calc-session-badge');
+      if (badgeEl) {
+        badgeEl.textContent = `${pct}%`;
+      }
+      const ofTextEl = card.querySelector('.job-calc-percent-of-text');
+      if (ofTextEl) {
+        ofTextEl.innerHTML = `of <strong>$${postTaxIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> net`;
+      }
+      return;
+    }
+
     let totalAmt = 0;
     let totalQty = 0;
     const splits = Array.isArray(cExp.splits) && cExp.splits.length > 0 ? cExp.splits : [{ qty: 1, amount: parseFloat(cExp.amount) || 0 }];
@@ -4465,8 +4628,10 @@
       totalHours,
       grossEarnings,
       taxDeductionAmount,
+      postTaxIncome,
       totalExpenses,
-      netTakeHome
+      netTakeHome,
+      customExpenseResults
     } = calculateTotals();
 
     // Metrics
@@ -4544,6 +4709,24 @@
         ? 'Currently Dollar ($) — click to switch to Percent (%)'
         : 'Currently Percent (%) — click to switch to Dollar ($)';
     }
+
+    // Sync any percent-based custom expense cards currently rendered
+    container.querySelectorAll('.job-calc-expense-card').forEach((card) => {
+      const expId = card.dataset.expenseId;
+      const cExp = (state.settings.customExpenses || []).find((c) => c.id === expId);
+      if (cExp && cExp.type === 'percent') {
+        const res = customExpenseResults?.[expId];
+        const amt = res ? res.amount : 0;
+        const subtotalEl = card.querySelector('.job-calc-subtotal-badge.job-calc-expense-badge .job-calc-subtotal-amount');
+        if (subtotalEl) {
+          subtotalEl.textContent = `-$${amt.toFixed(2)}`;
+        }
+        const ofTextEl = card.querySelector('.job-calc-percent-of-text');
+        if (ofTextEl) {
+          ofTextEl.innerHTML = `of <strong>$${(postTaxIncome || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> net`;
+        }
+      }
+    });
 
     // Keep the receipt ticket synced with current data
     updateReceiptTicket();
@@ -4723,12 +4906,15 @@
           const res = customExpenseResults?.[cExp.id];
           const amt = res ? res.amount : (parseFloat(cExp.amount) || 0);
           const count = res?.count ?? 1;
+          const detailText = res?.isPercent
+            ? `Custom Expense (${res.percentValue}% of post-tax)`
+            : `Custom Expense (${count}x)`;
           if (amt > 0) {
             expHtml += `
               <div class="receipt-item-row">
                 <div class="receipt-item-title-col">
                   <span class="receipt-item-name">${escapeHtml(cExp.name || 'Untitled')} <span class="receipt-item-tag-expense">EXPENSES</span></span>
-                  <span class="receipt-item-detail">Custom Expense (${count}x)</span>
+                  <span class="receipt-item-detail">${detailText}</span>
                 </div>
                 <span class="receipt-item-amount receipt-item-deduction">-$${amt.toFixed(2)}</span>
               </div>
@@ -4901,8 +5087,9 @@
           const res = totals.customExpenseResults?.[cExp.id];
           const amt = res ? res.amount : (parseFloat(cExp.amount) || 0);
           const count = res?.count ?? 1;
+          const countOrPct = res?.isPercent ? `${res.percentValue}% of post-tax` : `${count}x`;
           if (amt > 0) {
-            out.push(row(`  ${cExp.name || 'Untitled'} [Expenses] (${count}x)`, `-$${amt.toFixed(2)}`));
+            out.push(row(`  ${cExp.name || 'Untitled'} [Expenses] (${countOrPct})`, `-$${amt.toFixed(2)}`));
           }
         }
       });
