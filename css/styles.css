@@ -13215,6 +13215,13 @@ ic {
     padding-top: 4px;
 }
 
+.receipt-barcode-svg {
+    display: block;
+    margin: 4px auto 6px auto;
+    max-width: 100%;
+    height: 24px;
+}
+
 .receipt-barcode {
     font-size: 1.1rem;
     letter-spacing: 3px;

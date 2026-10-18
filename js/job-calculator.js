@@ -833,9 +833,27 @@
    * 5. Lazy DOM Creation & Injection
    * ========================================================================== */
 
+  const RECEIPT_BARCODE_BARS = [
+    4, 2, 2, 2, 5, 3, 2, 2, 4, 3, 2, 4, 3, 2, 5, 3, 2, 2, 4, 3,
+    3, 2, 2, 4, 5, 3, 3, 3, 2, 4, 4, 3, 2, 3, 5, 3, 3, 2, 4, 3,
+    2, 4, 3, 3, 5, 3, 2, 3, 4, 3, 3, 2, 2, 4, 4
+  ];
+
+  function getBarcodeSvgMarkup() {
+    let x = 0;
+    const rects = [];
+    RECEIPT_BARCODE_BARS.forEach((w, idx) => {
+      if (idx % 2 === 0) {
+        rects.push(`<rect x="${x}" y="0" width="${w}" height="24" fill="#334155" />`);
+      }
+      x += w;
+    });
+    return `<svg class="receipt-barcode-svg" viewBox="0 0 ${x} 24" width="${x}" height="24" aria-hidden="true">${rects.join('')}</svg>`;
+  }
+
   function ensureCalculatorDOM() {
     const existing = document.getElementById('job-calculator-container');
-    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('EARNINGS STATEMENT') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#job-calc-post-tax-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.querySelector('#receipt-post-tax-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator') && !existing.querySelector('#job-calc-btn-quick-copy') && existing.querySelector('#job-calc-net-status-icon') && existing.querySelector('#job-calc-tax-symbol-toggle') && !existing.querySelector('#job-calc-tax-mode-toggle') && !existing.querySelector('#job-calc-tax-field #job-calc-tax-symbol-toggle') && existing.querySelector('#receipt-btn-download')) {
+    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('EARNINGS STATEMENT') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#job-calc-post-tax-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.querySelector('#receipt-post-tax-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator') && !existing.querySelector('#job-calc-btn-quick-copy') && existing.querySelector('#job-calc-net-status-icon') && existing.querySelector('#job-calc-tax-symbol-toggle') && !existing.querySelector('#job-calc-tax-mode-toggle') && !existing.querySelector('#job-calc-tax-field #job-calc-tax-symbol-toggle') && existing.querySelector('#receipt-btn-download') && existing.querySelector('.receipt-barcode-svg')) {
       return;
     }
 
@@ -1142,7 +1160,7 @@
 
               <!-- Footer -->
               <div class="receipt-footer">
-                <div class="receipt-barcode">||| |||| || ||||||| ||| ||||| |||| |||</div>
+                ${getBarcodeSvgMarkup()}
                 <div class="receipt-footer-msg">THANK YOU FOR YOUR HARD WORK!</div>
                 <div class="receipt-footer-sub">EVERY SHIFT ADDS UP 🐷</div>
               </div>
@@ -5350,7 +5368,7 @@
     ctx.scale(dpr, dpr);
 
     // Helpers
-    const fontPrimary = "'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+    const fontPrimary = "'Courier New', Courier, 'Cascadia Code', Consolas, monospace";
     const teethCount = Math.round(logicalWidth / 14);
     const toothW = logicalWidth / teethCount;
     const toothH = 6;
@@ -5751,18 +5769,12 @@
 
     // 11. Footer: Barcode and Message
     ctx.save();
-    // Alternating [bar, gap, bar, gap, ... bar] ending with a bar (perfectly centered on 460px receipt)
-    const barcodeBars = [
-      4, 2, 2, 2, 5, 3, 2, 2, 4, 3, 2, 4, 3, 2, 5, 3, 2, 2, 4, 3,
-      3, 2, 2, 4, 5, 3, 3, 3, 2, 4, 4, 3, 2, 3, 5, 3, 3, 2, 4, 3,
-      2, 4, 3, 3, 5, 3, 2, 3, 4, 3, 3, 2, 2, 4, 4
-    ];
-    const totalBarW = barcodeBars.reduce((sum, w) => sum + w, 0);
+    const totalBarW = RECEIPT_BARCODE_BARS.reduce((sum, w) => sum + w, 0);
     const barcodeX = Math.round((logicalWidth - totalBarW) / 2);
     const barcodeH = 24;
     ctx.fillStyle = '#334155';
     let bx = barcodeX;
-    barcodeBars.forEach((w, idx) => {
+    RECEIPT_BARCODE_BARS.forEach((w, idx) => {
       if (idx % 2 === 0) {
         ctx.fillRect(bx, currY, w, barcodeH);
       }
