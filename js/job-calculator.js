@@ -835,7 +835,7 @@
 
   function ensureCalculatorDOM() {
     const existing = document.getElementById('job-calculator-container');
-    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator') && !existing.querySelector('#job-calc-btn-quick-copy') && existing.querySelector('#job-calc-net-status-icon') && existing.querySelector('#job-calc-tax-symbol-toggle') && !existing.querySelector('#job-calc-tax-mode-toggle') && !existing.querySelector('#job-calc-tax-field #job-calc-tax-symbol-toggle')) {
+    if (state.injected && existing && existing.querySelector('#job-calc-receipt-wrapper') && !existing.querySelector('#receipt-btn-print') && existing.innerHTML.includes('PAYSLIP') && !existing.innerHTML.includes('Paid Jobs (') && existing.innerHTML.includes('Earnings (') && existing.innerHTML.includes('Schedules') && existing.querySelector('.job-calc-btn-close') && existing.innerHTML.includes('job-calc-tax-field') && existing.querySelector('#job-calc-jobs-card') && existing.querySelector('#job-calc-add-custom-btn') && existing.querySelector('#job-calc-tab-expenses') && existing.querySelector('#job-calc-expense-summary-row') && existing.querySelector('#job-calc-post-tax-summary-row') && existing.querySelector('#receipt-expenses-section') && existing.querySelector('#receipt-post-tax-section') && existing.innerHTML.includes('Financial Summary') && existing.innerHTML.includes('Schedule Calculator') && !existing.querySelector('#job-calc-btn-quick-copy') && existing.querySelector('#job-calc-net-status-icon') && existing.querySelector('#job-calc-tax-symbol-toggle') && !existing.querySelector('#job-calc-tax-mode-toggle') && !existing.querySelector('#job-calc-tax-field #job-calc-tax-symbol-toggle')) {
       return;
     }
 
@@ -989,6 +989,15 @@
                 </div>
               </div>
 
+              <!-- Post-Tax Earnings Row (Visible whenever Tax Deduction > 0) -->
+              <div class="job-calc-summary-row" id="job-calc-post-tax-summary-row" style="display: none;">
+                <div class="job-calc-row-title-wrap">
+                  <span class="job-calc-flow-dot flow-post-tax"></span>
+                  <span class="job-calc-row-title">Post-Tax Earnings</span>
+                </div>
+                <span class="job-calc-sum-bold job-calc-post-tax-amount" id="job-calc-sum-post-tax">$0.00</span>
+              </div>
+
               <!-- Expenses Row (Included only when expenses exist) -->
               <div class="job-calc-summary-row" id="job-calc-expense-summary-row" style="display: none;">
                 <div class="job-calc-row-title-wrap">
@@ -1077,6 +1086,27 @@
                 <span id="receipt-gross-amount">$0.00</span>
               </div>
 
+              <!-- Tax Deduction (if any) -->
+              <div class="receipt-section" id="receipt-tax-section" style="display: none;">
+                <div class="receipt-divider-dash"></div>
+                <div class="receipt-item-row">
+                  <div class="receipt-item-title-col">
+                    <span class="receipt-item-name">Total Tax Deduction</span>
+                    <span class="receipt-item-detail" id="receipt-tax-detail">(0%)</span>
+                  </div>
+                  <span class="receipt-item-amount receipt-item-deduction" id="receipt-tax-amount">-$0.00</span>
+                </div>
+              </div>
+
+              <!-- Post-Tax Earnings (if tax was deducted) -->
+              <div class="receipt-section" id="receipt-post-tax-section" style="display: none;">
+                <div class="receipt-divider-dash"></div>
+                <div class="receipt-post-tax-row">
+                  <span>POST-TAX EARNINGS</span>
+                  <span id="receipt-post-tax-amount">$0.00</span>
+                </div>
+              </div>
+
               <!-- Expenses (if any) -->
               <div class="receipt-section" id="receipt-expenses-section" style="display: none;">
                 <div class="receipt-divider-dash"></div>
@@ -1090,18 +1120,6 @@
                 <div class="receipt-subtotal-row">
                   <span>EXPENSES TOTAL</span>
                   <span class="receipt-item-deduction" id="receipt-expenses-subtotal">-$0.00</span>
-                </div>
-              </div>
-
-              <!-- Tax Deduction (if any) -->
-              <div class="receipt-section" id="receipt-tax-section" style="display: none;">
-                <div class="receipt-divider-dash"></div>
-                <div class="receipt-item-row">
-                  <div class="receipt-item-title-col">
-                    <span class="receipt-item-name">Total Tax Deduction</span>
-                    <span class="receipt-item-detail" id="receipt-tax-detail">(0%)</span>
-                  </div>
-                  <span class="receipt-item-amount receipt-item-deduction" id="receipt-tax-amount">-$0.00</span>
                 </div>
               </div>
 
@@ -1827,8 +1845,8 @@
                 ${isPercentMode ? `
                   <div class="job-calc-percent-exp-wrap">
                     <div class="job-calc-split-headers-row is-two-col">
-                      <span class="job-calc-split-col-header">% of Net Pay</span>
-                      <span class="job-calc-split-col-header">Post-Tax Net</span>
+                      <span class="job-calc-split-col-header">% of Earnings</span>
+                      <span class="job-calc-split-col-header">Post-Tax Earnings</span>
                     </div>
                     <div class="job-calc-inputs-row is-two-col">
                       <div class="job-calc-input-block">
@@ -1840,19 +1858,19 @@
                                  step="0.5" 
                                  value="${pctVal}" 
                                  placeholder="10"
-                                 aria-label="Percentage of post-tax income">
+                                 aria-label="Percentage of post-tax earnings">
                           <span class="job-calc-unit">%</span>
                         </div>
                       </div>
 
                       <div class="job-calc-input-block">
                         <div class="job-calc-percent-of-wrap">
-                          <span class="job-calc-percent-of-text">of <strong>$${(postTaxIncome || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> net</span>
+                          <span class="job-calc-percent-of-text">of <strong>$${(postTaxIncome || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> post-tax</span>
                         </div>
                       </div>
                     </div>
                     <div class="job-calc-percent-calc-hint">
-                      Automatically calculated from your post-tax take-home pay.
+                      Automatically calculated from your post-tax earnings.
                     </div>
                   </div>
                 ` : `
@@ -1873,9 +1891,9 @@
 
                 <button type="button" 
                         class="job-calc-custom-exp-type-toggle job-calc-mode-swap-btn" 
-                        title="${isPercentMode ? 'Switch to Fixed Amount ($)' : 'Switch to Percentage of Post-Tax Income (%)'}">
+                        title="${isPercentMode ? 'Switch to Fixed Amount ($)' : 'Switch to Percentage of Post-Tax Earnings (%)'}">
                   <span class="material-symbols-outlined">swap_horiz</span>
-                  <span>${isPercentMode ? 'Fixed ($)' : '% of Income'}</span>
+                  <span>${isPercentMode ? 'Fixed ($)' : '% of Earnings'}</span>
                 </button>
               </div>
             </div>
@@ -4200,7 +4218,7 @@
       });
     });
 
-    // 17f. Custom Expense: Mode Swap Button (Fixed $ <-> % of Income)
+    // 17f. Custom Expense: Mode Swap Button (Fixed $ <-> % of Earnings)
     listEl.querySelectorAll('.job-calc-custom-exp-type-toggle').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -4221,17 +4239,6 @@
         saveSettings();
         renderTasksList();
         updateSummaryCard();
-
-        if (cExp.type === 'percent') {
-          const updatedCard = listEl.querySelector(`[data-expense-id="${expId}"]`);
-          if (updatedCard) {
-            const pctInput = updatedCard.querySelector('.job-calc-custom-exp-percent-input');
-            if (pctInput) {
-              pctInput.focus();
-              pctInput.select();
-            }
-          }
-        }
       });
     });
 
@@ -4510,7 +4517,7 @@
       }
       const ofTextEl = card.querySelector('.job-calc-percent-of-text');
       if (ofTextEl) {
-        ofTextEl.innerHTML = `of <strong>$${postTaxIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> net`;
+        ofTextEl.innerHTML = `of <strong>$${postTaxIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> post-tax`;
       }
       return;
     }
@@ -4648,6 +4655,16 @@
     if (sumHours) sumHours.textContent = `${totalHours.toFixed(1)} hrs`;
     if (sumGross) sumGross.textContent = `$${grossEarnings.toFixed(2)}`;
 
+    // Conditionally include Post-Tax Earnings in the summary (show whenever Tax Deduction > 0)
+    const postTaxRow = container.querySelector('#job-calc-post-tax-summary-row');
+    const sumPostTax = container.querySelector('#job-calc-sum-post-tax');
+    if (postTaxRow) {
+      postTaxRow.style.display = taxDeductionAmount > 0 ? 'flex' : 'none';
+    }
+    if (sumPostTax) {
+      sumPostTax.textContent = `$${postTaxIncome.toFixed(2)}`;
+    }
+
     // Conditionally include Expenses in the summary (hide if $0)
     const expenseRow = container.querySelector('#job-calc-expense-summary-row');
     if (expenseRow) {
@@ -4723,7 +4740,7 @@
         }
         const ofTextEl = card.querySelector('.job-calc-percent-of-text');
         if (ofTextEl) {
-          ofTextEl.innerHTML = `of <strong>$${(postTaxIncome || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> net`;
+          ofTextEl.innerHTML = `of <strong>$${(postTaxIncome || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> post-tax`;
         }
       }
     });
@@ -4746,6 +4763,7 @@
       grossEarnings,
       taxableEarnings,
       taxDeductionAmount,
+      postTaxIncome,
       totalExpenses,
       netTakeHome,
       jobResults,
@@ -4946,6 +4964,16 @@
       if (taxSection) taxSection.style.display = 'none';
     }
 
+    // 5b. Post-Tax Earnings
+    const postTaxSection = container.querySelector('#receipt-post-tax-section');
+    const postTaxAmountEl = container.querySelector('#receipt-post-tax-amount');
+    if (taxDeductionAmount > 0) {
+      if (postTaxSection) postTaxSection.style.display = 'block';
+      if (postTaxAmountEl) postTaxAmountEl.textContent = `$${postTaxIncome.toFixed(2)}`;
+    } else {
+      if (postTaxSection) postTaxSection.style.display = 'none';
+    }
+
     // 6. Net Take-Home Hero Row
     const netAmountEl = container.querySelector('#receipt-net-amount');
     const receiptNetRow = container.querySelector('.receipt-net-row');
@@ -5062,6 +5090,7 @@
     if (totals.taxDeductionAmount > 0) {
       const typeLabel = taxSetting.type === 'percent' ? ` (${taxSetting.value}%)` : '';
       out.push(row(`  Total Tax Deduction${typeLabel}`, `-$${totals.taxDeductionAmount.toFixed(2)}`));
+      out.push(row('POST-TAX EARNINGS', `$${totals.postTaxIncome.toFixed(2)}`));
     }
 
     // Expenses (if any)

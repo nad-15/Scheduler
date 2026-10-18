@@ -12524,6 +12524,11 @@ ic {
     box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
 }
 
+.job-calc-flow-dot.flow-post-tax {
+    background: #0ea5e9;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.22);
+}
+
 .job-calc-flow-dot.flow-expense {
     background: #f97316;
     box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
@@ -12543,6 +12548,10 @@ ic {
     white-space: nowrap;
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
+}
+
+.job-calc-sum-bold.job-calc-post-tax-amount {
+    color: #0284c7;
 }
 
 .job-calc-expense-amount {
@@ -13118,6 +13127,20 @@ ic {
 
 .receipt-gross-row #receipt-gross-amount {
     color: #059669;
+}
+
+/* Post-Tax Row */
+.receipt-post-tax-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+}
+
+.receipt-post-tax-row #receipt-post-tax-amount {
+    color: #0284c7;
 }
 
 /* Net Hero Row */
