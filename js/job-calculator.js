@@ -1174,7 +1174,7 @@
           <div class="job-calc-actions-row">
             <button type="button" class="job-calc-action-btn job-calc-btn-back-summary" id="job-calc-btn-back-summary" title="Back to Financial Summary">
               <span class="material-symbols-outlined">arrow_back</span>
-              <span>View Summary</span>
+              <span>Back to Summary</span>
             </button>
           </div>
         </section>
