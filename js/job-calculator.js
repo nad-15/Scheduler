@@ -1409,28 +1409,7 @@
       } catch (_) {}
     }
 
-    // Direct event bindings
-    const viewReceiptBtn = container.querySelector('#job-calc-btn-view-receipt');
-    if (viewReceiptBtn) {
-      viewReceiptBtn.addEventListener('click', swapToReceiptTicket);
-    }
-
-    const backSummaryBtn = container.querySelector('#job-calc-btn-back-summary');
-    if (backSummaryBtn) {
-      backSummaryBtn.addEventListener('click', swapToBreakdownSummary);
-    }
-
-    const receiptDownloadBtn = container.querySelector('#receipt-btn-download');
-    if (receiptDownloadBtn) {
-      receiptDownloadBtn.addEventListener('click', handleDownloadReceiptImage);
-    }
-
-    const receiptCopyBtn = container.querySelector('#receipt-btn-copy');
-    if (receiptCopyBtn) {
-      receiptCopyBtn.addEventListener('click', handleCopyReceipt);
-    }
-
-    // Delegated container click listener (catches clicks even if dynamic DOM shifts occur)
+    // Container delegated click listener handles receipt navigation, download, copy, and tax toggle cleanly without double-firing
     container.addEventListener('click', (e) => {
       if (e.target.closest('#job-calc-btn-view-receipt, .job-calc-btn-view-receipt')) {
         swapToReceiptTicket();
@@ -5501,7 +5480,8 @@
         ctx.textAlign = 'left';
         ctx.fillStyle = '#0f172a';
         ctx.font = `700 12.5px ${fontPrimary}`;
-        const nameStr = truncate(item.name, contentW - (item.tag ? 150 : 90));
+        const maxNameW = contentW - ctx.measureText(item.amount).width - (item.tag ? 65 : 12);
+        const nameStr = truncate(item.name, maxNameW);
         ctx.fillText(nameStr, padX, currY);
 
         if (item.tag) {
@@ -5664,7 +5644,8 @@
         ctx.textAlign = 'left';
         ctx.fillStyle = '#0f172a';
         ctx.font = `700 12.5px ${fontPrimary}`;
-        const nameStr = truncate(item.name, contentW - (item.tag ? 150 : 90));
+        const maxNameW = contentW - ctx.measureText(item.amount).width - (item.tag ? 70 : 12);
+        const nameStr = truncate(item.name, maxNameW);
         ctx.fillText(nameStr, padX, currY);
 
         if (item.tag) {
@@ -5770,17 +5751,22 @@
 
     // 11. Footer: Barcode and Message
     ctx.save();
-    const barcodeW = 240;
-    const barcodeX = (logicalWidth - barcodeW) / 2;
-    const barcodeH = 22;
+    // Alternating [bar, gap, bar, gap, ... bar] ending with a bar (perfectly centered on 460px receipt)
+    const barcodeBars = [
+      4, 2, 2, 2, 5, 3, 2, 2, 4, 3, 2, 4, 3, 2, 5, 3, 2, 2, 4, 3,
+      3, 2, 2, 4, 5, 3, 3, 3, 2, 4, 4, 3, 2, 3, 5, 3, 3, 2, 4, 3,
+      2, 4, 3, 3, 5, 3, 2, 3, 4, 3, 3, 2, 2, 4, 4
+    ];
+    const totalBarW = barcodeBars.reduce((sum, w) => sum + w, 0);
+    const barcodeX = Math.round((logicalWidth - totalBarW) / 2);
+    const barcodeH = 24;
     ctx.fillStyle = '#334155';
-    const pattern = [3, 2, 1, 3, 2, 4, 1, 2, 3, 1, 4, 2, 1, 3, 2, 1, 4, 3, 2, 1, 3, 2, 4, 1, 2, 3, 1, 2, 4, 2, 1, 3, 2, 1, 4, 2];
     let bx = barcodeX;
-    pattern.forEach((w, idx) => {
+    barcodeBars.forEach((w, idx) => {
       if (idx % 2 === 0) {
         ctx.fillRect(bx, currY, w, barcodeH);
       }
-      bx += w + 2;
+      bx += w;
     });
     ctx.restore();
     currY += barcodeH + 16;
@@ -5798,88 +5784,120 @@
     return canvas;
   }
 
-  function handleDownloadReceiptImage() {
-    const btn = document.querySelector('#receipt-btn-download');
-    const originalHtml = btn ? btn.innerHTML : '';
+  let isSavingReceipt = false;
+  const DEFAULT_RECEIPT_DOWNLOAD_HTML = `
+    <span class="material-symbols-outlined">download</span>
+    <span class="receipt-action-btn-text">Save Image</span>
+  `;
 
+  function handleDownloadReceiptImage() {
+    if (isSavingReceipt) return;
+    isSavingReceipt = true;
+
+    const btn = document.querySelector('#receipt-btn-download');
     if (btn) {
+      btn.disabled = true;
       btn.innerHTML = `
         <span class="material-symbols-outlined" style="font-size: 14px; color: #0284c7;">hourglass_empty</span>
         <span class="receipt-action-btn-text" style="color: #0284c7;">Saving...</span>
       `;
     }
 
-    setTimeout(() => {
-      try {
-        const canvas = renderReceiptToCanvas();
-        const rangeEl = document.querySelector('#receipt-date-range');
-        const periodStr = (rangeEl?.textContent || 'statement')
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '');
-        const filename = `earnings-statement-${periodStr || 'breakdown'}.png`;
-
-        const finishDownloadSuccess = () => {
-          showToastNotification('Earnings Statement image saved! 📸');
-          if (btn) {
-            btn.innerHTML = `
-              <span class="material-symbols-outlined" style="font-size: 14px; color: #16a34a;">check</span>
-              <span class="receipt-action-btn-text" style="color: #16a34a;">Saved!</span>
-            `;
-            setTimeout(() => {
-              if (btn) btn.innerHTML = originalHtml;
-            }, 1800);
-          }
-        };
-
-        if (canvas.toBlob) {
-          canvas.toBlob((blob) => {
-            if (!blob) throw new Error('Blob creation failed');
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 1500);
-            finishDownloadSuccess();
-          }, 'image/png');
-        } else {
-          const dataUrl = canvas.toDataURL('image/png');
-          const a = document.createElement('a');
-          a.href = dataUrl;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          finishDownloadSuccess();
-        }
-      } catch (err) {
-        console.error('Failed to download earnings statement image:', err);
-        showToastNotification('Failed to generate image. Please try again.');
-        if (btn) btn.innerHTML = originalHtml;
+    const resetButton = () => {
+      isSavingReceipt = false;
+      const b = document.querySelector('#receipt-btn-download');
+      if (b) {
+        b.disabled = false;
+        b.innerHTML = DEFAULT_RECEIPT_DOWNLOAD_HTML;
       }
-    }, 60);
+    };
+
+    // Safety fallback timer: guarantee button resets even under extreme delays or browser cancellations
+    const safetyTimer = setTimeout(() => {
+      if (isSavingReceipt) {
+        resetButton();
+      }
+    }, 3000);
+
+    try {
+      const canvas = renderReceiptToCanvas();
+      const rangeEl = document.querySelector('#receipt-date-range');
+      const periodStr = (rangeEl?.textContent || 'statement')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      const filename = `earnings-statement-${periodStr || 'breakdown'}.png`;
+
+      // Helper to convert dataURL to Blob synchronously
+      function dataURLtoBlob(dataurl) {
+        const arr = dataurl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+      }
+
+      const dataUrl = canvas.toDataURL('image/png');
+      const blob = dataURLtoBlob(dataUrl);
+
+      // Trigger download synchronously to preserve user activation on mobile / PWA
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
+
+      clearTimeout(safetyTimer);
+      showToastNotification('Earnings Statement saved.');
+
+      if (btn) {
+        btn.innerHTML = `
+          <span class="material-symbols-outlined" style="font-size: 14px; color: #16a34a;">check</span>
+          <span class="receipt-action-btn-text" style="color: #16a34a;">Saved!</span>
+        `;
+        setTimeout(() => {
+          resetButton();
+        }, 1600);
+      } else {
+        resetButton();
+      }
+    } catch (err) {
+      clearTimeout(safetyTimer);
+      console.error('Failed to download earnings statement image:', err);
+      showToastNotification('Failed to save image. Please try again.');
+      resetButton();
+    }
   }
+
+  const DEFAULT_RECEIPT_COPY_HTML = `
+    <span class="material-symbols-outlined">content_copy</span>
+    <span class="receipt-action-btn-text">Copy</span>
+  `;
 
   function handleCopyReceipt() {
     const totals = calculateTotals();
     const text = formatReceiptText(totals);
 
     const btn = document.querySelector('#receipt-btn-copy');
-    const originalHtml = btn ? btn.innerHTML : '';
 
     const showSuccess = () => {
-      showToastNotification('Breakdown ticket copied to clipboard! 📋');
+      showToastNotification('Breakdown copied to clipboard.');
       if (btn) {
         btn.innerHTML = `
           <span class="material-symbols-outlined" style="font-size: 14px; color: #16a34a;">check</span>
           <span class="receipt-action-btn-text" style="color: #16a34a;">Copied!</span>
         `;
         setTimeout(() => {
-          if (btn) btn.innerHTML = originalHtml;
-        }, 1800);
+          if (btn) btn.innerHTML = DEFAULT_RECEIPT_COPY_HTML;
+        }, 1600);
       }
     };
 
@@ -5906,7 +5924,7 @@
     textArea.select();
     try {
       document.execCommand('copy');
-      showToastNotification('Receipt Ticket copied to clipboard! 📋');
+      showToastNotification('Breakdown copied to clipboard.');
     } catch (err) {
       console.warn('Fallback copy failed', err);
       alert('Could not copy to clipboard. Please copy manually:\n\n' + text);
