@@ -1070,7 +1070,7 @@
               <!-- Header -->
               <div class="receipt-header">
                 <div class="receipt-brand">EARNINGS STATEMENT</div>
-                <div class="receipt-badge">★ SHIFT & EXPENSE BREAKDOWN ★</div>
+                <div class="receipt-badge">★ EARNINGS & EXPENSES BREAKDOWN ★</div>
                 <div class="receipt-meta">
                   <div class="receipt-meta-row">
                     <span>PERIOD:</span>
@@ -1085,17 +1085,17 @@
 
               <div class="receipt-divider-dash"></div>
 
-              <!-- Calendar Shifts -->
+              <!-- Earnings -->
               <div class="receipt-section" id="receipt-shifts-section">
                 <div class="receipt-section-header">
-                  <span>CALENDAR SHIFTS</span>
+                  <span>EARNINGS</span>
                   <span id="receipt-shifts-count">0x</span>
                 </div>
                 <div class="receipt-items-list" id="receipt-shifts-list">
                   <!-- Dynamic shift lines -->
                 </div>
                 <div class="receipt-subtotal-row">
-                  <span>SHIFTS TOTAL (<span id="receipt-shifts-hours">0.0h</span>)</span>
+                  <span>EARNINGS TOTAL (<span id="receipt-shifts-hours">0.0h</span>)</span>
                   <span id="receipt-shifts-subtotal">$0.00</span>
                 </div>
               </div>
@@ -1720,7 +1720,7 @@
 
       let customExpRowsHtml = `
         <div class="job-calc-split-headers-row is-two-col">
-          <span class="job-calc-split-col-header">Qty</span>
+          <span class="job-calc-split-col-header">Items</span>
           <span class="job-calc-split-col-header">Cost ($)</span>
         </div>
       `;
@@ -1732,7 +1732,7 @@
         customExpTotalAmt += (sQty * sAmt);
 
         customExpRowsHtml += `
-          <div class="job-calc-split-row-item ${canDeleteCustomExpSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteCustomExpSplit ? 'Swipe left to delete this split row (or type 0 in qty)' : ''}">
+          <div class="job-calc-split-row-item ${canDeleteCustomExpSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteCustomExpSplit ? 'Swipe left to delete this split row (or type 0 in items)' : ''}">
             ${canDeleteCustomExpSplit ? `
               <div class="job-calc-split-delete-action">
                 <button type="button" 
@@ -1753,8 +1753,8 @@
                          min="0" 
                          step="1" 
                          value="${s.qty ?? 1}" 
-                         aria-label="Quantity"
-                         title="Enter quantity (swipe left or type 0 to remove this row)">
+                         aria-label="Items"
+                         title="Enter items (swipe left or type 0 to remove this row)">
                   <span class="job-calc-unit">x</span>
                 </div>
               </div>
@@ -2273,7 +2273,7 @@
                         <span>Add Split</span>
                       </button>
                       <span class="job-calc-split-tag ${expSplitRemaining === 0 ? 'is-complete' : (expSplitRemaining > 0 ? 'is-pending' : 'is-over')}">
-                        ${expSplitRemaining === 0 ? `${count} events ✔` : `${expSplitAllocated}/${count} events`}
+                        ${expSplitRemaining === 0 ? `${count} items ✔` : `${expSplitAllocated}/${count} items`}
                       </span>
                     </div>
 
@@ -2298,7 +2298,7 @@
                       <button type="button" 
                               class="job-calc-exp-mode-swap-btn job-calc-mode-swap-btn" 
                               data-mode="split" 
-                              title="Switch to split shifts">
+                              title="Switch to split items">
                         <span class="material-symbols-outlined">swap_horiz</span>
                         <span>Split</span>
                       </button>
@@ -2666,14 +2666,14 @@
 
       let splitRowsHtml = `
         <div class="job-calc-split-headers-row is-two-col">
-          <span class="job-calc-split-col-header">Events</span>
-          <span class="job-calc-split-col-header">Cost / Event ($)</span>
+          <span class="job-calc-split-col-header">Items</span>
+          <span class="job-calc-split-col-header">Cost ($)</span>
         </div>
       `;
 
       expSplits.forEach((s, idx) => {
         splitRowsHtml += `
-          <div class="job-calc-split-row-item ${canDeleteExpSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteExpSplit ? 'Swipe left to delete this split row (or type 0 in shifts)' : ''}">
+          <div class="job-calc-split-row-item ${canDeleteExpSplit ? 'is-swipeable' : ''}" data-split-index="${idx}" title="${canDeleteExpSplit ? 'Swipe left to delete this split row (or type 0 in items)' : ''}">
             ${canDeleteExpSplit ? `
               <div class="job-calc-split-delete-action">
                 <button type="button" 
@@ -2694,8 +2694,8 @@
                          min="0" 
                          step="1" 
                          value="${s.shifts}" 
-                         aria-label="Events"
-                         title="Enter events (swipe left or type 0 to remove this row)">
+                         aria-label="Items"
+                         title="Enter items (swipe left or type 0 to remove this row)">
                   <span class="job-calc-unit">x</span>
                 </div>
               </div>
@@ -2709,7 +2709,7 @@
                          min="0" 
                          step="0.5" 
                          value="${s.amount ?? defaultExp}" 
-                         aria-label="Cost per event">
+                         aria-label="Cost per item">
                 </div>
               </div>
             </div>
@@ -2724,7 +2724,7 @@
     return `
       <div class="job-calc-inputs-row">
         <div class="job-calc-input-block" style="flex: 1; grid-column: 1 / -1;">
-          <label>Default Cost / Event ($)</label>
+          <label>Default Cost ($)</label>
           <div class="job-calc-input-wrapper">
             <span class="job-calc-prefix">$</span>
             <input type="number" class="job-calc-calendar-expense-input job-calc-num-input" min="0" step="0.5" value="${defaultExp}">
@@ -2957,13 +2957,13 @@
     tagEl.className = 'job-calc-split-tag';
     if (remaining === 0) {
       tagEl.classList.add('is-complete');
-      tagEl.textContent = `${count} events ✔`;
+      tagEl.textContent = `${count} items ✔`;
     } else if (remaining > 0) {
       tagEl.classList.add('is-pending');
-      tagEl.textContent = `${allocated}/${count} events`;
+      tagEl.textContent = `${allocated}/${count} items`;
     } else {
       tagEl.classList.add('is-over');
-      tagEl.textContent = `${allocated}/${count} events`;
+      tagEl.textContent = `${allocated}/${count} items`;
     }
   }
 
@@ -5094,7 +5094,7 @@
     let out = [];
     out.push(doubleDivider);
     out.push(center('EARNINGS STATEMENT'));
-    out.push(center('★ SHIFT & EXPENSE BREAKDOWN ★'));
+    out.push(center('★ EARNINGS & EXPENSES BREAKDOWN ★'));
     out.push(doubleDivider);
     out.push(row('PERIOD', rangeStr));
     out.push(row('GENERATED', formatGeneratedDate()));
@@ -5105,7 +5105,7 @@
     const paidCustom = (state.settings.customJobs || []).filter((c) => c.isPaid !== false);
 
     if (paidJobs.length > 0 || paidCustom.length > 0) {
-      out.push('CALENDAR SHIFTS:');
+      out.push('EARNINGS:');
       paidJobs.forEach((name) => {
         const setting = getJobSetting(name);
         const res = totals.jobResults?.[name] || { count: 0, totalHours: 0, subtotal: 0 };
@@ -5152,8 +5152,8 @@
         }
       });
 
-      out.push(row('  Total Shift Hours', `${totals.totalHours.toFixed(1)} hrs`));
-      out.push(row('  Shifts Subtotal', `$${totals.grossEarnings.toFixed(2)}`));
+      out.push(row('  Total Hours', `${totals.totalHours.toFixed(1)} hrs`));
+      out.push(row('  Earnings Subtotal', `$${totals.grossEarnings.toFixed(2)}`));
       out.push(divider);
     }
 
@@ -5364,7 +5364,7 @@
 
     let totalHeight = 24; // Top padding & tear edge
     totalHeight += 28;    // Brand title "EARNINGS STATEMENT"
-    totalHeight += 20;    // Badge "★ SHIFT & EXPENSE BREAKDOWN ★"
+    totalHeight += 20;    // Badge "★ EARNINGS & EXPENSES BREAKDOWN ★"
     totalHeight += 12;    // Gap
     totalHeight += 18;    // PERIOD row
     totalHeight += 18;    // GENERATED row
@@ -5468,7 +5468,7 @@
 
     ctx.fillStyle = '#475569';
     ctx.font = `700 10.5px ${fontPrimary}`;
-    ctx.fillText('★ SHIFT & EXPENSE BREAKDOWN ★', logicalWidth / 2, currY);
+    ctx.fillText('★ EARNINGS & EXPENSES BREAKDOWN ★', logicalWidth / 2, currY);
     currY += 18;
 
     // 3. Meta Rows
@@ -5531,11 +5531,11 @@
     drawDashDivider(currY);
     currY += 16;
 
-    // 4. Shifts Section Header
+    // 4. Earnings Section Header
     ctx.textAlign = 'left';
     ctx.fillStyle = '#334155';
     ctx.font = `800 11px ${fontPrimary}`;
-    ctx.fillText('CALENDAR SHIFTS', padX, currY);
+    ctx.fillText('EARNINGS', padX, currY);
     ctx.textAlign = 'right';
     ctx.font = `700 11px ${fontPrimary}`;
     ctx.fillText(`${totalSessions}x`, logicalWidth - padX, currY);
@@ -5641,7 +5641,7 @@
     ctx.textAlign = 'left';
     ctx.fillStyle = '#475569';
     ctx.font = `700 11.5px ${fontPrimary}`;
-    ctx.fillText(`SHIFTS TOTAL (${totalHours.toFixed(1)}h)`, padX, currY + 10);
+    ctx.fillText(`EARNINGS TOTAL (${totalHours.toFixed(1)}h)`, padX, currY + 10);
     ctx.textAlign = 'right';
     ctx.fillStyle = '#0f172a';
     ctx.font = `700 12px ${fontPrimary}`;
