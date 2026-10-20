@@ -5561,10 +5561,10 @@
         ctx.fillText(nameStr, padX, currY);
 
         if (item.tag) {
+          const nameTextW = ctx.measureText(nameStr).width;
           ctx.save();
           ctx.font = `700 8.5px ${fontPrimary}`;
           const tagTextW = ctx.measureText(item.tag).width;
-          const nameTextW = ctx.measureText(nameStr).width;
           const badgeX = padX + nameTextW + 6;
           const badgeW = tagTextW + 8;
           ctx.fillStyle = '#dcfce7';
@@ -5725,10 +5725,10 @@
         ctx.fillText(nameStr, padX, currY);
 
         if (item.tag) {
+          const nameTextW = ctx.measureText(nameStr).width;
           ctx.save();
           ctx.font = `700 8.5px ${fontPrimary}`;
           const tagTextW = ctx.measureText(item.tag).width;
-          const nameTextW = ctx.measureText(nameStr).width;
           const badgeX = padX + nameTextW + 6;
           const badgeW = tagTextW + 8;
           ctx.fillStyle = '#ffedd5';
