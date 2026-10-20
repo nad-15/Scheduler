@@ -222,7 +222,7 @@
         id: c.id,
         name: c.name || 'Untitled',
         isPaid: c.isPaid !== false,
-        isTaxable: c.isTaxable === true,
+        isTaxable: c.isTaxable !== false,
         hourlyRate: typeof c.hourlyRate === 'number' ? c.hourlyRate : (parseFloat(c.hourlyRate) || 25),
         shiftsCount: parseInt(c.shiftsCount, 10) || 1,
         hoursPerShift: typeof c.hoursPerShift === 'number' ? c.hoursPerShift : (parseFloat(c.hoursPerShift) || 4),
@@ -706,7 +706,7 @@
         }
 
         const customSubtotal = roundCents(totalCustomHours * rate);
-        const isTaxable = cJob.isTaxable === true; // Default false for custom jobs
+        const isTaxable = cJob.isTaxable !== false;
 
         totalSessions += count;
         totalHours += totalCustomHours;
@@ -732,7 +732,7 @@
           count: parseInt(cJob.shiftsCount, 10) || 1,
           totalHours: 0,
           hourlyRate: parseFloat(cJob.hourlyRate) || 0,
-          isTaxable: cJob.isTaxable === true,
+          isTaxable: cJob.isTaxable !== false,
           subtotal: 0,
           isExcluded: true
         };
@@ -1478,7 +1478,7 @@
       hoursPerShift: 4,
       hourlyRate: 25,
       isPaid: true,
-      isTaxable: false,
+      isTaxable: true,
       splits: [{ shifts: 1, hours: 4 }]
     });
     state.expandedJobs.add(newId);
@@ -2053,8 +2053,8 @@
                 <span class="job-calc-session-badge">${customTotalShifts}x</span>
               </div>
               ${isCustomPaid ? `
-                <label class="job-calc-taxable-check-row" title="${cJob.isTaxable === true ? 'Subject to tax deduction' : 'Untaxed earnings'}">
-                  <input type="checkbox" class="job-calc-custom-taxable-checkbox" ${cJob.isTaxable === true ? 'checked' : ''}>
+                <label class="job-calc-taxable-check-row" title="${cJob.isTaxable !== false ? 'Subject to tax deduction' : 'Untaxed earnings'}">
+                  <input type="checkbox" class="job-calc-custom-taxable-checkbox" ${cJob.isTaxable !== false ? 'checked' : ''}>
                   <span class="job-calc-taxable-check-box"></span>
                   <span class="job-calc-taxable-check-text">Taxable</span>
                 </label>
@@ -4873,6 +4873,7 @@
         `;
       } else {
         const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
+        const taxVal = parseFloat(taxSetting.value) || 0;
         let shiftsHtml = '';
 
         paidNames.forEach((name) => {
@@ -4884,15 +4885,15 @@
           const subtotal = res.subtotal;
 
           const isTaxable = setting.isTaxable !== false;
-          const jobTax = (taxDeductionAmount > 0 && isTaxable)
+          const jobTax = (taxVal > 0 && isTaxable)
             ? (taxSetting.type === 'percent'
-                ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+                ? roundCents((subtotal * taxVal) / 100)
                 : (taxableEarnings > 0 ? roundCents((subtotal / taxableEarnings) * taxDeductionAmount) : 0))
             : 0;
           const jobNet = Math.max(0, roundCents(subtotal - jobTax));
 
           let taxSublineHtml = '';
-          if (taxDeductionAmount > 0) {
+          if (taxVal > 0) {
             taxSublineHtml = isTaxable
               ? `<span class="receipt-item-tax-detail">Tax: -$${jobTax.toFixed(2)} <span class="receipt-item-tax-net">· Net: $${jobNet.toFixed(2)}</span></span>`
               : `<span class="receipt-item-tax-detail receipt-item-untaxed-detail">Untaxed <span class="receipt-item-tax-net">· Net: $${subtotal.toFixed(2)}</span></span>`;
@@ -4917,16 +4918,16 @@
           const count = res.count;
           const subtotal = res.subtotal;
 
-          const isTaxable = cJob.isTaxable === true;
-          const jobTax = (taxDeductionAmount > 0 && isTaxable)
+          const isTaxable = cJob.isTaxable !== false;
+          const jobTax = (taxVal > 0 && isTaxable)
             ? (taxSetting.type === 'percent'
-                ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+                ? roundCents((subtotal * taxVal) / 100)
                 : (taxableEarnings > 0 ? roundCents((subtotal / taxableEarnings) * taxDeductionAmount) : 0))
             : 0;
           const jobNet = Math.max(0, roundCents(subtotal - jobTax));
 
           let taxSublineHtml = '';
-          if (taxDeductionAmount > 0) {
+          if (taxVal > 0) {
             taxSublineHtml = isTaxable
               ? `<span class="receipt-item-tax-detail">Tax: -$${jobTax.toFixed(2)} <span class="receipt-item-tax-net">· Net: $${jobNet.toFixed(2)}</span></span>`
               : `<span class="receipt-item-tax-detail receipt-item-untaxed-detail">Untaxed <span class="receipt-item-tax-net">· Net: $${subtotal.toFixed(2)}</span></span>`;
@@ -5088,6 +5089,7 @@
       : 'Selected Period';
 
     const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
+    const taxVal = parseFloat(taxSetting.value) || 0;
 
     let out = [];
     out.push(doubleDivider);
@@ -5114,11 +5116,11 @@
         const detailStr = `  ${name} (${hours.toFixed(1)}h · ${count}x)`;
         out.push(row(detailStr, `$${subtotal.toFixed(2)}`));
 
-        if (totals.taxDeductionAmount > 0) {
+        if (taxVal > 0) {
           const isTaxable = setting.isTaxable !== false;
           if (isTaxable) {
             const jobTax = taxSetting.type === 'percent'
-              ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+              ? roundCents((subtotal * taxVal) / 100)
               : (totals.taxableEarnings > 0 ? roundCents((subtotal / totals.taxableEarnings) * totals.taxDeductionAmount) : 0);
             const jobNet = Math.max(0, roundCents(subtotal - jobTax));
             out.push(`    Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}`);
@@ -5136,11 +5138,11 @@
         const detailStr = `  ${cJob.name || 'Untitled'} [Earnings] (${hours.toFixed(1)}h · ${count}x)`;
         out.push(row(detailStr, `$${subtotal.toFixed(2)}`));
 
-        if (totals.taxDeductionAmount > 0) {
-          const isTaxable = cJob.isTaxable === true;
+        if (taxVal > 0) {
+          const isTaxable = cJob.isTaxable !== false;
           if (isTaxable) {
             const jobTax = taxSetting.type === 'percent'
-              ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+              ? roundCents((subtotal * taxVal) / 100)
               : (totals.taxableEarnings > 0 ? roundCents((subtotal / totals.taxableEarnings) * totals.taxDeductionAmount) : 0);
             const jobNet = Math.max(0, roundCents(subtotal - jobTax));
             out.push(`    Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}`);
@@ -5248,6 +5250,7 @@
     } = totals;
 
     const taxSetting = state.settings.tax || { type: 'percent', value: 0 };
+    const taxVal = parseFloat(taxSetting.value) || 0;
     const rangeEl = document.querySelector('#receipt-date-range');
     const periodText = (rangeEl && rangeEl.textContent) ? rangeEl.textContent.trim() : 'Selected Period';
     const genDateText = formatGeneratedDate();
@@ -5266,9 +5269,9 @@
       const subtotal = res.subtotal;
       const isTaxable = setting.isTaxable !== false;
 
-      const jobTax = (taxDeductionAmount > 0 && isTaxable)
+      const jobTax = (taxVal > 0 && isTaxable)
         ? (taxSetting.type === 'percent'
-            ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+            ? roundCents((subtotal * taxVal) / 100)
             : (taxableEarnings > 0 ? roundCents((subtotal / taxableEarnings) * taxDeductionAmount) : 0))
         : 0;
       const jobNet = Math.max(0, roundCents(subtotal - jobTax));
@@ -5276,7 +5279,7 @@
       shiftItems.push({
         name,
         detail: `${hours.toFixed(1)}h (${count}x) @ $${rate.toFixed(2)}/hr`,
-        taxSubline: taxDeductionAmount > 0
+        taxSubline: taxVal > 0
           ? (isTaxable ? `Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}` : `Untaxed · Net: $${subtotal.toFixed(2)}`)
           : null,
         amount: `$${subtotal.toFixed(2)}`,
@@ -5291,11 +5294,11 @@
       const rate = parseFloat(cJob.hourlyRate) || 0;
       const count = res.count;
       const subtotal = res.subtotal;
-      const isTaxable = cJob.isTaxable === true;
+      const isTaxable = cJob.isTaxable !== false;
 
-      const jobTax = (taxDeductionAmount > 0 && isTaxable)
+      const jobTax = (taxVal > 0 && isTaxable)
         ? (taxSetting.type === 'percent'
-            ? roundCents((subtotal * (parseFloat(taxSetting.value) || 0)) / 100)
+            ? roundCents((subtotal * taxVal) / 100)
             : (taxableEarnings > 0 ? roundCents((subtotal / taxableEarnings) * taxDeductionAmount) : 0))
         : 0;
       const jobNet = Math.max(0, roundCents(subtotal - jobTax));
@@ -5303,7 +5306,7 @@
       shiftItems.push({
         name: cJob.name || 'Untitled',
         detail: `${hours.toFixed(1)}h (${count}x) @ $${rate.toFixed(2)}/hr`,
-        taxSubline: taxDeductionAmount > 0
+        taxSubline: taxVal > 0
           ? (isTaxable ? `Tax: -$${jobTax.toFixed(2)} · Net: $${jobNet.toFixed(2)}` : `Untaxed · Net: $${subtotal.toFixed(2)}`)
           : null,
         amount: `$${subtotal.toFixed(2)}`,
